@@ -94,7 +94,7 @@
             </div>
         </div>
         <h1>Solar ROI Calculator</h1>
-        <form method="POST">
+        <form id="roi-form" method="POST">
             <!-- Example of tooltip added to one input field -->
             <label for="system_size">System Size (kW): <span data-toggle="tooltip" title="Average size for residential solar systems is between 4 to 5 kW">?</span></label><br>
             <!-- Example of input validation added to one input field -->
@@ -222,7 +222,10 @@
             return 'Today is ' + month_names[month] + ' ' + day + suffix + ', ' + year;
         }
 
-
+        document.getElementById('roi-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            updateEquation();
+        });
 
     </script>    
 </body>
