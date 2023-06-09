@@ -176,8 +176,8 @@
             let roi = ((system_size * panel_efficiency * sunlight_hours * 365 * energy_sell_price) - system_cost - (system_cost * maintenance_cost_rate)) / system_cost;
 
             document.getElementById('equation').innerText = 
-            `ROI ${roi} = ((System Size ${system_size} kW * Panel Efficiency ${panel_efficiency} * Sunlight Hours ${sunlight_hours} hours/day * 365 days/year * Energy Sell Price $${energy_sell_price}/kWh - System Cost $${system_cost} - Annual Maintenance Cost $${system_cost * maintenance_cost_rate}) / System Cost $${system_cost}) * 100%`;
-
+            `ROI = ((System Size ${system_size} kW * Panel Efficiency ${panel_efficiency} * Sunlight Hours ${sunlight_hours} hours/day * 365 days/year * Energy Sell Price $${energy_sell_price}/kWh - System Cost $${system_cost} - Annual Maintenance Cost $${system_cost * maintenance_cost_rate}) / System Cost $${system_cost}) * 100%`;
+            document.getElementById('roiResult').innerText = `Return on Investment: ${(roi * 100).toFixed(2)}%`;
         }
 
         // Call the updateEquation function whenever an input value changes
