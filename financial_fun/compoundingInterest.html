@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compounding Interest Calculator</title>
+</head>
+<body>
+    <h1>Compounding Interest Calculator</h1>
+
+    <form id="calculator-form">
+        <label for="principal-amount">Principal Amount:</label><br>
+        <input type="number" id="principal-amount" name="principal-amount"><br>
+
+        <label for="annual-interest-rate">Annual Interest Rate (in %):</label><br>
+        <input type="number" id="annual-interest-rate" name="annual-interest-rate"><br>
+
+        <label for="compounding-frequency">Compounding Frequency (per year):</label><br>
+        <input type="number" id="compounding-frequency" name="compounding-frequency"><br>
+
+        <label for="investment-duration">Investment Duration (years):</label><br>
+        <input type="number" id="investment-duration" name="investment-duration"><br>
+
+        <input type="submit" value="Calculate">
+    </form>
+
+    <h2>Investment Output:</h2>
+    <p id="investment-output"></p>
+
+    <h2>Investment Equation:</h2>
+    <p id="investment-equation"></p>
+  
+
+    <script>
+      document.getElementById('calculator-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+
+          var principalAmount = parseFloat(document.getElementById('principal-amount').value);
+          var annualInterestRate = parseFloat(document.getElementById('annual-interest-rate').value) / 100;
+          var compoundingFrequency = parseFloat(document.getElementById('compounding-frequency').value);
+          var investmentDuration = parseFloat(document.getElementById('investment-duration').value);
+
+          // calculation logic goes here
+          var investmentOutput = principalAmount * Math.pow((1 + annualInterestRate / compoundingFrequency), compoundingFrequency * investmentDuration);
+
+          // display output
+          document.getElementById('investment-output').textContent = investmentOutput.toFixed(2);
+
+          // display equation
+          document.getElementById('investment-equation').textContent = 
+              principalAmount + ' * (1 + ' + annualInterestRate / compoundingFrequency + ')^(' + compoundingFrequency + ' * ' + investmentDuration + ') = ' + investmentOutput.toFixed(2);
+      });
+  </script>
+
+  
+</body>
+</html>
