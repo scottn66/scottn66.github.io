@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Solar Energy Investment Calculator</title>
+</head>
+<body>
+    <h1>Solar Energy Investment Calculator</h1>
+
+    <form id="calculator-form">
+        <label for="investment-amount">Investment Amount:</label><br>
+        <input type="number" id="investment-amount" name="investment-amount"><br>
+
+        <label for="solar-energy-rate">Solar Energy Rate:</label><br>
+        <input type="number" id="solar-energy-rate" name="solar-energy-rate"><br>
+
+        <label for="investment-duration">Investment Duration (years):</label><br>
+        <input type="number" id="investment-duration" name="investment-duration"><br>
+
+        <input type="submit" value="Calculate">
+    </form>
+
+    <h2>Investment Output:</h2>
+    <p id="investment-output"></p>
+
+    <h2>Investment Equation:</h2>
+    <p id="investment-equation"></p>
+
+
+
+
+    <script>
+        document.getElementById('calculator-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var investmentAmount = parseFloat(document.getElementById('investment-amount').value);
+            var solarEnergyRate = parseFloat(document.getElementById('solar-energy-rate').value);
+            var investmentDuration = parseFloat(document.getElementById('investment-duration').value);
+
+            // calculation logic goes here
+            // this is just an example, replace it with your actual calculation
+            var investmentOutput = investmentAmount * Math.pow((1 + solarEnergyRate), investmentDuration);
+
+            // display output
+            document.getElementById('investment-output').textContent = investmentOutput.toFixed(2);
+
+            // display equation
+            document.getElementById('investment-equation').textContent =
+                investmentAmount + ' * (1 + ' + solarEnergyRate + ')^' + investmentDuration + ' = ' + investmentOutput.toFixed(2);
+        });
+    </script>
+</body>
+</html>
