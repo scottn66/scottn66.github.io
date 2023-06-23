@@ -40,13 +40,12 @@ function validateInput(input) {
 }
 
 function updateEquation() {
-    let system_size = document.getElementById('system_size').value;
-    let system_cost = document.getElementById('system_cost').value;
-    let panel_efficiency = document.getElementById('panel_efficiency').value;
-    let sunlight_hours = document.getElementById('sunlight_hours').value;
-    let energy_usage = document.getElementById('energy_usage').value;
-    let energy_sell_price = document.getElementById('energy_sell_price').value;
-    let maintenance_cost_rate = document.getElementById('maintenance_cost_rate').value;
+    let system_size = parseFloat(document.getElementById('system_size').value);
+    let system_cost = parseFloat(document.getElementById('system_cost').value);
+    let panel_efficiency = parseFloat(document.getElementById('panel_efficiency').value);
+    let sunlight_hours = parseFloat(document.getElementById('sunlight_hours').value);
+    let energy_sell_price = parseFloat(document.getElementById('energy_sell_price').value);
+    let maintenance_cost_rate = parseFloat(document.getElementById('maintenance_cost_rate').value);
 
     let roi = ((system_size * panel_efficiency * sunlight_hours * 365 * energy_sell_price) - system_cost - (system_cost * maintenance_cost_rate)) / system_cost;
 
