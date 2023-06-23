@@ -96,16 +96,16 @@
         <h1>Solar ROI Calculator</h1>
         <form method="POST">
             <!-- Example of tooltip added to one input field -->
-            <label for="system_size">System Size (kW): <span data-toggle="tooltip" title="Average size for residential solar systems is between 4 to 5 kW">?</span></label><br>
+            <label for="system_size">System Size (kW): <span data-toggle="tooltip" title="A typical residential solar system size in the United States is between 3 kW and 10 kW, with 6 kW being the average.">?</span></label><br>
             <!-- Example of input validation added to one input field -->
             <input type="number" id="system_size" name="system_size" value="4.0" min="1" max="10" step="0.1" oninput="validateInput(this);"><br>
 
             <!-- System Cost -->
-            <label for="system_cost">System Cost ($): <span data-toggle="tooltip" title="The average cost of solar panel installation can range from $15,000 to $25,000">?</span></label><br>
+            <label for="system_cost">System Cost ($): <span data-toggle="tooltip" title="Cost: The cost of solar panels has been decreasing significantly over the years. As of 2021, the average solar panel cost in the U.S. ranges from $2.40 to $3.22 per watt before solar tax credits, and from $1.72 to $2.27 per watt after claiming the tax credit. For an average 6 kW system, this translates to a gross cost of $14,400 to $19,320, and a net cost (after tax credit) of $10,656 to $14,296.">?</span></label><br>
             <input type="number" step="any" id="system_cost" name="system_cost" value="10000.0" oninput="validateInput(this);"><br>
 
             <!-- Panel Efficiency -->
-            <label for="panel_efficiency">Panel Efficiency: <span data-toggle="tooltip" title="The average efficiency of solar panels falls within the range of 15% to 20%">?</span></label><br>
+            <label for="panel_efficiency">Panel Efficiency: <span data-toggle="tooltip" title="Efficiency: Solar panel efficiency measures how much sunlight the panels can convert into usable electricity. It is generally around 15-20% for most commercially available panels. High-efficiency models can reach over 22%.">?</span></label><br>
             <input type="number" step="any" id="panel_efficiency" name="panel_efficiency" value="0.18" oninput="validateInput(this);"><br>
 
             <!-- Sunlight Hours -->
@@ -121,7 +121,7 @@
             <input type="number" step="any" id="energy_usage" name="energy_usage" value="4000.0" oninput="validateInput(this);"><br>
 
             <!-- Energy Sell Price -->
-            <label for="energy_sell_price">Energy Sell Price ($/kWh): <span data-toggle="tooltip" title="The price utilities pay for excess solar power varies, but it can be around $0.03 to $0.04 per kWh">?</span></label><br>
+            <label for="energy_sell_price">Energy Sell Price ($/kWh): <span data-toggle="tooltip" title="The price utilities pay for excess solar power varies, but it can be around $0.03 to $0.04 per kWh. Energy Sell Price is also known as the feed-in tariff, or the amount you get paid for any excess power that your solar panels produce and feed back into the grid. It can vary greatly depending on local policies. As of 2021, in the United States it can be anywhere from $0.03 to $0.10 per kWh.">?</span></label><br>
             <input type="number" step="any" id="energy_sell_price" name="energy_sell_price" value="0.10" oninput="validateInput(this);"><br>
 
             <!-- Maintenance Cost Rate -->
