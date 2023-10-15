@@ -1,22 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <title>Scott Nelson</title>
 </head>
+
 <body>
-    <div class="container mt-5">
-        <div class="jumbotron">
-            <h1 class="display-4">Hello, welcome</h1>
-            <p class="lead">This is a simple start to my new, informational homepage.</p>
-            <hr class="my-4">
-            <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-            <a class="btn btn-primary btn-lg" href="sun/solnsa.html" role="button">Learn more</a>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="#">Scott Nelson</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="#about">About Me</a></li>
+                <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
         </div>
-    </div>
+    </nav>
+
+    <!-- About Me -->
+    <section id="about" class="container mt-5">
+        <h2>About Me</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <img src="your_photo.jpg" class="img-fluid" alt="Scott Nelson">
+            </div>
+            <div class="col-md-8">
+                <p>Your brief introduction and background. Highlight your skills and areas of expertise.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="container mt-5">
+        <h2>Projects</h2>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title">Project Title</h3>
+                <p class="card-text">Brief description of the project, technologies used, and possibly challenges and solutions during development.</p>
+            </div>
+            <img src="project_image.jpg" class="card-img-bottom" alt="Project Image">
+        </div>
+        <!-- Add more project cards as needed -->
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container mt-5">
+        <h2>Contact</h2>
+        <p>Feel free to connect with me on <a href="https://www.linkedin.com/in/your_linkedin/">LinkedIn</a> or check out my <a href="https://github.com/scottn66">GitHub</a>.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2023 Scott Nelson | <a href="#about">About</a> | <a href="#projects">Projects</a> | <a href="#contact">Contact</a></p>
+    </footer>
+
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
