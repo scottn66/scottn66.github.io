@@ -1,0 +1,15 @@
+├── assets/
+│   ├── img/
+│   │   ├── your_photo.jpg
+│   │   ├── project1.jpg
+│   │   └── project2.jpg
+│   │
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   └── script.js
+│   │
+│   └── lib/
+│       ├── bootstrap.css
+│       └── jquery.js
