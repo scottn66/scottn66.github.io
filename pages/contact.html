@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Contact - Scott Nelson</title>
+    <style>
+        body {
+            background-color: #f8f8f8;
+        }
+        .social-icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="index.html">Scott Nelson</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html#about">About Me</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html#projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contact Section -->
+    <section class="container mt-5">
+        <h1>Contact Me</h1>
+        <p>If you would like to get in touch, please fill out the form below.</p>
+        <form>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea class="form-control" id="message" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+        <h2 class="mt-5">Connect with Me</h2>
+        <p>You can also connect with me on:</p>
+        <a href="https://www.linkedin.com/in/yourlinkedinprofile" class="social-icon" target="_blank">
+            <img src="../assets/img/linkedin_icon.png" alt="LinkedIn" width="32">
+        </a>
+        <a href="https://github.com/scottn66" class="social-icon" target="_blank">
+            <img src="../assets/img/github_icon.png" alt="GitHub" width="32">
+        </a>
+        <!-- Add more social icons as per your profiles -->
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2023 Scott Nelson | <a href="index.html#about">About</a> | <a href="index.html#projects">Projects</a> | <a href="index.html#contact">Contact</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
