@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Scott Nelson</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .navbar-brand, .nav-link {
+            font-weight: bold;
+        }
+        .nav-link {
+            color: #fff !important;
+        }
+        .nav-link:hover {
+            color: #f8f8f8 !important;
+        }
+        section {
+            padding: 60px 0;
+        }
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .profile-img {
+            border-radius: 50%;
+            max-width: 250px;
+        }
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4);
+        }
+        .card-img-top {
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .footer {
+            background-color: #222;
+            color: #ddd;
+            padding: 20px 0;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand" href="#">Scott Nelson</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="#about">About Me</a></li>
+                <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- About Me -->
+    <section id="about" class="container">
+        <h2>About Me</h2>
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <img src="assets/AniMe.png" class="img-fluid profile-img" alt="Scott Nelson">
+            </div>
+            <div class="col-md-8">
+                <p>I am a passionate learner who enjoys Philosophy discussions. I am an idealist and romantic, hoping to shape the future, informed by the past. My goal is to make Current Events more accessible for awareness and democratic discussions. </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="container">
+        <h2>Projects</h2>
+        <div class="card mb-3">
+            <img src="assets/Space_Shuttle_Columbia_launching.jpg" class="card-img-top" alt="Project Image">
+            <div class="card-body">
+                <h3 class="card-title">Project Title</h3>
+                <p class="card-text">Brief description of the project, technologies used, and possibly challenges and solutions during development.</p>
+            </div>
+        </div>
+        <!-- Add more project cards as needed -->
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container">
+        <h2>Contact</h2>
+        <p>Feel free to connect with me on <a href="https://www.linkedin.com/in/scott-nelson-adastra67/" target="_blank">LinkedIn</a> or check out my <a href="https://github.com/scottn66" target="_blank">GitHub</a>.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <p>&copy; 2023 Scott Nelson | <a href="#about">About</a> | <a href="#projects">Projects</a> | <a href="#contact">Contact</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

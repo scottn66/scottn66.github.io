@@ -1,64 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Scott Nelson - Portfolio</title>
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
             color: #333;
             background-color: #f4f4f4;
-            margin-top: 40px;
-        }
-        h2 {
-            color: #0056b3;
-            margin-bottom: 30px;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
         }
         .container {
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        h2 {
+            color: #0056b3;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f47645; /* New secondary color */
+        }
+        h1, h2, h3 {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--primary-color);
+        }
+        p {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
         }
         .card {
-            transition: transform .3s;
-            cursor: pointer;
+            overflow: hidden; /* Ensures that all content fits within the card */
+            transition: transform .3s, box-shadow .3s; /* Smooth transition for transform and shadow */
         }
-
         .card:hover {
-            transform: scale(1.05);
-        }
-        .card-title {
-            color: #0056b3;
-            font-weight: bold;
-        }
-        .card-text {
-            font-size: 0.9rem;
+            transform: translateY(-5px); /* Moves card up slightly on hover */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         }
 
+        .card-title {
+            font-size: 1.25rem; /* Slightly larger title */
+            margin-bottom: 15px; /* Space below the title */
+        }
+
+        .card-text {
+            font-size: 0.95rem; /* Readable text size */
+            margin-bottom: 20px; /* Space above the button */
+        }
+
+        .btn-primary {
+            background-color: #0056b3; /* Match the button color with the header */
+            border-color: #0056b3; /* Match the border color with the button background */
+        }
+
+        .btn-primary:hover {
+            background-color: #003d82; /* Darken button on hover for interaction feedback */
+            border-color: #003d82; /* Match the border color with the button background on hover */
+        }
         .card-img-top {
-            height: 200px; /* Fixed height for consistency */
-            object-fit: cover; /* Ensures images cover the card area nicely */
+            height: auto;
+            object-fit: cover;
             border-top-left-radius: calc(.25rem - 1px);
             border-top-right-radius: calc(.25rem - 1px);
         }
         footer {
-            margin-top: 40px;
-            color: #fff;
             background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+        .footer p {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+            /*border-radius: 50%; !* Make the image round *!*/
+        }
+        .contact-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+        /* Responsive design adjustments */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem; /* Smaller font size on smaller screens */
+            }
+            .card-title {
+                font-size: 1.2rem; /* Adjust card title size for mobile */
+            }
+            .card-text {
+                font-size: 0.9rem; /* Adjust card text size for mobile */
+            }
         }
     </style>
-    <title>Scott Nelson</title>
 </head>
-
 <body>
 
     <!-- About Me -->
     <section id="about" class="container">
-        <h2>About Me</h2>
+        <h2>About Scott Nelson</h2>
         <div class="row">
             <div class="col-md-4">
                 <img src="assets/AniMe.png" class="img-fluid" alt="Scott Nelson">
@@ -70,38 +139,44 @@
     </section>
 
 <!-- Projects -->
-<section id="projects" class="container mt-5">
-    <h2 class="text-center mb-4">Projects</h2>
+<section id="projects" class="container">
+    <h2>Projects</h2>
     <div class="row">
-        <!-- Multi-Armed Bandit Agents -->
+        <!-- Project Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card border-0 shadow">
+            <div class="card border-0 shadow-sm">
                 <img src="assets/MAB.png" class="card-img-top" alt="Multi-Armed Bandit Agents">
                 <div class="card-body">
-                    <h3 class="card-title">Multi-Armed Bandit Agents</h3>
-                    <p class="card-text">The <a href="https://en.wikipedia.org/wiki/Multi-armed_bandit" target="_blank">Multi-Armed Bandit Problem</a> is a classic reinforcement learning problem: balancing the optimal ratio of exploration vs. exploitation. With K=4 agents.</p>
+                    <h5 class="card-title">Multi-Armed Bandit Agents</h5>
+                    <p class="card-text">Exploring reinforcement learning through the classic multi-armed bandit problem.</p>
+                    <a href="MAB.html" class="btn btn-primary">View Project</a>
                 </div>
             </div>
         </div>
 
+
         <!-- Q-learning Crawler -->
+        <!-- Project Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card border-0 shadow">
+            <div class="card border-0 shadow-sm">
                 <img src="assets/crawler.gif" class="card-img-top" alt="crawler">
                 <div class="card-body">
-                    <h3 class="card-title">The Speedy, Q-learning Crawler</h3>
-                    <p class="card-text">A simulated environment for a reinforcement learning crawling robot, designed to maximize forward movement by adjusting its arm and hand angles.</p>
+                    <h5 class="card-title">The Speedy, Q-learning Crawler</h5>
+                    <p class="card-text">Simulating a reinforcement learning environment for a robot crawler.</p>
+                    <a href="Q.html" class="btn btn-primary">View Project</a>
                 </div>
             </div>
         </div>
 
         <!-- NER with Viterbi HMM -->
+        <!-- Project Cards -->
         <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card border-0 shadow">
+            <div class="card border-0 shadow-sm">
                 <img src="assets/hmm.png" class="card-img-top" alt="NER w/ HMM">
                 <div class="card-body">
-                    <h3 class="card-title">NER with Viterbi HMM</h3>
-                    <p class="card-text">Utilizing Hidden Markov Models to analyze parts of speech, this NER tool expertly maps out and selects the best fitting tags for sentence structure analysis.</p>
+                    <h5 class="card-title">NER with Viterbi HMM</h5>
+                    <p class="card-text">Using Hidden Markov Models for natural language entity recognition.</p>
+                    <a href="HMM.html" class="btn btn-primary">View Project</a>
                 </div>
             </div>
         </div>
@@ -109,9 +184,9 @@
 </section>
 
     <!-- Contact -->
-    <section id="contact" class="container mt-5">
+    <section id="contact" class="container">
         <h2>Contact</h2>
-        <p>Feel free to connect with me on <a href="https://www.linkedin.com/in/scott-nelson-adastra67/">LinkedIn</a></p>
+        <p>Feel free to connect with me on <a href="https://www.linkedin.com/in/scott-nelson-adastra67/"class="contact-link">LinkedIn</a>.</p>
     </section>
 
     <!-- Footer -->

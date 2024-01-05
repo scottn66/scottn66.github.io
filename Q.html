@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Markov Decision Processes - MDP</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            color: #0056b3;
+        }
+        a {
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: none;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        /* Additional styles as needed */
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>Markov Decision Processes (MDPs)</h1>
+    </header>
+    <section class="container mt-5">
+        <h2><u>Learn about Markov Decision Processes (MDPs)</u></h2>
+            <h5>Primer for Encyclopedic Knowledge</h5>
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/Andrey_Markov">Andrey Markov</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_property">Markov property</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov Decision Process</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chains</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Statistical_model">Statistical Model</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Optimal_control">Control Theory</a>; <a href="https://en.wikipedia.org/wiki/Control_theory#Main_control_strategies">Control Strategies</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Cybernetics#">Cybernetics</a></li>
+            </ul>
+        <p>Below is a formal representation of MDPs. Notice how it is simple yet profound. The Agent is an abstract entity interacting with the environment, much like us humans! Although, of course, our reality is much more sophisticated, colorful and nuanced.</p>
+        <p>You'll notice that the variables along the arrows have a little subscript <i>t </i> which represents each moment in time, or a "step/increment" in time t. The step changes at the dotted line are very similar to taking/using a turn in a board game. </p>
+        <img src="assets/Markov_decision_process.png" class="card-img-top" alt="MDP">
+
+        <!-- Concept Overview -->
+        <h2>Q-Learning</h2>
+        <p><a href="https://en.wikipedia.org/wiki/Q-learning">Q-Learning</a> is a strong reinforcement learning strategy specialized in its ability to learn optimal policies in stochastic environments, making it a powerful tool for a wide range of applications, especially where modeling the environment is complex or impractical.</p>
+        <p>Just like in the Multi-Armed Bandits scenario, but now we consider a state change after each action. Actions have consequences!</p>
+        <p><u>Some background topics:</u></p>
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/Intelligent_agent#">Agent</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov Decision Process</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/State–action–reward–state–action">SARSA (State-action-reward-state-action)</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Temporal_difference_learning">Temporal Difference Learning</a></li>
+            </ul>
+        <p>Q-Learning is a model-free reinforcement learning algorithm that seeks to find the best action to take given the current state. It's known for its ability to compare the expected utility of the available actions without requiring a model of the environment. Essentially, Q-learning focuses on learning a policy that tells an agent what action to take under what circumstances. It works by learning an action-value function that gives the expected utility of taking a given action in a given state and following the optimal policy thereafter.</p>
+        <p><u>Here's how it operates</u>:</p>
+        <ul>
+            <li> <b>Initialization: </b> The Q-values (action-values) are initialized to arbitrary starting values, and the algorithm continually updates them towards their true values.</li>
+            <li> <b>Exploration vs. Exploitation: </b> The agent explores the environment and exploits its current knowledge to choose the best action.</li>
+            <li> <b>Learning Q-Values: </b> After taking an action, the agent observes the outcome and reward, and updates the Q-value of the previous state and action pair using the <a href="https://en.wikipedia.org/wiki/Bellman_equation"> Bellman equation</a>.</li>
+            <li> <b>Update Rule: </b> The Q-value for a particular state-action pair is updated by taking a weighted average of the old value and the new information based on the reward received and the maximum Q-value for the next state.</li>
+            <p>By continually updating and exploring state-action pairs, or Q-values, Q-learning can find the optimal action-selection policy for any given finite Markov Decision Process (MDP).</p>
+        </ul>
+        <p>By continually updating Q-values, Q-learning can find the optimal action-selection policy for any given finite Markov decision process (MDP)</p>
+        <h2><b>Example: Crawling Robot</b></h2>
+
+        <!-- Concept Overview -->
+        <img src="assets/crawler.gif" class="card-img-top" alt="crawler">
+        <div class="concept-box">
+            <h3>Breaking down the Crawling Robot</h3>
+            <p>In our crawling robot example, Q-learning helps the robot decide the most effective way to move forward. The robot is placed in various position (states) and must choose actions that will move it towards its goal. The Q-learning algorithm enables the robot to learn which movements (actions) yield the highest rewards through trial and error. </p>
+            <p>Here's a simplified breakdown of the mechanics behind the robot's movement:</p>
+            <ul>
+                <li><b>States</b>: The State is the current situation of the agent, our robot. In this example, the discretized representations of the robot's arm and hand angles. These fall into bucket ranges to help distinguish from a continuous state space. </li>
+                <li><b>Actions</b>: The choice of action depend on the actions available in any given state, and the current policy for selection. The robot's actions involve moving the arm or hand up or down. These are represented as discrete choices. </li>
+                <li><b>Rewards</b>: Rewards are given to the agent after performing an action in a certain state which leads to the next state. This reward is used to guide, or nudge, the agent into moving into the right direction through each transition. Hence, State>Action>Reward>State>Action. For our robot crawling with a simulated arm, we calculate the change in the robot's position along the x-axis. A positive reward is given for forward movement, and no reward (or negative reward) for no movement or backward movement.</li>
+            </ul>
+                <h3>Learning Q-values with Q-learning</h3>
+                <p>The Q-learning agent is not included in the provided code, but it would typically function as follows:</p>
+                <ol>
+                    <li><strong>Initialization</strong>: A Q-learning agent begins by initializing a table of Q-values for each state-action pair, typically starting at zero.</li>
+                    <li><strong>Exploration/Exploitation</strong>: The agent must decide whether to explore new actions randomly or exploit its current knowledge to select the best action based on existing Q-values.</li>
+                    <li><strong>Action Execution</strong>: Upon selecting an action, the agent performs it using the <code>doAction</code> method, which in turn provides the new state and resulting reward.</li>
+                    <li><strong>Q-value Update</strong>: The agent updates the Q-value for the prior state-action pair with the new data using the Bellman equation: <code>Q(s, a) = Q(s, a) + alpha * (reward + gamma * max(Q(s', a')) - Q(s, a))</code>, where <code>s</code> is the previous state, <code>a</code> is the action taken, <code>s'</code> is the new state, <code>alpha</code> is the learning rate, and <code>gamma</code> is the discount factor.</li>
+                    <li><strong>Iteration</strong>: This process is repeated over many iterations, allowing the agent to gradually improve its Q-values and, by extension, its policy.</li>
+                </ol>
+       </div>
+        <p>Using special tricks with the parameters, randomness, and speeding up the timescale...</p>
+        <img src="assets/Crawler2.gif" class="card-img-top" alt="crawler">
+        <!-- Footer -->
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
