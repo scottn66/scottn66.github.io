@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Multi-Armed Bandit Agents Project</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            padding: 20px;
+        }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            color: #0056b3;
+        }
+        a {
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: none;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        iframe {
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        /* Additional styles as needed */
+    </style>
+</head>
+<body>
+    <!-- Header -->
+
+
+
+            <!-- Header -->
+    <header class="header">
+        <h1>Multi-Armed Bandit Agents</h1>
+    </header>
+    <section class="container mt-5">
+        <p>Explore the concepts of reinforcement learning through multi-armed bandits, Thompson sampling, and upper confidence bound strategies.</p>
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/Intelligent_agent#">Agent</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Stochastic_scheduling#Multi-armed_bandit_problems">Multi-armed bandit scheduling problem</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Multi-armed_bandit#">MAB</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Thompson_sampling">Thompson Sampling</a></li>
+            </ul>
+
+        <!-- Concept Overview -->
+        <div class="concept-box">
+            <h3>Introduction to Multi-Armed Bandits</h3>
+            <p>In <a href="https://en.wikipedia.org/wiki/Reinforcement_learning">Reinforcement Learning</a>, there is typically a goal-directed agent that seeks to explore its interaction with the environment, guided by rewards. In this simulation, agents are equipped with various action-selection rules (ASRs). These ASRs are modeled as a map called <i>policy</i>. The idea is to explore the actions in the state space, observe and record the best actions (via quantified reward response to said action), and ultimately, balance exploration with exploitation. The following is a (hopefully) intuitive approach to understanding the exploration-vs-exploitation dilemma in reinforcement learning.</p>
+            <p>Agent action selection rules:</p>
+            <ul>
+                <li>Greedy Approach</li>
+                <ul>
+                    <li>Plan: always choose the action with the highest rewarded return. (i.e. The one that looks best at present). </li>
+                    <li>Problem: purely exploitative. No exploration! So, it relies on luck to get it right from the start. We'd like some guarentee, in the limit, to find the optimal policy</li>
+                </ul>
+                <li>Epsilon-Greedy Approach</li>
+                <ul>
+                    <li>Plan: At each trial, randomly choose (or sample) an action with the probability 𝜖 (epsilon), otherwise, exploit the current best action with the greedy choice with probability 1-𝜖</li>
+                    <li>Problem: Well, we don't know when to stop exploring (i.e. when we've found the best action).</li>
+                </ul>
+                <li>Epsilon-First Approach</li>
+                <ul>
+                    <li>Plan: For the initial <i>n</i> trials, randomly sample the actions. Then, use the greedy policy.</li>
+                    <li>Problem: (1) Don't know how much time to spend sampling (how to pick n). (2) All the 'static' sampled actions don't ensure that we've found the optimal arm, there could be a better option. (3) The time used exploring could be wasted, causing an accumulation of regret!</li>
+                </ul>
+                <li>Epsilon-Decreasing Approach</li>
+                <ul>
+                    <li><a href="https://en.wikipedia.org/wiki/Simulated_annealing">Simulated Annealing:</a> a slow decrease in the probability of accepting worse solutions as the solution space is explored.</li>
+                    <li>Plan: Modify the 𝜖-greedy approach to decreasing epsilon over time using a cooling schedule.</li>
+                    <li>Problem: Still aren't sure about if we may be annealing too fast to miss exposure to the best option, or too slow and miss rewards, accumulating regret.</li>
+                </ul>
+            </ul>
+            <h4>Summary of ASRs</h4>
+            <p>MAB represents a sequential decision problem: initially unknown reward distributions associated with each arm/choice. Remember, we have treated each arm like a unique slot machine- we'd like to find the best machine to play with our finite cash & time. </p>
+            <p>The idea is: we need some way to model uncertainty of what the "true" reward rates of each slot machine arm are! We know, thanks to the <a href="https://en.wikipedia.org/wiki/Law_of_large_numbers">Law of Large Numbers</a>, that as we take more and more samples, we have less uncertainty. </p>
+        </div>
+
+        <div class="concept-box">
+            <h3>Thompson Sampling Explained</h3>
+            <div class="col-md-4">
+                <img src="assets/Visualization_of_Thompson_sampling.gif" class="img-fluid" alt="Scott Nelson">
+            </div>
+            <p>We know that there is some unknown, but "fixed" probability of reward for each action/arm. Using <a href="https://en.wikipedia.org/wiki/Probability_density_function">Probability Density Functions</a>, we use area/distribution over possible likelihoods that have less variance the more samples are collected. We represent our belief in the best action by fitting some PDF to estimate this true reward, where PDFs can be sampled from to obtain a possible probability. Therefore, the more an arm is chosen/sampled, the closer the PDF P(R|a) is to its true probability, where R ∈ {0,1} ∀ arms a.</p>
+            <p>In other words, the curves of options are estimates of reward. Random choice/sample refines confidence in expectation of the reward/outcome probability</p>
+        </div>
+
+        <div class="concept-box">
+            <h3>Understanding Upper Confidence Bound</h3>
+            <p>Despite the elegant representation of the options, there still will be uncertainty about the accuracy of the action-value estimates. Plus, the environment may be dynamic, adapting to our experience live. Online learning like this is orders of magnitude harder.</p>
+            <p>The greedy actions take the seemingly best actions in the present moment. So, we need exploration. Epsilon greedy action forces non-greedy actions to be tried, but indiscriminately, with no preference for the nearly greedy or particularly uncertain, mysterious actions. It would behoove us to take these aspects into account, selecting near-greedy actions according to their potential for being the optimal choice.</p>
+            <div class="col-md-4">
+                <img src="assets/UCB.png" class="img-fluid" alt="Scott Nelson">
+            </div>
+            <p>Here, we can say that the action for Upper Confidence Bound (UCB) should be the argmax (a value at <i>a</i> at which <i>f(a)</i> takes its maximal value of the expression that follows). ln t denotes the natural logarithm of t (the number that e ≈ 2.71828 would have to be raised to in order to equal t), Nt(a) denotes the number of times that action a has been selected prior to time t (the denominator), and the number c > 0 controls the degree of exploration. If Nt(a) = 0, then a is considered to be a maximizing action</p>
+            <p>The idea is that the <i>upper confidence bound</i> action selection method is that the square root term is a measure of the uncertainty of a's value, with c determining the confidence level. We want to 'max' over the true value of action a. When a is selected, the Nt(a) increments, and as it is in the denominator, decreasing the uncertainty term. Using natural logarithm means that the increases get smaller over time, but are unbounded; all actions will eventually be selected, but actions with lower value estimates, or that hvae already been selected frequently, will be selected with decreasing frequency over time.</p>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="interactive-demo">
+            <h3>Interactive Simulations</h3>
+                <p>Engage with an interactive simulation that demonstrates these concepts in a dynamic and educational way.</p>
+                <ul>
+                    <li>reward signal probabilities: [0.3, 0.4, 0.5, 0.6]</li>
+                </ul>
+            <iframe src="assets/cum_reg_cmsi_432_ass3_sims.html" style="width:100%; height:600px;"></iframe>
+                <ul>
+                    <li>reward signal probabilities: [0.4, 0.45, 0.5, 0.55]</li>
+                </ul>
+            <iframe src="assets/cum_reg_cmsi_432_ass3_sims2.html" style="width:100%; height:600px;"></iframe>
+                <ul>
+                    <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
+                    <li>These probabilities are much closer together </li>
+                </ul>
+            <iframe src="assets/cum_reg_cmsi_432_ass3_sims%204.html" style="width:100%; height:600px;"></iframe>
+            <ul>
+                    <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
+                    <li>To compensate for the difficult probabilities, lets increase the number of trials per <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method#">Monte Carlo</a> Simulations</li>
+                </ul>
+            <iframe src="assets/cum_reg_cmsi_432_ass3_sims%203.html" style="width:100%; height:600px;"></iframe>
+
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+            <footer class="footer">
+            <p>&copy; 2023 Multi-Armed Bandit Agents Project. All Rights Reserved.</p>
+        </footer>
+    <!-- (Copy the footer section from your main HTML file) -->
+
+    <!-- Scripts -->
+    <!-- Plotly Graph Script -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
+
