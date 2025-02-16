@@ -117,7 +117,7 @@
         <div class="concept-box">
             <h3>Thompson Sampling Explained</h3>
             <div class="col-md-4">
-                <img src="assets/Visualization_of_Thompson_sampling.gif" class="img-fluid" alt="Scott Nelson">
+                <img src="assets/images/projects/MAB/Visualization_of_Thompson_sampling.gif" class="img-fluid" alt="Scott Nelson">
             </div>
             <p>We know that there is some unknown, but "fixed" probability of reward for each action/arm. Using <a href="https://en.wikipedia.org/wiki/Probability_density_function">Probability Density Functions</a>, we use area/distribution over possible likelihoods that have less variance the more samples are collected. We represent our belief in the best action by fitting some PDF to estimate this true reward, where PDFs can be sampled from to obtain a possible probability. Therefore, the more an arm is chosen/sampled, the closer the PDF P(R|a) is to its true probability, where R ∈ {0,1} ∀ arms a.</p>
             <p>In other words, the curves of options are estimates of reward. Random choice/sample refines confidence in expectation of the reward/outcome probability</p>
@@ -128,7 +128,7 @@
             <p>Despite the elegant representation of the options, there still will be uncertainty about the accuracy of the action-value estimates. Plus, the environment may be dynamic, adapting to our experience live. Online learning like this is orders of magnitude harder.</p>
             <p>The greedy actions take the seemingly best actions in the present moment. So, we need exploration. Epsilon greedy action forces non-greedy actions to be tried, but indiscriminately, with no preference for the nearly greedy or particularly uncertain, mysterious actions. It would behoove us to take these aspects into account, selecting near-greedy actions according to their potential for being the optimal choice.</p>
             <div class="col-md-4">
-                <img src="assets/UCB.png" class="img-fluid" alt="Scott Nelson">
+                <img src="assets/images/projects/MAB/UCB.png" class="img-fluid" alt="Scott Nelson">
             </div>
             <p>Here, we can say that the action for Upper Confidence Bound (UCB) should be the argmax (a value at <i>a</i> at which <i>f(a)</i> takes its maximal value of the expression that follows). ln t denotes the natural logarithm of t (the number that e ≈ 2.71828 would have to be raised to in order to equal t), Nt(a) denotes the number of times that action a has been selected prior to time t (the denominator), and the number c > 0 controls the degree of exploration. If Nt(a) = 0, then a is considered to be a maximizing action</p>
             <p>The idea is that the <i>upper confidence bound</i> action selection method is that the square root term is a measure of the uncertainty of a's value, with c determining the confidence level. We want to 'max' over the true value of action a. When a is selected, the Nt(a) increments, and as it is in the denominator, decreasing the uncertainty term. Using natural logarithm means that the increases get smaller over time, but are unbounded; all actions will eventually be selected, but actions with lower value estimates, or that hvae already been selected frequently, will be selected with decreasing frequency over time.</p>
@@ -141,11 +141,11 @@
                 <ul>
                     <li>reward signal probabilities: [0.3, 0.4, 0.5, 0.6]</li>
                 </ul>
-            <iframe src="assets/cum_reg_cmsi_432_ass3_sims.html" style="width:100%; height:600px;"></iframe>
+            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims.html" style="width:100%; height:600px;"></iframe>
                 <ul>
                     <li>reward signal probabilities: [0.4, 0.45, 0.5, 0.55]</li>
                 </ul>
-            <iframe src="assets/cum_reg_cmsi_432_ass3_sims2.html" style="width:100%; height:600px;"></iframe>
+            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims2.html" style="width:100%; height:600px;"></iframe>
                 <ul>
                     <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
                     <li>These probabilities are much closer together </li>
