@@ -44,8 +44,8 @@
   <style>
     /* Global Color Variables for Light Mode */
     :root {
-      --primary-color: #314d69;   /* Dark Blue for headings */
-      --secondary-color: #ff5742;   /* Coral Red for accents */
+      --primary-color: #2C3E50;   /* Dark Blue for headings */
+      --secondary-color: #E74C3C;   /* Coral Red for accents */
       --accent-color: #ECF0F1;      /* Light Gray for accents */
       --bg-color: #ffffff;        /* Overall background for the body */
       --text-color: #333;         /* Text color for body */
@@ -60,6 +60,10 @@
       --section-bg: #333;
       --navbar-bg: #111;
       --footer-bg: #111;
+      //--primary-color: #0093E9;
+    }
+    .dark-mode .navbar {
+      background-color: #111;
     }
 
     /* Base styles for body using variables */
@@ -114,6 +118,16 @@
     }
     .header p.lead {
       font-size: 1.5rem;
+    }
+    /* Dark Mode Header */
+    .dark-mode .header {
+      background: linear-gradient(to right, #022542, #480606);
+    }
+    /* Dark mode toggle button in header */
+    #darkModeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
     }
     /* Sections */
     section {
@@ -220,6 +234,7 @@
     <div class="container">
       <h1>Scott Nelson</h1>
       <p class="lead"><span id="typed-text"></span></p>
+      <button id="darkModeToggle" class="btn btn-secondary">Toggle Dark Mode</button>
     </div>
   </header>
 
@@ -390,6 +405,13 @@
       typeSpeed: 50,
       backSpeed: 30,
       loop: true
+    });
+  </script>
+  <!-- Dark Mode Toggle Script -->
+  <script>
+    const toggleButton = document.getElementById('darkModeToggle');
+    toggleButton.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
     });
   </script>
 </body>
