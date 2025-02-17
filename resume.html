@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scott Nelson - Resume</title>
+  <style>
+    /* Global CSS Variables for Light Mode */
+    :root {
+      --primary-color: #314d69;      /* Used for headings and accents */
+      --secondary-color: #ff5742;      /* Accent color for emphasis */
+      --bg-color: #ffffff;             /* Overall background for body */
+      --text-color: #333333;           /* Main text color */
+      --section-bg: #f4f4f4;           /* Background for content sections */
+      --header-bg: #eaeaea;            /* Background for header */
+      --footer-bg: #333333;            /* Footer background */
+    }
+    /* Base styles */
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Open Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header, section, footer {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    header {
+      background-color: var(--header-bg);
+      text-align: center;
+      border-bottom: 2px solid var(--secondary-color);
+    }
+    header h1 {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.8rem;
+      color: var(--primary-color);
+    }
+    header p {
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+    /* Section titles */
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    /* Articles for Experience, Education, etc. */
+    section article {
+      margin-bottom: 30px;
+    }
+    section article h3 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: var(--secondary-color);
+    }
+    section article p {
+      margin: 5px 0;
+      font-style: italic;
+    }
+    ul {
+      list-style: none;
+      padding-left: 1em;
+      margin-top: 10px;
+    }
+    ul li {
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 1.2em;
+    }
+    ul li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--secondary-color);
+    }
+    /* Footer styles */
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      background-color: var(--footer-bg);
+      color: var(--bg-color);
+      padding: 15px;
+      margin-top: 40px;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2.2rem;
+      }
+      .section-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header: Name, Professional Summary & Contact -->
+  <header>
+    <h1>Scott Nelson</h1>
+    <p>
+      Data Scientist with robust proficiency in Python and hands‑on experience in managing large-scale datasets,
+      statistical analysis, and building automated data pipelines. Adept at translating complex data into actionable
+      insights to drive product innovation and operational excellence. Passionate about leveraging advanced ML techniques
+      to support secure, scalable, and transparent AI solutions.
+    </p>
+    <p>
+      Redwood City, CA 94061 • (650) 425-0935 •
+      <a href="mailto:scottjnelson5@gmail.com" style="color: var(--primary-color);">scottjnelson5@gmail.com</a> •
+      <a href="https://scottn66.github.io" style="color: var(--primary-color);">scottn66.github.io</a>
+    </p>
+  </header>
+
+  <!-- Experience Section -->
+  <section id="experience" class="section-bg">
+    <h2 class="section-title">Experience</h2>
+    <article>
+      <h3>Meta, Remote — Linguistic Data Analyst</h3>
+      <p>AUGUST 2023 - AUGUST 2024</p>
+      <ul>
+        <li>Collaborated with cross-functional teams (Data Engineering, Product, and Research) to fine‑tune LLM datasets, ensuring safety and bias alignment in Meta AI’s Llama 2 &amp; Llama 3 projects.</li>
+        <li>Developed and maintained automated data pipelines to streamline dataset preparation, enhancing data quality and model deployment efficiency.</li>
+        <li>Contributed to GenAI research efforts by integrating statistical analysis and real-time data insights into production‑grade systems.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Loyola Marymount University, Los Angeles — Research Assistant</h3>
+      <p>NOVEMBER 2021 - SEPTEMBER 2023</p>
+      <ul>
+        <li>Conducted advanced statistical analyses and machine learning programming to support neuroscience research, transforming raw data into actionable insights.</li>
+        <li>Collaborated with interdisciplinary teams to review literature and implement experimental designs that bridged cognitive science with emerging AI techniques.</li>
+        <li>Assisted in the development and validation of predictive models, ensuring reproducibility and scalability of research outcomes.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Tenant’s Law Firm, Los Angeles — Internship</h3>
+      <p>MAY 2022 - DECEMBER 2022</p>
+      <ul>
+        <li>Automated data‑intelligence reporting by integrating APIs and JSON data pipelines with CRM systems, reducing routine legal drafting time by 80%.</li>
+        <li>Designed scalable data pipelines that enhanced the efficiency of client caseload management for nonprofit legal advocacy.</li>
+        <li>Leveraged quantitative analysis to support strategic decisions and improve overall operational workflow.</li>
+      </ul>
+    </article>
+  </section>
+
+  <!-- Education Section -->
+  <section id="education" class="section-bg">
+    <h2 class="section-title">Education</h2>
+    <article>
+      <h3>Loyola Marymount University, Los Angeles, CA — Bachelor of Arts in Psychology</h3>
+      <p>AUGUST 2019 - MAY 2023</p>
+      <p>Minors: Computer Science; Statistics &amp; Data Science</p>
+      <p>
+        Relevant Coursework: Machine Learning, Artificial Intelligence, Programming Abstractions, NLP, Cognitive Systems Design,
+        Statistical Methods, Agile Team Methods.
+      </p>
+    </article>
+  </section>
+
+  <!-- Certifications Section -->
+  <section id="certifications" class="section-bg">
+    <h2 class="section-title">Certifications</h2>
+    <ul>
+      <li>Machine Learning Specialization – Dr. Andrew Ng, Stanford Coursera (2024)</li>
+      <li>Relational Databases and SQL Specialization – Stanford Coursera (2024)</li>
+      <li>Google Professional Data Analytics Certificate – Google Coursera (2022)</li>
+      <li>How Software Ate Finance (Financial Services) – Stanford Coursera (2023)</li>
+    </ul>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills" class="section-bg">
+    <h2 class="section-title">Skills</h2>
+    <ul>
+      <li>Machine Learning, Deep Learning &amp; Optimization</li>
+      <li>Statistical &amp; Quantitative Analysis</li>
+      <li>Data Engineering &amp; Pipeline Development</li>
+      <li>Programming: Python (advanced)</li>
+      <li>Agile Methodologies</li>
+    </ul>
+  </section>
+
+  <!-- Awards Section -->
+  <section id="awards" class="section-bg">
+    <h2 class="section-title">Awards</h2>
+    <ul>
+      <li>Hack-a-thon: 1st overall for full-stack news aggregation and summarizer</li>
+      <li>Data-thon: 1st in 24‑hour competition for cleaning, analysis, and inference on a large, econometric dataset</li>
+      <li>Data Challenge: 1st place winner of ASA’s federal dataset analysis competition for successful educational insights</li>
+    </ul>
+  </section>
+
+  <!-- Languages Section -->
+  <section id="languages" class="section-bg">
+    <h2 class="section-title">Languages</h2>
+    <p>Python (preferred), Java, SQL, C++, R, Git</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2023 Scott Nelson. All Rights Reserved.</p>
+  </footer>
+</body>
+</html>
