@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mandelbrot Set Renderer</title>
+  <style>
+    /* Ensure the canvas fills the window with a black background */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #8a3d3d;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="mandelbrot"></canvas>
+  <script>
+    const canvas = document.getElementById('mandelbrot');
+    const ctx = canvas.getContext('2d');
+
+    // Set the canvas size to fill the window
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawMandelbrot();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawMandelbrot() {
+      const maxIter = 100; // Maximum iterations for the escape-time algorithm
+      const width = canvas.width;
+      const height = canvas.height;
+      const imgData = ctx.createImageData(width, height);
+      const data = imgData.data;
+
+      // Define the region of the complex plane to render.
+      const xmin = -2.5, xmax = 1;
+      const ymin = -1, ymax = 1;
+
+      for (let y = 0; y < height; y++) {
+        // Map pixel y coordinate to imaginary part
+        const cy = ymin + (y / height) * (ymax - ymin);
+        for (let x = 0; x < width; x++) {
+          // Map pixel x coordinate to real part
+          const cx = xmin + (x / width) * (xmax - xmin);
+          let zx = 0, zy = 0;
+          let iter = 0;
+
+          while (zx * zx + zy * zy < 4 && iter < maxIter) {
+            const xtemp = zx * zx - zy * zy + cx;
+            zy = 2 * zx * zy + cy;
+            zx = xtemp;
+            iter++;
+          }
+
+          // Determine the color based on the number of iterations.
+          // Use a simple grayscale where points that do not escape remain black.
+          const pixelIndex = 4 * (y * width + x);
+          const color = iter === maxIter ? 0 : Math.floor(255 * iter / maxIter);
+          const hue = iter === maxIter ? 0 : Math.floor(360 * iter / maxIter);
+          data[pixelIndex]     = hue; // Use this as a base to compute RGB via an HSL-to-RGB function.
+// You can implement an HSL-to-RGB conversion and then assign the resulting values.
+
+          data[pixelIndex] = color;     // Red
+          data[pixelIndex + 1] = color; // Green
+          data[pixelIndex + 2] = color; // Blue
+          data[pixelIndex + 3] = 255;   // Alpha (fully opaque)
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+    }
+  </script>
+</body>
+</html>
