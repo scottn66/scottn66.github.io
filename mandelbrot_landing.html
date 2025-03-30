@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mandelbrot Explorer - Tutorial &amp; Background</title>
+  <style>
+    :root {
+      --primary-color: #314d69;
+      --secondary-color: #ff5742;
+      --bg-color: #ffffff;
+      --text-color: #333;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Open Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    header, main, footer {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      border-bottom: 2px solid var(--secondary-color);
+    }
+    header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.8rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-top: 40px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    p {
+      margin: 15px 0;
+    }
+    a.btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--secondary-color);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    a.btn:hover {
+      background-color: darkred;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid #ccc;
+      margin-top: 40px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mandelbrot Explorer</h1>
+  </header>
+  <main>
+    <h2 class="section-title">Background</h2>
+    <p>
+      The Mandelbrot set is one of the most famous examples of a fractal in mathematics. It is defined by a simple iterative process on complex numbers,
+      yet it exhibits intricate and infinitely detailed boundary patterns. Its discovery has not only advanced the field of mathematics but has also had
+      a profound influence on art and computer graphics.
+    </p>
+
+    <h2 class="section-title">Tutorial</h2>
+    <p>
+      <strong>How to Use the Mandelbrot Explorer:</strong>
+    </p>
+    <ul>
+      <li>Use your mouse to click on a point in the rendered fractal. The display will zoom in on the clicked area, revealing more detail.</li>
+      <li>Right-click (or use the designated control) to zoom out and see a broader view of the fractal.</li>
+      <li>Explore the color gradients, which are mapped to the number of iterations taken for a point to diverge. Areas of high complexity display vibrant colors.</li>
+    </ul>
+
+    <h2 class="section-title">Get Started</h2>
+    <p>
+      Ready to dive into infinity? Click the button below to launch the Mandelbrot Renderer.
+    </p>
+    <p>
+      <a href="mandelbrot_renderer.html" class="btn">Launch Mandelbrot Renderer</a>
+    </p>
+  </main>
+  <footer>
+    <p>&copy; 2023 Scott Nelson</p>
+  </footer>
+</body>
+</html>
