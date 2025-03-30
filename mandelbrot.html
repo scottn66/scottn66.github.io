@@ -178,6 +178,8 @@
           var width = ((this.i_max - this.i_min) *
                        this.canvas.width / this.canvas.height);
           var r_mid = (this.r_max + this.r_min) / 2;
+          var squishFactor = 0.95;
+          width *= squishFactor;
           this.r_min = r_mid - width/2;
           this.r_max = r_mid + width/2;
 
