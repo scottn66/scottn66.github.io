@@ -34,12 +34,11 @@
       canvas.height = h * dpr;
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
-      // Reset any previous transforms before scaling.
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
     }
 
-    // Complex plane boundaries.
+    // Global boundaries of the complex plane.
     let xmin = -2.5, xmax = 1;
     let ymin = -1, ymax = 1;
     const maxIter = 200;
@@ -60,7 +59,6 @@
         default: r = 0; g = 0; b = 0; break;
       }
       const m = l - c / 2;
-      // Using bitwise OR with 0 for fast floor conversion.
       return [
         (r + m) * 255 | 0,
         (g + m) * 255 | 0,
@@ -68,9 +66,11 @@
       ];
     }
 
-    // Draw the Mandelbrot set with improved performance.
+    // Draw the Mandelbrot set. We clear the canvas at the start so that each call is a fresh render.
     function drawMandelbrot() {
-      // Use CSS pixels for drawing dimensions.
+      // Clear the canvas completely.
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       const width = canvas.width / (window.devicePixelRatio || 1);
       const height = canvas.height / (window.devicePixelRatio || 1);
       const imgData = ctx.createImageData(width, height);
@@ -89,7 +89,7 @@
           const cx = xmin + i * dx;
           let zx = 0, zy = 0, iter = 0;
           
-          // Mandelbrot iteration loop.
+          // Mandelbrot iteration.
           while (zx*zx + zy*zy < escapeRadiusSq && iter < maxIter) {
             const temp = zx*zx - zy*zy + cx;
             zy = 2 * zx * zy + cy;
@@ -98,13 +98,11 @@
           }
           
           if (iter === maxIter) {
-            // Inside the Mandelbrot set: color it black.
             data[pixelIndex++] = 0;
             data[pixelIndex++] = 0;
             data[pixelIndex++] = 0;
             data[pixelIndex++] = 255;
           } else {
-            // Smooth coloring to avoid banding.
             const mag = Math.sqrt(zx*zx + zy*zy);
             const smoothIter = iter + 1 - Math.log(Math.log(mag)) / log2;
             const hue = (smoothIter / maxIter) * 360;
@@ -119,7 +117,7 @@
       ctx.putImageData(imgData, 0, 0);
     }
 
-    // Resize handler: adjust canvas resolution and redraw.
+    // Resize handler: adjust resolution and redraw.
     function resize() {
       setCanvasResolution();
       drawMandelbrot();
@@ -127,7 +125,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Zoom in (left-click) and zoom out (right-click) event handlers.
+    // Left-click: Zoom in and trigger a fresh render.
     canvas.addEventListener('click', function(event) {
       const rect = canvas.getBoundingClientRect();
       const x = event.clientX - rect.left;
@@ -145,6 +143,7 @@
       drawMandelbrot();
     });
 
+    // Right-click: Zoom out and trigger a fresh render.
     canvas.addEventListener('contextmenu', function(event) {
       event.preventDefault();
       const rect = canvas.getBoundingClientRect();
