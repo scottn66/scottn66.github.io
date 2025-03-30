@@ -3,231 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Improved Mandelbrot Explorer</title>
+  <title>Mandelbrot Explorer</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-      font-family: sans-serif;
-      color: #fff;
-    }
-    canvas {
-      display: block;
-    }
-    #controls {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: rgba(0,0,0,0.7);
-      padding: 10px;
-      border-radius: 5px;
-      z-index: 10;
-    }
-    #controls label,
-    #controls button {
-      margin: 0 5px 5px 0;
-      display: inline-block;
-    }
-    #loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1.5em;
-      background: rgba(0,0,0,0.8);
-      padding: 20px;
-      border-radius: 10px;
-      display: none;
-      z-index: 20;
-    }
+    body { margin: 0; overflow: hidden; background: #000; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <canvas id="mandelbrot"></canvas>
-  <div id="controls">
-    <label for="maxIter">Max Iterations:</label>
-    <input type="number" id="maxIter" min="50" max="1000" value="200">
-    <button id="reset">Reset View</button>
-  </div>
-  <div id="loading">Rendering…</div>
-
+  <canvas id="mandelbrotCanvas"></canvas>
+  <script src="mandelbrot.js"></script>
   <script>
-    const canvas = document.getElementById('mandelbrot');
-    const ctx = canvas.getContext('2d');
-    const loadingDiv = document.getElementById('loading');
-    const maxIterInput = document.getElementById('maxIter');
-    const resetBtn = document.getElementById('reset');
+    // Wait for the DOM to load
+    window.onload = function() {
+      const canvas = document.getElementById("mandelbrotCanvas");
+      // Optional: Set canvas dimensions, for example:
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-    // Initial boundaries of the complex plane.
-    let xmin = -2.5, xmax = 1, ymin = -1, ymax = 1;
-    let maxIter = parseInt(maxIterInput.value, 10);
-
-    // Adjust canvas resolution for HiDPI displays.
-    const setCanvasResolution = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
-      ctx.resetTransform();
-      ctx.scale(dpr, dpr);
+      // Create a new Mandelbrot instance with the desired number of workers.
+      // Ensure the path to worker.js is correct relative to index.html.
+      const mandelbrot = new Mandelbrot(canvas, 4);
+      
+      // Start the initial render.
+      mandelbrot.redraw();
     };
-
-    // Create a web worker from a Blob containing the Mandelbrot calculation code.
-    const workerCode = `
-      self.onmessage = function(e) {
-        const { width, height, xmin, xmax, ymin, ymax, maxIter } = e.data;
-        const escapeRadiusSq = 4;
-        const log2 = Math.log(2);
-        
-        // Optimized HSL to RGB conversion.
-        function hslToRgb(h, s, l) {
-          const c = (1 - Math.abs(2 * l - 1)) * s;
-          const hp = Math.floor(h / 60);
-          const x = c * (1 - Math.abs((h / 60) - hp - 0.5) * 2);
-          let r = 0, g = 0, b = 0;
-          switch (hp) {
-            case 0: r = c; g = x; break;
-            case 1: r = x; g = c; break;
-            case 2: g = c; b = x; break;
-            case 3: g = x; b = c; break;
-            case 4: r = x; b = c; break;
-            case 5: r = c; b = x; break;
-            default: break;
-          }
-          const m = l - c / 2;
-          return [
-            ((r + m) * 255) | 0,
-            ((g + m) * 255) | 0,
-            ((b + m) * 255) | 0
-          ];
-        }
-        
-        const dx = (xmax - xmin) / width;
-        const dy = (ymax - ymin) / height;
-        const data = new Uint8ClampedArray(width * height * 4);
-        let index = 0;
-        
-        for (let j = 0; j < height; j++) {
-          const cy = ymin + j * dy;
-          for (let i = 0; i < width; i++) {
-            const cx = xmin + i * dx;
-            let zx = 0, zy = 0, iter = 0;
-            while (zx * zx + zy * zy < escapeRadiusSq && iter < maxIter) {
-              const temp = zx * zx - zy * zy + cx;
-              zy = 2 * zx * zy + cy;
-              zx = temp;
-              iter++;
-            }
-            if (iter === maxIter) {
-              data[index++] = 0;
-              data[index++] = 0;
-              data[index++] = 0;
-              data[index++] = 255;
-            } else {
-              const mag = Math.sqrt(zx * zx + zy * zy);
-              const smoothIter = iter + 1 - Math.log(Math.log(mag)) / log2;
-              const hue = (smoothIter / maxIter) * 360;
-              const rgb = hslToRgb(hue, 1, 0.5);
-              data[index++] = rgb[0];
-              data[index++] = rgb[1];
-              data[index++] = rgb[2];
-              data[index++] = 255;
-            }
-          }
-        }
-        self.postMessage({ imageBuffer: data.buffer }, [data.buffer]);
-      };
-    `;
-    const blob = new Blob([workerCode], { type: "application/javascript" });
-    const worker = new Worker(URL.createObjectURL(blob));
-
-    // Render the Mandelbrot set by sending parameters to the worker.
-    const renderMandelbrot = () => {
-      showLoading(true);
-      const dpr = window.devicePixelRatio || 1;
-      const width = canvas.width / dpr;
-      const height = canvas.height / dpr;
-      worker.postMessage({
-        width,
-        height,
-        xmin,
-        xmax,
-        ymin,
-        ymax,
-        maxIter
-      });
-    };
-
-    // When the worker sends back the computed pixel buffer, draw it to the canvas.
-    worker.onmessage = (e) => {
-      const dpr = window.devicePixelRatio || 1;
-      const width = canvas.width / dpr;
-      const height = canvas.height / dpr;
-      const imgData = new ImageData(new Uint8ClampedArray(e.data.imageBuffer), width, height);
-      ctx.putImageData(imgData, 0, 0);
-      showLoading(false);
-    };
-
-    // Show or hide the loading indicator.
-    const showLoading = (flag) => {
-      loadingDiv.style.display = flag ? 'block' : 'none';
-    };
-
-    // Resize the canvas and re-render.
-    const resize = () => {
-      setCanvasResolution();
-      renderMandelbrot();
-    };
-    window.addEventListener('resize', resize);
-    resize();
-
-    // Zoom handling: left-click to zoom in, right-click to zoom out.
-    canvas.addEventListener('click', (event) => {
-      handleZoom(event, 0.5);
-    });
-    canvas.addEventListener('contextmenu', (event) => {
-      event.preventDefault();
-      handleZoom(event, 2.0);
-      return false;
-    });
-
-    const handleZoom = (event, zoomFactor) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const width = rect.width;
-      const height = rect.height;
-      const clickReal = xmin + (x / width) * (xmax - xmin);
-      const clickImag = ymin + (y / height) * (ymax - ymin);
-      const newWidth = (xmax - xmin) * zoomFactor;
-      const newHeight = (ymax - ymin) * zoomFactor;
-      xmin = clickReal - newWidth / 2;
-      xmax = clickReal + newWidth / 2;
-      ymin = clickImag - newHeight / 2;
-      ymax = clickImag + newHeight / 2;
-      renderMandelbrot();
-    };
-
-    // UI Controls
-    maxIterInput.addEventListener('change', () => {
-      maxIter = parseInt(maxIterInput.value, 10);
-      renderMandelbrot();
-    });
-
-    resetBtn.addEventListener('click', () => {
-      // Reset boundaries and iteration count.
-      xmin = -2.5; xmax = 1; ymin = -1; ymax = 1;
-      maxIterInput.value = 200;
-      maxIter = 200;
-      renderMandelbrot();
-    });
   </script>
 </body>
 </html>
