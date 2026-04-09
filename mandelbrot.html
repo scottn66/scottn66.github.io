@@ -32,6 +32,7 @@
           for (var i = 0; i < data.width; i++) {
               var c_r = data.r_min + (data.r_max - data.r_min) * i / data.width;
               var z_r = 0, z_i = 0;
+              var iter;
               for (iter = 0; z_r*z_r + z_i*z_i < escape && iter < max_iter; iter++) {
                   // Compute z -> z^2 + c
                   var tmp = z_r*z_r - z_i*z_i + c_r;
@@ -57,12 +58,18 @@
       this.ctx = canvas.getContext("2d");
       this.row_data = this.ctx.createImageData(canvas.width, 1);
       this.canvas.addEventListener("click", function(event) {
-          self.click(
-            event.clientX + document.body.scrollLeft +
-            document.documentElement.scrollLeft - canvas.offsetLeft,
-            event.clientY + document.body.scrollTop +
-            document.documentElement.scrollTop - canvas.offsetTop
-          );
+          var rect = canvas.getBoundingClientRect();
+          var x = (event.clientX - rect.left) * (canvas.width  / rect.width);
+          var y = (event.clientY - rect.top)  * (canvas.height / rect.height);
+          self.click(x, y);
+      }, false);
+      this.canvas.addEventListener("contextmenu", function(event) {
+          event.preventDefault();
+          var rect = canvas.getBoundingClientRect();
+          var x = (event.clientX - rect.left) * (canvas.width  / rect.width);
+          var y = (event.clientY - rect.top)  * (canvas.height / rect.height);
+          self.zoom_out(x, y);
+          return false;
       }, false);
       window.addEventListener("resize", function() {
           self.resize_to_parent();
@@ -171,15 +178,31 @@
           this.redraw();
       },
 
+      zoom_out: function(x, y) {
+          var width = this.r_max - this.r_min;
+          var height = this.i_min - this.i_max;
+          var click_r = this.r_min + width * x / this.canvas.width;
+          var click_i = this.i_max + height * y / this.canvas.height;
+
+          // Inverse of click(): expand the viewport 4x around the right-click point.
+          this.r_min = click_r - width*2;
+          this.r_max = click_r + width*2;
+          this.i_max = click_i - height*2;
+          this.i_min = click_i + height*2;
+          this.redraw();
+      },
+
       resize_to_parent: function() {
-          this.canvas.width = window.innerWidth;
-          this.canvas.height = window.innerHeight;
+          var dpr = window.devicePixelRatio || 1;
+          this.canvas.width  = Math.floor(window.innerWidth  * dpr);
+          this.canvas.height = Math.floor(window.innerHeight * dpr);
+          this.canvas.style.width  = window.innerWidth  + 'px';
+          this.canvas.style.height = window.innerHeight + 'px';
+
           // Adjust horizontal scale to maintain aspect ratio.
           var width = ((this.i_max - this.i_min) *
                        this.canvas.width / this.canvas.height);
           var r_mid = (this.r_max + this.r_min) / 2;
-          var squishFactor = 0.40;
-          width *= squishFactor;
           this.r_min = r_mid - width/2;
           this.r_max = r_mid + width/2;
 
@@ -192,8 +215,11 @@
     // When the page loads, initialize the Mandelbrot viewer.
     window.onload = function() {
       var canvas = document.getElementById("mandelbrotCanvas");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width  = Math.floor(window.innerWidth  * dpr);
+      canvas.height = Math.floor(window.innerHeight * dpr);
+      canvas.style.width  = window.innerWidth  + 'px';
+      canvas.style.height = window.innerHeight + 'px';
       var mandelbrot = new Mandelbrot(canvas, 4);
       mandelbrot.redraw();
     };
