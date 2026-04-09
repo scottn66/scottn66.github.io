@@ -22,51 +22,102 @@
   <canvas id="mandelbrotCanvas"></canvas>
   <script>
     // Define the worker code as a string.
+    //
+    // Worker protocol (Mariani-Silver friendly):
+    //   In:  { id, generation, coords: Int32Array [x0,y0, x1,y1, ...],
+    //          r_min, r_max, i_min, i_max, canvas_w, canvas_h, max_iter, escape }
+    //   Out: { id, generation, coords, values: Int32Array [v0, v1, ...] }
+    // Both coords and values are transferable buffers (zero-copy hand-off).
     var workerScript = `
       self.onmessage = function (event) {
-          var data = event.data;
-          var c_i = data.i;
-          var max_iter = data.max_iter;
-          var escape = data.escape * data.escape;
-          data.values = [];
-          for (var i = 0; i < data.width; i++) {
-              var c_r = data.r_min + (data.r_max - data.r_min) * i / data.width;
+          var d = event.data;
+          var width = d.canvas_w, height = d.canvas_h;
+          var escape = d.escape * d.escape;
+          var max_iter = d.max_iter;
+          var n = d.coords.length / 2;
+          var values = new Int32Array(n);
+          for (var k = 0; k < n; k++) {
+              var px = d.coords[2*k];
+              var py = d.coords[2*k + 1];
+              var c_r = d.r_min + (d.r_max - d.r_min) * px / width;
+              var c_i = d.i_max + (d.i_min - d.i_max) * py / height;
+
               var iter;
-              // Early-out: points inside the main cardioid or period-2 bulb
-              // are provably in the set — skip the iteration loop entirely.
+              // Cardioid + period-2 bulb early-out
               var cr_m = c_r - 0.25;
               var q = cr_m*cr_m + c_i*c_i;
               if (q * (q + cr_m) < 0.25 * c_i*c_i) {
-                  iter = max_iter;  // main cardioid
+                  iter = max_iter;
               } else if ((c_r + 1)*(c_r + 1) + c_i*c_i < 0.0625) {
-                  iter = max_iter;  // period-2 bulb
+                  iter = max_iter;
               } else {
                   var z_r = 0, z_i = 0;
                   for (iter = 0; z_r*z_r + z_i*z_i < escape && iter < max_iter; iter++) {
-                      // Compute z -> z^2 + c
                       var tmp = z_r*z_r - z_i*z_i + c_r;
                       z_i = 2 * z_r * z_i + c_i;
                       z_r = tmp;
                   }
               }
-              if (iter == max_iter) {
-                  iter = -1;
-              }
-              data.values.push(iter);
+              if (iter === max_iter) iter = -1;
+              values[k] = iter;
           }
-          self.postMessage(data);
+          self.postMessage({
+              id: d.id,
+              generation: d.generation,
+              coords: d.coords,
+              values: values,
+          }, [d.coords.buffer, values.buffer]);
       }
     `;
     // Create a Blob URL for the worker code.
     var blob = new Blob([workerScript], { type: "application/javascript" });
     var workerURL = URL.createObjectURL(blob);
 
-    // Define the Mandelbrot viewer class.
+    // ========================================================================
+    // Mariani-Silver + Hilbert-ordered progressive renderer.
+    //
+    // Mariani-Silver observation: the iteration-count function of the
+    // Mandelbrot set is continuous away from the set boundary, so if every
+    // pixel on a rectangle's border has the same iter count, every pixel
+    // inside that rectangle has that same count too. We can skip computing
+    // the interior entirely. For rectangles with a non-uniform border, we
+    // subdivide into four quadrants and recurse. The result: regions far
+    // from the set's boundary finalize in one border pass each; regions
+    // near the boundary keep subdividing until we hit MIN_RECT.
+    //
+    // Hilbert ordering: the work queue is sorted by the Hilbert index of
+    // each rect's center. Rects whose centers are close on the 2D canvas
+    // are also close in the queue, so the visual progression of updates
+    // snakes across the canvas along a fractal space-filling curve
+    // instead of row-by-row.
+    //
+    // Drawing: workers return pixel results into a single canvas-wide
+    // backing ImageData. A requestAnimationFrame loop blits the backing
+    // buffer once per display frame, amortizing the putImageData cost.
+    // ========================================================================
+
     var Mandelbrot = function (canvas, n_workers) {
       var self = this;
       this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
-      this.row_data = this.ctx.createImageData(canvas.width, 1);
+
+      // Mariani-Silver tuning
+      this.MIN_RECT  = 16;   // below this, compute interior directly (no further subdivision)
+      this.INIT_TILE = 128;  // starting grid cell size; each is an independent MS root
+
+      // Canvas-wide backing buffer — single allocation, rAF flushes to ctx
+      this.backing = this.ctx.createImageData(canvas.width, canvas.height);
+      this.dirty = false;
+
+      // Work state
+      this.work_queue = [];          // sorted ascending by Hilbert index of rect center
+      this.pending = new Map();      // id -> {rect, type, generation}
+      this.next_id = 0;
+      this.generation = 0;
+      this.hilbert_n = 1;
+      this.update_hilbert_n();
+
+      // Event listeners
       this.canvas.addEventListener("click", function(event) {
           var rect = canvas.getBoundingClientRect();
           var x = (event.clientX - rect.left) * (canvas.width  / rect.width);
@@ -85,33 +136,40 @@
           self.resize_to_parent();
       }, false);
 
-      // Create workers using the Blob URL.
+      // Worker pool
       this.workers = [];
       for (var i = 0; i < n_workers; i++) {
           var worker = new Worker(workerURL);
           worker.onmessage = function(event) {
-              self.received_row(event.target, event.data);
-          }
+              self.received(event.target, event.data);
+          };
           worker.idle = true;
           this.workers.push(worker);
       }
 
-      // Set up initial Mandelbrot parameters.
+      // Mandelbrot parameters
       this.i_max = 1.5;
       this.i_min = -1.5;
       this.r_min = -2.5;
       this.r_max = 1.5;
-      this.max_iter = 1024;
+      this.max_iter = 256;
       this.escape = 100;
-      this.generation = 0;
-      this.nextrow = 0;
       this.make_palette();
+
+      // rAF loop — flush the backing buffer to the canvas once per frame
+      var tick = function() {
+          if (self.dirty) {
+              self.ctx.putImageData(self.backing, 0, 0);
+              self.dirty = false;
+          }
+          requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
     };
 
     Mandelbrot.prototype = {
       make_palette: function() {
           this.palette = [];
-          // A helper to wrap values to a sawtooth pattern.
           function wrap(x) {
               x = ((x + 256) & 0x1ff) - 256;
               if (x < 0) x = -x;
@@ -122,52 +180,182 @@
           }
       },
 
-      draw_row: function(data) {
-          var values = data.values;
-          var pdata = this.row_data.data;
-          for (var i = 0; i < this.row_data.width; i++) {
-              pdata[4*i+3] = 255;
-              if (values[i] < 0) {
-                  pdata[4*i] = pdata[4*i+1] = pdata[4*i+2] = 0;
-              } else {
-                  var colour = this.palette[values[i]];
-                  pdata[4*i]   = colour[0];
-                  pdata[4*i+1] = colour[1];
-                  pdata[4*i+2] = colour[2];
+      // ------------------------------------------------------------
+      // Hilbert curve: pixel (x,y) -> index along a 2^k x 2^k curve
+      // that covers the smallest power-of-2 square containing the canvas.
+      // Adapted from the standard d2xy inverse (Wikipedia: Hilbert curve).
+      // ------------------------------------------------------------
+      update_hilbert_n: function() {
+          var max_dim = Math.max(this.canvas.width, this.canvas.height);
+          var n = 1;
+          while (n < max_dim) n *= 2;
+          this.hilbert_n = n;
+      },
+
+      hilbert_index: function(x, y) {
+          var n = this.hilbert_n;
+          var rx, ry, d = 0;
+          var ix = Math.floor(x) | 0;
+          var iy = Math.floor(y) | 0;
+          for (var s = n >>> 1; s > 0; s >>>= 1) {
+              rx = (ix & s) > 0 ? 1 : 0;
+              ry = (iy & s) > 0 ? 1 : 0;
+              d += s * s * ((3 * rx) ^ ry);
+              if (ry === 0) {
+                  if (rx === 1) {
+                      ix = s - 1 - ix;
+                      iy = s - 1 - iy;
+                  }
+                  var t = ix; ix = iy; iy = t;
               }
           }
-          this.ctx.putImageData(this.row_data, 0, data.row);
+          return d;
       },
 
-      received_row: function(worker, data) {
-          if (data.generation === this.generation) {
-              this.draw_row(data);
+      // ------------------------------------------------------------
+      // Work queue: binary-search insertion keeps it sorted by Hilbert
+      // index so dispatch_next pulls from the Hilbert-front.
+      // ------------------------------------------------------------
+      enqueue: function(type, rect, iter_hint) {
+          var cx = rect.x + rect.w / 2;
+          var cy = rect.y + rect.h / 2;
+          var h_index = this.hilbert_index(cx, cy);
+          var item = {type: type, rect: rect, hilbert: h_index, iter_hint: iter_hint};
+          var lo = 0, hi = this.work_queue.length;
+          while (lo < hi) {
+              var mid = (lo + hi) >>> 1;
+              if (this.work_queue[mid].hilbert < h_index) lo = mid + 1;
+              else hi = mid;
           }
-          this.process_row(worker);
+          this.work_queue.splice(lo, 0, item);
       },
 
-      process_row: function(worker) {
-          var row = this.nextrow++;
-          if (row >= this.canvas.height) {
-              worker.idle = true;
+      // ------------------------------------------------------------
+      // Rect geometry helpers
+      // ------------------------------------------------------------
+      border_coords: function(rect) {
+          // Interleaved [x0,y0, x1,y1, ...] along the rect's 1-pixel perimeter.
+          var x0 = rect.x, y0 = rect.y;
+          var x1 = rect.x + rect.w - 1, y1 = rect.y + rect.h - 1;
+          var count;
+          if (rect.h === 1) {
+              count = rect.w;
+          } else if (rect.w === 1) {
+              count = rect.h;
           } else {
-              worker.idle = false;
-              worker.postMessage({
-                  row: row,
-                  width: this.row_data.width,
-                  generation: this.generation,
-                  r_min: this.r_min,
-                  r_max: this.r_max,
-                  i: this.i_max + (this.i_min - this.i_max) * row / this.canvas.height,
-                  max_iter: this.max_iter,
-                  escape: this.escape,
-              });
+              count = 2 * rect.w + 2 * (rect.h - 2);
           }
+          var coords = new Int32Array(count * 2);
+          var k = 0;
+          // Top edge
+          for (var x = x0; x <= x1; x++) { coords[k++] = x; coords[k++] = y0; }
+          if (rect.h > 1) {
+              // Bottom edge
+              for (var x2 = x0; x2 <= x1; x2++) { coords[k++] = x2; coords[k++] = y1; }
+              // Left edge (excluding corners)
+              for (var y = y0 + 1; y < y1; y++) { coords[k++] = x0; coords[k++] = y; }
+              // Right edge (excluding corners)
+              if (rect.w > 1) {
+                  for (var y2 = y0 + 1; y2 < y1; y2++) { coords[k++] = x1; coords[k++] = y2; }
+              }
+          }
+          return coords;
       },
 
+      solid_coords: function(rect) {
+          // All pixels in rect, row-major. Used only for leaf rects (≤ MIN_RECT).
+          var n = rect.w * rect.h;
+          var coords = new Int32Array(n * 2);
+          var k = 0;
+          for (var y = rect.y; y < rect.y + rect.h; y++) {
+              for (var x = rect.x; x < rect.x + rect.w; x++) {
+                  coords[k++] = x;
+                  coords[k++] = y;
+              }
+          }
+          return coords;
+      },
+
+      subdivide: function(rect) {
+          var w1 = Math.floor(rect.w / 2);
+          var h1 = Math.floor(rect.h / 2);
+          var w2 = rect.w - w1;
+          var h2 = rect.h - h1;
+          var out = [];
+          if (w1 > 0 && h1 > 0) out.push({x: rect.x,      y: rect.y,      w: w1, h: h1});
+          if (w2 > 0 && h1 > 0) out.push({x: rect.x + w1, y: rect.y,      w: w2, h: h1});
+          if (w1 > 0 && h2 > 0) out.push({x: rect.x,      y: rect.y + h1, w: w1, h: h2});
+          if (w2 > 0 && h2 > 0) out.push({x: rect.x + w1, y: rect.y + h1, w: w2, h: h2});
+          return out;
+      },
+
+      inner_rect: function(rect) {
+          if (rect.w <= 2 || rect.h <= 2) return null;
+          return {x: rect.x + 1, y: rect.y + 1, w: rect.w - 2, h: rect.h - 2};
+      },
+
+      // ------------------------------------------------------------
+      // Backing-buffer drawing — all writes hit `this.backing`, which
+      // the rAF tick blits to the canvas at display rate.
+      // ------------------------------------------------------------
+      iter_to_rgb: function(iter) {
+          if (iter < 0) return [0, 0, 0];
+          return this.palette[iter] || [0, 0, 0];
+      },
+
+      draw_pixels: function(coords, values) {
+          var data = this.backing.data;
+          var w = this.canvas.width;
+          for (var k = 0; k < values.length; k++) {
+              var px = coords[2*k];
+              var py = coords[2*k + 1];
+              var v = values[k];
+              var rgb = v < 0 ? [0, 0, 0] : (this.palette[v] || [0, 0, 0]);
+              var idx = 4 * (py * w + px);
+              data[idx]     = rgb[0];
+              data[idx + 1] = rgb[1];
+              data[idx + 2] = rgb[2];
+              data[idx + 3] = 255;
+          }
+          this.dirty = true;
+      },
+
+      fill_rect: function(rect, iter) {
+          var rgb = iter < 0 ? [0, 0, 0] : (this.palette[iter] || [0, 0, 0]);
+          var r = rgb[0], g = rgb[1], b = rgb[2];
+          var data = this.backing.data;
+          var w = this.canvas.width;
+          var y_end = rect.y + rect.h;
+          var x_end = rect.x + rect.w;
+          for (var y = rect.y; y < y_end; y++) {
+              var row_base = 4 * (y * w + rect.x);
+              for (var x = rect.x; x < x_end; x++) {
+                  data[row_base]     = r;
+                  data[row_base + 1] = g;
+                  data[row_base + 2] = b;
+                  data[row_base + 3] = 255;
+                  row_base += 4;
+              }
+          }
+          this.dirty = true;
+      },
+
+      clear_backing: function() {
+          var data = this.backing.data;
+          for (var i = 0; i < data.length; i += 4) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              data[i + 3] = 255;
+          }
+          this.dirty = true;
+      },
+
+      // ------------------------------------------------------------
+      // Render pipeline
+      // ------------------------------------------------------------
       redraw: function() {
-          // Scale max_iter with zoom depth: more detail deeper in, less
-          // wasted work at the default view.
+          // Scale max_iter with zoom depth.
           var zoom_depth = Math.log2(4.0 / (this.r_max - this.r_min));
           var new_max_iter = Math.max(256, Math.round(256 + 100 * Math.max(0, zoom_depth)));
           if (new_max_iter !== this.max_iter) {
@@ -175,13 +363,104 @@
               this.make_palette();
           }
 
+          // Reset state and invalidate any in-flight worker results.
           this.generation++;
-          this.nextrow = 0;
-          for (var i = 0; i < this.workers.length; i++) {
-              var worker = this.workers[i];
-              if (worker.idle)
-                  this.process_row(worker);
+          this.work_queue = [];
+          this.pending.clear();
+          this.clear_backing();
+
+          // Seed: grid of INIT_TILE × INIT_TILE rects, each an independent
+          // Mariani-Silver root. Starting from small tiles keeps the initial
+          // border-compute phase short and lets Hilbert ordering take effect
+          // immediately.
+          for (var ty = 0; ty < this.canvas.height; ty += this.INIT_TILE) {
+              for (var tx = 0; tx < this.canvas.width; tx += this.INIT_TILE) {
+                  var rect = {
+                      x: tx, y: ty,
+                      w: Math.min(this.INIT_TILE, this.canvas.width  - tx),
+                      h: Math.min(this.INIT_TILE, this.canvas.height - ty),
+                  };
+                  this.enqueue('border', rect);
+              }
           }
+
+          // Kick all idle workers
+          for (var i = 0; i < this.workers.length; i++) {
+              if (this.workers[i].idle) this.dispatch_next(this.workers[i]);
+          }
+      },
+
+      dispatch_next: function(worker) {
+          // Drain any interior fills (no worker needed) from the front of the queue.
+          while (this.work_queue.length > 0 && this.work_queue[0].type === 'interior') {
+              var item0 = this.work_queue.shift();
+              this.fill_rect(item0.rect, item0.iter_hint);
+          }
+          if (this.work_queue.length === 0) {
+              worker.idle = true;
+              return;
+          }
+          var item = this.work_queue.shift();
+          var id = this.next_id++;
+          this.pending.set(id, {rect: item.rect, type: item.type, generation: this.generation});
+
+          var coords;
+          if (item.type === 'border') {
+              coords = this.border_coords(item.rect);
+          } else {
+              coords = this.solid_coords(item.rect);
+          }
+          worker.idle = false;
+          worker.postMessage({
+              id: id,
+              generation: this.generation,
+              coords: coords,
+              r_min: this.r_min, r_max: this.r_max,
+              i_min: this.i_min, i_max: this.i_max,
+              canvas_w: this.canvas.width,
+              canvas_h: this.canvas.height,
+              max_iter: this.max_iter,
+              escape: this.escape,
+          }, [coords.buffer]);
+      },
+
+      received: function(worker, data) {
+          if (data.generation !== this.generation) {
+              // Stale result — discard and keep the worker running.
+              this.dispatch_next(worker);
+              return;
+          }
+          var entry = this.pending.get(data.id);
+          this.pending.delete(data.id);
+
+          // Always draw what we computed.
+          this.draw_pixels(data.coords, data.values);
+
+          if (entry && entry.type === 'border') {
+              // Uniformity check: if every border pixel has the same iter
+              // count, the Mariani-Silver theorem says the interior is the
+              // same color — no compute needed.
+              var first = data.values[0];
+              var uniform = true;
+              for (var i = 1; i < data.values.length; i++) {
+                  if (data.values[i] !== first) { uniform = false; break; }
+              }
+              var inner = this.inner_rect(entry.rect);
+              if (uniform) {
+                  if (inner) this.enqueue('interior', inner, first);
+              } else if (entry.rect.w <= this.MIN_RECT || entry.rect.h <= this.MIN_RECT) {
+                  // Too small to subdivide further — just fill in the interior.
+                  if (inner) this.enqueue('solid', inner);
+              } else {
+                  // Subdivide into 4 quads and border-check each.
+                  var quads = this.subdivide(entry.rect);
+                  for (var q = 0; q < quads.length; q++) {
+                      this.enqueue('border', quads[q]);
+                  }
+              }
+          }
+
+          this.dispatch_next(worker);
       },
 
       click: function(x, y) {
@@ -225,8 +504,9 @@
           this.r_min = r_mid - width/2;
           this.r_max = r_mid + width/2;
 
-          // Reallocate the row image data.
-          this.row_data = this.ctx.createImageData(this.canvas.width, 1);
+          // Reallocate the backing buffer and recompute Hilbert grid size.
+          this.backing = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+          this.update_hilbert_n();
           this.redraw();
       },
     };
