@@ -31,13 +31,23 @@
           data.values = [];
           for (var i = 0; i < data.width; i++) {
               var c_r = data.r_min + (data.r_max - data.r_min) * i / data.width;
-              var z_r = 0, z_i = 0;
               var iter;
-              for (iter = 0; z_r*z_r + z_i*z_i < escape && iter < max_iter; iter++) {
-                  // Compute z -> z^2 + c
-                  var tmp = z_r*z_r - z_i*z_i + c_r;
-                  z_i = 2 * z_r * z_i + c_i;
-                  z_r = tmp;
+              // Early-out: points inside the main cardioid or period-2 bulb
+              // are provably in the set — skip the iteration loop entirely.
+              var cr_m = c_r - 0.25;
+              var q = cr_m*cr_m + c_i*c_i;
+              if (q * (q + cr_m) < 0.25 * c_i*c_i) {
+                  iter = max_iter;  // main cardioid
+              } else if ((c_r + 1)*(c_r + 1) + c_i*c_i < 0.0625) {
+                  iter = max_iter;  // period-2 bulb
+              } else {
+                  var z_r = 0, z_i = 0;
+                  for (iter = 0; z_r*z_r + z_i*z_i < escape && iter < max_iter; iter++) {
+                      // Compute z -> z^2 + c
+                      var tmp = z_r*z_r - z_i*z_i + c_r;
+                      z_i = 2 * z_r * z_i + c_i;
+                      z_r = tmp;
+                  }
               }
               if (iter == max_iter) {
                   iter = -1;
@@ -156,6 +166,15 @@
       },
 
       redraw: function() {
+          // Scale max_iter with zoom depth: more detail deeper in, less
+          // wasted work at the default view.
+          var zoom_depth = Math.log2(4.0 / (this.r_max - this.r_min));
+          var new_max_iter = Math.max(256, Math.round(256 + 100 * Math.max(0, zoom_depth)));
+          if (new_max_iter !== this.max_iter) {
+              this.max_iter = new_max_iter;
+              this.make_palette();
+          }
+
           this.generation++;
           this.nextrow = 0;
           for (var i = 0; i < this.workers.length; i++) {
