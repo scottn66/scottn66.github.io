@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>SEP Scraper &mdash; Knowledge Source Pipeline</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container { padding: 20px; }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 { margin: 0; }
+        .header p { margin: 0.25rem 0 0; opacity: 0.85; font-size: 1.05rem; }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2, h3 { color: #0056b3; }
+        a { color: #007bff; }
+        a:hover { text-decoration: none; }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        pre .func { color: #dcdcaa; }
+        .output-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+        .badge-role {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 3px;
+            background: #0056b3;
+            color: #fff;
+            margin-right: 6px;
+        }
+        .arch-diagram {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        table.stats { width: 100%; margin-bottom: 1rem; }
+        table.stats td, table.stats th {
+            padding: 6px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table.stats th { text-align: left; font-weight: 600; }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .related-grid .tag {
+            background: #e8f0fe;
+            border: 1px solid #b8d4fe;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-primary">Home</a>
+            <a href="wikipedia_scraper.html" class="btn btn-outline-light ml-2">Wikipedia Scraper</a>
+            <a href="arxiv_scraper.html" class="btn btn-outline-light ml-2">arXiv Scraper</a>
+        </div>
+        <h1>Stanford Encyclopedia of Philosophy Scraper</h1>
+        <p>Peer-reviewed concept backbone with hand-curated cross-references</p>
+    </header>
+
+    <section class="container mt-5">
+
+        <p><span class="badge-role">Role in pipeline</span> <strong>Concept backbone.</strong> Peer-reviewed entries, hand-curated <code>related_entries</code>, highest signal-per-page of any source in the stack. A single SEP entry on "Cognitive Science" yields 27 section headings and 31 curated cross-references.</p>
+
+        <!-- Why SEP -->
+        <div class="concept-box">
+            <h3>Why the Stanford Encyclopedia of Philosophy?</h3>
+            <p>An LLM knowledge pipeline needs a <em>concept layer</em> &mdash; a source of authoritative, peer-reviewed definitions that anchor the meaning of terms across disciplines. SEP is that source for anything touching philosophy, philosophy of mind, epistemology, and the theoretical foundations of cognitive science.</p>
+            <p>What makes SEP uniquely valuable is not just the quality of its articles, but its <strong>explicit, editor-curated cross-reference graph</strong>. Each article has a <code>&lt;div id="related-entries"&gt;</code> section listing the entries the editors consider most relevant. Unlike Wikipedia's noisy inline links (834 from a single page), SEP's related entries are sparse and intentional &mdash; typically 20&ndash;40 per article, each one hand-picked. This means you get a <em>high-signal citation graph for free</em>.</p>
+        </div>
+
+        <!-- Architecture -->
+        <div class="concept-box">
+            <h3>Architecture</h3>
+            <div class="arch-diagram">
+<strong>plato.py</strong>
+
+  <strong>WebScraper</strong>          &mdash; session-based HTTP with polite UA + timeout
+    .scrape()           &mdash; fetch + parse to BeautifulSoup
+    .get_initial_paragraph() &mdash; extracts &lt;div id="preamble"&gt; first &lt;p&gt;
+    .get_headings()     &mdash; all h1-h6 in document order
+    .get_content_under_headings() &mdash; {heading: next_sibling_text}
+    .get_related_entries()  &mdash; parses &lt;div id="related-entries"&gt; links
+
+  <strong>SepFetcher</strong>         &mdash; fetch by name or by index slice from contents.html
+    .fetch_sep_article_named(slug)  &mdash; single-article ingest
+    .fetch_sep_articles(n)          &mdash; batch from alphabetical index
+
+  <strong>DBreader</strong>           &mdash; query layer over sep_articles/metadata.json
+    .search(keyword)    &mdash; scans titles + paragraphs + section content
+    .get_related_entries(ref) &mdash; look up cross-references for any cached article
+    .find_article(name) &mdash; exact-match lookup
+
+<strong>read_plato.py</strong>
+
+  <strong>ArticleAnalyzer</strong>    &mdash; NLTK post-processor
+    .get_lexicon_and_bigrams()  &mdash; tokenize cached content, build frequency profiles
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="concept-box">
+            <h3>Key Design Decisions</h3>
+            <h4>Explicit citation graph from related_entries</h4>
+            <p>SEP doesn't have a formal API. What saves the scraper is that every SEP article includes a hand-curated <code>&lt;div id="related-entries"&gt;</code>. The scraper parses this into a <code>{title: href_slug}</code> dictionary, giving you a directed graph where edges are editorial judgments, not accidental hyperlinks. This is the highest-quality citation signal in the entire stack.</p>
+
+            <h4>Two-class separation: Fetcher + Reader</h4>
+            <p><code>SepFetcher</code> writes to the cache; <code>DBreader</code> reads from it. This is the only source in the stack with a proper query layer over its own metadata. You can <code>.search("consciousness")</code> and get back matching articles without re-scraping.</p>
+
+            <h4>Initial paragraph extraction</h4>
+            <p>SEP articles have a distinct <code>&lt;div id="preamble"&gt;</code> that contains the lede &mdash; usually the single best one-paragraph definition of the concept. The scraper extracts this separately from the full section content, making it ideal for LLM context windows where brevity matters.</p>
+        </div>
+
+        <!-- Code Sample -->
+        <div class="concept-box">
+            <h3>Code: Extracting the Related-Entries Graph</h3>
+            <pre><span class="keyword">def</span> <span class="func">get_related_entries</span>(self, soup):
+    related_entries = {}
+    related_entries_div = soup.find(<span class="string">'div'</span>, id=<span class="string">'related-entries'</span>)
+    <span class="keyword">if</span> related_entries_div:
+        links = related_entries_div.find_all(<span class="string">'a'</span>)
+        <span class="keyword">for</span> link <span class="keyword">in</span> links:
+            title = link.text.strip()
+            href = link.get(<span class="string">'href'</span>)
+            <span class="keyword">if</span> href <span class="keyword">is not</span> <span class="keyword">None</span> <span class="keyword">or</span> title != <span class="string">'Related Entries'</span>:
+                clean_href = re.sub(<span class="string">r'^[^A-Za-z]+'</span>, <span class="string">''</span>, href)
+                related_entries[title] = clean_href
+    <span class="keyword">return</span> related_entries</pre>
+        </div>
+
+        <!-- Live Output -->
+        <div class="concept-box">
+            <h3>Live Output: Cognitive Science Entry</h3>
+            <p>Single fetch of <code>/entries/cognitive-science/</code>:</p>
+            <div class="output-box">=== SEP fetch: cognitive-science ===
+  Title: Cognitive Science
+  Intro (691 chars):
+    Cognitive science is the interdisciplinary study of mind and
+    intelligence, embracing philosophy, psychology, artificial
+    intelligence, neuroscience, linguistics, and anthropology. Its
+    intellectual origins are in the mid-1950s when researchers in
+    several fields began to develop theories of mind based on
+    complex representations and computational procedures...
+  Total headings: 27
+  First 5 headings:
+    - Cognitive Science
+    - 1. History
+    - 2. Methods
+    - 3. Representation and Computation
+    - 4. Theoretical Approaches</div>
+
+            <h4>Related entries (31 curated cross-references)</h4>
+            <div class="related-grid">
+                <span class="tag">artificial intelligence</span>
+                <span class="tag">logic-based AI</span>
+                <span class="tag">behaviorism</span>
+                <span class="tag">embodied cognition</span>
+                <span class="tag">computational philosophy</span>
+                <span class="tag">connectionism</span>
+                <span class="tag">consciousness</span>
+                <span class="tag">dynamic systems (cognitive science)</span>
+                <span class="tag">emotion</span>
+                <span class="tag">externalism (self-knowledge)</span>
+                <span class="tag">folk psychology</span>
+                <span class="tag">frame problem</span>
+                <span class="tag">functionalism</span>
+                <span class="tag">innateness (cognition)</span>
+                <span class="tag">language of thought</span>
+                <span class="tag">mental imagery</span>
+                <span class="tag">mental representation</span>
+                <span class="tag">mind: modularity of</span>
+                <span class="tag">multiple realizability</span>
+                <span class="tag">neuroscience (philosophy of)</span>
+                <span class="tag">propositional attitude reports</span>
+                <span class="tag">psychology (philosophy of)</span>
+                <span class="tag">qualia</span>
+                <span class="tag">rationality</span>
+                <span class="tag">scientific explanation</span>
+                <span class="tag">situated cognition</span>
+                <span class="tag">supervenience</span>
+                <span class="tag">Turing machine</span>
+            </div>
+            <p class="mt-3"><em>Each tag is one curated cross-reference &mdash; an edge in the SEP citation graph. Compare this to Wikipedia's 834 raw hyperlinks: fewer edges, but every one is an editorial judgment.</em></p>
+        </div>
+
+        <!-- Stats -->
+        <div class="concept-box">
+            <h3>At a Glance</h3>
+            <table class="stats">
+                <tr><th>Metric</th><th>Value</th></tr>
+                <tr><td>Section headings per article</td><td>~27 (Cognitive Science)</td></tr>
+                <tr><td>Related entries per article</td><td>~31 (hand-curated)</td></tr>
+                <tr><td>Storage backend</td><td>JSON (sep_articles/metadata.json)</td></tr>
+                <tr><td>Graph type</td><td>Explicit editor-curated cross-references</td></tr>
+                <tr><td>Query layer</td><td>DBreader.search() &mdash; keyword search over cached content</td></tr>
+                <tr><td>Unique extraction</td><td>Preamble paragraph (best one-sentence definition)</td></tr>
+                <tr><td>Post-processing</td><td>NLTK lexicon + bigram analysis (read_plato.py)</td></tr>
+            </table>
+        </div>
+
+        <div class="text-center mt-4 mb-4">
+            <a href="https://github.com/scottn66/wiki" class="btn btn-primary btn-lg" target="_blank">View Source on GitHub</a>
+            <a href="wikipedia_scraper.html" class="btn btn-outline-primary btn-lg ml-2">&larr; Wikipedia Scraper</a>
+            <a href="arxiv_scraper.html" class="btn btn-outline-primary btn-lg ml-2">arXiv Scraper &rarr;</a>
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Scott Nelson &mdash; Knowledge Source Scrapers. <a href="https://github.com/scottn66/wiki" style="color:#aaa;">github.com/scottn66/wiki</a></p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

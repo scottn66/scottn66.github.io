@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>arXiv Scraper &mdash; Knowledge Source Pipeline</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container { padding: 20px; }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 { margin: 0; }
+        .header p { margin: 0.25rem 0 0; opacity: 0.85; font-size: 1.05rem; }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2, h3 { color: #0056b3; }
+        a { color: #007bff; }
+        a:hover { text-decoration: none; }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        pre .func { color: #dcdcaa; }
+        .output-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+        .badge-role {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 3px;
+            background: #0056b3;
+            color: #fff;
+            margin-right: 6px;
+        }
+        .arch-diagram {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        table.stats { width: 100%; margin-bottom: 1rem; }
+        table.stats td, table.stats th {
+            padding: 6px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table.stats th { text-align: left; font-weight: 600; }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .category-grid .cat {
+            background: #fff3e0;
+            border: 1px solid #ffe0b2;
+            border-radius: 4px;
+            padding: 3px 10px;
+            font-size: 0.82rem;
+            font-family: 'Courier New', monospace;
+        }
+        .callout-future {
+            background: #fff8e1;
+            border-left: 5px solid #ffc107;
+            padding: 16px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-primary">Home</a>
+            <a href="wikipedia_scraper.html" class="btn btn-outline-light ml-2">Wikipedia Scraper</a>
+            <a href="sep_scraper.html" class="btn btn-outline-light ml-2">SEP Scraper</a>
+        </div>
+        <h1>arXiv Scraper</h1>
+        <p>Atom API metadata ingest with category-driven queries and PDF download</p>
+    </header>
+
+    <section class="container mt-5">
+
+        <p><span class="badge-role">Role in pipeline</span> <strong>Primary-source verification.</strong> Direct access to recent research PDFs in CS, AI, math, and neuroscience. When a concept page in the knowledge base makes an empirical claim, the arXiv pipeline provides the paper that backs it up.</p>
+
+        <!-- Why arXiv -->
+        <div class="concept-box">
+            <h3>Why arXiv for LLM Knowledge Ingest?</h3>
+            <p>Wikipedia gives you breadth. SEP gives you peer-reviewed definitions. But when someone asks "what's the latest evidence for predictive processing in visual cortex?" or "which RAG architectures actually improve factual grounding?" &mdash; you need primary literature. arXiv is the open-access preprint server where CS/AI, math, physics, and quantitative biology researchers publish before (and sometimes instead of) journal submission.</p>
+            <p>arXiv has a unique constraint: its <strong>Atom API exposes metadata only &mdash; no references, no citation graph.</strong> The paper's abstract, authors, categories, and PDF link are available, but its bibliography is locked inside the PDF. This means the arXiv scraper is structurally different from the Wikipedia and SEP scrapers: it's a metadata-and-document fetcher, not a graph crawler. Citation-graph reconstruction requires an external bridge (Semantic Scholar) or full PDF reference extraction.</p>
+        </div>
+
+        <!-- Architecture -->
+        <div class="concept-box">
+            <h3>Architecture</h3>
+            <p>Two implementations targeting different entry patterns:</p>
+            <div class="arch-diagram">
+<strong>arxiv.py</strong> (category-driven)
+
+  <strong>ArxivFetcher</strong>
+    .arxiv_categories   &mdash; 35 CS subcategories mapped to arXiv codes
+    .fetch_arxiv_articles(category_key, n)
+      1. Build Atom API URL:  cat:{code}&amp;sortBy=submittedDate
+      2. Parse feed via feedparser
+      3. For each entry: extract arxiv_id, title, date, summary
+      4. Download PDF via application/pdf link
+      5. Dedup against metadata.json
+      6. Persist metadata + PDF to arxiv_articles/
+
+<strong>merged_arxiv_union.ipynb cell 24</strong> (search-query-driven)
+
+  1. Build URL:  all:{free-text query}&amp;max_results=N
+  2. Parse + normalize to pandas DataFrame
+  3. Filter by category list (e.g. cs.CL, cs.LG)
+  4. Download first PDF + extract first 2 pages via PyPDF2
+  5. Save CSV + JSON + text preview to arxiv_out/
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="concept-box">
+            <h3>Key Design Decisions</h3>
+
+            <h4>Two entry patterns: category browse vs. keyword search</h4>
+            <p><code>arxiv.py</code> answers "what's new in cs.AI?" &mdash; sorted by submission date, category-filtered. The notebook answers "find papers about retrieval-augmented generation" &mdash; free-text search, post-filtered by category list. Both patterns are needed: browse for monitoring a field, search for answering a specific question.</p>
+
+            <h4>35 CS subcategory index</h4>
+            <p>The <code>arxiv_categories</code> dictionary maps human-readable names to arXiv codes, covering the full CS taxonomy. This makes category-driven queries accessible without memorizing codes like <code>cs.CL</code> or <code>cs.NE</code>.</p>
+
+            <h4>PDF download + text preview</h4>
+            <p>The notebook goes one step further than <code>arxiv.py</code>: after downloading the PDF, it extracts the first 1&ndash;2 pages as plain text via PyPDF2. This gives an immediate text preview without requiring a full PDF-to-text pipeline. Enough for an LLM to read the abstract + introduction.</p>
+
+            <h4>Polite identification</h4>
+            <p>All requests use a shared <code>CogSciWikiBot/0.1</code> user-agent string with explicit timeouts, matching the same politeness standards as the Wikipedia and SEP scrapers.</p>
+        </div>
+
+        <!-- Category Index -->
+        <div class="concept-box">
+            <h3>arXiv CS Category Index (35 subcategories)</h3>
+            <div class="category-grid">
+                <span class="cat">cs.AI &mdash; Artificial Intelligence</span>
+                <span class="cat">cs.CL &mdash; Computation and Language</span>
+                <span class="cat">cs.CV &mdash; Computer Vision</span>
+                <span class="cat">cs.LG &mdash; Machine Learning</span>
+                <span class="cat">cs.NE &mdash; Neural/Evolutionary Computing</span>
+                <span class="cat">cs.RO &mdash; Robotics</span>
+                <span class="cat">cs.HC &mdash; Human-Computer Interaction</span>
+                <span class="cat">cs.IR &mdash; Information Retrieval</span>
+                <span class="cat">cs.SE &mdash; Software Engineering</span>
+                <span class="cat">cs.LO &mdash; Logic in CS</span>
+                <span class="cat">cs.CC &mdash; Computational Complexity</span>
+                <span class="cat">cs.DS &mdash; Data Structures/Algorithms</span>
+                <span class="cat">cs.CR &mdash; Cryptography and Security</span>
+                <span class="cat">cs.DB &mdash; Databases</span>
+                <span class="cat">cs.DC &mdash; Distributed Computing</span>
+                <span class="cat">cs.PL &mdash; Programming Languages</span>
+                <span class="cat">cs.MA &mdash; Multiagent Systems</span>
+                <span class="cat">cs.GT &mdash; Game Theory</span>
+                <span class="cat">cs.CY &mdash; Computers and Society</span>
+                <span class="cat">cs.IT &mdash; Information Theory</span>
+            </div>
+            <p class="mt-2 text-muted" style="font-size:0.85rem;">Showing 20 of 35 &mdash; full index in <a href="https://github.com/scottn66/wiki/blob/feat/scraper-showcase/arxiv.py">source code</a>.</p>
+        </div>
+
+        <!-- Code Sample -->
+        <div class="concept-box">
+            <h3>Code: Category-Driven Fetch</h3>
+            <pre><span class="keyword">def</span> <span class="func">fetch_arxiv_articles</span>(self, category_key, num_articles=<span class="string">3</span>):
+    category = self.arxiv_categories.get(category_key, <span class="keyword">None</span>)
+    <span class="keyword">if not</span> category:
+        print(<span class="string">f"Invalid category: {category_key}"</span>)
+        <span class="keyword">return</span>
+
+    downloaded_ids = self._load_downloaded_articles()
+    new_articles = []
+
+    base_url = <span class="string">"http://export.arxiv.org/api"</span>
+    query = (
+        <span class="string">f"/query?search_query=cat:{category}"</span>
+        <span class="string">f"&amp;sortBy=submittedDate&amp;sortOrder=descending"</span>
+        <span class="string">f"&amp;start=0&amp;max_results={num_articles}"</span>
+    )
+    feed = feedparser.parse(base_url + query)
+
+    <span class="keyword">for</span> entry <span class="keyword">in</span> feed.entries:
+        arxiv_id = entry.id.split(<span class="string">'/'</span>)[-<span class="string">1</span>]
+        <span class="keyword">if</span> arxiv_id <span class="keyword">in</span> downloaded_ids:
+            <span class="keyword">continue</span>
+        <span class="comment"># ... download PDF, extract metadata, persist ...</span></pre>
+        </div>
+
+        <!-- Live Output -->
+        <div class="concept-box">
+            <h3>Live Output: Recent RAG Papers</h3>
+            <p>Search query: <code>all:retrieval-augmented generation</code>, 3 results, sorted by date:</p>
+            <div class="output-box">=== arXiv fetch via Atom API ===
+  Feed status: 301 (redirect to https, expected)
+  Entries returned: 3
+
+  [1] Fast Spatial Memory with Elastic Test-Time Training
+      id: 2604.07350v1
+      published: 2026-04-08T17:59:48Z
+      categories: [cs.CV, cs.GR, cs.LG]
+      pdf: https://arxiv.org/pdf/2604.07350v1
+
+  [2] MoRight: Motion Control Done Right
+      id: 2604.07348v1
+      published: 2026-04-08T17:59:22Z
+      categories: [cs.CV, cs.AI, cs.GR, cs.LG, cs.RO]
+      pdf: https://arxiv.org/pdf/2604.07348v1
+
+  [3] Interaction-Mediated Non-Reciprocal Dynamics in Open Quantum Systems
+      id: 2604.07346v1
+      published: 2026-04-08T17:57:26Z
+      categories: [quant-ph, cond-mat.mes-hall]
+      pdf: https://arxiv.org/pdf/2604.07346v1</div>
+            <p><em>Papers published yesterday (April 8, 2026). The pipeline fetches real-time preprints.</em></p>
+        </div>
+
+        <!-- The Fundamental Limit -->
+        <div class="callout-future">
+            <h3>The Graph Gap &mdash; and How to Close It</h3>
+            <p>arXiv's Atom API exposes <strong>no references, no citation graph, no inbound counts</strong>. This is the fundamental structural difference from Wikipedia (834 outlinks per page) and SEP (31 curated cross-references). To reconstruct the citation network, the pipeline needs an external bridge.</p>
+            <p><strong>Planned approach:</strong> Semantic Scholar's free API provides <code>references</code> and <code>citations</code> endpoints for any paper, plus an <code>influentialCitationCount</code> field that approximates whether a paper is cited substantively (in the body) vs. perfunctorily (in the reference list). This gives ~80% of the signal of full PDF reference extraction at ~5% of the implementation cost.</p>
+            <p>Once wired in, this enables <strong>citation-distance visualization</strong> &mdash; plotting how the reachable paper set grows exponentially with hop distance, and why bounding traversal depth is critical for tractable knowledge ingest.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="concept-box">
+            <h3>At a Glance</h3>
+            <table class="stats">
+                <tr><th>Metric</th><th>Value</th></tr>
+                <tr><td>API</td><td>arXiv Atom (export.arxiv.org/api)</td></tr>
+                <tr><td>Entry patterns</td><td>Category browse + free-text search</td></tr>
+                <tr><td>Category coverage</td><td>35 CS subcategories (extensible to math, physics, q-bio)</td></tr>
+                <tr><td>Storage backend</td><td>JSON metadata + downloaded PDFs</td></tr>
+                <tr><td>Text extraction</td><td>First 1&ndash;2 PDF pages via PyPDF2</td></tr>
+                <tr><td>Graph availability</td><td>None in API (Semantic Scholar bridge planned)</td></tr>
+                <tr><td>Dedup strategy</td><td>arxiv_id set from metadata.json</td></tr>
+            </table>
+        </div>
+
+        <!-- Comparison -->
+        <div class="concept-box">
+            <h3>Three Sources, Three Roles</h3>
+            <table class="stats">
+                <tr><th></th><th>Wikipedia</th><th>SEP</th><th>arXiv</th></tr>
+                <tr><td><strong>Role</strong></td><td>Breadth + entities</td><td>Concept backbone</td><td>Primary-source verification</td></tr>
+                <tr><td><strong>Graph signal</strong></td><td>Dense (834 links/page)</td><td>Sparse, curated (31/page)</td><td>None in API</td></tr>
+                <tr><td><strong>Content type</strong></td><td>Section-aware HTML</td><td>Section-aware HTML</td><td>Metadata + PDF</td></tr>
+                <tr><td><strong>Validation</strong></td><td>6-point soup check</td><td>Basic</td><td>HTTP status</td></tr>
+                <tr><td><strong>Storage</strong></td><td>SQLite</td><td>JSON</td><td>JSON + PDFs</td></tr>
+                <tr><td><strong>Unique strength</strong></td><td>Canonical keys + fake scraper</td><td>Query layer + preamble</td><td>35-category index + PDF text</td></tr>
+            </table>
+        </div>
+
+        <div class="text-center mt-4 mb-4">
+            <a href="https://github.com/scottn66/wiki" class="btn btn-primary btn-lg" target="_blank">View Source on GitHub</a>
+            <a href="sep_scraper.html" class="btn btn-outline-primary btn-lg ml-2">&larr; SEP Scraper</a>
+            <a href="wikipedia_scraper.html" class="btn btn-outline-primary btn-lg ml-2">Wikipedia Scraper</a>
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Scott Nelson &mdash; Knowledge Source Scrapers. <a href="https://github.com/scottn66/wiki" style="color:#aaa;">github.com/scottn66/wiki</a></p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

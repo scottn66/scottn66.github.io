@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Wikipedia Scraper &mdash; Knowledge Source Pipeline</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container { padding: 20px; }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 { margin: 0; }
+        .header p { margin: 0.25rem 0 0; opacity: 0.85; font-size: 1.05rem; }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2, h3 { color: #0056b3; }
+        a { color: #007bff; }
+        a:hover { text-decoration: none; }
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #569cd6; }
+        pre .string { color: #ce9178; }
+        pre .func { color: #dcdcaa; }
+        pre .cls { color: #4ec9b0; }
+        .output-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+        .badge-role {
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 3px;
+            background: #0056b3;
+            color: #fff;
+            margin-right: 6px;
+        }
+        .arch-diagram {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        table.stats { width: 100%; margin-bottom: 1rem; }
+        table.stats td, table.stats th {
+            padding: 6px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        table.stats th { text-align: left; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-primary">Home</a>
+            <a href="sep_scraper.html" class="btn btn-outline-light ml-2">SEP Scraper</a>
+            <a href="arxiv_scraper.html" class="btn btn-outline-light ml-2">arXiv Scraper</a>
+        </div>
+        <h1>Wikipedia Scraper</h1>
+        <p>Bounded BFS crawl with canonical keys, SQLite graph store, and a 6-point soup validator</p>
+    </header>
+
+    <section class="container mt-5">
+
+        <p><span class="badge-role">Role in pipeline</span> <strong>Breadth + entity coverage.</strong> Dense inline hyperlink graph, canonical page keys, high recall. Wikipedia gives you 834 outlinks from a single article &mdash; the widest expansion of any source in the stack.</p>
+
+        <!-- Role & Motivation -->
+        <div class="concept-box">
+            <h3>Why Wikipedia for LLM Knowledge Ingest?</h3>
+            <p>RAG pipelines need a <em>breadth layer</em> &mdash; a source that covers entities (people, theories, labs, models) at scale, with structured hyperlinks between them. Wikipedia is ideal: every article is a node in a massive directed graph, every inline <code>/wiki/</code> link is an edge, and the content is structured enough to extract section-keyed text automatically.</p>
+            <p>The challenge is taming the graph. A single seed article like <em>Cognitive science</em> links to 834 other articles. Two hops out, the reachable set grows exponentially. The scraper stack solves this with <strong>bounded BFS</strong> (configurable depth and max-connections-per-hop), <strong>canonical key normalization</strong> (so <code>Cognitive_science</code>, <code>cognitive science</code>, and <code>https://en.wikipedia.org/wiki/Cognitive_science#History</code> all resolve to the same node), and a <strong>SQLite store</strong> that deduplicates across sessions.</p>
+        </div>
+
+        <!-- Architecture -->
+        <div class="concept-box">
+            <h3>Architecture</h3>
+            <p>Three files, three maturity levels, each solving a different sub-problem:</p>
+            <div class="arch-diagram">
+<strong>sitehopper3_basic.py</strong> (the grown-up scraper)
+  canonical_page_key() &mdash; normalizes URLs, spaces, fragments into one key
+  SimpleWikiStore      &mdash; SQLite with pages + edges tables, upsert semantics
+  WikipediaScraper     &mdash; live fetcher, strips noisy elements, extracts &lt;p&gt; text
+  FakeWikipediaScraper &mdash; deterministic offline mode (SHA-256 seeded, no network)
+  crawl()              &mdash; bounded BFS: depth + max_connections + PRNG sampling
+
+<strong>wikiFetcher.py</strong> (the validator)
+  WebScraper           &mdash; session-based with polite UA + timeout + referer
+  validate_wikipedia_soup() &mdash; 6-point quality gate:
+    1. HTTP status == 200
+    2. No &lt;table class="noarticletext"&gt;
+    3. h1#firstHeading exists
+    4. div.mw-parser-output exists
+    5. At least one paragraph &gt; 40 chars
+    6. Not a disambiguation page (category check)
+  WikipediaFetcher     &mdash; title-list fetcher with section-aware extraction
+
+<strong>wikiSearch.py</strong> (the search entry point)
+  WikiPage             &mdash; in-memory page graph with 1-hop link expansion
+  WikipediaFetcher     &mdash; MediaWiki API search with content-type validation
+            </div>
+        </div>
+
+        <!-- Key Features -->
+        <div class="concept-box">
+            <h3>Key Design Decisions</h3>
+            <h4>Canonical page keys</h4>
+            <p>The function <code>canonicalize_page_key()</code> solves the identity problem at ingest time rather than query time. URLs, display titles, and fragments all map to a single canonical string. This means the SQLite edges table never has duplicate nodes under different names.</p>
+
+            <h4>Graph persistence in SQLite</h4>
+            <p>Unlike flat JSON metadata, the <code>pages</code>/<code>edges</code> schema gives you a real directed graph with bidirectional queries, neighbor lookups with limits, and upsert semantics that survive across sessions. Placeholder pages are created for unseen outlinks so the graph stays connected even before those pages are fetched.</p>
+
+            <h4>Real + fake scraper pair</h4>
+            <p>The <code>FakeWikipediaScraper</code> uses SHA-256 hashing of the page key to produce deterministic content and outlinks &mdash; same inputs always produce same outputs, with zero network calls. This means crawl behavior can be tested and benchmarked offline, which is critical for developing the BFS parameters without hammering Wikipedia.</p>
+
+            <h4>6-point soup validation</h4>
+            <p>Validation rejects bad content before it enters the cache: disambiguation pages, deleted articles, empty stubs, and non-article pages are caught by six progressive checks. Each failure returns a reason string, making debugging transparent.</p>
+        </div>
+
+        <!-- Code Sample -->
+        <div class="concept-box">
+            <h3>Code: Bounded BFS Crawl</h3>
+            <pre><span class="keyword">def</span> <span class="func">crawl</span>(start_page, store, scraper, depth=<span class="string">2</span>, max_connections=<span class="string">8</span>, seed=<span class="string">0</span>):
+    <span class="comment">"""Simple bounded BFS crawl."""</span>
+    rng = random.Random(seed)
+    start = <span class="func">canonicalize_page_key</span>(start_page)
+    visited: set[str] = set()
+    frontier = [start]
+    fetched = <span class="string">0</span>
+
+    <span class="keyword">for</span> _ <span class="keyword">in</span> range(depth):
+        next_frontier: list[str] = []
+        <span class="keyword">for</span> page <span class="keyword">in</span> frontier:
+            <span class="keyword">if</span> page <span class="keyword">in</span> visited:
+                <span class="keyword">continue</span>
+            visited.add(page)
+            _, outlinks, _, from_cache = <span class="func">load_or_fetch_page</span>(page, store, scraper)
+            <span class="keyword">if not</span> from_cache:
+                fetched += <span class="string">1</span>
+            <span class="keyword">if</span> len(outlinks) > max_connections:
+                outlinks = rng.sample(outlinks, k=max_connections)
+            next_frontier.extend(outlinks)
+        frontier = next_frontier
+
+    <span class="keyword">return</span> {<span class="string">"start"</span>: start, <span class="string">"depth"</span>: depth,
+            <span class="string">"visited_pages"</span>: len(visited), <span class="string">"fresh_fetches"</span>: fetched}</pre>
+        </div>
+
+        <!-- Live Output -->
+        <div class="concept-box">
+            <h3>Live Output: Cognitive Science Seed</h3>
+            <p>Single fetch of <code>Cognitive_science</code> via <code>WikipediaScraper</code>:</p>
+            <div class="output-box">=== canonicalization ===
+  'Cognitive_science'                              -> Cognitive_science
+  'cognitive science'                              -> cognitive_science
+  'https://en.wikipedia.org/wiki/Cognitive_science#History' -> Cognitive_science
+
+=== live fetch: Cognitive_science ===
+  HTTP status: 200
+  Content chars: 33,266
+  Outlinks found: 834
+  First 250 chars:
+    Cognitive science is the interdisciplinary, scientific study of the
+    mind and its processes. It examines the nature, the tasks, and the
+    functions of cognition (in a broad sense)...
+  Sample outlinks:
+    - Philosophy of mind
+    - Linguistics
+    - Neuroscience
+    - Artificial intelligence
+    - Anthropology
+    - Psychology
+    - Computer science
+    - Cognitive Science (journal)</div>
+            <p><em>Notice:</em> the outlinks are essentially the <a href="https://en.wikipedia.org/wiki/Cognitive_science">cognitive science pillar list</a> &mdash; philosophy of mind, linguistics, neuroscience, AI, anthropology, psychology, computer science. This is why Wikipedia is the natural breadth layer for a cognitive-science knowledge pipeline.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="concept-box">
+            <h3>At a Glance</h3>
+            <table class="stats">
+                <tr><th>Metric</th><th>Value</th></tr>
+                <tr><td>Content per page</td><td>~33K chars (Cognitive Science)</td></tr>
+                <tr><td>Outlinks per page</td><td>~834 (varies by article)</td></tr>
+                <tr><td>Effective branching factor (capped)</td><td>8 (configurable <code>max_connections</code>)</td></tr>
+                <tr><td>Storage backend</td><td>SQLite (pages + edges tables)</td></tr>
+                <tr><td>Dedup strategy</td><td>Canonical key normalization + upsert</td></tr>
+                <tr><td>Validation</td><td>6-point soup check (strictest in the stack)</td></tr>
+                <tr><td>Offline mode</td><td>FakeWikipediaScraper (deterministic, zero network)</td></tr>
+            </table>
+        </div>
+
+        <div class="text-center mt-4 mb-4">
+            <a href="https://github.com/scottn66/wiki" class="btn btn-primary btn-lg" target="_blank">View Source on GitHub</a>
+            <a href="sep_scraper.html" class="btn btn-outline-primary btn-lg ml-2">Next: SEP Scraper &rarr;</a>
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Scott Nelson &mdash; Knowledge Source Scrapers. <a href="https://github.com/scottn66/wiki" style="color:#aaa;">github.com/scottn66/wiki</a></p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

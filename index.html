@@ -307,6 +307,50 @@
             </div>
           </article>
         </div>
+
+        <!-- Knowledge Source Scrapers -->
+        <h3 class="text-center mt-5 mb-4" style="color: var(--primary-color);">Knowledge Source Scrapers</h3>
+        <p class="text-center text-muted mb-4">Three complementary Python scrapers forming the raw-sources layer of an LLM knowledge pipeline for cognitive science.</p>
+        <div class="row">
+          <!-- Wikipedia Scraper Card -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">Wikipedia Scraper</h5>
+                <p class="card-text">Bounded BFS crawl with canonical page keys, SQLite graph store, and a 6-point soup validator. 834 outlinks from a single seed article.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#projectModalWiki">View Project</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- SEP Scraper Card -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">SEP Scraper</h5>
+                <p class="card-text">Stanford Encyclopedia of Philosophy: peer-reviewed concept backbone with hand-curated cross-references and a built-in query layer.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#projectModalSEP">View Project</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- arXiv Scraper Card -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">arXiv Scraper</h5>
+                <p class="card-text">Atom API metadata ingest with category-driven queries, PDF download, and text extraction across 35 CS subcategories.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#projectModalArxiv">View Project</a>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -401,6 +445,66 @@
         </div>
         <div class="modal-footer">
           <a href="https://scottn66.github.io/HMM.html" class="btn btn-primary" target="_blank">View Full Project</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Wikipedia Scraper -->
+  <div class="modal fade" id="projectModalWiki" tabindex="-1" aria-labelledby="projectModalLabelWiki" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="projectModalLabelWiki">Wikipedia Scraper</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Three complementary Wikipedia scrapers: <strong>sitehopper3_basic.py</strong> provides canonical page-key normalization, a SQLite pages/edges graph store, bounded BFS crawling, and a deterministic fake scraper for offline testing. <strong>wikiFetcher.py</strong> adds a 6-point soup validator that rejects disambiguation pages, missing content, and empty stubs before they enter the cache. <strong>wikiSearch.py</strong> wraps the MediaWiki search API with content-type validation and JSON decode fallback. Together they form the breadth layer of a cognitive-science knowledge pipeline.</p>
+        </div>
+        <div class="modal-footer">
+          <a href="wikipedia_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
+          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for SEP Scraper -->
+  <div class="modal fade" id="projectModalSEP" tabindex="-1" aria-labelledby="projectModalLabelSEP" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="projectModalLabelSEP">SEP Scraper</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Scraper for the Stanford Encyclopedia of Philosophy &mdash; the highest signal-per-page source in the stack. Extracts section-keyed content, initial preamble paragraphs, and the hand-curated <code>related_entries</code> cross-reference graph that SEP editors maintain. Includes a <strong>DBreader</strong> query layer for keyword search over cached articles and an NLTK-based lexicon/bigram analyzer. Each SEP entry yields ~31 curated cross-references vs. Wikipedia's ~834 noisy hyperlinks.</p>
+        </div>
+        <div class="modal-footer">
+          <a href="sep_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
+          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for arXiv Scraper -->
+  <div class="modal fade" id="projectModalArxiv" tabindex="-1" aria-labelledby="projectModalLabelArxiv" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="projectModalLabelArxiv">arXiv Scraper</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Atom API scraper for arXiv preprints with two entry patterns: category-driven browsing (35 CS subcategories) and free-text keyword search. Downloads PDFs and extracts the first 1&ndash;2 pages as text previews via PyPDF2. Normalizes results to structured metadata (arxiv_id, title, authors, categories, abstract). The primary-source verification layer &mdash; when a concept page makes an empirical claim, the arXiv pipeline provides the paper that backs it up.</p>
+        </div>
+        <div class="modal-footer">
+          <a href="arxiv_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
+          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
