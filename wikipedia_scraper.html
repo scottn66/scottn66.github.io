@@ -120,7 +120,7 @@
         <div class="concept-box">
             <h3>Architecture</h3>
             <p>Three files, three maturity levels, each solving a different sub-problem:</p>
-            <div class="arch-diagram">
+            <pre class="arch-diagram">
 <strong>sitehopper3_basic.py</strong> (the grown-up scraper)
   canonical_page_key() &mdash; normalizes URLs, spaces, fragments into one key
   SimpleWikiStore      &mdash; SQLite with pages + edges tables, upsert semantics
@@ -142,7 +142,7 @@
 <strong>wikiSearch.py</strong> (the search entry point)
   WikiPage             &mdash; in-memory page graph with 1-hop link expansion
   WikipediaFetcher     &mdash; MediaWiki API search with content-type validation
-            </div>
+            </pre>
         </div>
 
         <!-- Key Features -->
