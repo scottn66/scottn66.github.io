@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Dashboard &mdash; Scott Nelson</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f4f4f4; --card-bg: #fff; --text: #333; --muted: #6c757d;
+      --q1: #dc3545; --q2: #0d6efd; --q3: #ffc107; --q4: #6c757d;
+      --col-backlog: #e9ecef; --col-todo: #cfe2ff; --col-wip: #fff3cd; --col-done: #d1e7dd;
+    }
+    body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+    h1,h2,h3,h4 { font-family: 'Montserrat', sans-serif; }
+    .navbar { background-color: #343a40 !important; }
+
+    /* Stats bar */
+    .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .stat-card {
+      flex: 1; min-width: 120px; background: var(--card-bg); border-radius: 8px;
+      padding: 12px 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    }
+    .stat-card .num { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .stat-card .label { font-size: .75rem; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+    /* Controls */
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+    .view-btn.active { background: #0d6efd; color: #fff; }
+
+    /* Kanban */
+    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 400px; }
+    .kanban-col {
+      background: var(--col-backlog); border-radius: 8px; padding: 10px;
+      display: flex; flex-direction: column; gap: 8px; min-height: 200px;
+    }
+    .kanban-col:nth-child(2) { background: var(--col-todo); }
+    .kanban-col:nth-child(3) { background: var(--col-wip); }
+    .kanban-col:nth-child(4) { background: var(--col-done); }
+    .kanban-col h5 { font-size: .85rem; text-transform: uppercase; margin: 0 0 6px; color: var(--muted); }
+
+    /* Eisenhower */
+    .eisenhower { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; }
+    .eq { border-radius: 8px; padding: 12px; min-height: 220px; }
+    .eq h5 { font-size: .8rem; text-transform: uppercase; margin: 0 0 8px; }
+    .eq-q1 { background: #f8d7da; } .eq-q1 h5 { color: var(--q1); }
+    .eq-q2 { background: #cfe2ff; } .eq-q2 h5 { color: var(--q2); }
+    .eq-q3 { background: #fff3cd; } .eq-q3 h5 { color: var(--q3); }
+    .eq-q4 { background: #e9ecef; } .eq-q4 h5 { color: var(--q4); }
+    .eq-axis-label {
+      font-size: .7rem; text-transform: uppercase; color: var(--muted);
+      text-align: center; font-weight: 600; letter-spacing: 1px;
+    }
+
+    /* Task cards */
+    .task-card {
+      background: var(--card-bg); border-radius: 6px; padding: 8px 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.08); cursor: pointer; font-size: .82rem;
+      border-left: 4px solid var(--muted); transition: box-shadow .15s;
+    }
+    .task-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    .task-card .title { font-weight: 600; margin-bottom: 2px; }
+    .task-card .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .badge-project {
+      font-size: .65rem; padding: 2px 6px; border-radius: 3px; color: #fff; font-weight: 600;
+    }
+    .badge-size {
+      font-size: .65rem; padding: 1px 5px; border-radius: 3px;
+      background: #e9ecef; color: #555;
+    }
+    .badge-epic {
+      font-size: .65rem; padding: 1px 5px; border-radius: 3px;
+      background: #f0f0f0; color: var(--muted);
+    }
+
+    /* Modal overrides */
+    .modal-body select { max-width: 200px; }
+    .detail-section { margin-top: 10px; }
+    .detail-section dt { font-weight: 600; font-size: .8rem; color: var(--muted); }
+    .detail-section dd { font-size: .85rem; margin-bottom: 8px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .kanban { grid-template-columns: 1fr; }
+      .eisenhower { grid-template-columns: 1fr; }
+    }
+
+    /* Progress bar */
+    .progress-row { margin-bottom: 1.5rem; }
+    .progress { height: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Scott Nelson</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html#projects">Projects</a></li>
+          <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="resume.html">Resume</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4 mb-5">
+    <h2 class="mb-1"><i class="fas fa-th-large me-2"></i>Project Dashboard</h2>
+    <p class="text-muted mb-3">Aggregate view of all active work. Click any card to update its status or priority.</p>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="stats-bar"></div>
+
+    <!-- Progress -->
+    <div class="progress-row" id="progress-row"></div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="btn-group" role="group">
+        <button class="btn btn-sm btn-outline-secondary view-btn active" data-view="kanban"><i class="fas fa-columns me-1"></i>Kanban</button>
+        <button class="btn btn-sm btn-outline-secondary view-btn" data-view="eisenhower"><i class="fas fa-border-all me-1"></i>Eisenhower</button>
+      </div>
+      <select class="form-select form-select-sm" id="filter-project" style="max-width:200px;">
+        <option value="all">All Projects</option>
+      </select>
+      <select class="form-select form-select-sm" id="filter-status" style="max-width:160px;">
+        <option value="all">All Statuses</option>
+        <option value="backlog">Backlog</option>
+        <option value="todo">To Do</option>
+        <option value="in_progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+      <button class="btn btn-sm btn-outline-danger ms-auto" id="btn-reset" title="Reset all changes to defaults"><i class="fas fa-undo me-1"></i>Reset</button>
+    </div>
+
+    <!-- Board -->
+    <div id="board"></div>
+  </div>
+
+  <!-- Detail modal -->
+  <div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="modal-save">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  // ============================================================
+  // PROJECT DATA — edit this array to add/update tasks
+  // ============================================================
+  const PROJECTS = [
+    {
+      name: "LLM Wiki", color: "#0d6efd",
+      link: null,
+      tasks: [
+        // Epic 0 — Bootstrap
+        { id:"E0-S1", title:"Create wiki directory skeleton", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"pillars/, concepts/, entities/, sources/, questions/, syntheses/, raw/ all exist", deps:[] },
+        { id:"E0-S2", title:"Write minimal CLAUDE.md schema", status:"backlog", size:"M", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"Documents page types, frontmatter conventions, ingest/query/lint workflows; under 300 lines", deps:["E0-S1"] },
+        { id:"E0-S3", title:"Seed index.md and log.md", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"index.md has empty category headers; log.md has one bootstrap entry", deps:["E0-S1"] },
+        { id:"E0-S4", title:"Smoke test schema in conversation", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"Fresh Claude session reads CLAUDE.md and correctly creates one stub page", deps:["E0-S2","E0-S3"] },
+        // Epic 1 — First Ingest
+        { id:"E1-S1", title:"Define source page template", status:"backlog", size:"M", epic:"First Ingest", urgency:"low", importance:"high", acceptance:"Template in CLAUDE.md with frontmatter and section structure", deps:["E0-S2"] },
+        { id:"E1-S2", title:"Ingest one real Wikipedia article", status:"backlog", size:"M", epic:"First Ingest", urgency:"low", importance:"high", acceptance:"Raw saved, summary page created, index + log updated", deps:["E1-S1"] },
+        { id:"E1-S3", title:"Create stubs for top concepts", status:"backlog", size:"S", epic:"First Ingest", urgency:"low", importance:"medium", acceptance:"Concepts mentioned 3+ times get a stub page", deps:["E1-S2"] },
+        { id:"E1-S4", title:"Retro: update CLAUDE.md", status:"backlog", size:"S", epic:"First Ingest", urgency:"low", importance:"medium", acceptance:"At least one concrete schema improvement", deps:["E1-S2"] },
+        // Epic 2 — First Synthesis
+        { id:"E2-S1", title:"Define concept page template", status:"backlog", size:"M", epic:"First Synthesis", urgency:"low", importance:"medium", acceptance:"Template with Definition / Origins / Key proponents / Sources / Contradictions", deps:["E1-S4"] },
+        { id:"E2-S2", title:"Ingest 2 more sources", status:"backlog", size:"M", epic:"First Synthesis", urgency:"low", importance:"medium", acceptance:"SEP + Wikipedia articles on related entities", deps:["E1-S2"] },
+        { id:"E2-S3", title:"Author first concept page", status:"backlog", size:"L", epic:"First Synthesis", urgency:"low", importance:"high", acceptance:"3+ cited claims from different sources", deps:["E2-S1","E2-S2"] },
+        { id:"E2-S4", title:"Bidirectional linking pass", status:"backlog", size:"S", epic:"First Synthesis", urgency:"low", importance:"low", acceptance:"All source pages link forward; orphan check passes", deps:["E2-S3"] },
+        // Epic 3 — Query
+        { id:"E3-S1", title:"Define query workflow", status:"backlog", size:"M", epic:"Query Loop", urgency:"low", importance:"medium", acceptance:"Documented: read index → find pages → synthesize → cite", deps:["E0-S2"] },
+        { id:"E3-S2", title:"Run first real query", status:"backlog", size:"M", epic:"Query Loop", urgency:"low", importance:"high", acceptance:"Cited markdown answer to a real question", deps:["E3-S1","E2-S3"] },
+        { id:"E3-S3", title:"File answer as synthesis page", status:"backlog", size:"S", epic:"Query Loop", urgency:"low", importance:"medium", acceptance:"Lives in syntheses/, indexed, logged", deps:["E3-S2"] },
+        { id:"E3-S4", title:"Identify gaps from query", status:"backlog", size:"S", epic:"Query Loop", urgency:"low", importance:"low", acceptance:"1+ new stub or needs-more-sources note", deps:["E3-S2"] },
+        // Epic 4 — Pillar Scaffolding
+        { id:"E4-S1", title:"Write 8 pillar stub pages", status:"backlog", size:"M", epic:"Pillar Scaffolding", urgency:"low", importance:"medium", acceptance:"psychology, linguistics, neuroscience, philosophy-of-mind, CS, AI, anthropology, mathematics", deps:["E0-S1"] },
+        { id:"E4-S2", title:"Cross-link pillars ↔ concepts", status:"backlog", size:"S", epic:"Pillar Scaffolding", urgency:"low", importance:"low", acceptance:"Frontmatter + prose links both directions", deps:["E4-S1","E2-S3"] },
+        { id:"E4-S3", title:"Backlog concept stubs from pillars", status:"backlog", size:"S", epic:"Pillar Scaffolding", urgency:"low", importance:"low", acceptance:"New stubs for unaddressed concepts", deps:["E4-S1"] },
+        // Epic 5 — Automation
+        { id:"E5-S0", title:"Scraper survey doc", status:"done", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"SCRAPER_SURVEY.md with comparison table and unified Source schema", deps:[] },
+        { id:"E5-S1", title:"Wikipedia markdown emitter", status:"backlog", size:"L", epic:"Automation", urgency:"low", importance:"medium", acceptance:"wiki_emit.py writes sources/wikipedia/{slug}.md", deps:["E1-S1"] },
+        { id:"E5-S2", title:"SEP markdown emitter", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"low", acceptance:"Same shape, sources/sep/", deps:["E5-S1"] },
+        { id:"E5-S3", title:"arXiv markdown emitter", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"low", acceptance:"Frontmatter includes paper metadata", deps:["E5-S1"] },
+        { id:"E5-S4", title:"One-shot ingest CLI", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"python ingest.py --wikipedia 'Embodied cognition'", deps:["E5-S1"] },
+        { id:"E5-S5", title:"Hook link graph into frontmatter", status:"backlog", size:"S", epic:"Automation", urgency:"low", importance:"low", acceptance:"outbound_links from SQLite edges", deps:["E5-S4"] },
+        { id:"E5-S6", title:"Citation-graph visualization", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"3-panel figure: growth curve, branching histogram, inlaid bars", deps:["E5-S3"] },
+        // Epic 6 — Lint
+        { id:"E6-S1", title:"Define lint workflow", status:"backlog", size:"M", epic:"Lint", urgency:"low", importance:"low", acceptance:"Orphans, stale stubs, contradictions, frontmatter validation", deps:["E0-S2"] },
+        { id:"E6-S2", title:"First lint pass", status:"backlog", size:"M", epic:"Lint", urgency:"low", importance:"low", acceptance:"Lint report + 3 issues fixed", deps:["E6-S1"] },
+        { id:"E6-S3", title:"Lint cadence note", status:"backlog", size:"S", epic:"Lint", urgency:"low", importance:"low", acceptance:"Rule of thumb in CLAUDE.md", deps:["E6-S2"] },
+        // Epic 7 — Beachhead
+        { id:"E7-S1", title:"Pick beachhead topic", status:"backlog", size:"S", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"Topic in log.md, scope as questions/*.md", deps:[] },
+        { id:"E7-S2", title:"Ingest 10 sources", status:"backlog", size:"L", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"~4 SEP + ~4 Wikipedia + ~2 arXiv", deps:["E7-S1"] },
+        { id:"E7-S3", title:"Build concept + entity pages", status:"backlog", size:"L", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"5+ concept pages, 3+ entity pages, contradictions flagged", deps:["E7-S2"] },
+        { id:"E7-S4", title:"End-to-end demo query", status:"backlog", size:"M", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"Hard multi-source question, fully cited answer", deps:["E7-S3"] },
+        // Epic 8 — Polish
+        { id:"E8-S1", title:"Obsidian setup notes", status:"backlog", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Vault config, plugins", deps:[] },
+        { id:"E8-S2", title:"Dataview dashboards", status:"backlog", size:"M", epic:"Polish", urgency:"low", importance:"low", acceptance:"Status overview queries", deps:[] },
+        { id:"E8-S3", title:"Local search (qmd/BM25)", status:"backlog", size:"M", epic:"Polish", urgency:"low", importance:"low", acceptance:"Works when index.md gets unwieldy", deps:[] },
+        { id:"E8-S4", title:"Marp slide template", status:"backlog", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Wiki tour presentations", deps:[] },
+      ]
+    },
+    {
+      name: "Scrapers", color: "#198754",
+      link: "https://github.com/scottn66/wiki/pull/2",
+      tasks: [
+        { id:"SC-1", title:"Merge PR #2 to main", status:"todo", size:"S", epic:"Ship", urgency:"high", importance:"high", acceptance:"feat/scraper-showcase merged, main has README + .gitignore + all fixes", deps:[] },
+        { id:"SC-2", title:"Wikipedia showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"wikipedia_scraper.html live on scottn66.github.io", deps:[] },
+        { id:"SC-3", title:"SEP showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"sep_scraper.html live", deps:[] },
+        { id:"SC-4", title:"arXiv showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"arxiv_scraper.html live", deps:[] },
+        { id:"SC-5", title:"Hygiene: import guards + UA", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"medium", acceptance:"No import-time network, polite UA on all scrapers", deps:[] },
+        { id:"SC-6", title:"Smoke tests pass (all 3)", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"high", acceptance:"Wiki, SEP, arXiv all fetch live data", deps:[] },
+      ]
+    },
+    {
+      name: "Portfolio", color: "#6f42c1",
+      link: "https://scottn66.github.io",
+      tasks: [
+        { id:"PF-1", title:"MAB page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"MAB.html live with interactive sims", deps:[] },
+        { id:"PF-2", title:"Q-learning crawler page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"Q.html live", deps:[] },
+        { id:"PF-3", title:"HMM NER page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"HMM.html live", deps:[] },
+        { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", acceptance:"mandelbrot.html + landing page live", deps:[] },
+        { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", acceptance:"dashboard.html with kanban + Eisenhower views", deps:[] },
+      ]
+    }
+  ];
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  const STORAGE_KEY = "dashboard_overrides_v1";
+  let overrides = {};
+  try { overrides = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) {}
+
+  function getTask(t) {
+    const o = overrides[t.id] || {};
+    return { ...t, status: o.status || t.status, urgency: o.urgency || t.urgency, importance: o.importance || t.importance };
+  }
+  function saveOverride(id, field, value) {
+    if (!overrides[id]) overrides[id] = {};
+    overrides[id][field] = value;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+  }
+
+  function allTasks(filterProject, filterStatus) {
+    const out = [];
+    for (const p of PROJECTS) {
+      if (filterProject !== "all" && p.name !== filterProject) continue;
+      for (const t of p.tasks) {
+        const merged = { ...getTask(t), project: p.name, projectColor: p.color };
+        if (filterStatus !== "all" && merged.status !== filterStatus) continue;
+        out.push(merged);
+      }
+    }
+    return out;
+  }
+
+  // ============================================================
+  // RENDERING
+  // ============================================================
+  let currentView = "kanban";
+
+  function renderCard(t) {
+    const el = document.createElement("div");
+    el.className = "task-card";
+    el.style.borderLeftColor = t.projectColor;
+    el.innerHTML = `
+      <div class="title">${t.id}: ${t.title}</div>
+      <div class="meta">
+        <span class="badge-project" style="background:${t.projectColor}">${t.project}</span>
+        <span class="badge-size">${t.size}</span>
+        <span class="badge-epic">${t.epic}</span>
+      </div>`;
+    el.addEventListener("click", () => openModal(t));
+    return el;
+  }
+
+  function renderKanban(tasks) {
+    const cols = { backlog: [], todo: [], in_progress: [], done: [] };
+    for (const t of tasks) cols[t.status]?.push(t);
+    const labels = { backlog:"Backlog", todo:"To Do", in_progress:"In Progress", done:"Done" };
+    const board = document.getElementById("board");
+    board.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "kanban";
+    for (const key of ["backlog","todo","in_progress","done"]) {
+      const col = document.createElement("div");
+      col.className = "kanban-col";
+      col.innerHTML = `<h5>${labels[key]} (${cols[key].length})</h5>`;
+      for (const t of cols[key]) col.appendChild(renderCard(t));
+      grid.appendChild(col);
+    }
+    board.appendChild(grid);
+  }
+
+  function renderEisenhower(tasks) {
+    const quads = { q1:[], q2:[], q3:[], q4:[] };
+    for (const t of tasks) {
+      if (t.status === "done") continue;
+      const u = t.urgency === "high", i = t.importance === "high";
+      if (u && i) quads.q1.push(t);
+      else if (!u && i) quads.q2.push(t);
+      else if (u && !i) quads.q3.push(t);
+      else quads.q4.push(t);
+    }
+    const board = document.getElementById("board");
+    board.innerHTML = `
+      <div style="display:grid; grid-template-columns:40px 1fr 1fr; grid-template-rows:auto auto auto; gap:0;">
+        <div></div>
+        <div class="eq-axis-label" style="padding:6px;">Urgent</div>
+        <div class="eq-axis-label" style="padding:6px;">Not Urgent</div>
+        <div class="eq-axis-label" style="writing-mode:vertical-lr; transform:rotate(180deg); padding:6px;">Important</div>
+        <div class="eq eq-q1" id="eq-q1"><h5><i class="fas fa-fire me-1"></i>Do First (${quads.q1.length})</h5></div>
+        <div class="eq eq-q2" id="eq-q2"><h5><i class="fas fa-calendar-alt me-1"></i>Schedule (${quads.q2.length})</h5></div>
+        <div class="eq-axis-label" style="writing-mode:vertical-lr; transform:rotate(180deg); padding:6px;">Less Important</div>
+        <div class="eq eq-q3" id="eq-q3"><h5><i class="fas fa-user-friends me-1"></i>Delegate (${quads.q3.length})</h5></div>
+        <div class="eq eq-q4" id="eq-q4"><h5><i class="fas fa-trash-alt me-1"></i>Eliminate / Defer (${quads.q4.length})</h5></div>
+      </div>`;
+    for (const [k,arr] of Object.entries(quads)) {
+      const container = document.getElementById("eq-"+k);
+      for (const t of arr) container.appendChild(renderCard(t));
+    }
+  }
+
+  function renderStats(tasks) {
+    const counts = { backlog:0, todo:0, in_progress:0, done:0 };
+    for (const t of tasks) counts[t.status] = (counts[t.status]||0) + 1;
+    const total = tasks.length;
+    const pct = total ? Math.round(counts.done / total * 100) : 0;
+    document.getElementById("stats-bar").innerHTML = `
+      <div class="stat-card"><div class="num">${total}</div><div class="label">Total</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--q1)">${counts.in_progress}</div><div class="label">In Progress</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--q2)">${counts.todo}</div><div class="label">To Do</div></div>
+      <div class="stat-card"><div class="num" style="color:var(--muted)">${counts.backlog}</div><div class="label">Backlog</div></div>
+      <div class="stat-card"><div class="num" style="color:#198754">${counts.done}</div><div class="label">Done</div></div>
+      <div class="stat-card"><div class="num" style="color:#198754">${pct}%</div><div class="label">Complete</div></div>`;
+    document.getElementById("progress-row").innerHTML = `
+      <div class="progress">
+        <div class="progress-bar bg-success" style="width:${counts.done/total*100}%"></div>
+        <div class="progress-bar bg-warning" style="width:${counts.in_progress/total*100}%"></div>
+        <div class="progress-bar bg-primary" style="width:${counts.todo/total*100}%"></div>
+      </div>`;
+  }
+
+  function render() {
+    const fp = document.getElementById("filter-project").value;
+    const fs = document.getElementById("filter-status").value;
+    const tasks = allTasks(fp, fs);
+    renderStats(tasks);
+    if (currentView === "kanban") renderKanban(tasks);
+    else renderEisenhower(tasks);
+  }
+
+  // ============================================================
+  // MODAL
+  // ============================================================
+  let modalTask = null;
+  function openModal(t) {
+    modalTask = t;
+    document.getElementById("modal-title").textContent = `${t.id}: ${t.title}`;
+    document.getElementById("modal-body").innerHTML = `
+      <div class="row g-3 mb-3">
+        <div class="col-auto">
+          <label class="form-label fw-bold" style="font-size:.8rem;">Status</label>
+          <select class="form-select form-select-sm" id="m-status">
+            <option value="backlog" ${t.status==="backlog"?"selected":""}>Backlog</option>
+            <option value="todo" ${t.status==="todo"?"selected":""}>To Do</option>
+            <option value="in_progress" ${t.status==="in_progress"?"selected":""}>In Progress</option>
+            <option value="done" ${t.status==="done"?"selected":""}>Done</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label fw-bold" style="font-size:.8rem;">Urgency</label>
+          <select class="form-select form-select-sm" id="m-urgency">
+            <option value="low" ${t.urgency==="low"?"selected":""}>Low</option>
+            <option value="high" ${t.urgency==="high"?"selected":""}>High</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label fw-bold" style="font-size:.8rem;">Importance</label>
+          <select class="form-select form-select-sm" id="m-importance">
+            <option value="low" ${t.importance==="low"?"selected":""}>Low</option>
+            <option value="medium" ${t.importance==="medium"?"selected":""}>Medium</option>
+            <option value="high" ${t.importance==="high"?"selected":""}>High</option>
+          </select>
+        </div>
+      </div>
+      <dl class="detail-section">
+        <dt>Project</dt><dd><span class="badge-project" style="background:${t.projectColor}">${t.project}</span></dd>
+        <dt>Epic</dt><dd>${t.epic}</dd>
+        <dt>Size</dt><dd>${t.size === "S" ? "Small (~30 min)" : t.size === "M" ? "Medium (~1-2 hr)" : "Large (half day+)"}</dd>
+        <dt>Acceptance Criteria</dt><dd>${t.acceptance || "—"}</dd>
+        <dt>Dependencies</dt><dd>${t.deps && t.deps.length ? t.deps.join(", ") : "None"}</dd>
+      </dl>`;
+    new bootstrap.Modal(document.getElementById("taskModal")).show();
+  }
+  document.getElementById("modal-save").addEventListener("click", () => {
+    if (!modalTask) return;
+    saveOverride(modalTask.id, "status", document.getElementById("m-status").value);
+    saveOverride(modalTask.id, "urgency", document.getElementById("m-urgency").value);
+    saveOverride(modalTask.id, "importance", document.getElementById("m-importance").value);
+    bootstrap.Modal.getInstance(document.getElementById("taskModal")).hide();
+    render();
+  });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  // Populate project filter
+  const filterEl = document.getElementById("filter-project");
+  for (const p of PROJECTS) {
+    const opt = document.createElement("option");
+    opt.value = p.name; opt.textContent = p.name;
+    filterEl.appendChild(opt);
+  }
+  // View toggle
+  document.querySelectorAll(".view-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentView = btn.dataset.view;
+      render();
+    });
+  });
+  // Filters
+  document.getElementById("filter-project").addEventListener("change", render);
+  document.getElementById("filter-status").addEventListener("change", render);
+  // Reset
+  document.getElementById("btn-reset").addEventListener("click", () => {
+    if (confirm("Reset all status/priority changes to defaults?")) {
+      localStorage.removeItem(STORAGE_KEY);
+      overrides = {};
+      render();
+    }
+  });
+  // Go
+  render();
+  </script>
+</body>
+</html>
