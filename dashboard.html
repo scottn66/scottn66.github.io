@@ -130,6 +130,9 @@
       <select class="form-select form-select-sm" id="filter-project" style="max-width:200px;">
         <option value="all">All Projects</option>
       </select>
+      <select class="form-select form-select-sm" id="filter-epic" style="max-width:220px;">
+        <option value="all">All Epics</option>
+      </select>
       <select class="form-select form-select-sm" id="filter-status" style="max-width:160px;">
         <option value="all">All Statuses</option>
         <option value="backlog">Backlog</option>
@@ -241,6 +244,34 @@
         { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", acceptance:"mandelbrot.html + landing page live", deps:[] },
         { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", acceptance:"dashboard.html with kanban + Eisenhower views", deps:[] },
       ]
+    },
+    {
+      name: "AInt", color: "#5a3e8c",
+      link: null,
+      tasks: [
+        // Epic — Substrate Hygiene (vault-layer cleanups from _duplicates-review.md + _questions.md Q-A2)
+        { id:"AI-H1", title:"Audit 137 inventory notes for locked enum compliance", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"All notes use locked enums: status ∈ {described|partial|uncertain|deleted|empty|stub}, authorship ∈ {mine|vendored|mixed|unknown}; kind/empty-folder vs kind/stub vs kind/duplicate vs kind/snapshot distinguished. Q-A2 closes.", deps:[] },
+        { id:"AI-H2", title:"Add publish_status field to all inventory notes", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Each inv-*.md has publish_status frontmatter (default backlog); drives the action-potential traversal documented in concept-action-potential-vault-traversal.md.", deps:["AI-H1"] },
+        { id:"AI-H3", title:"Fold loose huffman.cpp (cluster A1)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Assignment Packages/huffman.cpp deleted (byte-identical to submissions/huffman/huffman.cpp). ~13 KB reclaim.", deps:[] },
+        { id:"AI-H4", title:"Fold SURP NewsBiasDetection nested clone (cluster B1)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"SURP/NewsBiasDetection/NewsBiasDetection/ (the self-clone, 44 MB) deleted; gith/ copy preserves the published-version content; working tree intact.", deps:[] },
+        { id:"AI-H5", title:"Diff aima-python ×2; decide fold (cluster D1)", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"diff agents.py + nlp.py between 3300/aima-python and portfolio/AI/aima-python; identify which side has substance; fold the redundant copy. ~190 MB potential reclaim.", deps:[] },
+        { id:"AI-H6", title:"Diff dsml/dataStructures ↔ eclipse/Productivity/src (D4)", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"diff -r the two trees. If identical, fold one; if diverged, keep both with cross-link improvements. ~25 MB potential reclaim.", deps:[] },
+        { id:"AI-H7", title:"Diff CS 3300 cw mirror (cluster B5)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"diff -r 3300/cw vs portfolio/AI/cw. If byte-identical, fold portfolio/AI/cw and replace with a stub note pointing to 3300/cw.", deps:[] },
+        { id:"AI-H8", title:"Diff DataSci-4 FinalProjDataSci pair (cluster A3)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Determine whether twitterSentiment/FinalProjDataSci and Tweet Scraper/FinalProjDataSci are accidental macOS Keep-Both duplicates or substantive variants.", deps:[] },
+
+        // Epic — Publishable Extraction (action-potential canonical goal-state)
+        { id:"AI-P1", title:"Polish Huffman C++ capstone for publication", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", acceptance:"huffman.html live on scottn66.github.io alongside MAB.html / HMM.html / Q.html; explains compress/decompress roundtrip with code excerpts; cites Stanford CS 106B scaffolding.", deps:[] },
+        { id:"AI-P2", title:"Publish CTF Pacman linear-Q RL case study", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", acceptance:"pacman_ctf.html (or similar) live; documents the LearningOffensiveAgent3 + Sentinel team from 3420 final; hyperparameters and reward shaping per myTeam.py signature in inv-3420-final-turtles.md.", deps:[] },
+        { id:"AI-P3", title:"Publish bigram LM tutorial (with Will Judy attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", acceptance:"bigram_lm.html live; explains add-alpha smoothing + perplexity using the 5370 ps0 lm.py code; credits Scott + Will Judy as co-authors.", deps:[] },
+        { id:"AI-P4", title:"Publish exercise-log sequence tagger explainer (5370 midterm)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", acceptance:"sequence_tagger.html (or similar); explains the 5-tag BIO scheme (BE/IE/BF/IF/O), three-word context window LR baseline + LSTM tagger; uses tagger.py signature from inv-5370-midterm.md.", deps:[] },
+        { id:"AI-P5", title:"Publish MABUC paper explainer (Forney attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"low", acceptance:"mabuc.html (or similar): summarizes Forney's AAAI-19 HI-RCT paper using simulation parameters from inv-3420-misc-mabuc-paper-repo.md; cites paper, makes clear code is vendored.", deps:[] },
+        { id:"AI-P6", title:"Rotate Q15 credentials so 5370 summarizer can be considered publishable", status:"backlog", size:"S", epic:"Publishable Extraction", urgency:"low", importance:"low", acceptance:"OpenAI key rotated/revoked; GCP service-account JSON rotated; git history rewrite if archive ever goes public. Until then: blocked.", deps:[] },
+
+        // Epic — Meta / Vault Evolution
+        { id:"AI-M1", title:"Add blocked_by frontmatter field on inventory notes", status:"backlog", size:"S", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"inv-5370-summarizer gets blocked_by: Q15. Schema documented in _vault/README.md tag taxonomy section.", deps:["AI-H1"] },
+        { id:"AI-M2", title:"Vocabulary-hooks sweep across 11 remaining concept notes", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Each concept note has a Vocabulary handles section naming the orientation-vocabulary terms that activate it. (concept-causal-inference.md already done as the pattern.)", deps:[] },
+        { id:"AI-M3", title:"Pass 4 — incremental update routine when archive gains a new folder", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Documented procedure: detect new leaves via find-vs-inventory mismatch; generate inventory note(s); cross-link to relevant MOC; update concept hooks if needed.", deps:[] },
+      ]
     }
   ];
 
@@ -261,13 +292,14 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
   }
 
-  function allTasks(filterProject, filterStatus) {
+  function allTasks(filterProject, filterStatus, filterEpic) {
     const out = [];
     for (const p of PROJECTS) {
       if (filterProject !== "all" && p.name !== filterProject) continue;
       for (const t of p.tasks) {
         const merged = { ...getTask(t), project: p.name, projectColor: p.color };
         if (filterStatus !== "all" && merged.status !== filterStatus) continue;
+        if (filterEpic !== "all" && merged.epic !== filterEpic) continue;
         out.push(merged);
       }
     }
@@ -364,7 +396,8 @@
   function render() {
     const fp = document.getElementById("filter-project").value;
     const fs = document.getElementById("filter-status").value;
-    const tasks = allTasks(fp, fs);
+    const fe = document.getElementById("filter-epic").value;
+    const tasks = allTasks(fp, fs, fe);
     renderStats(tasks);
     if (currentView === "kanban") renderKanban(tasks);
     else renderEisenhower(tasks);
@@ -432,6 +465,27 @@
     opt.value = p.name; opt.textContent = p.name;
     filterEl.appendChild(opt);
   }
+  // Populate epic filter (unique across all projects, project-prefixed)
+  const epicFilterEl = document.getElementById("filter-epic");
+  const epicsByProject = {};
+  for (const p of PROJECTS) {
+    const seen = new Set();
+    for (const t of p.tasks) {
+      if (t.epic && !seen.has(t.epic)) { seen.add(t.epic); }
+    }
+    epicsByProject[p.name] = Array.from(seen).sort();
+  }
+  for (const p of PROJECTS) {
+    if (!epicsByProject[p.name].length) continue;
+    const group = document.createElement("optgroup");
+    group.label = p.name;
+    for (const epic of epicsByProject[p.name]) {
+      const opt = document.createElement("option");
+      opt.value = epic; opt.textContent = epic;
+      group.appendChild(opt);
+    }
+    epicFilterEl.appendChild(group);
+  }
   // View toggle
   document.querySelectorAll(".view-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -444,6 +498,7 @@
   // Filters
   document.getElementById("filter-project").addEventListener("change", render);
   document.getElementById("filter-status").addEventListener("change", render);
+  document.getElementById("filter-epic").addEventListener("change", render);
   // Reset
   document.getElementById("btn-reset").addEventListener("click", () => {
     if (confirm("Reset all status/priority changes to defaults?")) {
