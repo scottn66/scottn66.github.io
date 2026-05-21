@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>robot-arm-sim · RL + hyperparameter tuning dashboard</title>
+  <meta name="description"
+        content="Pedagogical reinforcement-learning playground. Q-learning, SARSA,
+                 decay-schedule cross-validation, and live Bayesian optimization
+                 of a planar crawling robot's hyperparameters." />
+  <link rel="icon"
+        href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🦾</text></svg>" />
+  <script>
+    // MathJax config -- load before script tag, accept dollar-sign inline math.
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      },
+      svg: { fontCache: 'global' },
+    };
+  </script>
+  <script async id="MathJax-script"
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    /* ---------------------- Reset + design tokens ---------------------- */
+    :root {
+      --bg:           #FAFAFA;
+      --card-bg:      #FFFFFF;
+      --text:         #232323;
+      --muted:        #555;
+      --rule:         #E5E5EA;
+      --accent:       #1F4E9E;
+      --accent-soft:  #DCE6F4;
+      --good:         #2F7A4A;
+      --good-soft:    #DEEFE0;
+      --warn:         #B83A2E;
+      --warn-soft:    #F5DEDB;
+      --gold:         #C9A227;
+      --code-bg:      #F2F2F5;
+      --shadow:       0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.04);
+      --shadow-hover: 0 1px 2px rgba(0,0,0,.06), 0 12px 36px rgba(0,0,0,.08);
+      --radius:       12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(31,78,158,.25); }
+    a:hover { border-bottom-color: var(--accent); }
+    code, pre {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    }
+    code { background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 5px; font-size: 0.92em; }
+    pre {
+      background: #1f2430;
+      color: #e6edf3;
+      padding: 1rem 1.2rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-size: 0.88em;
+      line-height: 1.55;
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+    h1, h2, h3, h4 { color: #1A1A1A; line-height: 1.25; letter-spacing: -0.01em; }
+    h1 { font-size: 2.2rem; margin: 0 0 0.4rem; }
+    h2 { font-size: 1.5rem; margin: 2.5rem 0 0.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--rule); }
+    h3 { font-size: 1.15rem; margin: 1.6rem 0 0.4rem; color: var(--accent); }
+    p { margin: 0.6rem 0; }
+    img { max-width: 100%; height: auto; border-radius: var(--radius); display: block; }
+    figure { margin: 1.4rem 0; }
+    figcaption {
+      font-size: 0.88em; color: var(--muted); margin-top: 0.5rem; line-height: 1.45;
+    }
+    blockquote {
+      margin: 1rem 0;
+      padding: 0.75rem 1.1rem;
+      background: var(--accent-soft);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      color: #1f2a44;
+    }
+    blockquote p { margin: 0.2rem 0; }
+    table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: 0.93em; }
+    th, td { padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); text-align: left; }
+    th { background: #F0F0F4; font-weight: 600; }
+    .stretch td:first-child { font-weight: 600; }
+    /* ---------------------- Layout ---------------------- */
+    .page { display: grid; grid-template-columns: 1fr; max-width: 1080px; margin: 0 auto; padding: 1.5rem 1.5rem 6rem; }
+    @media (min-width: 1100px) {
+      .page { grid-template-columns: 220px 1fr; gap: 2.2rem; padding-left: 2rem; padding-right: 2rem; max-width: 1240px; }
+    }
+    aside.toc {
+      display: none;
+    }
+    @media (min-width: 1100px) {
+      aside.toc {
+        display: block;
+        position: sticky;
+        top: 1.5rem;
+        align-self: start;
+        max-height: calc(100vh - 3rem);
+        overflow-y: auto;
+        padding: 0.4rem 0;
+        font-size: 0.92em;
+      }
+      aside.toc ol { list-style: none; padding-left: 0; margin: 0; }
+      aside.toc li { margin: 0.15rem 0; }
+      aside.toc a { display: block; padding: 0.25rem 0.55rem; border-radius: 6px;
+                    color: var(--muted); border-bottom: none; }
+      aside.toc a:hover { background: var(--accent-soft); color: var(--accent); }
+    }
+    header.hero {
+      padding: 1.5rem 0 0.5rem;
+    }
+    header.hero .tagline {
+      color: var(--muted); font-size: 1.05rem; margin: 0.2rem 0 1rem;
+    }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.88em; color: var(--muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      background: #ECEEF3;
+      color: #333;
+      border-radius: 999px;
+      font-size: 0.82em;
+      letter-spacing: 0.01em;
+      border-bottom: none !important;
+    }
+    /* ---------------------- Cards ---------------------- */
+    .cards { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .cards.cols-2 { grid-template-columns: 1fr 1fr; } }
+    .card {
+      background: var(--card-bg);
+      padding: 1.1rem 1.3rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.18s ease, transform 0.18s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); }
+    .card h3 { margin-top: 0; }
+    .card.qlearn { border-top: 4px solid var(--accent); }
+    .card.sarsa  { border-top: 4px solid var(--good); }
+    .card .row { display: grid; grid-template-columns: 100px 1fr; gap: 0.4rem 0.8rem; margin-top: 0.4rem; }
+    .card .row dt { font-weight: 600; color: var(--muted); }
+    .card .row dd { margin: 0; }
+    /* ---------------------- Stat strip ---------------------- */
+    .stats {
+      display: grid; gap: 0.8rem; margin: 1rem 0 0.5rem;
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media (min-width: 700px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stat {
+      background: var(--card-bg);
+      padding: 0.7rem 0.9rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .stat .label { color: var(--muted); font-size: 0.82em; letter-spacing: 0.01em; }
+    .stat .value { font-size: 1.25rem; font-weight: 600; color: var(--accent); }
+    /* ---------------------- Footer ---------------------- */
+    footer {
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.9em;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<!-- ============ Top bar (back to scottn66.github.io) ============ -->
+<nav style="background: #343a40; color: #fff; padding: 0.6rem 1.2rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', sans-serif;
+            font-size: 0.92rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08);">
+  <a href="https://scottn66.github.io/"
+     style="color: #fff; text-decoration: none; border-bottom: none;">
+    &larr; back to scottn66.github.io
+  </a>
+  <span style="float: right; opacity: 0.65;">
+    🦾 robot-arm-sim &nbsp;·&nbsp;
+    <a href="https://github.com/scottn66/robot-arm-sim"
+       style="color: #fff; text-decoration: underline; opacity: 0.9; border-bottom: none;">source on GitHub</a>
+  </span>
+</nav>
+
+<div class="page">
+  <!-- ============ TABLE OF CONTENTS ============ -->
+  <aside class="toc" aria-label="Table of contents">
+    <nav>
+      <ol>
+        <li><a href="#hero">Welcome</a></li>
+        <li><a href="#simulator">The simulator</a></li>
+        <li><a href="#agents">The agents</a></li>
+        <li><a href="#whatlearned">What the agent learns</a></li>
+        <li><a href="#showdown">QL vs SARSA</a></li>
+        <li><a href="#schedules">Decay schedules</a></li>
+        <li><a href="#sweep">CV decay sweep</a></li>
+        <li><a href="#scaling">Optimum scaling law</a></li>
+        <li><a href="#bo-1d">BO intuition (1D)</a></li>
+        <li><a href="#bo-crawler">BO on the crawler</a></li>
+        <li><a href="#run">Run it yourself</a></li>
+        <li><a href="#more">Read more</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <header class="hero" id="hero">
+      <div class="meta">
+        <a class="badge" href="https://github.com/scottn66/robot-arm-sim">📦 scottn66/robot-arm-sim</a>
+        <span class="badge">Python 3 · matplotlib · scikit-learn</span>
+        <span class="badge">Q-learning · SARSA · Bayesian Optimization</span>
+      </div>
+      <h1>robot-arm-sim</h1>
+      <p class="tagline">
+        A pedagogical reinforcement-learning playground. Teach a planar
+        crawling robot to walk; visualize how it learns; cross-validate
+        decay schedules; let Bayesian optimization tune the
+        hyperparameters live.
+      </p>
+      <figure>
+        <img src="img/bo_intuition_1d.gif"
+             alt="Animated 1D Bayesian-optimization loop"
+             loading="lazy" />
+        <figcaption>
+          <strong>Hero: live Bayesian optimization on a 1D toy.</strong>
+          Each frame is one BO step.
+          <em>Top</em>: true objective (gray dashed) — hidden from BO in
+          the real problem; the GP posterior mean (blue) and ±2σ band
+          show what BO believes; circles are evaluations, star is the
+          best so far.
+          <em>Bottom</em>: Expected-Improvement acquisition (green);
+          the dotted red line is the next pick. Same algorithm runs on
+          the crawler — see §<a href="#bo-crawler">BO on the crawler</a>.
+        </figcaption>
+      </figure>
+
+      <div class="stats">
+        <div class="stat"><div class="label">State space</div><div class="value">1,872</div></div>
+        <div class="stat"><div class="label">Actions</div><div class="value">4</div></div>
+        <div class="stat"><div class="label">Best QL cum-reward (50k steps)</div><div class="value">~12,250</div></div>
+        <div class="stat"><div class="label">Empirical decay slope</div><div class="value">k ≈ 0.63</div></div>
+      </div>
+    </header>
+
+    <!-- ============ THE SIMULATOR ============ -->
+    <section id="simulator">
+      <h2>The simulator</h2>
+      <p>
+        The crawler is a wheeled body with a two-link limb — an
+        <em>arm</em> (upper segment) and a <em>hand</em> (lower segment),
+        both pivoting to discrete angles. When the lowest tip is below
+        ground, the geometry produces forward displacement; when above,
+        the robot doesn't move. There's no friction model — only
+        kinematic displacement.
+      </p>
+      <div class="cards cols-2">
+        <div class="card">
+          <h3>State</h3>
+          <p>
+            A pair of discrete bucket indices
+            <code>(arm_bucket, hand_bucket)</code>. The arm has
+            <code>nArmStates = 36</code> buckets across its range; the
+            hand has <code>nHandStates = 52</code>. Total:
+            <strong>1,872 possible configurations</strong>.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Actions</h3>
+          <p>
+            Up to four moves: <code>arm-up</code>, <code>arm-down</code>,
+            <code>hand-up</code>, <code>hand-down</code>. Boundary states
+            offer fewer (e.g., at <code>arm_bucket = 0</code> you can't
+            go further down).
+          </p>
+        </div>
+        <div class="card">
+          <h3>Reward</h3>
+          <p>
+            <strong>Signed forward displacement</strong> caused by the
+            action. Typically in $[-1, +1]$ per step. Going backward gives
+            a small negative reward; pushing the body forward gives a
+            small positive one. Most steps are very small in magnitude —
+            credit assignment is the entire challenge.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Episode</h3>
+          <p>
+            <strong>The episode never ends.</strong> Learning here means
+            maximizing the long-run rate of forward progress (average
+            reward per step), not winning a finite-horizon game.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ THE AGENTS ============ -->
+    <section id="agents">
+      <h2>The agents</h2>
+      <p>
+        Two RL agents ship in this repo. They look nearly identical from
+        outside. Internally they disagree on one small but consequential
+        thing — what to assume about the <em>next</em> action when
+        updating their value table.
+      </p>
+      <div class="cards cols-2">
+        <div class="card qlearn">
+          <h3>🤖 Q-Learning Karen</h3>
+          <dl class="row">
+            <dt>Class</dt><dd>Off-policy</dd>
+            <dt>Mantra</dt><dd><code>max<sub>a'</sub> Q(s', a')</code></dd>
+            <dt>Strategy</dt><dd>"Assume I'll always do the smartest thing from here."</dd>
+            <dt>Strengths</dt><dd>Fast learner, optimistic, propagates good news.</dd>
+            <dt>Weakness</dt><dd>Can be reckless in stochastic environments.</dd>
+          </dl>
+          <p style="margin-top: 0.8rem;">
+            Update: $Q(s,a) \leftarrow Q(s,a) + \alpha\, [r + \gamma\,\max_{a'} Q(s', a') - Q(s,a)]$
+          </p>
+        </div>
+        <div class="card sarsa">
+          <h3>🤖 SARSA Sam</h3>
+          <dl class="row">
+            <dt>Class</dt><dd>On-policy</dd>
+            <dt>Mantra</dt><dd><code>Q(s', a')</code>, sampled</dd>
+            <dt>Strategy</dt><dd>"Plan for what I'll actually do next, exploration and all."</dd>
+            <dt>Strengths</dt><dd>Safer, conservative, great when bad moves are costly.</dd>
+            <dt>Weakness</dt><dd>Slow under high exploration; can stall on this domain.</dd>
+          </dl>
+          <p style="margin-top: 0.8rem;">
+            Update: $Q(s,a) \leftarrow Q(s,a) + \alpha\, [r + \gamma\, Q(s', a') - Q(s,a)]$
+            where $a'$ is sampled $\epsilon$-greedy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ WHAT THE AGENT LEARNS ============ -->
+    <section id="whatlearned">
+      <h2>What the agent actually learns</h2>
+      <p>
+        After 50k steps of Q-learning training under a linear ε-decay
+        schedule, here's the learned $V^*(s) = \max_a Q(s, a)$ and the
+        greedy policy direction at every visited state:
+      </p>
+      <figure>
+        <img src="img/q_heatmap.png" alt="Learned Q-value field + greedy policy" loading="lazy" />
+        <figcaption>
+          <strong>Left:</strong> $V^*(s)$. Green = high expected reward;
+          red = low. Only ~28% of the grid is visited — the agent doesn't
+          need to learn the whole state space, just one cycle. <br />
+          <strong>Right:</strong> greedy policy (arrows mark the best
+          action at each visited state). The arrows form a repeating
+          cycle in the high-value pocket: hand-down (↓) when the arm is
+          forward, arm-down (←) to push, hand-up (↑) to lift, arm-up (→)
+          to swing. That's locomotion.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ SHOWDOWN ============ -->
+    <section id="showdown">
+      <h2>Q-learning vs SARSA on the crawler</h2>
+      <p>
+        Train both agents under identical conditions ($\alpha = 0.5$,
+        $\gamma = 0.95$, linear ε-decay from 1.0 to 0.05 over 30k of 50k
+        steps). Same random seed, same budget. The result is striking:
+      </p>
+      <figure>
+        <img src="img/compare.png" alt="Q-learning vs SARSA learning curves" loading="lazy" />
+        <figcaption>
+          <strong>Top:</strong> rolling-1000-step average reward.
+          Q-learning climbs to ~0.37 reward/step; SARSA stays pinned to
+          ~0. <strong>Bottom:</strong> robot x-position. Q-learning's
+          robot crawls from $x{=}20$ to $x \approx 12{,}250$. SARSA's
+          robot oscillates in $[20, 150]$ the whole time.
+        </figcaption>
+      </figure>
+      <p>
+        This is not a bug. It's the off-policy/on-policy distinction
+        playing out empirically. Q-learning's $\max$ keeps the bootstrap
+        target optimistic; SARSA's sampled $Q(s', a')$ gets dragged down
+        by known-bad actions under high $\epsilon$.
+      </p>
+    </section>
+
+    <!-- ============ SCHEDULES ============ -->
+    <section id="schedules">
+      <h2>Decay schedules</h2>
+      <p>
+        Four schedule shapes ship with the repo:
+        <code>Constant</code>, <code>Linear</code>,
+        <code>Exponential</code>, <code>GLIE</code>. The
+        $\text{GLIE}(c)$ schedule, $\epsilon_t = c / (c + t)$, is the
+        one that satisfies the convergence conditions for tabular
+        Q-learning and SARSA.
+      </p>
+      <figure>
+        <img src="img/schedules.png" alt="Decay schedule shapes" loading="lazy" />
+        <figcaption>Four schedule shapes plotted together. Use these to
+          decay $\epsilon$ (exploration) or $\alpha$ (learning rate)
+          across training.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/epsilon_greedy.png" alt="Epsilon-greedy split" loading="lazy" />
+        <figcaption>The $\epsilon$-greedy policy: random with probability
+          $\epsilon$ (blue), greedy with probability $1-\epsilon$
+          (green). Decaying $\epsilon$ tilts the balance from
+          exploration to exploitation as training proceeds.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ SWEEP ============ -->
+    <section id="sweep">
+      <h2>Cross-validating the decay length</h2>
+      <p>
+        Which decay length is best? <code>scripts/sweep_schedules.py</code>
+        answers empirically: train Q-learning under several decay-length
+        values, with multiple seeds per cell, and compare the rolling
+        reward curves and the cumulative-reward distributions.
+      </p>
+      <figure>
+        <img src="img/schedule_sweep.png" alt="Decay-length cross-validation sweep" loading="lazy" />
+        <figcaption>
+          7 decay lengths × 5 seeds = 35 training runs.
+          <strong>Top:</strong> rolling-1000 reward curves; solid line =
+          mean across seeds, shaded band = ±stdev.
+          <strong>Bottom:</strong> cumulative reward vs decay length
+          (log $x$-axis). Two empirical facts pop out:
+          (1) a <em>failure cliff</em> below ~18k steps of decay (every
+          run stays near zero); (2) the best <em>mean</em> at decay = 30k
+          is bimodal — three of five seeds break through, two stall.
+          Decay = 60k is lower-mean but rock-solid across seeds.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ SCALING ============ -->
+    <section id="scaling">
+      <h2>The optimum-vs-budget scaling law</h2>
+      <p>
+        Theory (GLIE, Robbins-Monro) gives the <em>shape</em> of the
+        schedule but not its <em>scale</em>. Does the optimal decay
+        length scale with the training budget? <code>scripts/find_optimum.py</code>
+        runs a multi-budget sweep to find out.
+      </p>
+      <figure>
+        <img src="img/optimum_scaling.png" alt="Optimal decay length vs training budget" loading="lazy" />
+        <figcaption>
+          <strong>Top:</strong> cumulative reward vs $(\text{decay}/\text{budget})$
+          fraction, three curves (one per budget). The peaks line up
+          at fraction $\approx 0.6$ for the larger budgets — the
+          optimum is <em>budget-invariant in normalized units</em>.
+          <strong>Bottom:</strong> best absolute decay length vs budget,
+          with a through-origin linear fit. Empirical slope:
+          <strong>$k = 0.629$</strong> — essentially identical to the
+          textbook 0.60 heuristic.
+        </figcaption>
+      </figure>
+      <blockquote>
+        <p><strong>One-line takeaway.</strong> Theory gives you the
+        <em>shape</em> of the schedule (GLIE / Robbins-Monro); the
+        <em>scale</em> is roughly linear in the training budget with a
+        problem-specific slope. For this crawler, that slope is
+        $\approx 0.63$.</p>
+      </blockquote>
+    </section>
+
+    <!-- ============ BO INTUITION ============ -->
+    <section id="bo-1d">
+      <h2>Bayesian optimization in 1D — intuition first</h2>
+      <p>
+        Before going to the 2D crawler problem, watch BO run on a 1D
+        toy where the true objective is visible:
+        $f(x) = -((6x - 2)^2 \sin(12x - 4))$ on $[0, 1]$, a textbook
+        BO benchmark with a global max near $x \approx 0.76$ and a
+        deceptive local max near $x \approx 0.15$.
+      </p>
+      <figure>
+        <img src="img/bo_intuition_1d.gif"
+             alt="Animated 1D BO loop"
+             loading="lazy" />
+        <figcaption>
+          15-frame animation; one BO iteration per frame. Watch the
+          GP mean (blue) snap onto the true function (gray dashed) as
+          samples accumulate; watch the EI peaks shift from
+          exploration territory (wide $\sigma$) to exploitation
+          territory (near the gold star). BO finds $x \approx 0.7569$
+          — within 0.0003 of the true optimum.
+        </figcaption>
+      </figure>
+      <p>
+        Prefer to read the steps frame-by-frame? Here's the same data
+        as a comic strip, at six key iterations:
+      </p>
+      <figure>
+        <img src="img/bo_intuition_1d.png"
+             alt="6-panel BO comic strip"
+             loading="lazy" />
+        <figcaption>
+          BO snapshots after 2, 4, 6, 9, 12, 16 evaluations. The GP
+          mean (blue) tracks the true function (gray) progressively
+          better; the EI (green) narrows to spikes as BO becomes
+          confident.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============ BO ON CRAWLER ============ -->
+    <section id="bo-crawler">
+      <h2>Bayesian optimization on the crawler</h2>
+      <p>
+        Same algorithm, lifted to a 2D search space — $\texttt{decay\_frac}$
+        (decay length / budget) and $\alpha$ (learning rate). When you
+        run <code>scripts/bo_optimize.py</code> a four-panel matplotlib
+        window opens and updates after every evaluation.
+      </p>
+      <figure>
+        <img src="img/bo_landscape.png" alt="BO landscape on the crawler" loading="lazy" />
+        <figcaption>
+          Final state after 6 initial random samples + 20 BO iterations.
+          <strong>Top-left:</strong> GP posterior mean — best so far
+          marked with a gold star. <strong>Top-right:</strong> GP
+          posterior stdev — uncertainty, collapsing where the agent
+          has sampled. <strong>Bottom-left:</strong> Expected
+          Improvement — bright = promising; red square = next pick.
+          <strong>Bottom-right:</strong> best-so-far convergence —
+          step function rising as BO finds new regions.
+        </figcaption>
+      </figure>
+      <p>
+        On the run shown, BO's first non-random suggestion already beat
+        every random sample. A second jump at evaluation 20 took the
+        cumulative reward from ~2,500 to ~5,000 — a 2× improvement found
+        by trusting the acquisition function to explore an
+        uncertain corner.
+      </p>
+    </section>
+
+    <!-- ============ RUN IT ============ -->
+    <section id="run">
+      <h2>Run it yourself</h2>
+      <p>One-time setup:</p>
+      <pre><code>git clone https://github.com/scottn66/robot-arm-sim.git
+cd robot-arm-sim
+brew install python-tk@3.14   # on macOS; otherwise the system Tk
+pip install matplotlib scikit-learn scipy numpy pillow</code></pre>
+
+      <h3>Live GUI with Inspector</h3>
+      <pre><code>cd src
+python3 crawler.py</code></pre>
+      <p>
+        Watch the green robot animate while the embedded panel shows a
+        live $V^*(s)$ heatmap, a rolling reward curve, and live
+        $\alpha / \epsilon / \gamma$ readouts. Flip
+        <code>agentType = 'sarsa'</code> at the top of
+        <code>graphicsCrawlerDisplay.py</code> to swap learners.
+      </p>
+
+      <h3>Q-learning vs SARSA comparison</h3>
+      <pre><code>python3 src/train_compare.py
+# writes docs/img/compare.png  (or pass --out)</code></pre>
+
+      <h3>Cross-validate decay length</h3>
+      <pre><code>python3 scripts/sweep_schedules.py
+# writes docs/img/schedule_sweep.png</code></pre>
+
+      <h3>Characterize the scaling law</h3>
+      <pre><code>python3 scripts/find_optimum.py
+# writes docs/img/optimum_scaling.png</code></pre>
+
+      <h3>Live Bayesian optimization</h3>
+      <pre><code>python3 scripts/bo_optimize.py
+# opens a live 4-panel matplotlib window
+# writes docs/img/bo_landscape.png at the end</code></pre>
+
+      <h3>1D BO intuition demo (this dashboard's hero GIF)</h3>
+      <pre><code>python3 scripts/bo_intuition.py
+# writes docs/img/bo_intuition_1d.gif and .png</code></pre>
+    </section>
+
+    <!-- ============ READ MORE ============ -->
+    <section id="more">
+      <h2>Read more</h2>
+      <p>
+        For the full pedagogical reference — agent stat blocks, the
+        TD update mechanics, the failure-mode catalog, gamified quests,
+        and the glossary — read
+        <a href="LEARNING_GUIDE.md">docs/LEARNING_GUIDE.md</a>
+        (rendered nicely on GitHub).
+      </p>
+      <p>
+        The repo is at
+        <a href="https://github.com/scottn66/robot-arm-sim">github.com/scottn66/robot-arm-sim</a>.
+        Issues and pull requests welcome.
+      </p>
+    </section>
+
+    <footer>
+      <p>
+        Built on the
+        <a href="http://ai.berkeley.edu/">UC Berkeley CS188 Pacman AI</a>
+        crawler simulator, ported to Python 3 and extended with SARSA,
+        decay schedules, cross-validation, live introspection, and
+        Bayesian optimization.
+      </p>
+      <p>
+        Open this page directly with <code>open docs/index.html</code>,
+        or enable GitHub Pages on this repo to host it at
+        <code>https://scottn66.github.io/robot-arm-sim/</code>.
+      </p>
+    </footer>
+  </main>
+</div>
+</body>
+</html>
