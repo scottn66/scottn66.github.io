@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>California Solar Viability Heatmap | DATA 201</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F4F5F7;
+    color: #1A1A2E;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: linear-gradient(135deg, #1B1464 0%, #2D2B8C 45%, #4A3FB5 100%);
+    color: #fff;
+    padding: 3.5rem 1.5rem 3rem;
+    text-align: center;
+  }
+  .hero h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+  }
+  .hero p {
+    font-size: 1.05rem;
+    opacity: 0.82;
+    max-width: 600px;
+    margin: 0 auto 1.75rem;
+    line-height: 1.55;
+  }
+  .hero-nav {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hero-nav a {
+    display: inline-block;
+    padding: 0.55rem 1.4rem;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .hero-nav a:hover { opacity: 0.85; }
+  .btn-primary   { background: #fff; color: #1B1464; }
+  .btn-secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1.5px solid rgba(255,255,255,0.45); }
+
+  /* ---------- Container ---------- */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 1rem;
+  }
+
+  /* ---------- Map cards ---------- */
+  .map-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .map-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(27,20,100,0.08);
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .map-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px rgba(27,20,100,0.15);
+  }
+  .map-card-banner {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+  }
+  .banner-ca     { background: linear-gradient(135deg, #26A69A 0%, #00897B 100%); }
+  .banner-norcal { background: linear-gradient(135deg, #42A5F5 0%, #1565C0 100%); }
+  .map-card-body {
+    padding: 1.4rem 1.5rem 1.6rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .map-card-body h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1B1464;
+  }
+  .map-card-body p {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .map-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+  }
+  .chip {
+    display: inline-block;
+    padding: 0.2rem 0.65rem;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #EEF0FF;
+    color: #3A37A0;
+  }
+  .open-btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.55rem 1.3rem;
+    background: #1B1464;
+    color: #fff;
+    border-radius: 24px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.18s;
+    align-self: flex-start;
+  }
+  .open-btn:hover { background: #2D2B8C; }
+
+  /* ---------- Methodology ---------- */
+  .section {
+    margin-top: 1.5rem;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(27,20,100,0.05);
+  }
+  .section h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1B1464;
+  }
+  .tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+  .tier-table th {
+    background: #F4F5F7;
+    padding: 0.55rem 0.85rem;
+    text-align: left;
+    font-weight: 600;
+    color: #1B1464;
+    border-bottom: 2px solid #E0E0E0;
+  }
+  .tier-table td {
+    padding: 0.55rem 0.85rem;
+    border-bottom: 1px solid #F0F0F0;
+    color: #333;
+  }
+  .dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .dot-high   { background: #26A69A; }
+  .dot-medium { background: #7986CB; opacity: 0.55; }
+  .dot-na     { background: #9E9E9E; opacity: 0.40; }
+
+  .section p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 0.65rem;
+  }
+  .section a { color: #26A69A; text-decoration: none; font-weight: 500; }
+  .section a:hover { text-decoration: underline; }
+
+  /* ---------- Breadcrumb ---------- */
+  .breadcrumb {
+    font-size: 0.84rem;
+    color: #888;
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a { color: #26A69A; text-decoration: none; font-weight: 500; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { margin: 0 0.4rem; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    text-align: center;
+    padding: 2.25rem 1rem;
+    font-size: 0.78rem;
+    color: #AAA;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.65rem; }
+    .map-cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <h1>California Solar Heatmap</h1>
+  <p>Interactive ZIP-level viability scores for all 2,593 California ZIP codes — scored with the same NREL-calibrated engine used in the individual city reports.</p>
+  <div class="hero-nav">
+    <a href="../reports/" class="btn-secondary">&#8592; City Reports</a>
+    <a href="../" class="btn-secondary">Project Home</a>
+  </div>
+</div>
+
+<!-- ===== Content ===== -->
+<div class="container">
+  <div class="breadcrumb">
+    <a href="../">Solar Viability</a><span>&rsaquo;</span>
+    <strong>Heatmaps</strong>
+  </div>
+
+  <!-- Map cards -->
+  <div class="map-cards">
+
+    <!-- Statewide CA -->
+    <a class="map-card" href="heatmap_ca.html">
+      <div class="map-card-banner banner-ca">🗺️</div>
+      <div class="map-card-body">
+        <h2>California Statewide</h2>
+        <p>All 2,593 CA ZIP codes scored on a 0&ndash;100 viability index. Opens centered on the Bay Area; scroll out to explore SoCal, the Central Valley, and the Sierra foothills.</p>
+        <div class="map-meta">
+          <span class="chip">2,593 ZIPs</span>
+          <span class="chip">NEM 3.0</span>
+          <span class="chip">4.5 kW system</span>
+          <span class="chip">IOU + Muni</span>
+        </div>
+        <span class="open-btn">Open Map &rarr;</span>
+      </div>
+    </a>
+
+    <!-- NorCal -->
+    <a class="map-card" href="heatmap_norcal.html">
+      <div class="map-card-banner banner-norcal">🌉</div>
+      <div class="map-card-body">
+        <h2>NorCal &mdash; Bay Area &amp; Sacramento Valley</h2>
+        <p>714 ZIPs across 15 counties including San Francisco, the Peninsula, East Bay, South Bay, Marin, Sonoma, Napa, Solano, Sacramento, and the Sierra foothills.</p>
+        <div class="map-meta">
+          <span class="chip">714 ZIPs</span>
+          <span class="chip">15 Counties</span>
+          <span class="chip">Bay Area Focus</span>
+        </div>
+        <span class="open-btn">Open Map &rarr;</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Methodology -->
+  <div class="section">
+    <h2>How the Map Works</h2>
+
+    <p>
+      Each dot represents one ZIP code, colored by its <strong>viability score</strong> (0&ndash;100, Viridis scale: purple = lower, yellow = higher).
+      Opacity encodes data confidence based on the number of real solar installations in
+      <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab&rsquo;s Tracking the Sun (TTS)</a>
+      dataset within the same three-digit ZIP prefix:
+    </p>
+
+    <table class="tier-table">
+      <thead>
+        <tr><th>Tier</th><th>TTS installs (ZIP3)</th><th>Appearance</th><th>Meaning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="dot dot-high"></span>High</td>
+          <td>&ge;30</td>
+          <td>Full color, opacity 0.90</td>
+          <td>Real median $/W from local installations; high confidence</td>
+        </tr>
+        <tr>
+          <td><span class="dot dot-medium"></span>Medium</td>
+          <td>5&ndash;29</td>
+          <td>Colored, dimmed (opacity 0.55)</td>
+          <td>Some local data; score directionally reliable</td>
+        </tr>
+        <tr>
+          <td><span class="dot dot-na"></span>Low / NA</td>
+          <td>&lt;5</td>
+          <td>Gray, opacity 0.30</td>
+          <td>No score shown; insufficient local install data</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      <strong>Scoring model:</strong> each ZIP is modeled as a 4.5 kW south-facing residential system.
+      Specific yield (kWh/kW/yr) is estimated from latitude using a piecewise fit calibrated to NREL PVWatts
+      national results. The viability score combines four sub-scores:
+      <em>25% solar resource</em> &middot; <em>50% economics</em> &middot; <em>15% site fit</em> &middot; <em>10% local market maturity</em>.
+    </p>
+
+    <p>
+      <strong>Utility rates:</strong> IOU territories (PG&amp;E, SCE, SDG&amp;E) use a blended residential rate of $0.389/kWh
+      with a NEM 3.0 export ratio of 14.1% (CPUC avoided-cost credit &asymp;&nbsp;$0.055/kWh).
+      Municipal utility territories (SMUD) use the EIA CA average of $0.30/kWh with a NEM&nbsp;2.0-equivalent
+      export ratio of 50%.
+    </p>
+
+    <p>
+      <strong>Cost inputs:</strong> installed cost uses the TTS ZIP3 median $/W where &ge;5 installations exist;
+      otherwise defaults to $3.80/W (Berkeley Lab 2024 CA median).
+      Federal 30% ITC applied to all sites.
+    </p>
+  </div>
+
+  <!-- About section -->
+  <div class="section">
+    <h2>About These Reports</h2>
+    <p>
+      Part of the DATA 201 Solar Viability Analysis project at Cal Poly Humboldt.
+      Financial projections use current California NEM 3.0 tariff schedules,
+      the 30% federal Investment Tax Credit (ITC), and real retail electricity rates.
+    </p>
+    <p>
+      Data sources: <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts</a>,
+      <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab TTS</a>,
+      <a href="https://www.eia.gov/" target="_blank" rel="noopener">EIA utility rate databases</a>,
+      <a href="https://geonames.org/" target="_blank" rel="noopener">GeoNames ZIP coordinate data</a>.
+      &mdash; <a href="../reports/">View individual city reports &rarr;</a>
+    </p>
+  </div>
+</div>
+
+<footer>
+  Solar Viability Heatmap &middot; DATA 201 &middot; Cal Poly Humboldt
+</footer>
+
+</body>
+</html>
