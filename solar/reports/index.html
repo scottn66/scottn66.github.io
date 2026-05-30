@@ -23,56 +23,32 @@
     padding: 3.5rem 1.5rem 3rem;
     text-align: center;
   }
-  .hero h1 {
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 0.5rem;
+  .hero h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+  .hero p { font-size: 1.05rem; opacity: 0.82; max-width: 580px; margin: 0 auto 1.75rem; line-height: 1.55; }
+  .hero-nav { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.75rem; }
+  .hero-nav a {
+    display: inline-block; padding: 0.5rem 1.25rem; border-radius: 24px;
+    font-size: 0.88rem; font-weight: 600; text-decoration: none;
+    background: rgba(255,255,255,0.14); color: #fff;
+    border: 1.5px solid rgba(255,255,255,0.4); transition: background 0.18s;
   }
-  .hero p {
-    font-size: 1.05rem;
-    opacity: 0.82;
-    max-width: 540px;
-    margin: 0 auto 1.75rem;
-    line-height: 1.55;
-  }
+  .hero-nav a:hover { background: rgba(255,255,255,0.26); }
 
   /* ---------- Search ---------- */
-  .search-wrap {
-    max-width: 500px;
-    margin: 0 auto;
-    position: relative;
-  }
-  .search-wrap svg {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.45;
-  }
+  .search-wrap { max-width: 500px; margin: 0 auto; position: relative; }
+  .search-wrap svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); opacity: 0.45; }
   .search-wrap input {
-    width: 100%;
-    padding: 0.9rem 1rem 0.9rem 2.8rem;
-    border: none;
-    border-radius: 14px;
-    font-size: 1rem;
-    font-family: inherit;
-    outline: none;
-    background: rgba(255,255,255,0.14);
-    color: #fff;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: background 0.2s;
+    width: 100%; padding: 0.9rem 1rem 0.9rem 2.8rem; border: none; border-radius: 14px;
+    font-size: 1rem; font-family: inherit; outline: none;
+    background: rgba(255,255,255,0.14); color: #fff;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 0.2s;
   }
   .search-wrap input::placeholder { color: rgba(255,255,255,0.5); }
   .search-wrap input:focus { background: rgba(255,255,255,0.24); }
 
   /* ---------- Container ---------- */
-  .container {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 1rem;
-  }
+  .container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 1rem; }
+  .result-count { font-size: 0.85rem; color: #888; margin-bottom: 1rem; font-weight: 500; }
 
   /* ---------- Cards grid ---------- */
   .cards {
@@ -82,155 +58,54 @@
     margin-bottom: 1.5rem;
   }
   .card {
-    background: #fff;
-    border-radius: 16px;
-    overflow: hidden;
+    background: #fff; border-radius: 16px; overflow: hidden;
     box-shadow: 0 2px 10px rgba(27,20,100,0.07);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
   }
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 28px rgba(27,20,100,0.14);
-  }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(27,20,100,0.14); }
 
-  /* Card top row */
-  .card-top {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.25rem 0.65rem;
-  }
+  .card-top { display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.25rem 0.65rem; }
   .score-circle {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: #26A69A;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(38,166,154,0.3);
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .score-circle span {
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.2rem;
-  }
-  .card-title h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.1rem;
-    color: #1B1464;
-  }
-  .card-title .zip {
-    font-size: 0.84rem;
-    color: #777;
-    font-weight: 500;
-  }
+  .score-circle span { color: #fff; font-weight: 800; font-size: 1.2rem; }
+  .card-title h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.1rem; color: #1B1464; }
+  .card-title .zip { font-size: 0.82rem; color: #777; font-weight: 500; }
+  .card-title .rank { color: #4A3FB5; font-weight: 600; }
 
-  /* Card body */
-  .card-body {
-    padding: 0 1.25rem 1.25rem;
-    flex: 1;
-  }
+  .card-body { padding: 0 1.25rem 1.25rem; flex: 1; }
   .detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.45rem 0.75rem;
-    font-size: 0.84rem;
-    margin-top: 0.65rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem 0.75rem;
+    font-size: 0.84rem; margin-top: 0.65rem;
   }
-  .detail-grid dt {
-    color: #8D8D8D;
-    font-weight: 500;
-  }
-  .detail-grid dd {
-    font-weight: 600;
-    text-align: right;
-    color: #1A1A2E;
-  }
+  .detail-grid dt { color: #8D8D8D; font-weight: 500; }
+  .detail-grid dd { font-weight: 600; text-align: right; color: #1A1A2E; }
   .verdict {
-    display: inline-block;
-    margin-top: 0.85rem;
-    padding: 0.3rem 0.85rem;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    background: #E8F5E9;
-    color: #2E7D32;
-    letter-spacing: 0.02em;
+    display: inline-block; margin-top: 0.85rem; padding: 0.3rem 0.85rem;
+    border-radius: 20px; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.02em;
   }
 
-  /* ---------- No-match message ---------- */
-  .no-match {
-    display: none;
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: #666;
-  }
+  /* ---------- No-match ---------- */
+  .no-match { display: none; text-align: center; padding: 2.5rem 1rem; color: #666; }
   .no-match.visible { display: block; }
-  .no-match h3 {
-    font-size: 1.15rem;
-    margin-bottom: 0.5rem;
-    color: #1B1464;
-  }
-  .no-match p {
-    font-size: 0.92rem;
-    line-height: 1.6;
-  }
+  .no-match h3 { font-size: 1.15rem; margin-bottom: 0.5rem; color: #1B1464; }
   .no-match code {
-    display: block;
-    margin: 0.85rem auto 0;
-    background: #EAECF0;
-    padding: 0.7rem 1.1rem;
-    border-radius: 10px;
-    font-size: 0.84rem;
-    text-align: left;
-    max-width: 440px;
-    color: #1B1464;
+    display: block; margin: 0.85rem auto 0; background: #EAECF0;
+    padding: 0.7rem 1.1rem; border-radius: 10px; font-size: 0.84rem;
+    text-align: left; max-width: 440px; color: #1B1464;
   }
 
-  /* ---------- About section ---------- */
-  .about {
-    margin-top: 1.5rem;
-    padding: 2rem;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(27,20,100,0.05);
-  }
-  .about h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 0.85rem;
-    color: #1B1464;
-  }
-  .about p {
-    font-size: 0.9rem;
-    line-height: 1.7;
-    color: #555;
-    margin-bottom: 0.6rem;
-  }
-  .about a {
-    color: #26A69A;
-    text-decoration: none;
-    font-weight: 500;
-  }
+  /* ---------- About ---------- */
+  .about { margin-top: 1.5rem; padding: 2rem; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(27,20,100,0.05); }
+  .about h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.85rem; color: #1B1464; }
+  .about p { font-size: 0.9rem; line-height: 1.7; color: #555; margin-bottom: 0.6rem; }
+  .about a { color: #26A69A; text-decoration: none; font-weight: 500; }
   .about a:hover { text-decoration: underline; }
 
-  /* ---------- Footer ---------- */
-  footer {
-    text-align: center;
-    padding: 2.25rem 1rem;
-    font-size: 0.78rem;
-    color: #AAA;
-    letter-spacing: 0.01em;
-  }
+  footer { text-align: center; padding: 2.25rem 1rem; font-size: 0.78rem; color: #AAA; letter-spacing: 0.01em; }
 
-  /* ---------- Responsive ---------- */
   @media (max-width: 600px) {
     .hero h1 { font-size: 1.65rem; }
     .cards { grid-template-columns: 1fr; }
@@ -241,103 +116,440 @@
 
 <!-- ===== Hero ===== -->
 <div class="hero">
-  <h1>Is solar worth it at your address?</h1>
-  <p>Independent viability reports for residential rooftop solar in California, powered by NREL data.</p>
+  <h1>Is solar worth it in your city?</h1>
+  <p>Independent viability reports for 20 California locations &mdash; the 15 largest cities plus Stanford &amp; Berkeley &mdash; powered by NREL irradiance data and live utility rate detection.</p>
+  <div class="hero-nav">
+    <a href="../">&#8592; Project Home</a>
+    <a href="../heatmap/">View ZIP Heatmaps &rarr;</a>
+  </div>
   <div class="search-wrap">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search" placeholder="Search by city, ZIP, or keyword..." autocomplete="off">
+    <input type="text" id="search" placeholder="Search by city, ZIP, utility, or region..." autocomplete="off">
   </div>
 </div>
 
 <!-- ===== Cards ===== -->
 <div class="container">
+  <div class="result-count" id="result-count">Showing all 20 reports &middot; sorted by viability score &middot; Chula Vista leads at 96/100</div>
   <div class="cards" id="cards">
 
-    <!-- Atherton -->
-    <a class="card" href="atherton.html" data-s="atherton 94027 pge nem 3.0 solar california ca peninsula">
+    <a class="card" href="chula-vista.html" data-s="chula vista 91910 sdg&amp;e nem 3.0 socal south bay san diego solar california ca">
       <div class="card-top">
-        <div class="score-circle"><span>89</span></div>
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>96</span></div>
+        <div class="card-title">
+          <h3>Chula Vista</h3>
+          <div class="zip">ZIP 91910 &middot; <span class="rank">#15 · 276K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,816 kWh</dd>
+          <dt>LCOE</dt><dd>$0.072/kWh</dd>
+          <dt>Payback</dt><dd>6.5 yr</dd>
+          <dt>Utility</dt><dd>SDG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="san-diego.html" data-s="san diego 92101 sdg&amp;e nem 3.0 socal coast solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>95</span></div>
+        <div class="card-title">
+          <h3>San Diego</h3>
+          <div class="zip">ZIP 92101 &middot; <span class="rank">#2 · 1.4M</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,643 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>6.6 yr</dd>
+          <dt>Utility</dt><dd>SDG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="long-beach.html" data-s="long beach 90802 sce nem 3.0 socal la county solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="card-title">
+          <h3>Long Beach</h3>
+          <div class="zip">ZIP 90802 &middot; <span class="rank">#7 · 451K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.073/kWh</dd>
+          <dt>Payback</dt><dd>7.2 yr</dd>
+          <dt>Utility</dt><dd>SCE</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="bakersfield.html" data-s="bakersfield 93301 pg&amp;e nem 3.0 central valley kern solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="card-title">
+          <h3>Bakersfield</h3>
+          <div class="zip">ZIP 93301 &middot; <span class="rank">#9 · 413K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,679 kWh</dd>
+          <dt>LCOE</dt><dd>$0.073/kWh</dd>
+          <dt>Payback</dt><dd>7.2 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="stanford.html" data-s="stanford 94305 pg&amp;e nem 3.0 bay area peninsula university solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="card-title">
+          <h3>Stanford</h3>
+          <div class="zip">ZIP 94305 &middot; <span class="rank">University</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,594 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>7.2 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="atherton.html" data-s="atherton 94027 pg&amp;e nem 3.0 bay area peninsula solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
         <div class="card-title">
           <h3>Atherton</h3>
-          <div class="zip">ZIP 94027</div>
+          <div class="zip">ZIP 94027 &middot; <span class="rank">Peninsula</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,578 kWh</dd>
+          <dt>Annual Yield</dt><dd>7,577 kWh</dd>
           <dt>LCOE</dt><dd>$0.074/kWh</dd>
           <dt>Payback</dt><dd>7.2 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict">Excellent &mdash; install with confidence</span>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
     </a>
 
-    <!-- Redwood City -->
-    <a class="card" href="redwood-city.html" data-s="redwood city redwood-city 94061 pge nem 3.0 solar california ca peninsula">
+    <a class="card" href="redwood-city.html" data-s="redwood city 94061 pg&amp;e nem 3.0 bay area peninsula solar california ca">
       <div class="card-top">
-        <div class="score-circle"><span>89</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
         <div class="card-title">
           <h3>Redwood City</h3>
-          <div class="zip">ZIP 94061</div>
+          <div class="zip">ZIP 94061 &middot; <span class="rank">Peninsula</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,578 kWh</dd>
+          <dt>Annual Yield</dt><dd>7,577 kWh</dd>
           <dt>LCOE</dt><dd>$0.074/kWh</dd>
           <dt>Payback</dt><dd>7.2 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict">Excellent &mdash; install with confidence</span>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
     </a>
 
-    <!-- San Jose -->
-    <a class="card" href="san-jose.html" data-s="san jose san-jose 95134 pge nem 3.0 solar california ca south bay">
+    <a class="card" href="irvine.html" data-s="irvine 92618 sce nem 3.0 socal orange county solar california ca">
       <div class="card-top">
-        <div class="score-circle"><span>89</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
         <div class="card-title">
-          <h3>San Jose</h3>
-          <div class="zip">ZIP 95134</div>
+          <h3>Irvine</h3>
+          <div class="zip">ZIP 92618 &middot; <span class="rank">#13 · 311K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,542 kWh</dd>
+          <dt>Annual Yield</dt><dd>7,614 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>7.3 yr</dd>
+          <dt>Utility</dt><dd>SCE</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="santa-ana.html" data-s="santa ana 92701 sce nem 3.0 socal orange county solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="card-title">
+          <h3>Santa Ana</h3>
+          <div class="zip">ZIP 92701 &middot; <span class="rank">#14 · 310K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,596 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>7.3 yr</dd>
+          <dt>Utility</dt><dd>SCE</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="san-jose.html" data-s="san jose 95113 pg&amp;e nem 3.0 bay area south bay solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>San Jose</h3>
+          <div class="zip">ZIP 95113 &middot; <span class="rank">#3 · 1.0M</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,493 kWh</dd>
           <dt>LCOE</dt><dd>$0.075/kWh</dd>
           <dt>Payback</dt><dd>7.3 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict">Excellent &mdash; install with confidence</span>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
     </a>
 
-    <!-- Arnold -->
-    <a class="card" href="arnold.html" data-s="arnold 95223 pge nem 3.0 solar california ca sierra foothills">
+    <a class="card" href="fresno.html" data-s="fresno 93721 pg&amp;e nem 3.0 central valley solar california ca">
       <div class="card-top">
-        <div class="score-circle"><span>88</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
         <div class="card-title">
-          <h3>Arnold</h3>
-          <div class="zip">ZIP 95223</div>
+          <h3>Fresno</h3>
+          <div class="zip">ZIP 93721 &middot; <span class="rank">#5 · 545K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,439 kWh</dd>
+          <dt>Annual Yield</dt><dd>7,475 kWh</dd>
+          <dt>LCOE</dt><dd>$0.075/kWh</dd>
+          <dt>Payback</dt><dd>7.3 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="stockton.html" data-s="stockton 95202 pg&amp;e nem 3.0 central valley solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>Stockton</h3>
+          <div class="zip">ZIP 95202 &middot; <span class="rank">#11 · 322K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,404 kWh</dd>
           <dt>LCOE</dt><dd>$0.076/kWh</dd>
           <dt>Payback</dt><dd>7.4 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict">Excellent &mdash; install with confidence</span>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="arnold.html" data-s="arnold 95223 pg&amp;e nem 3.0 sierra foothills solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>Arnold</h3>
+          <div class="zip">ZIP 95223 &middot; <span class="rank">Sierra foothills</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,440 kWh</dd>
+          <dt>LCOE</dt><dd>$0.076/kWh</dd>
+          <dt>Payback</dt><dd>7.4 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="riverside.html" data-s="riverside 92501 riverside pu net metering socal inland empire solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>Riverside</h3>
+          <div class="zip">ZIP 92501 &middot; <span class="rank">#12 · 315K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,728 kWh</dd>
+          <dt>LCOE</dt><dd>$0.073/kWh</dd>
+          <dt>Payback</dt><dd>8.0 yr</dd>
+          <dt>Utility</dt><dd>Riverside PU</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="los-angeles.html" data-s="los angeles 90012 ladwp net metering socal la basin solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>Los Angeles</h3>
+          <div class="zip">ZIP 90012 &middot; <span class="rank">#1 · 3.8M</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,637 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>8.1 yr</dd>
+          <dt>Utility</dt><dd>LADWP</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="anaheim.html" data-s="anaheim 92805 anaheim pu net metering socal orange county solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="card-title">
+          <h3>Anaheim</h3>
+          <div class="zip">ZIP 92805 &middot; <span class="rank">#10 · 345K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,572 kWh</dd>
+          <dt>LCOE</dt><dd>$0.074/kWh</dd>
+          <dt>Payback</dt><dd>8.2 yr</dd>
+          <dt>Utility</dt><dd>Anaheim PU</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="berkeley.html" data-s="berkeley 94704 pg&amp;e nem 3.0 bay area east bay university solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
+        <div class="card-title">
+          <h3>Berkeley</h3>
+          <div class="zip">ZIP 94704 &middot; <span class="rank">UC Berkeley</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,262 kWh</dd>
+          <dt>LCOE</dt><dd>$0.078/kWh</dd>
+          <dt>Payback</dt><dd>7.5 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="oakland.html" data-s="oakland 94607 pg&amp;e nem 3.0 bay area east bay solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
+        <div class="card-title">
+          <h3>Oakland</h3>
+          <div class="zip">ZIP 94607 &middot; <span class="rank">#8 · 419K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,172 kWh</dd>
+          <dt>LCOE</dt><dd>$0.079/kWh</dd>
+          <dt>Payback</dt><dd>7.6 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="sacramento.html" data-s="sacramento 95814 smud net metering central valley capital solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
+        <div class="card-title">
+          <h3>Sacramento</h3>
+          <div class="zip">ZIP 95814 &middot; <span class="rank">#6 · 528K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,401 kWh</dd>
+          <dt>LCOE</dt><dd>$0.076/kWh</dd>
+          <dt>Payback</dt><dd>8.3 yr</dd>
+          <dt>Utility</dt><dd>SMUD</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="san-francisco.html" data-s="san francisco 94103 cleanpowersf net metering bay area peninsula solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>86</span></div>
+        <div class="card-title">
+          <h3>San Francisco</h3>
+          <div class="zip">ZIP 94103 &middot; <span class="rank">#4 · 810K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,147 kWh</dd>
+          <dt>LCOE</dt><dd>$0.079/kWh</dd>
+          <dt>Payback</dt><dd>8.6 yr</dd>
+          <dt>Utility</dt><dd>CleanPowerSF</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
     </a>
 
@@ -347,28 +559,32 @@
   <div class="no-match" id="no-match">
     <h3>No matching report found</h3>
     <p>We don't have a report for that location yet. You can generate one from the command line:</p>
-    <code>python generate_report.py --zip YOUR_ZIP</code>
+    <code>python -m solar_fetch YOUR_ZIP --system-kw 4.5 --output report.html</code>
   </div>
 
   <!-- About section -->
   <div class="about">
     <h2>About These Reports</h2>
     <p>
-      Each report models a 4.5 kW residential rooftop system using irradiance and weather data
-      from the <a href="https://developer.nrel.gov/" target="_blank" rel="noopener">NREL Developer Network</a>
-      (PVWatts v8 API). Financial projections use current California NEM 3.0 tariff schedules
-      from PG&amp;E, the 30% federal Investment Tax Credit (ITC), and real retail electricity rates.
+      Each report models a 4.5&nbsp;kW south-facing residential rooftop system using irradiance and
+      weather data from the <a href="https://developer.nrel.gov/" target="_blank" rel="noopener">NREL Developer Network</a>
+      (PVWatts&nbsp;v8). The utility and electricity rate are detected automatically per ZIP; for the three
+      CPUC-regulated investor-owned utilities (PG&amp;E, SCE, SDG&amp;E) we apply current <strong>NEM&nbsp;3.0</strong>
+      export pricing, while municipal utilities (LADWP, SMUD, Anaheim, Riverside) use their own net-metering tariffs.
     </p>
     <p>
       Viability scores (0&ndash;100) combine levelized cost of energy (LCOE), simple payback period,
       net present value (NPV), solar resource quality, panel orientation, and local market maturity
-      into a single weighted index. A score of 65 or above is rated "Good" for most homeowners.
+      into a single weighted index (25% resource + 50% economics + 15% site fit + 10% policy).
+      A score of 65 or above is rated "Good" for most homeowners; all 20 locations here clear that bar,
+      reflecting California's high retail rates and strong solar resource.
     </p>
     <p>
       Data sources: <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts</a>,
-      <a href="https://www.eia.gov/" target="_blank" rel="noopener">EIA utility rate databases</a>,
-      and <a href="https://www.dsireusa.org/" target="_blank" rel="noopener">DSIRE incentive records</a>.
-      Built for DATA 201 at Cal Poly Humboldt.
+      <a href="https://openei.org/wiki/Utility_Rate_Database" target="_blank" rel="noopener">OpenEI URDB</a>,
+      <a href="https://www.eia.gov/" target="_blank" rel="noopener">EIA rate data</a>, and
+      <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab TTS</a>.
+      Built for DATA&nbsp;201 at Cal Poly Humboldt. &mdash; <a href="../heatmap/">Explore all 2,593 CA ZIPs on the heatmap &rarr;</a>
     </p>
   </div>
 </div>
@@ -382,6 +598,8 @@
   var input = document.getElementById('search');
   var cards = document.querySelectorAll('.card');
   var noMatch = document.getElementById('no-match');
+  var count = document.getElementById('result-count');
+  var total = cards.length;
 
   input.addEventListener('input', function () {
     var q = this.value.toLowerCase().trim();
@@ -393,6 +611,9 @@
       if (show) visible++;
     });
     noMatch.className = visible === 0 && q ? 'no-match visible' : 'no-match';
+    count.textContent = q
+      ? 'Showing ' + visible + ' of ' + total + ' reports'
+      : 'Showing all ' + total + ' reports · sorted by viability score';
   });
 })();
 </script>

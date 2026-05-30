@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Site Analysis — Stockton, CA 95202</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #FAFBFD;
+            color: #1A1A2E;
+            line-height: 1.6;
+        }
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #1B1464 0%, #2D2B8C 100%);
+            color: white;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        .header-left .subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        .header-score {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .score-badge {
+            background: #4CAF78;
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .score-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 40px;
+        }
+        .section {
+            margin-bottom: 48px;
+        }
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #546E7A;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #DEE2E8;
+        }
+        .chart-card {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #DEE2E8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .assumptions-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .assumptions-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #FAFBFD;
+            border-bottom: 2px solid #DEE2E8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #546E7A;
+        }
+        .footer {
+            text-align: center;
+            padding: 32px 40px;
+            color: #8D8D8D;
+            font-size: 12px;
+            border-top: 1px solid #DEE2E8;
+        }
+        /* Tooltip system */
+        .has-tip {
+            position: relative;
+        }
+        .has-tip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1B1464;
+            color: white;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            white-space: normal;
+            width: 240px;
+            text-align: left;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            letter-spacing: normal;
+            text-transform: none;
+        }
+        .has-tip::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1B1464;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+        }
+        .has-tip:hover::after,
+        .has-tip:hover::before {
+            opacity: 1;
+        }
+
+        .score-tip {
+            position: relative;
+            cursor: help;
+        }
+        .score-tip::after {
+            content: attr(data-tip);
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1B1464;
+            color: white;
+            font-size: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            width: 260px;
+            text-align: left;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            white-space: normal;
+        }
+        .score-tip:hover::after {
+            opacity: 1;
+        }
+
+        .prov-pill {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 16px;
+            background: #FFFFFF;
+            border: 1px solid #DEE2E8;
+            color: #546E7A;
+            text-decoration: none;
+            font-variant: small-caps;
+        }
+        .prov-pill:hover {
+            border-color: #1B1464;
+            color: #1B1464;
+        }
+        .accordion-header {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .accordion-body.open {
+            max-height: 2000px;
+        }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .sticky-header { padding: 12px 20px; }
+            .container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sticky Header -->
+<div class="sticky-header">
+    <div class="header-left">
+        <h1>Stockton, CA 95202</h1>
+        <div class="subtitle">CA &middot; 1,645 kWh/kW &middot; 18.8% CF</div>
+    </div>
+    <div class="header-score">
+        <div>
+            <div class="score-label">Viability Score</div>
+        </div>
+        <div class="score-badge score-tip" data-tip="Composite viability score (0-100). Weights: 25% solar resource quality, 50% financial returns, 15% panel orientation, 10% local market maturity. 80+ = Excellent, 65-79 = Good, 50-64 = Marginal, &lt;50 = Poor.">88</div>
+        <span style="background: #FF8F00; color: white; font-size: 11px; padding: 3px 10px; border-radius: 12px; margin-left: 12px; cursor: help;" title="Geocode: medium confidence (ZIP centroid or multiple matches) | Rate: bundled current TOU schedule (E-TOU-C (bundled 2024 schedule)) | Solar data: nearby station (1.5 km)">MEDIUM CONFIDENCE</span>
+    </div>
+</div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 40px;
+                     background: #FAFBFD; border-bottom: 1px solid #DEE2E8;">
+            <span class="prov-pill">Utility: Pacific Gas & Electric Co</span><span class="prov-pill">Rate: E-TOU-C (bundled 2024 schedule)</span><span class="prov-pill">Source: bundled_tou</span><span class="prov-pill">Export: NEM 3.0 (CA)</span><span class="prov-pill">Geocode: uszips (medium)</span>
+        </div>
+        
+
+<div class="container">
+
+    <!-- Hero Gauge + KPIs -->
+    <div class="section">
+        <div class="section-label">Overview</div>
+        <div class="grid-2">
+            <div class="chart-card">
+                <div>                            <div id="a17b2eac-e199-4a87-b61d-f86e5055622c" class="plotly-graph-div" style="height:320px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("a17b2eac-e199-4a87-b61d-f86e5055622c")) {                    Plotly.newPlot(                        "a17b2eac-e199-4a87-b61d-f86e5055622c",                        [{"gauge":{"axis":{"dtick":10,"range":[0,100],"tickcolor":"#DEE2E8","tickfont":{"color":"#8D8D8D","size":11},"tickwidth":2},"bar":{"color":"#4CAF78","thickness":0.75},"bgcolor":"#FAFBFD","borderwidth":0,"steps":[{"color":"#FFCDD2","range":[0,50]},{"color":"#FFF3E0","range":[50,65]},{"color":"#E0F2F1","range":[65,80]},{"color":"#C8E6C9","range":[80,100]}],"threshold":{"line":{"color":"#1B1464","width":3},"thickness":0.85,"value":88.0}},"mode":"gauge+number","number":{"font":{"color":"#1A1A2E","family":"Inter, sans-serif","size":64},"suffix":""},"title":{"font":{"color":"#546E7A","size":16},"text":"\u003cb\u003eExcellent \u2014 install with confidence\u003c\u002fb\u003e"},"value":88.0,"type":"indicator"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":30,"r":30,"t":30,"b":10},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8"},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":320},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            <div>
+                
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+                gap: 16px; margin: 24px 0;">
+        
+    <div class="has-tip" data-tip="What you actually pay after the federal Investment Tax Credit. Gross cost is $15,750." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            Net Cost <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #1B1464; line-height: 1.2;">
+            $11,025
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            After 30% ITC
+        </div>
+    </div>
+    
+        
+    <div class="has-tip" data-tip="Levelized Cost of Energy — the effective price of each kWh your panels produce over their lifetime, including install cost and maintenance. Lower is better. Compare to your retail rate." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            LCOE <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #4CAF78; line-height: 1.2;">
+            $0.076
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            per kWh
+        </div>
+    </div>
+    
+        
+    <div class="has-tip" data-tip="How many years until your cumulative electricity savings equal the net cost of the system. Under 7 years is excellent, 7-10 is good, over 15 is poor." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            Payback <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #26A69A; line-height: 1.2;">
+            7.4 yr
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            simple payback
+        </div>
+    </div>
+    
+        
+    <div class="has-tip" data-tip="Net Present Value — the total profit (or loss) from the system in today's dollars, after accounting for the time value of money. Positive = the investment beats a 6% return." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            NPV <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #4CAF78; line-height: 1.2;">
+            $10,491
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            25-year horizon
+        </div>
+    </div>
+    
+        
+    <div class="has-tip" data-tip="Internal Rate of Return — the annualized return on your solar investment. Compare to stock market (~10%) or savings accounts (~4%). Higher is better." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            IRR <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #4CAF78; line-height: 1.2;">
+            13.8%
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            internal rate of return
+        </div>
+    </div>
+    
+        
+    <div class="has-tip" data-tip="Metric tons of CO2 emissions avoided each year by displacing grid electricity with solar. Roughly equivalent to driving 7,344 fewer miles per year." style="
+        background: #FFFFFF;
+        border-radius: 12px;
+        padding: 20px 24px;
+        border: 1px solid #DEE2E8;
+        text-align: center;
+        min-width: 160px;
+        cursor: help;
+        position: relative;
+    ">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+                     color: #546E7A; margin-bottom: 6px;">
+            CO2 Avoided <span style="font-size:10px; opacity:0.6;">&#9432;</span>
+        </div>
+        <div style="font-size: 28px; font-weight: 700; color: #26A69A; line-height: 1.2;">
+            3.0 t/yr
+        </div>
+        <div style="font-size: 12px; color: #8D8D8D; margin-top: 4px;">
+            metric tons
+        </div>
+    </div>
+    
+    </div>
+    
+            </div>
+        </div>
+        
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0;">
+        <div class="has-tip" data-tip="How much sunlight energy this location receives. Based on specific yield (kWh produced per kW installed). 1,800 kWh/kW is top-tier US solar (desert Southwest). Your site: 1,645 kWh/kW."
+             style="text-align: center; padding: 16px; background: #FFFFFF;
+                     border-radius: 10px; border: 1px solid #DEE2E8; cursor: help;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+                         color: #546E7A;">Resource (25%) <span style="font-size:9px; opacity:0.6;">&#9432;</span></div>
+            <div style="font-size: 22px; font-weight: 700; color: #F5A623; margin: 4px 0;">
+                91%
+            </div>
+            <div style="font-size: 11px; color: #8D8D8D;">
+                1,645 kWh/kW
+            </div>
+        </div>
+        <div class="has-tip" data-tip="Blended financial score: 40% payback speed (yours: 7.4 yr), 40% LCOE vs retail rate (yours: $0.076 vs $0.389), 20% NPV magnitude (yours: $10,491). This is the most heavily weighted component."
+             style="text-align: center; padding: 16px; background: #FFFFFF;
+                     border-radius: 10px; border: 1px solid #DEE2E8; cursor: help;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+                         color: #546E7A;">Economics (50%) <span style="font-size:9px; opacity:0.6;">&#9432;</span></div>
+            <div style="font-size: 22px; font-weight: 700; color: #4CAF78; margin: 4px 0;">
+                88%
+            </div>
+            <div style="font-size: 11px; color: #8D8D8D;">
+                Payback + LCOE + NPV
+            </div>
+        </div>
+        <div class="has-tip" data-tip="How well the panels are physically oriented. Optimal: tilt angle equals latitude (38&deg;), azimuth faces true south (180&deg;). Your tilt deviation: 0&deg;, azimuth deviation: 0&deg;."
+             style="text-align: center; padding: 16px; background: #FFFFFF;
+                     border-radius: 10px; border: 1px solid #DEE2E8; cursor: help;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+                         color: #546E7A;">Site Fit (15%) <span style="font-size:9px; opacity:0.6;">&#9432;</span></div>
+            <div style="font-size: 22px; font-weight: 700; color: #26A69A; margin: 4px 0;">
+                100%
+            </div>
+            <div style="font-size: 11px; color: #8D8D8D;">
+                Tilt &Delta;0&deg; Az &Delta;0&deg;
+            </div>
+        </div>
+        <div class="has-tip" data-tip="How mature the local solar market is, based on the number of recent installations in your area. More installations = better installer competition, favorable policies, and streamlined permitting."
+             style="text-align: center; padding: 16px; background: #FFFFFF;
+                     border-radius: 10px; border: 1px solid #DEE2E8; cursor: help;">
+            <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+                         color: #546E7A;">Market (10%) <span style="font-size:9px; opacity:0.6;">&#9432;</span></div>
+            <div style="font-size: 22px; font-weight: 700; color: #2D2B8C; margin: 4px 0;">
+                64%
+            </div>
+            <div style="font-size: 11px; color: #8D8D8D;">
+                Local adoption signal
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
+    <!-- Economics Waterfall -->
+    <div class="section">
+        <div class="section-label">Financial Analysis</div>
+        <div class="chart-card">
+            <div>                            <div id="a87f83e0-70a2-4936-8409-0e65619ff4b1" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("a87f83e0-70a2-4936-8409-0e65619ff4b1")) {                    Plotly.newPlot(                        "a87f83e0-70a2-4936-8409-0e65619ff4b1",                        [{"connector":{"line":{"color":"#DEE2E8","width":1}},"decreasing":{"marker":{"color":"#E85D4A"}},"increasing":{"marker":{"color":"#4CAF78"}},"measure":["relative","relative","total","relative","relative","total"],"name":"","orientation":"v","text":["$15,750","-$4,725","$11,025","-$2,250","+$44,608","$31,333"],"textfont":{"family":"Inter, sans-serif","size":12},"textposition":"outside","totals":{"marker":{"color":"#1B1464"}},"x":["Gross Cost","ITC Credit (30%)","Net Cost","Lifetime O&M (25yr)","Lifetime Savings","Net Benefit"],"y":[15750.0,-4725.0,0,-2250.0,44608.43,0],"type":"waterfall"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":60,"r":30,"t":100,"b":50},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","title":{"text":"USD ($)"}},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003eEconomics Waterfall\u003c\u002fb\u003e"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":420,"showlegend":false,"annotations":[{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eFollow the money from gross cost to net benefit over the system lifetime\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Source: TTS median $\u002fW, IRA 30% ITC, PVWatts v8.5 production estimates","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}]},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+    </div>
+
+    <!-- Cashflow + LCOE side by side -->
+    <div class="section">
+        <div class="grid-2">
+            <div class="chart-card">
+                <div>                            <div id="b26ed0b7-0e84-4146-bb6a-c218e18ac9e1" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("b26ed0b7-0e84-4146-bb6a-c218e18ac9e1")) {                    Plotly.newPlot(                        "b26ed0b7-0e84-4146-bb6a-c218e18ac9e1",                        [{"fill":"tozeroy","fillcolor":"rgba(211, 47, 47, 0.10)","hovertemplate":"Year %{x}\u003cbr\u003eCumulative: $%{y:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#E85D4A","width":3},"name":"Underwater","x":[0,1,2,3,4,5,6,7,8],"y":[-11025.0,-9630.08,-8207.44,-6756.52,-5276.76,-3767.59,-2228.4300000000003,-658.6800000000003,942.2699999999998],"type":"scatter"},{"fill":"tozeroy","fillcolor":"rgba(76, 175, 120, 0.10)","hovertemplate":"Year %{x}\u003cbr\u003eCumulative: $%{y:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#4CAF78","width":3},"name":"Net Positive","x":[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"y":[-658.6800000000003,942.2699999999998,2575.04,4240.26,5938.58,7670.65,9437.14,11238.74,13076.15,14950.08,16861.25,18810.41,20798.31,22825.72,24893.420000000002,27002.22,29152.93,31346.39,33583.44],"type":"scatter"},{"hovertemplate":"Year %{x}\u003cbr\u003eGrid cost: $%{y:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#8D8D8D","dash":"dash","width":2},"name":"Grid cost (no solar)","x":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"y":[0,2877.35,5826.64,8849.66,11948.25,15124.31,18379.77,21716.62,25136.89,28642.67,32236.09,35919.34,39694.68,43564.4,47530.86,51596.49,55763.75,60035.2,64413.43,68901.12,73501.0,78215.88,83048.63,88002.2,93079.61,98283.95],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"shapes":[{"line":{"color":"#F5A623","dash":"dot","width":2},"type":"line","x0":7.41,"x1":7.41,"xref":"x","y0":0,"y1":1,"yref":"y domain"}],"annotations":[{"arrowcolor":"#F5A623","arrowhead":2,"ax":50,"ay":-40,"font":{"color":"#F5A623","size":13},"showarrow":true,"text":"\u003cb\u003ePayback: 7.4 yr\u003c\u002fb\u003e","x":7.41,"y":0},{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eTime to breakeven \u2014 red zone is out-of-pocket, green zone is net positive\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Dashed line: cumulative electricity cost without solar. Source: PVWatts v8.5, EIA state rates","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}],"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":60,"r":30,"t":100,"b":50},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false,"title":{"text":"Year"}},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","title":{"text":"Cumulative ($)"},"tickprefix":"$","tickformat":","},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003eCumulative Cashflow\u003c\u002fb\u003e"},"legend":{"x":0.02,"y":0.98,"bgcolor":"rgba(255,255,255,0.8)"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":420},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            <div class="chart-card">
+                <div>                            <div id="149ca6d4-ef19-4c37-9cd7-5ebe2cdb7a96" class="plotly-graph-div" style="height:280px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("149ca6d4-ef19-4c37-9cd7-5ebe2cdb7a96")) {                    Plotly.newPlot(                        "149ca6d4-ef19-4c37-9cd7-5ebe2cdb7a96",                        [{"hovertemplate":"LCOE: $%{x:.4f}\u002fkWh\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#4CAF78"},"name":"LCOE","orientation":"h","text":["$0.076\u002fkWh"],"textfont":{"size":14},"textposition":"outside","x":[0.0761],"y":["LCOE (Solar)"],"type":"bar"},{"hovertemplate":"Retail: $%{x:.4f}\u002fkWh\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#1B1464"},"name":"Retail","orientation":"h","text":["$0.389\u002fkWh"],"textfont":{"size":14},"textposition":"outside","x":[0.3886],"y":["Retail Rate (Grid)"],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"annotations":[{"font":{"color":"#4CAF78","size":14},"showarrow":false,"text":"\u003cb\u003eMargin of safety: $0.312\u002fkWh (80%)\u003c\u002fb\u003e","x":0.5,"xref":"paper","y":-0.25,"yref":"paper"},{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eIs solar cheaper than the grid? Lower LCOE = better deal\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"LCOE: undiscounted; Retail: CA state average (EIA). Grid parity ratio: 0.20","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}],"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":140,"r":80,"t":80,"b":80},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false,"title":{"text":"$\u002fkWh"},"tickprefix":"$"},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8"},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003eLCOE vs Grid Retail Rate\u003c\u002fb\u003e"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":280,"showlegend":false,"barmode":"group"},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sensitivity Tornado (prominent) -->
+    <div class="section">
+        <div class="section-label">Decision Support</div>
+        <div class="chart-card">
+            <div>                            <div id="9ba6e102-8ecf-4416-9b43-92bd3ac6ec58" class="plotly-graph-div" style="height:400px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("9ba6e102-8ecf-4416-9b43-92bd3ac6ec58")) {                    Plotly.newPlot(                        "9ba6e102-8ecf-4416-9b43-92bd3ac6ec58",                        [{"base":19091.46,"hovertemplate":"%{y}\u003cbr\u003eNPV at -20%: $%{text}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#E85D4A"},"name":"-20%","orientation":"h","text":["$12,879","$23,360","$15,803","$21,485","$19,407"],"textfont":{"size":11},"textposition":"outside","x":[-6212.299999999999,4268.23,-3288.8599999999988,2394.0,315.130000000001],"y":["Electricity Price","Discount Rate","NEM Export Ratio","Install Cost ($\u002fW)","Degradation Rate"],"type":"bar"},{"base":19091.46,"hovertemplate":"%{y}\u003cbr\u003eNPV at +20%: $%{text}\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#4CAF78"},"name":"+20%","orientation":"h","text":["$25,304","$15,552","$22,380","$16,697","$18,781"],"textfont":{"size":11},"textposition":"outside","x":[6212.290000000001,-3539.41,3288.8600000000006,-2394.0,-310.73999999999796],"y":["Electricity Price","Discount Rate","NEM Export Ratio","Install Cost ($\u002fW)","Degradation Rate"],"type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"shapes":[{"line":{"color":"#1B1464","dash":"dash","width":2},"type":"line","x0":19091.46,"x1":19091.46,"xref":"x","y0":0,"y1":1,"yref":"y domain"}],"annotations":[{"font":{"color":"#1B1464","size":12},"showarrow":false,"text":"Base NPV: $19,091","x":19091.46,"xanchor":"center","xref":"x","y":1,"yanchor":"bottom","yref":"y domain"},{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eWhich assumptions matter most? Sorted by impact magnitude. Longer bars = more sensitivity.\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Each parameter varied \u00b120% from base. Source: PVWatts v8.5, EIA rates, TTS benchmarks","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}],"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":160,"r":80,"t":100,"b":80},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false,"title":{"text":"NPV ($)"},"tickprefix":"$","tickformat":","},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8"},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003eSensitivity Analysis (Tornado)\u003c\u002fb\u003e"},"legend":{"x":0.02,"y":-0.15,"orientation":"h"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":400,"showlegend":true,"barmode":"overlay"},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+    </div>
+
+    <!-- Monthly Production + Peer Comparison -->
+    <div class="section">
+        <div class="grid-2">
+            <div class="chart-card">
+                <div>                            <div id="7dfe6d13-8e58-487e-ab24-1b9c8f88e152" class="plotly-graph-div" style="height:380px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("7dfe6d13-8e58-487e-ab24-1b9c8f88e152")) {                    Plotly.newPlot(                        "7dfe6d13-8e58-487e-ab24-1b9c8f88e152",                        [{"hovertemplate":"\u003cb\u003e%{x}\u003c\u002fb\u003e\u003cbr\u003e%{y:,.0f} kWh\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":{"dtype":"f8","bdata":"XI\u002fC9WgQeUCvXMd3St96QOB6FK7nz39AMjMzM7NHg0D1KFyPcqeGQA64girBH4lAuB6F6zEHikAPuIIqwR+JQPUoXI9yp4ZAMjMzM7NHg0DgehSu589\u002fQK9cx3dK33pA"},"colorscale":[[0,"#2D2B8C"],[1,"#F5A623"]],"showscale":false},"name":"Production (kWh)","x":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"y":{"dtype":"f8","bdata":"XI\u002fC9WgQeUCvXMd3St96QOB6FK7nz39AMjMzM7NHg0D1KFyPcqeGQA64girBH4lAuB6F6zEHikAPuIIqwR+JQPUoXI9yp4ZAMjMzM7NHg0DgehSu589\u002fQK9cx3dK33pA"},"type":"bar","xaxis":"x","yaxis":"y"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,0.94],"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false},"yaxis":{"anchor":"x","domain":[0.0,1.0],"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","title":{"text":"kWh"}},"yaxis2":{"anchor":"x","overlaying":"y","side":"right"},"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":60,"r":30,"t":100,"b":50},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003eEstimated Monthly Production\u003c\u002fb\u003e"},"legend":{"x":0.02,"y":0.98},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":380,"showlegend":true,"annotations":[{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eSeasonal pattern approximated from PVWatts annual total \u2014 expect more in summer, less in winter\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Source: PVWatts v8.5 annual estimate with sinusoidal seasonal decomposition","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}]},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+            <div class="chart-card">
+                <div>                            <div id="ee4ee7dd-2ab1-458e-92ab-93092b746f77" class="plotly-graph-div" style="height:420px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ee4ee7dd-2ab1-458e-92ab-93092b746f77")) {                    Plotly.newPlot(                        "ee4ee7dd-2ab1-458e-92ab-93092b746f77",                        [{"hovertemplate":"Yield: %{x:,.0f} kWh\u002fkW\u003cbr\u003ePayback: %{y:.1f} yr\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#546E7A","line":{"color":"#DEE2E8","width":1},"opacity":0.4,"size":8},"mode":"markers","name":"Kaggle Reference Sites","x":{"dtype":"f8","bdata":"JzI9SwceokBIf3SaCqGgQOqpnvWceKJAbT7NYtGFpEAlFakKgmegQPzOO5CEZ6BA\u002f3ClFoenpEDRI3L5dcCiQKPX+HehtJ9A1YYCOYk5okA+W7MV5rufQO4R2NEfuZ9AMVmoZy2FoUBBNhBPEPCYQC8D6j0Z0plAp2FhRUFFn0AiJ6NHmiidQCnT6WOMsKFA6yIGAV+mnUA0Ho5NPEmbQHHMoaZjY6RAFG+fwohsoEBWrw1VhByhQHYlcVtNOptAW8SEoL1an0DnGrS1jTahQDNe5MXOgpxAALwyN2vVoUC9h2HLOxefQClSDNf7RKBAWJmNuvMVn0AWKNztXUulQEkah9Pm66BAKDffM7\u002fynECjCATmhuGiQDqmqtT8LpxAQMK8clFxoUC3gYNWZbiYQFdV6z4trptA0bjF4h1qoUCO0Xh3FK+iQJhxASvSWqFAXM5\u002fbJyuoECPa+x4Vj+gQBY6aAvG+ZpAqUvz2y+InkCy9QHFO7+fQPmaVPlFbqNA"},"y":{"dtype":"f8","bdata":"rsdJADFHJUDNV+NSVn0VQHNNvv4vLiVAXnn6ZXSiIUCbeeNb5iwgQJZPDz9OniZAkVFiFQq3KED02ogHZjcoQHTOVrlSuh5AS8PccpEDIkCK9KqPYDclQM+SickOcChAkJqCWAQqIUBC3DBtt6EiQEDApaGADhxAZqvKWG4oG0DycxmfZJ8nQO7yfuRYVypA2+oj4i8zI0CwSurR4ZMoQGTvfA1BXiVA5JidUZtVIEDOpKJF8l0lQJngavsLQCtA0CX6roBhI0DO1deXGmIrQM6bUFZY2AlAbbgxLGWrJ0D2PEq+x\u002f4jQPsvcG6hECJAQiPNVNAEJEAR8\u002fcniz4TQE8yZxMudiJAU+2zznZYJUCQWQd7EPMqQCjh91\u002f59yBAZwHR8\u002fkIH0AGGHZpHA0hQJbbPCATIyhA\u002fVHYUik0JUBZQCBWROkgQO9g6qFXICZAZ+MHiJ4LJED8nyDAOWcoQDx39ma7DCBAG+Pq0\u002fPrIUCpxQ4pdpkhQJQs4SkffBhA"},"type":"scatter"},{"hovertemplate":"\u003cb\u003eStockton, CA 95202\u003c\u002fb\u003e\u003cbr\u003eYield: 1,645 kWh\u002fkW\u003cbr\u003ePayback: 7.4 yr\u003cbr\u003eScore: 88\u002f100\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#F5A623","line":{"color":"#1B1464","width":3},"size":18,"symbol":"star"},"mode":"markers+text","name":"This Site","text":["  Stockton, CA 95202"],"textfont":{"color":"#1B1464","size":13},"textposition":"middle right","x":[1645.23],"y":[7.41],"type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"font":{"family":"Inter, IBM Plex Sans, -apple-system, sans-serif","color":"#1A1A2E"},"margin":{"l":60,"r":30,"t":100,"b":50},"xaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","showgrid":false,"title":{"text":"Specific Yield (kWh\u002fkW)"}},"yaxis":{"gridcolor":"#E8ECF0","gridwidth":1,"zerolinecolor":"#DEE2E8","title":{"text":"Simple Payback (years)"},"autorange":"reversed"},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF","bordercolor":"#DEE2E8"},"title":{"font":{"size":18},"text":"\u003cb\u003ePeer Comparison\u003c\u002fb\u003e"},"legend":{"x":0.02,"y":0.02},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":420,"annotations":[{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eHow does this site compare to the reference distribution? Stars = this site, dots = peers\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Peers: synthetic distribution based on Kaggle global reference dataset (N=48)","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}]},                        {"responsive": true}                    )                };            </script>        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assumptions Reference -->
+    <div class="section">
+        <div class="section-label">Assumptions & Methodology</div>
+        <div class="chart-card">
+            <p style="font-size: 13px; color: #546E7A; margin-bottom: 16px;">
+                All parameters below are overridable via the <code>Assumptions</code> dataclass.
+                Electricity rate source: <b>override</b> ($0.389/kWh).
+            </p>
+            <table class="assumptions-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th style="text-align: right;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>system_life_years</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                25
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>degradation_rate</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.005
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>discount_rate</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.06
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>om_cost_per_kw_year</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                $20.0
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>federal_itc</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.3
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>electricity_price_override</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                $0.3886449771689498
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>electricity_escalation</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.025
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>nem_export_ratio</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.14132077947127306
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>self_consumption_rate</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.4
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>co2_intensity_tons_per_kwh</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                0.0004
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;">
+                <code>default_price_per_watt</code>
+            </td>
+            <td style="padding: 6px 12px; border-bottom: 1px solid #DEE2E8; font-size: 13px;
+                        text-align: right;">
+                $3.5
+            </td>
+        </tr>
+        
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="section"><div class="section-label">Rate Schedule</div><div class="chart-card"><div>                            <div id="ce2f045e-7629-49b4-9327-dc2a597fb4e1" class="plotly-graph-div" style="height:400px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ce2f045e-7629-49b4-9327-dc2a597fb4e1")) {                    Plotly.newPlot(                        "ce2f045e-7629-49b4-9327-dc2a597fb4e1",                        [{"hovertemplate":"Hour %{x}\u003cbr\u003eRate: $%{y:.4f}\u002fkWh\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#F5A623","shape":"hv","width":3},"name":"Avg $\u002fkWh","x":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],"y":{"dtype":"f8","bdata":"BZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002fBZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002fBZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002fBZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002fBZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002fBZ0nzNfk1z9lRHILSJjcP2VEcgtImNw\u002fZURyC0iY3D9lRHILSJjcP2VEcgtImNw\u002fBZ0nzNfk1z8FnSfM1+TXPwWdJ8zX5Nc\u002f"},"type":"scatter","xaxis":"x","yaxis":"y"},{"fill":"tozeroy","fillcolor":"rgba(76, 175, 120, 0.2)","hovertemplate":"Hour %{x}\u003cbr\u003eProduction: %{y:.1f} kWh\u003cextra\u003e\u003c\u002fextra\u003e","line":{"color":"#4CAF78","width":2},"name":"Avg daily kWh","x":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],"y":{"dtype":"f8","bdata":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABJYR4s5x3mP2qAJXX6XPU\u002f8OqqqE02\u002fj\u002f00ukwRoACQMoNXZ+gogRAa4AldfpcBUDKDV2foKIEQPXS6TBGgAJA8eqqqE02\u002fj9qgCV1+lz1P1BhHiznHeY\u002fLaH9w6GQtzwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"},"type":"scatter","xaxis":"x","yaxis":"y2"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,0.94],"title":{"text":"Hour of Day"},"dtick":2,"showgrid":false},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Rate ($\u002fkWh)"},"tickprefix":"$"},"yaxis2":{"anchor":"x","overlaying":"y","side":"right","title":{"text":"Production (kWh)"},"showgrid":false},"font":{"family":"Inter, IBM Plex Sans, sans-serif","color":"#1A1A2E"},"margin":{"l":70,"r":70,"t":80,"b":60},"title":{"font":{"size":18},"text":"\u003cb\u003eHourly Rate vs Production Profile\u003c\u002fb\u003e"},"legend":{"x":0.02,"y":0.98},"hoverlabel":{"font":{"size":13,"family":"Inter, sans-serif"},"bgcolor":"#FFFFFF"},"paper_bgcolor":"rgba(0,0,0,0)","plot_bgcolor":"rgba(0,0,0,0)","height":400,"annotations":[{"font":{"color":"#546E7A","size":11},"showarrow":false,"text":"\u003ci\u003eThe gap between when solar produces (midday) and when rates peak (evening) drives NEM 3.0 economics\u003c\u002fi\u003e","x":0,"xanchor":"left","xref":"paper","y":1.06,"yref":"paper"},{"font":{"color":"#8D8D8D","size":10},"showarrow":false,"text":"Rate: E-TOU-C (bundled 2024 schedule) via bundled_tou","x":0,"xanchor":"left","xref":"paper","y":-0.15,"yref":"paper"}]},                        {"responsive": true}                    )                };            </script>        </div></div></div>
+
+    
+    <div class="section">
+        <div class="section-label" style="cursor:pointer;" onclick="
+            var b=document.getElementById('accordion_assumptions');
+            b.style.maxHeight=b.style.maxHeight?'':'2000px';
+            this.querySelector('.arr').textContent=b.style.maxHeight?'&#9662;':'&#9656;';
+        "><span class="arr">&#9656;</span> What We Assumed — Full Provenance</div>
+        <div id="accordion_assumptions" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
+            <div class="chart-card" style="margin-top:12px;">
+                <table style="width:100%;border-collapse:collapse;"><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Resolved Address</td><td style="padding:5px 10px;font-size:12px;text-align:right;">Stockton, CA 95202</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Coordinates</td><td style="padding:5px 10px;font-size:12px;text-align:right;">37.9606, -121.2871</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Geocode Source</td><td style="padding:5px 10px;font-size:12px;text-align:right;">uszips (medium)</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">PVWatts Station Distance</td><td style="padding:5px 10px;font-size:12px;text-align:right;">1,539 m</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Utility</td><td style="padding:5px 10px;font-size:12px;text-align:right;">Pacific Gas & Electric Co</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Rate Schedule</td><td style="padding:5px 10px;font-size:12px;text-align:right;">E-TOU-C (bundled 2024 schedule)</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Rate Source</td><td style="padding:5px 10px;font-size:12px;text-align:right;">bundled_tou</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">TOU Rate</td><td style="padding:5px 10px;font-size:12px;text-align:right;">Yes</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Fixed Monthly Charge</td><td style="padding:5px 10px;font-size:12px;text-align:right;">$10.50</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Export Policy</td><td style="padding:5px 10px;font-size:12px;text-align:right;">NEM 3.0 (CA)</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Avg Export Rate</td><td style="padding:5px 10px;font-size:12px;text-align:right;">$0.0549/kWh</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">System Size</td><td style="padding:5px 10px;font-size:12px;text-align:right;">4.5 kW</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Sizing Method</td><td style="padding:5px 10px;font-size:12px;text-align:right;">user_specified</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">System Lifetime</td><td style="padding:5px 10px;font-size:12px;text-align:right;">25 years</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Panel Degradation</td><td style="padding:5px 10px;font-size:12px;text-align:right;">0.5%/yr</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Discount Rate</td><td style="padding:5px 10px;font-size:12px;text-align:right;">6.0%</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">O&M Cost</td><td style="padding:5px 10px;font-size:12px;text-align:right;">$20 /kW/yr</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Federal Tax Credit (ITC)</td><td style="padding:5px 10px;font-size:12px;text-align:right;">30%</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Electricity Rate Used</td><td style="padding:5px 10px;font-size:12px;text-align:right;">$0.3886 /kWh</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Rate Escalation</td><td style="padding:5px 10px;font-size:12px;text-align:right;">2.5%/yr</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">NEM Export Ratio</td><td style="padding:5px 10px;font-size:12px;text-align:right;">0.14 </td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Self-Consumption</td><td style="padding:5px 10px;font-size:12px;text-align:right;">40%</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Grid CO2 Intensity</td><td style="padding:5px 10px;font-size:12px;text-align:right;">0.0004 t/kWh</td></tr><tr><td style="padding:5px 10px;font-size:12px;color:#546E7A;">Default Install Cost</td><td style="padding:5px 10px;font-size:12px;text-align:right;">$3.50 /W</td></tr></table>
+            </div>
+        </div>
+    </div>
+    
+
+</div>
+
+<div class="footer">
+    Solar Site Analysis Report &middot; Generated by solar_viz.py &middot;
+    Data: NREL PVWatts v8.5, NASA POWER, Berkeley Lab TTS, Kaggle Reference
+</div>
+
+</body>
+</html>
