@@ -35,6 +35,14 @@
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
     border-radius: 20px; font-size: 0.78rem; font-weight: 600; color: #fff;
   }
+  .hero-cta {
+    display: inline-block; padding: 0.7rem 1.7rem;
+    background: #fff; color: #1B1464; border-radius: 26px;
+    font-size: 0.95rem; font-weight: 700; text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.26); }
 
   .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 1rem; }
 
@@ -67,6 +75,7 @@
   }
   .banner-reports { background: linear-gradient(135deg, #26A69A 0%, #00796B 100%); }
   .banner-heatmap { background: linear-gradient(135deg, #7E57C2 0%, #4527A0 100%); }
+  .banner-paper   { background: linear-gradient(135deg, #EF6C00 0%, #B53D00 100%); }
   .nav-card-body { padding: 1.25rem 1.35rem 1.4rem; flex: 1; }
   .nav-card-body h2 { font-size: 1.1rem; font-weight: 700; color: #1B1464; margin-bottom: 0.35rem; }
   .nav-card-body p { font-size: 0.88rem; color: #555; line-height: 1.6; }
@@ -107,6 +116,7 @@
     <span class="badge">30% federal ITC</span>
     <span class="badge">65 tests · CI green</span>
   </div>
+  <a class="hero-cta" href="paper.pdf" target="_blank" rel="noopener">📄 Read the Technical Paper (PDF)</a>
 </div>
 
 <div class="container">
@@ -126,6 +136,14 @@
       <div class="nav-card-body">
         <h2>ZIP Heatmaps</h2>
         <p>Interactive maps of viability scores across all 2,593 California ZIP codes. Includes statewide view and NorCal / Bay Area focus, with confidence tiers from real install data.</p>
+      </div>
+    </a>
+
+    <a class="nav-card" href="paper.pdf" target="_blank" rel="noopener">
+      <div class="nav-card-banner banner-paper">📄</div>
+      <div class="nav-card-body">
+        <h2>Technical Paper</h2>
+        <p>The full IEEE-style writeup — OLTP/OLAP architecture, the DuckDB warehouse schema, the 25-year financial model, the URDB staleness guard, and end-to-end verification.</p>
       </div>
     </a>
   </div>
