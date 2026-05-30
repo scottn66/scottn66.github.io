@@ -1,141 +1,509 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-    <title>Markov Decision Processes - MDP</title>
-    <style>
-        body {
-            font-family: 'Open Sans', sans-serif;
-            color: #333;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        .container {
-            padding: 20px;
-        }
-        .header {
-            background: #0056b3;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .concept-box {
-            background-color: #eef4ff;
-            border-left: 5px solid #0056b3;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h2, h3 {
-            color: #0056b3;
-        }
-        a {
-            color: #007bff;
-        }
-        a:hover {
-            text-decoration: none;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .footer {
-            background: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1rem 0;
-            margin-top: 20px;
-        }
-        /* Additional styles as needed */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Speedy Q-Learning Crawler — and the 60% gap we didn't see</title>
+
+  <!-- SEO / social -->
+  <meta name="description" content="A reinforcement-learning crawler: how a year of hyperparameter tuning reached only 42% of optimal, and how a 2002 model-based algorithm (R-MAX) closed the gap to 100%.">
+  <meta property="og:title" content="The Speedy Q-Learning Crawler — and the 60% gap">
+  <meta property="og:description" content="From Q-learning to dynamic programming: model-free RL plateaued at 42% of optimal; R-MAX closed it to 100%.">
+  <meta property="og:image" content="https://scottn66.github.io/robot-arm-sim/img/end_card_resolution.png">
+  <meta property="og:url" content="https://scottn66.github.io/Q.html">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Bootstrap 5 (match landing page) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts (match landing page) -->
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- MathJax for the Bellman equation -->
+  <script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+  <style>
+    /* Brand tokens — match scottn66.github.io landing page */
+    :root {
+      --primary-color: #2C3E50;   /* navy */
+      --secondary-color: #E74C3C; /* coral */
+      --accent-color: #ECF0F1;
+      --bg-color: #ffffff;
+      --text-color: #333;
+      --section-bg: #f4f4f4;
+      --footer-bg: #333;
+      --good: #0c7c1e;
+      --good-soft: #e7f5e9;
+    }
+    body {
+      font-family: 'Open Sans', sans-serif;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      margin: 0; padding: 0; line-height: 1.7;
+      scroll-behavior: smooth;
+    }
+    h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; color: var(--primary-color); }
+    a { color: var(--secondary-color); }
+    a:hover { text-decoration: none; }
+
+    /* Sticky top nav (Bootstrap, like landing) */
+    .navbar { background-color: var(--primary-color) !important; }
+    .navbar-brand { font-weight: 700; font-family: 'Montserrat', sans-serif; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--primary-color), #1a252f);
+      color: #fff; text-align: center; padding: 70px 0 40px;
+    }
+    .hero h1 { color: #fff; font-size: clamp(1.8rem, 4.5vw, 3rem); max-width: 22ch; margin: 0 auto 1rem; }
+    .hero .lead { color: #cfd8dc; font-size: 1.2rem; max-width: 60ch; margin: 0 auto 2rem; }
+    .hero video, .hero img.herovid {
+      width: 100%; max-width: 860px; border-radius: 10px;
+      box-shadow: 0 12px 50px rgba(0,0,0,0.45);
+    }
+    .hero .figcap { color: #90a4ae; font-size: 0.9rem; font-style: italic; margin-top: 0.8rem; }
+
+    /* Stat strip */
+    .stat-strip { background: var(--primary-color); color: #fff; padding: 0; }
+    .stat-strip .stat { text-align: center; padding: 1.4rem 0.5rem; }
+    .stat-strip .value { font-size: 2rem; font-weight: 700; font-family: 'Montserrat', sans-serif; }
+    .stat-strip .label { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
+    .stat-strip .value.bad  { color: #ff8a80; }
+    .stat-strip .value.good { color: #b9f6ca; }
+
+    section { padding: 48px 0; }
+    .section-bg { background-color: var(--section-bg); }
+    .section-title { font-size: 2rem; margin-bottom: 1.5rem; }
+    .kicker {
+      text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.85rem;
+      color: var(--secondary-color); font-weight: 600; margin-bottom: 0.3rem;
+    }
+
+    /* Concept-box (borrowed from the project-page template) */
+    .concept-box {
+      background-color: #eef2f7;
+      border-left: 5px solid var(--primary-color);
+      padding: 20px 24px; margin: 1.5rem 0; border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .concept-box.resolution { background-color: var(--good-soft); border-left-color: var(--good); }
+    .concept-box h3 { margin-top: 0; }
+
+    figure { margin: 1.8rem 0; }
+    figure img, figure video { width: 100%; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    figcaption { font-size: 0.9rem; color: #607d8b; font-style: italic; margin-top: 0.6rem; }
+
+    pre {
+      background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px;
+      overflow-x: auto; font-size: 0.86rem; line-height: 1.5;
+    }
+    code { color: #c0392b; }
+    pre code { color: inherit; }
+
+    table.stats { width: 100%; margin: 1.5rem 0; border-collapse: collapse; }
+    table.stats th, table.stats td { padding: 8px 14px; border-bottom: 1px solid #dee2e6; }
+    table.stats th { text-align: left; color: var(--primary-color); font-family: 'Montserrat', sans-serif; }
+    table.stats td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    table.stats tr.highlight { background: var(--good-soft); font-weight: 600; }
+
+    /* "Go deeper" CTA cards */
+    .cta-card {
+      display: block; height: 100%; padding: 28px 24px; border-radius: 10px;
+      background: var(--section-bg); border: 1px solid #e0e0e0; color: var(--text-color);
+      transition: transform 0.25s, box-shadow 0.25s; text-decoration: none;
+    }
+    .cta-card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: var(--text-color); }
+    .cta-card .icon { font-size: 2rem; color: var(--secondary-color); margin-bottom: 0.6rem; }
+    .cta-card h4 { margin: 0 0 0.4rem; }
+    .cta-card p { margin: 0; font-size: 0.92rem; color: #607d8b; }
+
+    .tag {
+      display: inline-block; background: #e8eef5; border: 1px solid #cdd9e5;
+      border-radius: 4px; padding: 2px 10px; font-size: 0.82rem; margin: 2px;
+      color: var(--primary-color); text-decoration: none;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+    a.tag:hover {
+      background: var(--primary-color); color: #fff;
+      border-color: var(--primary-color);
+    }
+
+    footer.site-footer { background-color: var(--footer-bg); color: #ddd; padding: 28px 0; text-align: center; }
+    footer.site-footer a { color: #ddd; margin: 0 8px; font-size: 1.3rem; }
+
+    details.foundations summary {
+      cursor: pointer; font-family: 'Montserrat', sans-serif; color: var(--primary-color);
+      font-size: 1.5rem; font-weight: 700; padding: 0.4rem 0; list-style: revert;
+    }
+    details.foundations[open] summary { margin-bottom: 1rem; }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="text-center mb-3">
-            <a href="index.html" class="btn btn-primary">Home</a>
-        </div>
-        <h1>Markov Decision Processes (MDPs)</h1>
-    </header>
-    <section class="container mt-5">
-        <h2><u>Learn about Markov Decision Processes (MDPs)</u></h2>
-            <h5>Primer for Encyclopedic Knowledge</h5>
-            <ul>
-                <li><a href="https://en.wikipedia.org/wiki/Andrey_Markov">Andrey Markov</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_property">Markov property</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov Decision Process</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_chain">Markov Chains</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Statistical_model">Statistical Model</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Optimal_control">Control Theory</a>; <a href="https://en.wikipedia.org/wiki/Control_theory#Main_control_strategies">Control Strategies</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Cybernetics#">Cybernetics</a></li>
-            </ul>
-        <p>Below is a formal representation of MDPs. Notice how it is simple yet profound. The Agent is an abstract entity interacting with the environment, much like us humans! Although, of course, our reality is much more sophisticated, colorful and nuanced.</p>
-        <p>You'll notice that the variables along the arrows have a little subscript <i>t </i> which represents each moment in time, or a "step/increment" in time t. The step changes at the dotted line are very similar to taking/using a turn in a board game. </p>
-        <img src="assets/images/projects/crawler/Markov_decision_process.png" class="card-img-top" alt="MDP">
 
-        <!-- Concept Overview -->
-        <h2>Q-Learning</h2>
-        <p><a href="https://en.wikipedia.org/wiki/Q-learning">Q-Learning</a> is a strong reinforcement learning strategy specialized in its ability to learn optimal policies in stochastic environments, making it a powerful tool for a wide range of applications, especially where modeling the environment is complex or impractical.</p>
-        <p>Just like in the Multi-Armed Bandits scenario, but now we consider a state change after each action. Actions have consequences!</p>
-        <p><u>Some background topics:</u></p>
-            <ul>
-                <li><a href="https://en.wikipedia.org/wiki/Intelligent_agent#">Agent</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov Decision Process</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/State–action–reward–state–action">SARSA (State-action-reward-state-action)</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Temporal_difference_learning">Temporal Difference Learning</a></li>
-            </ul>
-        <p>Q-Learning is a model-free reinforcement learning algorithm that seeks to find the best action to take given the current state. It's known for its ability to compare the expected utility of the available actions without requiring a model of the environment. Essentially, Q-learning focuses on learning a policy that tells an agent what action to take under what circumstances. It works by learning an action-value function that gives the expected utility of taking a given action in a given state and following the optimal policy thereafter.</p>
-        <p><u>Here's how it operates</u>:</p>
-        <ul>
-            <li> <b>Initialization: </b> The Q-values (action-values) are initialized to arbitrary starting values, and the algorithm continually updates them towards their true values.</li>
-            <li> <b>Exploration vs. Exploitation: </b> The agent explores the environment and exploits its current knowledge to choose the best action.</li>
-            <li> <b>Learning Q-Values: </b> After taking an action, the agent observes the outcome and reward, and updates the Q-value of the previous state and action pair using the <a href="https://en.wikipedia.org/wiki/Bellman_equation"> Bellman equation</a>.</li>
-            <li> <b>Update Rule: </b> The Q-value for a particular state-action pair is updated by taking a weighted average of the old value and the new information based on the reward received and the maximum Q-value for the next state.</li>
-            <p>By continually updating and exploring state-action pairs, or Q-values, Q-learning can find the optimal action-selection policy for any given finite Markov Decision Process (MDP).</p>
-        </ul>
-        <p>By continually updating Q-values, Q-learning can find the optimal action-selection policy for any given finite Markov decision process (MDP)</p>
-        <h2><b>Example: Crawling Robot</b></h2>
+  <!-- ===== Top nav ===== -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Scott Nelson</a>
+      <div class="ms-auto">
+        <a class="btn btn-sm btn-outline-light me-2" href="index.html">Home</a>
+        <a class="btn btn-sm btn-outline-light me-2" href="robot-arm-sim/index.html">Dashboard</a>
+        <a class="btn btn-sm btn-outline-light me-2" href="robot-arm-sim/narrative.html">Narrative</a>
+        <a class="btn btn-sm btn-light" href="https://github.com/scottn66/robot-arm-sim" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
 
-        <!-- Concept Overview -->
-        <img src="assets/images/projects/crawler/crawler.gif" class="card-img-top" alt="crawler">
+  <!-- ===== Hero ===== -->
+  <header class="hero">
+    <div class="container">
+      <div class="kicker" style="color:#90caf9;">Reinforcement Learning · Q-Learning → Dynamic Programming</div>
+      <h1>The Speedy Q-Learning Crawler — and the 60% gap we didn't see</h1>
+      <p class="lead">
+        A two-jointed robot teaches itself to crawl. We spent a small eternity
+        tuning the reinforcement-learning recipe — and reached only
+        <strong style="color:#ff8a80;">42% of optimal</strong>. Then a single
+        algorithm from 2002 closed the gap to
+        <strong style="color:#b9f6ca;">100%</strong>. Here's the whole story.
+      </p>
+      <video autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_optimal.gif">
+        <source src="robot-arm-sim/img/crawler_optimal.mp4" type="video/mp4">
+        <img class="herovid" src="robot-arm-sim/img/crawler_optimal.gif" alt="The optimal policy crawling forward">
+      </video>
+      <p class="figcap">The optimal gait — discovered online by R-MAX, verified against dynamic programming.</p>
+    </div>
+  </header>
+
+  <!-- ===== Stat strip ===== -->
+  <div class="stat-strip">
+    <div class="container">
+      <div class="row">
+        <div class="col-6 col-md-3 stat"><div class="value">1,872</div><div class="label">discrete states</div></div>
+        <div class="col-6 col-md-3 stat"><div class="value bad">0.41</div><div class="label">best model-free RL</div></div>
+        <div class="col-6 col-md-3 stat"><div class="value good">0.90</div><div class="label">R-MAX (matches optimal)</div></div>
+        <div class="col-6 col-md-3 stat"><div class="value">3 s</div><div class="label">to solve exactly with DP</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== The hook ===== -->
+  <section>
+    <div class="container">
+      <div class="kicker">The hook</div>
+      <h2 class="section-title">Tuning the wrong thing for a very long time</h2>
+      <p>
+        The crawler is a classic UC&nbsp;Berkeley CS188 environment: a body on a
+        wheel, an arm, and a hand. Four buttons — arm up/down, hand up/down.
+        Push them in the right order and the body ratchets forward. The agent
+        gets a reward equal to how far it moved each step. It has no body
+        diagram, no physics model. Just trial and error.
+      </p>
+      <p>
+        We threw an escalating stack of reinforcement-learning machinery at it:
+        ε-greedy schedules, cross-validated decay sweeps, Bayesian optimization,
+        population-based training, evolutionary refinement, scaling laws, a
+        from-scratch DQN, reward shaping, count-based exploration. Every method
+        converged to roughly the same ceiling: a peak velocity around
+        <strong>0.41</strong>.
+      </p>
+      <div class="concept-box">
+        <h3>The twist</h3>
+        <p>
+          We never knew that was only 42% of optimal — because we'd never
+          computed the optimum. The crawler is a <em>finite, deterministic
+          Markov Decision Process</em>. You can solve it exactly with dynamic
+          programming in about three seconds, using an algorithm from 1957.
+          When we finally did, the optimal policy crawled <strong>2.4× faster</strong>
+          than anything reinforcement learning had produced. The fix wasn't more
+          tuning — it was a different <em>class</em> of algorithm.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Foundations (preserved MDP/Q-learning pedagogy) ===== -->
+  <section class="section-bg">
+    <div class="container">
+      <div class="kicker">Foundations</div>
+      <details class="foundations" open>
+        <summary>Markov Decision Processes &amp; Q-Learning — the primer</summary>
+
+        <p>
+          A <a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov
+          Decision Process</a> is a deceptively simple model: an agent observes a
+          <em>state</em>, takes an <em>action</em>, receives a <em>reward</em>, and
+          lands in a new state. The subscript <i>t</i> on each arrow marks a step in
+          time — much like taking a turn in a board game.
+        </p>
+        <figure>
+          <img src="assets/images/projects/crawler/Markov_decision_process.png" alt="Markov Decision Process diagram">
+        </figure>
+
+        <h3>Q-Learning</h3>
+        <p>
+          <a href="https://en.wikipedia.org/wiki/Q-learning">Q-Learning</a> is a
+          <strong>model-free</strong> reinforcement-learning algorithm: it learns the
+          expected long-run value of each (state, action) pair without ever building a
+          model of the environment. It works by repeatedly applying the
+          <a href="https://en.wikipedia.org/wiki/Bellman_equation">Bellman update</a>:
+        </p>
+        <p style="text-align:center;">
+          $Q(s, a) \leftarrow Q(s, a) + \alpha\,\big[\,r + \gamma \max_{a'} Q(s', a') - Q(s, a)\,\big]$
+        </p>
+        <p>
+          where $\alpha$ is the learning rate, $\gamma$ the discount factor, $r$ the
+          reward, and $s'$ the next state. Background reading:
+        </p>
+        <p>
+          <span class="tag"><a href="https://en.wikipedia.org/wiki/Intelligent_agent#">Agent</a></span>
+          <span class="tag"><a href="https://en.wikipedia.org/wiki/State–action–reward–state–action">SARSA</a></span>
+          <span class="tag"><a href="https://en.wikipedia.org/wiki/Temporal_difference_learning">TD learning</a></span>
+          <span class="tag"><a href="https://en.wikipedia.org/wiki/Bellman_equation">Bellman equation</a></span>
+        </p>
+
         <div class="concept-box">
-            <h3>Breaking down the Crawling Robot</h3>
-            <p>In our crawling robot example, Q-learning helps the robot decide the most effective way to move forward. The robot is placed in various position (states) and must choose actions that will move it towards its goal. The Q-learning algorithm enables the robot to learn which movements (actions) yield the highest rewards through trial and error. </p>
-            <p>Here's a simplified breakdown of the mechanics behind the robot's movement:</p>
-            <ul>
-                <li><b>States</b>: The State is the current situation of the agent, our robot. In this example, the discretized representations of the robot's arm and hand angles. These fall into bucket ranges to help distinguish from a continuous state space. </li>
-                <li><b>Actions</b>: The choice of action depend on the actions available in any given state, and the current policy for selection. The robot's actions involve moving the arm or hand up or down. These are represented as discrete choices. </li>
-                <li><b>Rewards</b>: Rewards are given to the agent after performing an action in a certain state which leads to the next state. This reward is used to guide, or nudge, the agent into moving into the right direction through each transition. Hence, State>Action>Reward>State>Action. For our robot crawling with a simulated arm, we calculate the change in the robot's position along the x-axis. A positive reward is given for forward movement, and no reward (or negative reward) for no movement or backward movement.</li>
-            </ul>
-                <h3>Learning Q-values with Q-learning</h3>
-                <p>The Q-learning agent is not included in the provided code, but it would typically function as follows:</p>
-                <ol>
-                    <li><strong>Initialization</strong>: A Q-learning agent begins by initializing a table of Q-values for each state-action pair, typically starting at zero.</li>
-                    <li><strong>Exploration/Exploitation</strong>: The agent must decide whether to explore new actions randomly or exploit its current knowledge to select the best action based on existing Q-values.</li>
-                    <li><strong>Action Execution</strong>: Upon selecting an action, the agent performs it using the <code>doAction</code> method, which in turn provides the new state and resulting reward.</li>
-                    <li><strong>Q-value Update</strong>: The agent updates the Q-value for the prior state-action pair with the new data using the Bellman equation: <code>Q(s, a) = Q(s, a) + alpha * (reward + gamma * max(Q(s', a')) - Q(s, a))</code>, where <code>s</code> is the previous state, <code>a</code> is the action taken, <code>s'</code> is the new state, <code>alpha</code> is the learning rate, and <code>gamma</code> is the discount factor.</li>
-                    <li><strong>Iteration</strong>: This process is repeated over many iterations, allowing the agent to gradually improve its Q-values and, by extension, its policy.</li>
-                </ol>
-       </div>
-        <p>Using special tricks with the parameters, randomness, and speeding up the timescale...</p>
-        <img src="assets/images/projects/crawler/Crawler2.gif" class="card-img-top" alt="crawler">
-        <!-- Footer -->
-    </section>
+          <h3>The crawling robot, concretely</h3>
+          <img src="assets/images/projects/crawler/crawler.gif" alt="crawler" style="border-radius:6px; margin-bottom:1rem;">
+          <ul>
+            <li><b>States</b>: the discretized arm and hand angles — 36 arm buckets ×
+              52 hand buckets = <strong>1,872 states</strong>.</li>
+            <li><b>Actions</b>: move the arm or hand up or down — 4 discrete choices.</li>
+            <li><b>Rewards</b>: the change in the body's x-position. Forward motion is
+              positive; standing still or sliding back is zero or negative.</li>
+          </ul>
+          <p style="margin-bottom:0;">
+            Continually updating Q-values lets the agent converge — in principle — to
+            the optimal policy for any finite MDP. The question this project asks is:
+            <em>how close does it actually get, and how fast?</em>
+          </p>
+        </div>
+      </details>
+    </div>
+  </section>
 
-    <!-- Scripts -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+  <!-- ===== The journey ===== -->
+  <section>
+    <div class="container">
+      <div class="kicker">The journey</div>
+      <h2 class="section-title">A year of tuning, condensed</h2>
+      <p>
+        Each technique below was a genuine attempt to push past the ceiling. Each
+        one is a different idea from the RL literature. None of them broke through —
+        because they're all <strong>model-free</strong>: they optimize how the agent
+        explores or approximates, never <em>what it knows about the world</em>.
+      </p>
+      <p>
+        <a class="tag" href="https://en.wikipedia.org/wiki/Hyperparameter_optimization#Grid_search" target="_blank" rel="noopener">schedule sweeps</a>
+        <a class="tag" href="https://en.wikipedia.org/wiki/Bayesian_optimization" target="_blank" rel="noopener">Bayesian optimization</a>
+        <a class="tag" href="https://arxiv.org/abs/1711.09846" target="_blank" rel="noopener">population-based training</a>
+        <a class="tag" href="https://en.wikipedia.org/wiki/Evolutionary_algorithm" target="_blank" rel="noopener">evolutionary refinement</a>
+        <a class="tag" href="https://en.wikipedia.org/wiki/Neural_scaling_law" target="_blank" rel="noopener">scaling laws</a>
+        <a class="tag" href="https://www.nature.com/articles/nature14236" target="_blank" rel="noopener">DQN</a>
+        <a class="tag" href="https://en.wikipedia.org/wiki/Reward_shaping" target="_blank" rel="noopener">reward shaping</a>
+        <a class="tag" href="https://arxiv.org/abs/1606.01868" target="_blank" rel="noopener">count-based exploration</a>
+      </p>
+      <figure>
+        <img src="robot-arm-sim/img/gradient_sweep.png" alt="Dense gradient sweep over epsilon-decay length">
+        <figcaption>
+          A dense sweep over the exploration schedule. There's a sharp cliff — below
+          ~22,000 steps of exploration the robot never learns to crawl at all — but
+          even past it, peak velocity plateaus around 0.4.
+        </figcaption>
+      </figure>
+
+      <div class="concept-box">
+        <h3>How to read this figure</h3>
+        <p>
+          Each of the four panels measures the <em>same</em> 50 trained agents along
+          a different axis of performance:
+        </p>
+        <ul>
+          <li><b>Peak velocity</b> (top-left) — the highest rolling-1,000-step
+            average reward the agent achieved during training. <em>"Could it ever
+            crawl fast?"</em></li>
+          <li><b>Average velocity</b> (top-right) — cumulative reward divided by
+            total training steps. <em>"How fast was it, on average, including the
+            early random-walk phase?"</em></li>
+          <li><b>Terminal velocity</b> (bottom-left) — the rolling-1,000-step mean
+            at the <em>end</em> of training. <em>"Was it still fast at the moment
+            we stopped?"</em></li>
+          <li><b>Time to reach Δx ≥ 500</b> (bottom-right) — the step on which the
+            agent first crossed an absolute distance threshold (lower is better;
+            agents pegged at the training horizon never reached it).</li>
+        </ul>
+        <p style="margin-bottom:0;">
+          <b>X-axis (all four)</b>: ε-decay length on a log scale — how many steps
+          ε took to anneal from 1.0 (pure random) down to 0.05 (near-greedy).<br>
+          <b>Dot color</b>: each agent's position on the gradient (viridis: deep
+          purple = shortest decay, bright yellow = longest).<br>
+          <b>Error bars</b>: ±1 standard deviation across <b>5 random seeds</b>
+          per agent. The simulator itself is deterministic given a seed, but the
+          seed sets the initial Q-table and the ε-greedy coin flips, so different
+          seeds find different paths to (or away from) the optimum.<br>
+          <b>Red star</b>: the agent whose <em>mean</em> across seeds was best on
+          that panel's metric.
+        </p>
+      </div>
+
+      <p>
+        We even found that the "right" amount of exploration isn't a property of the
+        task — it shifts with the learning rate and discount factor. Interesting
+        science, but all of it within the same basin of attraction at 42% of optimal.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== The reckoning ===== -->
+  <section class="section-bg">
+    <div class="container">
+      <div class="kicker">The reckoning</div>
+      <h2 class="section-title">Dynamic programming computes the answer in 3 seconds</h2>
+      <p>
+        Because the crawler is a deterministic finite MDP, we can build its
+        transition table exhaustively, run <strong>value iteration</strong> until
+        $V^*(s)$ converges, and read off the optimal policy. Total compute: about
+        three seconds. We cross-checked with Karp's max-mean-cycle algorithm (1978)
+        for the true asymptotic velocity ceiling. They agree.
+      </p>
+      <figure>
+        <img src="robot-arm-sim/img/optimal_policy.png" alt="V*, optimal action field, 16-step limit cycle, comparison bars">
+        <figcaption>
+          The exact optimal policy. The optimal gait is a 16-step limit cycle living
+          in one corner of state space — exactly the corner random exploration almost
+          never reaches before the Q-values commit elsewhere.
+        </figcaption>
+      </figure>
+      <table class="stats">
+        <thead><tr><th>approach</th><th class="num">peak velocity</th><th class="num">% of optimum</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>π* via value iteration</td><td class="num">0.901</td><td class="num">100%</td></tr>
+          <tr><td>Karp max-mean-cycle (theory)</td><td class="num">0.894</td><td class="num">99%</td></tr>
+          <tr><td>best tabular Q-learning</td><td class="num">0.379</td><td class="num">42%</td></tr>
+          <tr><td>best DQN</td><td class="num">0.340</td><td class="num">38%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== The resolution ===== -->
+  <section>
+    <div class="container">
+      <div class="kicker">The resolution</div>
+      <h2 class="section-title">R-MAX: let the agent learn the model</h2>
+      <p>
+        The fix was in the literature all along. Brafman &amp; Tennenholtz's
+        <strong>R-MAX</strong> (2002) is still reinforcement learning — the agent has
+        no model handed to it — but it <em>builds</em> one from experience and plans
+        with it. Its trick is <strong>optimism under uncertainty</strong>: any
+        state-action pair it hasn't tried is assumed to pay the maximum possible
+        reward forever. That assumption mathematically forces the agent toward
+        unexplored corners — no ε-schedule, no exploration heuristic required.
+      </p>
+      <figure>
+        <img src="robot-arm-sim/img/optimism_evaporation.gif" alt="V*(s) heatmap evaporating from optimistic to converged">
+        <figcaption>
+          R-MAX's value estimate over training. Bright = unexplored and assumed
+          optimistic; dark = the model has filled in and the value has converged. The
+          optimism "evaporates" as the agent maps the world — and its greedy policy
+          locks onto the optimum.
+        </figcaption>
+      </figure>
+
+      <div class="concept-box resolution">
+        <h3>The full spectrum, on one chart</h3>
+        <p style="margin-bottom:0;">
+          Dyna-Q (bare model + planning, no exploration trick) already reaches 97% of
+          optimal. R-MAX reaches <strong>101%</strong> — within seed noise of the DP
+          ceiling — in fewer environment steps than vanilla Q-learning needs to start
+          moving.
+        </p>
+      </div>
+      <figure>
+        <img src="robot-arm-sim/img/full_arc.png" alt="Full algorithm spectrum from model-free to model-based to DP ceiling">
+      </figure>
+
+      <p>The bar chart says it numerically. The race says it viscerally:</p>
+      <figure>
+        <video autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_race.gif">
+          <source src="robot-arm-sim/img/crawler_race.mp4" type="video/mp4">
+          <img src="robot-arm-sim/img/crawler_race.gif" alt="4-panel race: epsilon-greedy, count-based, R-MAX, DP optimal">
+        </video>
+        <figcaption>
+          1,500 steps under each agent's final policy, all starting from x=0.
+          R-MAX and DP π* glide ahead at ~0.9/step; the model-free agents stagger at
+          0.42–0.49/step.
+        </figcaption>
+      </figure>
+
+      <figure>
+        <img src="robot-arm-sim/img/end_card_resolution.png" alt="RL epsilon-greedy 0.41 vs RL R-MAX 0.90 — the right tool was always there">
+      </figure>
+
+      <p>
+        The lesson isn't "RL is bad." It's that the right axis of choice is
+        <strong>model-free vs model-based</strong> — not which exploration trick or
+        which optimizer. Model-free RL earns its keep on problems too big to
+        enumerate (Atari, robotics with messy contact dynamics). The crawler isn't
+        that. And the surprise is that even here, RL <em>can</em> match dynamic
+        programming — as long as you let it learn the model.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Go deeper ===== -->
+  <section class="section-bg">
+    <div class="container">
+      <div class="kicker">Go deeper</div>
+      <h2 class="section-title">Two ways to read the whole thing</h2>
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <a class="cta-card" href="robot-arm-sim/index.html">
+            <div class="icon"><i class="fas fa-chart-line"></i></div>
+            <h4>The technical dashboard</h4>
+            <p>Every experiment, figure, and equation — schedule sweeps, BO, PBT,
+              scaling laws, DQN, the DP reckoning, R-MAX. The complete reference.</p>
+          </a>
+        </div>
+        <div class="col-md-6">
+          <a class="cta-card" href="robot-arm-sim/narrative.html">
+            <div class="icon"><i class="fas fa-film"></i></div>
+            <h4>The cinematic narrative</h4>
+            <p>The same story told as a 15-act script, with the videos in the order
+              the narrative expects them. Built for watching, not just studying.</p>
+          </a>
+        </div>
+      </div>
+
+      <h3>Run it yourself</h3>
+      <p>Everything is reproducible from the repo:</p>
+      <pre><code>git clone https://github.com/scottn66/robot-arm-sim.git
+cd robot-arm-sim
+pip install matplotlib scikit-learn scipy numpy pillow
+
+# Live GUI (watch the optimal schedule crawl in real time)
+python3 src/crawler.py
+
+# Compute the exact optimum (value iteration + Karp's cycle)
+python3 scripts/find_optimal_policy.py
+
+# The full algorithm-spectrum comparison: epsilon-greedy -> R-MAX
+python3 scripts/compare_full_arc.py</code></pre>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2026 Scott Nelson · built on UC Berkeley CS188's crawler, ported to Python 3 and extended with SARSA, schedules, BO, PBT, DQN, R-MAX/Dyna-Q+, and dynamic-programming ground truth.</p>
+      <div>
+        <a href="https://www.linkedin.com/in/scott-nelson-adastra67/" target="_blank" rel="noopener"><i class="fab fa-linkedin"></i></a>
+        <a href="https://github.com/scottn66/robot-arm-sim" target="_blank" rel="noopener"><i class="fab fa-github"></i></a>
+        <a href="mailto:scottjnelson5@gmail.com"><i class="fas fa-envelope"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
