@@ -223,6 +223,7 @@
           <li class="nav-item"><a class="nav-link" href="#projects">Projects</a></li>
           <li class="nav-item"><a class="nav-link" href="resume.html">Resume</a></li>
           <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="solar/">Solar</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
           <li class="nav-item"><a class="nav-link" href="mandelbrot_landing.html">Mandelbrot</a></li>
         </ul>
@@ -261,6 +262,57 @@
     <section id="projects" class="section-bg">
       <div class="container">
         <h2 class="section-title text-center">Projects</h2>
+
+        <!-- Featured: Solar Viability Analysis -->
+        <h3 class="text-center mt-2 mb-3" style="color: var(--primary-color);">&#9728;&#65039; Solar Viability Analysis</h3>
+        <p class="text-center text-muted mb-4" style="max-width: 760px; margin-left:auto; margin-right:auto;">
+          Address-to-financial-analysis for California rooftop solar &mdash; a 2.6M-row DuckDB warehouse,
+          a 25-year cashflow model, and live NREL&nbsp;PVWatts + utility-rate detection across PG&amp;E, SCE,
+          SDG&amp;E, and municipal utilities. Built for DATA&nbsp;201 at Cal Poly Humboldt.
+        </p>
+        <div class="row">
+          <!-- Solar: Project Overview -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">Project Overview</h5>
+                <p class="card-text">OLTP/OLAP warehouse, a FastAPI quote engine, and a 0&ndash;100 viability score blending LCOE, payback, NPV, solar resource, and local market maturity.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="solar/" class="btn btn-primary w-100">Explore &rarr;</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Solar: City Reports -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">City Reports</h5>
+                <p class="card-text">Deep-dive reports for the 15 largest CA cities plus Stanford &amp; Berkeley &mdash; 25-year cashflows, payback curves, and utility-specific NEM&nbsp;3.0 economics.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="solar/reports/" class="btn btn-primary w-100">View Reports &rarr;</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Solar: ZIP Heatmaps -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <div class="card-body">
+                <h5 class="card-title">ZIP Heatmaps</h5>
+                <p class="card-text">Interactive viability maps across all 2,593 California ZIP codes, with confidence tiers drawn from real Berkeley&nbsp;Lab installation data.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="solar/heatmap/" class="btn btn-primary w-100">Open Maps &rarr;</a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <hr class="my-4">
+        <h3 class="text-center mt-4 mb-4" style="color: var(--primary-color);">AI &amp; Machine Learning</h3>
         <div class="row">
           <!-- Project Card 1 -->
           <article class="col-lg-4 col-md-6 mb-4">
