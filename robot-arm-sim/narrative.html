@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Teaching a Robot Arm to Crawl — and why our best AI got it 60 % wrong (until it didn't)</title>
+<title>Teaching a Robot Arm to Crawl, and why our best AI got it 60 % wrong (until it didn't)</title>
 
 <!-- Math rendering -->
 <script>
@@ -230,7 +230,7 @@
      ============================================================ -->
 <header class="hero" id="act1">
   <div class="kicker">A pedagogical journey · ~24 min read</div>
-  <h1>Teaching a robot arm to crawl — and why our best AI got it 60 % wrong (until it didn't)</h1>
+  <h1>Teaching a robot arm to crawl, and why our best AI got it 60 % wrong (until it didn't)</h1>
   <p class="subtitle">
     A story about reinforcement learning, hyperparameter optimization,
     dynamic programming as ground truth, and the moment a 2002 paper
@@ -251,7 +251,7 @@
 
 
 <!-- ============================================================
-     ACT 2 — The setup
+     ACT 2, The setup
      ============================================================ -->
 <section class="act" id="act2">
   <div class="act-number">Act 2 · ~60 s</div>
@@ -268,9 +268,9 @@
 
   <div class="visual">
     <img src="img/env_diagram.png"
-         alt="Labeled crawler schematic — body, arm, hand, ground, state coords">
+         alt="Labeled crawler schematic, body, arm, hand, ground, state coords">
     <div class="caption">
-      The geometry, the state representation, and the action set —
+      The geometry, the state representation, and the action set -
       everything the agent works with.
     </div>
   </div>
@@ -306,11 +306,11 @@
 
 
 <!-- ============================================================
-     ACT 3 — First contact
+     ACT 3, First contact
      ============================================================ -->
 <section class="act" id="act3">
   <div class="act-number">Act 3 · ~90 s</div>
-  <h2>First contact — Q-learning with ε-greedy</h2>
+  <h2>First contact, Q-learning with ε-greedy</h2>
 
   <p>
     Vanilla setup: $\alpha = 0.5$, $\gamma = 0.95$, $\varepsilon$
@@ -323,15 +323,15 @@
     <img src="img/q_evolution.gif"
          alt="Q-table coloring fills in over training">
     <div class="caption">
-      Q-table discovery over training — color intensity = magnitude of
+      Q-table discovery over training, color intensity = magnitude of
       learned value. The "thin path" emerges from random walks.
     </div>
   </div>
 
   <p>
     After 30,000 environment steps the arm crawls. The mean velocity
-    is around 0.23 units per step. The peak — the rolling
-    thousand-step average — is about <strong>0.38</strong>. It works,
+    is around 0.23 units per step. The peak, the rolling
+    thousand-step average, is about <strong>0.38</strong>. It works,
     and intuitively the agent has <em>learned something</em>.
   </p>
 
@@ -346,7 +346,7 @@
 
 
 <!-- ============================================================
-     ACT 4 — Hyperparameter hunt
+     ACT 4, Hyperparameter hunt
      ============================================================ -->
 <section class="act" id="act4">
   <div class="act-number">Act 4 · ~120 s</div>
@@ -360,7 +360,7 @@
 
   <div class="visual">
     <img src="img/schedule_sweep.png"
-         alt="Schedule sweep — cumulative reward vs decay length">
+         alt="Schedule sweep, cumulative reward vs decay length">
     <div class="caption">
       Reward vs decay length, 5 seeds. The optimum sits around
       decay length ≈ 26 k steps when total training is 50 k steps.
@@ -386,7 +386,7 @@
 
 
 <!-- ============================================================
-     ACT 5 — Bayesian optimization
+     ACT 5, Bayesian optimization
      ============================================================ -->
 <section class="act" id="act5">
   <div class="act-number">Act 5 · ~150 s</div>
@@ -431,7 +431,7 @@
 
 
 <!-- ============================================================
-     ACT 6 — Population-based training
+     ACT 6, Population-based training
      ============================================================ -->
 <section class="act" id="act6">
   <div class="act-number">Act 6 · ~120 s</div>
@@ -455,7 +455,7 @@
 
   <p>
     We discover a real problem: the standard PBT recipe copies
-    <em>everything</em> from winner to loser — including the Q-table.
+    <em>everything</em> from winner to loser, including the Q-table.
     But the Q-table is tuned for the winner's body state, not the
     loser's. The fix: <strong>PBT-Pure</strong>. Copy only
     hyperparameters, not Q-tables. The loser keeps its own learned
@@ -473,7 +473,7 @@
 
   <blockquote>
     File another thing away: PBT-Pure copies hyperparameters. It never
-    copies <em>what the agent learned about the world</em> — because
+    copies <em>what the agent learned about the world</em>, because
     we never asked the agent to learn anything about the world, only
     to map states to actions. A model-free optimizer wrapped around a
     model-free learner.
@@ -482,7 +482,7 @@
 
 
 <!-- ============================================================
-     ACT 7 — The schedule cliff
+     ACT 7, The schedule cliff
      ============================================================ -->
 <section class="act" id="act7">
   <div class="act-number">Act 7 · ~120 s</div>
@@ -513,7 +513,7 @@
 
   <blockquote>
     Hold this thought too. The cliff is at 22 k random walks. That's
-    not a property of the <em>task</em> — that's a property of <em>random
+    not a property of the <em>task</em>, that's a property of <em>random
     walks on this task</em>. A directed exploration strategy that knew
     where to look wouldn't need 22 k steps of coin-flipping to stumble
     onto the cycle.
@@ -522,7 +522,7 @@
 
 
 <!-- ============================================================
-     ACT 8 — Scaling laws
+     ACT 8, Scaling laws
      ============================================================ -->
 <section class="act" id="act8">
   <div class="act-number">Act 8 · ~120 s</div>
@@ -551,7 +551,7 @@
 
 
 <!-- ============================================================
-     ACT 9 — The recipe twist
+     ACT 9, The recipe twist
      ============================================================ -->
 <section class="act" id="act9">
   <div class="act-number">Act 9 · ~120 s</div>
@@ -577,7 +577,7 @@
          alt="Phase transition: gamma below 0.95 doesn't learn">
     <div class="caption">
       Below $\gamma = 0.95$ the agent essentially <em>can't learn this
-      task</em> — the credit-assignment horizon is too short.
+      task</em>, the credit-assignment horizon is too short.
     </div>
   </div>
 
@@ -591,15 +591,15 @@
 
 
 <!-- ============================================================
-     ACT 10 — Function approximation
+     ACT 10, Function approximation
      ============================================================ -->
 <section class="act" id="act10">
   <div class="act-number">Act 10 · ~120 s</div>
   <h2>The function-approximation experiment</h2>
 
   <p>
-    What about DQN? Implemented in NumPy — MLP, experience replay,
-    target network, Adam — run head-to-head with tabular Q-learning
+    What about DQN? Implemented in NumPy, MLP, experience replay,
+    target network, Adam, run head-to-head with tabular Q-learning
     under the same recipe.
   </p>
 
@@ -623,7 +623,7 @@
 
 
 <!-- ============================================================
-     ACT 11 — The reckoning
+     ACT 11, The reckoning
      ============================================================ -->
 <section class="act" id="act11">
   <div class="act-number">Act 11 · ~150 s</div>
@@ -632,7 +632,7 @@
   <p>
     Here's the punchline. The crawler is a <em>finite deterministic
     MDP</em>. It has 1,872 states, 4 actions, and $(s, a) \to (s', r)$
-    is a function — same input, same output, every time.
+    is a function, same input, same output, every time.
     Determinism = 1.000 across 500,000 random steps.
   </p>
 
@@ -664,13 +664,13 @@
   <p>
     The optimal policy <em>crawls 2.4× faster</em> than anything we
     ever produced. It reaches $x = 500$ in <strong>559 steps</strong>.
-    Tabular Q-learning takes 22,000 steps — a 40× speedup by switching
+    Tabular Q-learning takes 22,000 steps, a 40× speedup by switching
     to DP.
   </p>
 
   <p>
-    The whole sprawling stack we built — schedules, BO, PBT, scaling
-    laws, axis sweeps — was optimizing within a basin of attraction at
+    The whole sprawling stack we built, schedules, BO, PBT, scaling
+    laws, axis sweeps, was optimizing within a basin of attraction at
     42 % of optimal. Every improvement we celebrated was an
     improvement within the basin.
   </p>
@@ -688,11 +688,11 @@
 
 
 <!-- ============================================================
-     ACT 12 — Smarter exploration
+     ACT 12, Smarter exploration
      ============================================================ -->
 <section class="act" id="act12">
   <div class="act-number">Act 12 · ~120 s</div>
-  <h2>Smarter exploration — does it close the gap?</h2>
+  <h2>Smarter exploration, does it close the gap?</h2>
 
   <p>
     Why didn't Q-learning find the optimum? Because ε-greedy is
@@ -723,7 +723,7 @@
 
 
 <!-- ============================================================
-     ACT 13 — The model-based pivot
+     ACT 13, The model-based pivot
      ============================================================ -->
 <section class="act" id="act13">
   <div class="act-number">Act 13 · ~150 s</div>
@@ -746,7 +746,7 @@
   <p>
     Brafman &amp; Tennenholtz's 2002 R-MAX: maintain the empirical
     model $T(s, a)$. Treat unknown $(s, a)$ as if they paid the maximum
-    reward $R_{\max}$ forever — so $V_{\text{opt}} = R_{\max}/(1 -
+    reward $R_{\max}$ forever, so $V_{\text{opt}} = R_{\max}/(1 -
     \gamma) \approx 100$. Run value iteration on this <em>optimistic</em>
     model. Act greedy. Once the agent visits an unknown pair, the
     optimism evaporates and the policy adjusts.
@@ -778,7 +778,7 @@
 
 
 <!-- ============================================================
-     ACT 14 — The full arc (results)
+     ACT 14, The full arc (results)
      ============================================================ -->
 <section class="act" id="act14">
   <div class="act-number">Act 14 · ~180 s</div>
@@ -803,7 +803,7 @@
       <tr><td><strong>Dyna-Q n=50</strong></td><td class="num"><strong>30 k</strong></td><td class="num"><strong>0.865</strong></td><td class="num"><strong>97 %</strong></td><td class="num"><strong>23 460</strong></td></tr>
       <tr><td><strong>Dyna-Q+ n=50</strong></td><td class="num"><strong>30 k</strong></td><td class="num"><strong>0.868</strong></td><td class="num"><strong>97 %</strong></td><td class="num"><strong>23 323</strong></td></tr>
       <tr><td><strong>R-MAX m=1</strong></td><td class="num"><strong>10 k</strong></td><td class="num"><strong>0.901</strong></td><td class="num"><strong>101 %</strong></td><td class="num"><strong>7 595</strong></td></tr>
-      <tr><td>DP optimum (Karp)</td><td class="num">—</td><td class="num">0.893</td><td class="num">100 %</td><td class="num">559</td></tr>
+      <tr><td>DP optimum (Karp)</td><td class="num">-</td><td class="num">0.893</td><td class="num">100 %</td><td class="num">559</td></tr>
     </tbody>
   </table>
 
@@ -821,8 +821,8 @@
   </p>
 
   <p>
-    <strong>One: Dyna-Q alone — bare model + planning, no exploration
-    trick — closes 84 % of the gap.</strong> Just learning the
+    <strong>One: Dyna-Q alone, bare model + planning, no exploration
+    trick, closes 84 % of the gap.</strong> Just learning the
     transition table and replaying it 50 times per real step takes us
     from 0.41 to 0.87. The architecture is doing all the work.
   </p>
@@ -838,8 +838,8 @@
   <p>
     <strong>Three: sample efficiency is the headline.</strong> R-MAX
     reaches 85 % of the DP optimum in a median of <strong>7,595</strong>
-    environment steps. Vanilla Q-learning at 1,000,000 steps — 130×
-    more environment interaction — never gets there.
+    environment steps. Vanilla Q-learning at 1,000,000 steps, 130×
+    more environment interaction, never gets there.
   </p>
 
   <div class="visual">
@@ -857,8 +857,8 @@
 
   <p>
     The bar chart says it numerically. The race animation says it
-    viscerally. And the gait R-MAX discovers — the 16-step optimal
-    cycle the narrative kept referring to — looks like this in
+    viscerally. And the gait R-MAX discovers, the 16-step optimal
+    cycle the narrative kept referring to, looks like this in
     slow-motion:
   </p>
 
@@ -876,7 +876,7 @@
 
 
 <!-- ============================================================
-     ACT 15 — Synthesis
+     ACT 15, Synthesis
      ============================================================ -->
 <section class="act" id="act15">
   <div class="act-number">Act 15 · ~150 s</div>
@@ -891,23 +891,23 @@
     model-based</strong>, <em>not</em> "tune ε vs use a neural net."
     Every improvement we made for twelve acts was within the
     model-free regime. None of it touched the bottleneck. The moment
-    we changed <em>what the agent knows about the world</em> — from
+    we changed <em>what the agent knows about the world</em>, from
     "Q-values only" to "Q-values plus an empirical transition table"
-    — performance jumped from 46 % to 97 % in one move.
+   , performance jumped from 46 % to 97 % in one move.
   </p>
 
   <p>
     <strong>2. Optimism under uncertainty is the principled
     exploration strategy.</strong> R-MAX doesn't need an ε-schedule
     because the math says undiscovered $(s, a)$ pairs are worth more
-    than discovered ones. It's not a heuristic — it's the consequence
+    than discovered ones. It's not a heuristic, it's the consequence
     of treating "I don't know" as "I should find out."
   </p>
 
   <p>
     <strong>3. Hyperparameter optimization within the wrong algorithm
     class is wasted work.</strong> All the BO, PBT, evolutionary
-    refinement, scaling laws — they were optimizing within model-free
+    refinement, scaling laws, they were optimizing within model-free
     RL's basin of attraction. If you're consistently far from a known
     ceiling, the right move isn't more tuning; it's changing the
     algorithm.
@@ -916,10 +916,10 @@
   <p>
     <strong>4. When you can learn the model, learn the model.</strong>
     RL's value proposition is bridging environments you <em>can't</em>
-    write down — Atari, robotics, language games. The crawler isn't
+    write down, Atari, robotics, language games. The crawler isn't
     that. It's a 1,872-state deterministic MDP that DP can solve in
     three seconds. And the surprise: even on a problem DP could
-    solve, <em>RL can match DP</em> — but only if you let RL learn the
+    solve, <em>RL can match DP</em>, but only if you let RL learn the
     model.
   </p>
 
@@ -946,7 +946,7 @@
   <h2>Choose your algorithm class first</h2>
 
   <p>
-    The robot arm crawls. It crawls fast — 0.901 distance units per
+    The robot arm crawls. It crawls fast, 0.901 distance units per
     step, the physical maximum we can prove with a 1957 algorithm and
     an algorithm from 1978. We didn't get there by tuning more
     carefully. We got there by asking a different question:
@@ -954,7 +954,7 @@
   </p>
 
   <p>
-    The answer for this problem is yes. The answer for Atari is no —
+    The answer for this problem is yes. The answer for Atari is no -
     the map is too big to store. The answer for most engineering
     problems is somewhere in between, and figuring out where on that
     spectrum your problem lives is more important than choosing

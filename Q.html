@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Speedy Q-Learning Crawler — and the 60% gap we didn't see</title>
+  <title>The Speedy Q-Learning Crawler, and the 60% gap we didn't see</title>
 
   <!-- SEO / social -->
   <meta name="description" content="A reinforcement-learning crawler: how a year of hyperparameter tuning reached only 42% of optimal, and how a 2002 model-based algorithm (R-MAX) closed the gap to 100%.">
-  <meta property="og:title" content="The Speedy Q-Learning Crawler — and the 60% gap">
+  <meta property="og:title" content="The Speedy Q-Learning Crawler, and the 60% gap">
   <meta property="og:description" content="From Q-learning to dynamic programming: model-free RL plateaued at 42% of optimal; R-MAX closed it to 100%.">
   <meta property="og:image" content="https://scottn66.github.io/robot-arm-sim/img/end_card_resolution.png">
   <meta property="og:url" content="https://scottn66.github.io/Q.html">
@@ -25,7 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
   <style>
-    /* Brand tokens — match scottn66.github.io landing page */
+    /* Brand tokens, match scottn66.github.io landing page */
     :root {
       --primary-color: #2C3E50;   /* navy */
       --secondary-color: #E74C3C; /* coral */
@@ -159,10 +159,10 @@
   <header class="hero">
     <div class="container">
       <div class="kicker" style="color:#90caf9;">Reinforcement Learning · Q-Learning → Dynamic Programming</div>
-      <h1>The Speedy Q-Learning Crawler — and the 60% gap we didn't see</h1>
+      <h1>The Speedy Q-Learning Crawler, and the 60% gap we didn't see</h1>
       <p class="lead">
         A two-jointed robot teaches itself to crawl. We spent a small eternity
-        tuning the reinforcement-learning recipe — and reached only
+        tuning the reinforcement-learning recipe, and reached only
         <strong style="color:#ff8a80;">42% of optimal</strong>. Then a single
         algorithm from 2002 closed the gap to
         <strong style="color:#b9f6ca;">100%</strong>. Here's the whole story.
@@ -171,7 +171,7 @@
         <source src="robot-arm-sim/img/crawler_optimal.mp4" type="video/mp4">
         <img class="herovid" src="robot-arm-sim/img/crawler_optimal.gif" alt="The optimal policy crawling forward">
       </video>
-      <p class="figcap">The optimal gait — discovered online by R-MAX, verified against dynamic programming.</p>
+      <p class="figcap">The optimal gait, discovered online by R-MAX, verified against dynamic programming.</p>
     </div>
   </header>
 
@@ -194,7 +194,7 @@
       <h2 class="section-title">Tuning the wrong thing for a very long time</h2>
       <p>
         The crawler is a classic UC&nbsp;Berkeley CS188 environment: a body on a
-        wheel, an arm, and a hand. Four buttons — arm up/down, hand up/down.
+        wheel, an arm, and a hand. Four buttons, arm up/down, hand up/down.
         Push them in the right order and the body ratchets forward. The agent
         gets a reward equal to how far it moved each step. It has no body
         diagram, no physics model. Just trial and error.
@@ -210,13 +210,13 @@
       <div class="concept-box">
         <h3>The twist</h3>
         <p>
-          We never knew that was only 42% of optimal — because we'd never
+          We never knew that was only 42% of optimal, because we'd never
           computed the optimum. The crawler is a <em>finite, deterministic
           Markov Decision Process</em>. You can solve it exactly with dynamic
           programming in about three seconds, using an algorithm from 1957.
           When we finally did, the optimal policy crawled <strong>2.4× faster</strong>
           than anything reinforcement learning had produced. The fix wasn't more
-          tuning — it was a different <em>class</em> of algorithm.
+          tuning, it was a different <em>class</em> of algorithm.
         </p>
       </div>
     </div>
@@ -227,14 +227,14 @@
     <div class="container">
       <div class="kicker">Foundations</div>
       <details class="foundations" open>
-        <summary>Markov Decision Processes &amp; Q-Learning — the primer</summary>
+        <summary>Markov Decision Processes &amp; Q-Learning, the primer</summary>
 
         <p>
           A <a href="https://en.wikipedia.org/wiki/Markov_decision_process">Markov
           Decision Process</a> is a deceptively simple model: an agent observes a
           <em>state</em>, takes an <em>action</em>, receives a <em>reward</em>, and
           lands in a new state. The subscript <i>t</i> on each arrow marks a step in
-          time — much like taking a turn in a board game.
+          time, much like taking a turn in a board game.
         </p>
         <figure>
           <img src="assets/images/projects/crawler/Markov_decision_process.png" alt="Markov Decision Process diagram">
@@ -266,14 +266,14 @@
           <h3>The crawling robot, concretely</h3>
           <img src="assets/images/projects/crawler/crawler.gif" alt="crawler" style="border-radius:6px; margin-bottom:1rem;">
           <ul>
-            <li><b>States</b>: the discretized arm and hand angles — 36 arm buckets ×
+            <li><b>States</b>: the discretized arm and hand angles, 36 arm buckets ×
               52 hand buckets = <strong>1,872 states</strong>.</li>
-            <li><b>Actions</b>: move the arm or hand up or down — 4 discrete choices.</li>
+            <li><b>Actions</b>: move the arm or hand up or down, 4 discrete choices.</li>
             <li><b>Rewards</b>: the change in the body's x-position. Forward motion is
               positive; standing still or sliding back is zero or negative.</li>
           </ul>
           <p style="margin-bottom:0;">
-            Continually updating Q-values lets the agent converge — in principle — to
+            Continually updating Q-values lets the agent converge, in principle, to
             the optimal policy for any finite MDP. The question this project asks is:
             <em>how close does it actually get, and how fast?</em>
           </p>
@@ -289,7 +289,7 @@
       <h2 class="section-title">A year of tuning, condensed</h2>
       <p>
         Each technique below was a genuine attempt to push past the ceiling. Each
-        one is a different idea from the RL literature. None of them broke through —
+        one is a different idea from the RL literature. None of them broke through -
         because they're all <strong>model-free</strong>: they optimize how the agent
         explores or approximates, never <em>what it knows about the world</em>.
       </p>
@@ -306,8 +306,8 @@
       <figure>
         <img src="robot-arm-sim/img/gradient_sweep.png" alt="Dense gradient sweep over epsilon-decay length">
         <figcaption>
-          A dense sweep over the exploration schedule. There's a sharp cliff — below
-          ~22,000 steps of exploration the robot never learns to crawl at all — but
+          A dense sweep over the exploration schedule. There's a sharp cliff, below
+          ~22,000 steps of exploration the robot never learns to crawl at all, but
           even past it, peak velocity plateaus around 0.4.
         </figcaption>
       </figure>
@@ -319,21 +319,21 @@
           a different axis of performance:
         </p>
         <ul>
-          <li><b>Peak velocity</b> (top-left) — the highest rolling-1,000-step
+          <li><b>Peak velocity</b> (top-left), the highest rolling-1,000-step
             average reward the agent achieved during training. <em>"Could it ever
             crawl fast?"</em></li>
-          <li><b>Average velocity</b> (top-right) — cumulative reward divided by
+          <li><b>Average velocity</b> (top-right), cumulative reward divided by
             total training steps. <em>"How fast was it, on average, including the
             early random-walk phase?"</em></li>
-          <li><b>Terminal velocity</b> (bottom-left) — the rolling-1,000-step mean
+          <li><b>Terminal velocity</b> (bottom-left), the rolling-1,000-step mean
             at the <em>end</em> of training. <em>"Was it still fast at the moment
             we stopped?"</em></li>
-          <li><b>Time to reach Δx ≥ 500</b> (bottom-right) — the step on which the
+          <li><b>Time to reach Δx ≥ 500</b> (bottom-right), the step on which the
             agent first crossed an absolute distance threshold (lower is better;
             agents pegged at the training horizon never reached it).</li>
         </ul>
         <p style="margin-bottom:0;">
-          <b>X-axis (all four)</b>: ε-decay length on a log scale — how many steps
+          <b>X-axis (all four)</b>: ε-decay length on a log scale, how many steps
           ε took to anneal from 1.0 (pure random) down to 0.05 (near-greedy).<br>
           <b>Dot color</b>: each agent's position on the gradient (viridis: deep
           purple = shortest decay, bright yellow = longest).<br>
@@ -348,7 +348,7 @@
 
       <p>
         We even found that the "right" amount of exploration isn't a property of the
-        task — it shifts with the learning rate and discount factor. Interesting
+        task, it shifts with the learning rate and discount factor. Interesting
         science, but all of it within the same basin of attraction at 42% of optimal.
       </p>
     </div>
@@ -370,7 +370,7 @@
         <img src="robot-arm-sim/img/optimal_policy.png" alt="V*, optimal action field, 16-step limit cycle, comparison bars">
         <figcaption>
           The exact optimal policy. The optimal gait is a 16-step limit cycle living
-          in one corner of state space — exactly the corner random exploration almost
+          in one corner of state space, exactly the corner random exploration almost
           never reaches before the Q-values commit elsewhere.
         </figcaption>
       </figure>
@@ -393,19 +393,19 @@
       <h2 class="section-title">R-MAX: let the agent learn the model</h2>
       <p>
         The fix was in the literature all along. Brafman &amp; Tennenholtz's
-        <strong>R-MAX</strong> (2002) is still reinforcement learning — the agent has
-        no model handed to it — but it <em>builds</em> one from experience and plans
+        <strong>R-MAX</strong> (2002) is still reinforcement learning, the agent has
+        no model handed to it, but it <em>builds</em> one from experience and plans
         with it. Its trick is <strong>optimism under uncertainty</strong>: any
         state-action pair it hasn't tried is assumed to pay the maximum possible
         reward forever. That assumption mathematically forces the agent toward
-        unexplored corners — no ε-schedule, no exploration heuristic required.
+        unexplored corners, no ε-schedule, no exploration heuristic required.
       </p>
       <figure>
         <img src="robot-arm-sim/img/optimism_evaporation.gif" alt="V*(s) heatmap evaporating from optimistic to converged">
         <figcaption>
           R-MAX's value estimate over training. Bright = unexplored and assumed
           optimistic; dark = the model has filled in and the value has converged. The
-          optimism "evaporates" as the agent maps the world — and its greedy policy
+          optimism "evaporates" as the agent maps the world, and its greedy policy
           locks onto the optimum.
         </figcaption>
       </figure>
@@ -414,8 +414,8 @@
         <h3>The full spectrum, on one chart</h3>
         <p style="margin-bottom:0;">
           Dyna-Q (bare model + planning, no exploration trick) already reaches 97% of
-          optimal. R-MAX reaches <strong>101%</strong> — within seed noise of the DP
-          ceiling — in fewer environment steps than vanilla Q-learning needs to start
+          optimal. R-MAX reaches <strong>101%</strong>, within seed noise of the DP
+          ceiling, in fewer environment steps than vanilla Q-learning needs to start
           moving.
         </p>
       </div>
@@ -437,16 +437,16 @@
       </figure>
 
       <figure>
-        <img src="robot-arm-sim/img/end_card_resolution.png" alt="RL epsilon-greedy 0.41 vs RL R-MAX 0.90 — the right tool was always there">
+        <img src="robot-arm-sim/img/end_card_resolution.png" alt="RL epsilon-greedy 0.41 vs RL R-MAX 0.90, the right tool was always there">
       </figure>
 
       <p>
         The lesson isn't "RL is bad." It's that the right axis of choice is
-        <strong>model-free vs model-based</strong> — not which exploration trick or
+        <strong>model-free vs model-based</strong>, not which exploration trick or
         which optimizer. Model-free RL earns its keep on problems too big to
         enumerate (Atari, robotics with messy contact dynamics). The crawler isn't
         that. And the surprise is that even here, RL <em>can</em> match dynamic
-        programming — as long as you let it learn the model.
+        programming, as long as you let it learn the model.
       </p>
     </div>
   </section>
@@ -461,7 +461,7 @@
           <a class="cta-card" href="robot-arm-sim/index.html">
             <div class="icon"><i class="fas fa-chart-line"></i></div>
             <h4>The technical dashboard</h4>
-            <p>Every experiment, figure, and equation — schedule sweeps, BO, PBT,
+            <p>Every experiment, figure, and equation, schedule sweeps, BO, PBT,
               scaling laws, DQN, the DP reckoning, R-MAX. The complete reference.</p>
           </a>
         </div>

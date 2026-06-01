@@ -230,7 +230,7 @@
         blank slate, then watch a higher-level algorithm pick the
         hyperparameters that made the learning fast. Everything below is
         produced by Python scripts in
-        <a href="https://github.com/scottn66/robot-arm-sim">the repo</a> —
+        <a href="https://github.com/scottn66/robot-arm-sim">the repo</a> -
         you can reproduce every figure on your own laptop in a few minutes.
       </p>
       <figure class="hero-fig">
@@ -263,7 +263,7 @@
         pivots at the shoulder; the hand pivots at the elbow. If the
         hand swings far enough down that its tip pushes into the
         ground, the body has to slide forward to maintain the rigid
-        geometry — that's the only way this robot can move. There's
+        geometry, that's the only way this robot can move. There's
         no motor pushing it directly. Forward motion happens as a
         consequence of <em>poking the ground at the right angles</em>.
       </p>
@@ -275,7 +275,7 @@
         bucket), and it has four buttons it can press:
         <code>arm-up</code>, <code>arm-down</code>, <code>hand-up</code>,
         <code>hand-down</code>. Each step it picks one button, the
-        world updates, and it gets a single number back — the change
+        world updates, and it gets a single number back, the change
         in its world $x$-coordinate from that one move. Forward is
         positive. Backward is negative. Most steps the number is
         nearly zero. That's it. That's the whole problem.
@@ -288,7 +288,7 @@
         of estimates that says "if I'm at angle config $s$ and I
         press button $a$, the total future reward I'll collect is
         $Q(s, a)$." It starts with all those estimates equal to zero
-        — a blank slate — and updates them from experience. After
+       , a blank slate, and updates them from experience. After
         enough experience, the table is good enough that just always
         pressing the highest-$Q$ button is a competent crawler.
       </p>
@@ -381,7 +381,7 @@
 
     <!-- ============ LEARNING ============ -->
     <section id="learning">
-      <h2>How it learns — explore, then exploit</h2>
+      <h2>How it learns, explore, then exploit</h2>
 
       <p>
         Tabular Q-learning works by repeatedly applying the
@@ -395,7 +395,7 @@
       <p>
         After each transition $(s, a, r, s')$, we nudge $Q(s, a)$ a
         fraction $\alpha$ of the way toward the
-        <em>target</em> $r + \gamma \max_{a'} Q(s', a')$ — the
+        <em>target</em> $r + \gamma \max_{a'} Q(s', a')$, the
         immediate reward plus the discounted best-case future
         reward from the state we landed in. Run that update a few
         hundred thousand times and the table converges to the
@@ -420,7 +420,7 @@
 
       <p>
         A 2D heatmap of $V^*(s) = \max_a Q(s, a)$ tells you the
-        agent's "exploit-only" knowledge — which states it thinks
+        agent's "exploit-only" knowledge, which states it thinks
         are valuable based on what it has already seen. But that's
         only half the picture. <strong>How sure</strong> is it of
         any given cell? Where should it still
@@ -446,7 +446,7 @@
         any moment in training tells you <em>where the agent's
         current knowledge is robust vs. where exploration still has
         work to do</em>. That's the same explore-vs-exploit signal
-        Bayesian optimization uses one level up — and exactly the
+        Bayesian optimization uses one level up, and exactly the
         story the four panels below tell over time.
       </p>
 
@@ -455,9 +455,9 @@
              alt="Four-panel time-lapse: V*, UCB1, visit counts, cumulative distance"
              loading="lazy" />
         <figcaption>
-          <strong>Q-learning time-lapse — 27 snapshots over 50,000 training
+          <strong>Q-learning time-lapse, 27 snapshots over 50,000 training
           steps, dense early.</strong>
-          <em>Top-left (V*):</em> the agent's exploit knowledge —
+          <em>Top-left (V*):</em> the agent's exploit knowledge -
           $\max_a Q(s, a)$ on visited cells, with tiny arrows
           marking the greedy action. Light gray = truly unvisited.
           The cyan circle is the agent's current state, with a
@@ -468,7 +468,7 @@
           uncertainty bonus); cells it has sampled deeply show up
           oranger (bonus has decayed toward zero, value resolved).
           <em>Bottom-left (log N):</em> per-state visit count on a
-          log scale — the entropy-minimization process made visible.
+          log scale, the entropy-minimization process made visible.
           Darker blue = more visits = less remaining uncertainty.
           <em>Bottom-right:</em> cumulative robot $x$ displacement
           since the start. The downstream consequence of all of
@@ -479,32 +479,32 @@
       <h3>A walkthrough of the four phases</h3>
 
       <p>
-        <strong>Steps 0 – 500 — pure exploration.</strong>
+        <strong>Steps 0 – 500, pure exploration.</strong>
         Every $Q$-value starts at zero, so the greedy branch of
         $\varepsilon$-greedy is also random. The cyan dot scatters
         through the state grid; visited cells light up in V* and N
         almost simultaneously. UCB starts at maximum brightness
-        everywhere — every $(s, a)$ has $n = 0$, so the
+        everywhere, every $(s, a)$ has $n = 0$, so the
         $\sqrt{\ln t / n}$ bonus is enormous. Distance traveled is
         a flat line near zero.
       </p>
 
       <p>
-        <strong>Steps 500 – 8,000 — exploration meets first signal.</strong>
+        <strong>Steps 500 – 8,000, exploration meets first signal.</strong>
         Reward is mostly zero (random thrashing rarely produces net
         displacement), but a handful of cells start showing
         positive $V^*$. Visit counts grow unevenly: a few states
         are heavily sampled (dark blue in the N panel) while
         most are barely touched. Notice that UCB has started to
-        differentiate — the cells with high $n$ have lost their
+        differentiate, the cells with high $n$ have lost their
         $\sqrt{\ln t / n}$ glow and are now oranger; the unsampled
         cells are still bright green. <strong>UCB minus V* is the
         exploration bonus the agent has yet to earn out.</strong>
       </p>
 
       <p>
-        <strong>Steps 8,000 – 20,000 — the cycle ignites.</strong>
-        A bright green region condenses in the lower-left of V* —
+        <strong>Steps 8,000 – 20,000, the cycle ignites.</strong>
+        A bright green region condenses in the lower-left of V* -
         the locomotion cycle has been discovered. As the agent
         commits to that pocket, the UCB and V* panels start to
         agree in the green region (uncertainty resolved); they
@@ -515,13 +515,13 @@
       </p>
 
       <p>
-        <strong>Steps 20,000 – 50,000 — pure exploitation.</strong>
+        <strong>Steps 20,000 – 50,000, pure exploitation.</strong>
         $\varepsilon$ has decayed below $0.3$. The agent cycles
         through a small set of states almost deterministically; new
         states stop being visited (V* and N panels lock in their
         shapes); UCB collapses toward V* inside the cycle but
         stays high outside because we're not bothering to explore
-        there. Distance grows nearly linearly — the policy is
+        there. Distance grows nearly linearly, the policy is
         committed and the body is crawling. By step 50,000 the
         robot has moved ~12,250 units forward from its starting
         position.
@@ -535,8 +535,8 @@
           budget across an unknown landscape, balancing what you
           currently believe to be best (exploit) against where
           your knowledge is weak enough that you might be wrong
-          (explore). They use different surrogates — a tabular
-          $Q + \sqrt{\ln t / n}$ here, a Gaussian process there —
+          (explore). They use different surrogates, a tabular
+          $Q + \sqrt{\ln t / n}$ here, a Gaussian process there -
           but the structure of the problem is the same.
         </p>
       </blockquote>
@@ -550,11 +550,11 @@
         The explore-vs-exploit story above is shaped by three
         hyperparameters. The next section searches for the best
         values automatically, but it's worth understanding what
-        each knob <em>does</em> first — and what the agent
+        each knob <em>does</em> first, and what the agent
         misbehaves like when you push each one to an extreme.
       </p>
 
-      <h3>γ (gamma) — the discount factor: how patient is the agent</h3>
+      <h3>γ (gamma), the discount factor: how patient is the agent</h3>
 
       <p>
         $γ$ multiplies the bootstrap term in the TD target. A reward
@@ -570,12 +570,12 @@
           <tr>
             <td><strong>0.0</strong></td>
             <td>Totally myopic. Only the next reward matters.</td>
-            <td>Future is discounted to zero. Can't learn multi-step plans like the crawler's cycle — early "preparation" moves never get credit for the eventual payoff.</td>
+            <td>Future is discounted to zero. Can't learn multi-step plans like the crawler's cycle, early "preparation" moves never get credit for the eventual payoff.</td>
           </tr>
           <tr>
             <td><strong>0.5</strong></td>
             <td>Short-sighted.</td>
-            <td>A reward 4 steps away is worth $0.5^4 ≈ 0.06$ — most of the cycle's value is lost in the bootstrap.</td>
+            <td>A reward 4 steps away is worth $0.5^4 ≈ 0.06$, most of the cycle's value is lost in the bootstrap.</td>
           </tr>
           <tr>
             <td><strong>0.95</strong> <em>(our default)</em></td>
@@ -603,7 +603,7 @@
         will pick locally-best moves and never find the cycle.
       </p>
 
-      <h3>ε (epsilon) — the exploration rate</h3>
+      <h3>ε (epsilon), the exploration rate</h3>
 
       <p>
         ε is the probability of taking a random action instead of the
@@ -646,10 +646,10 @@
         hyperparameter we tune (see next section).
       </p>
 
-      <h3>α (alpha) — the learning rate</h3>
+      <h3>α (alpha), the learning rate</h3>
 
       <p>
-        α is the step size of each TD update — how much each new
+        α is the step size of each TD update, how much each new
         experience overwrites the agent's existing belief.
       </p>
 
@@ -676,7 +676,7 @@
           <tr>
             <td><strong>0.8</strong></td>
             <td>Aggressive.</td>
-            <td>New experiences dominate old. Fast but noisy — Q-values can swing wildly with reward variance.</td>
+            <td>New experiences dominate old. Fast but noisy, Q-values can swing wildly with reward variance.</td>
           </tr>
           <tr>
             <td><strong>1.0</strong></td>
@@ -689,7 +689,7 @@
       <h3>The interactions matter more than the individual knobs</h3>
 
       <p>
-        The three are not independent — a few patterns come up
+        The three are not independent, a few patterns come up
         repeatedly when you tune them:
       </p>
 
@@ -723,7 +723,7 @@
         <p>
           Because of these interactions, picking good
           hyperparameters by hand is a dark art. The optimum isn't
-          on the axes — it's somewhere in the middle of a
+          on the axes, it's somewhere in the middle of a
           high-dimensional landscape where the values <em>and their
           decay shapes</em> co-depend on each other. Which is
           exactly the problem Bayesian optimization solves in the
@@ -734,7 +734,7 @@
 
     <!-- ============ OPTIMIZATION ============ -->
     <section id="optimization">
-      <h2>Tuning the hyperparameters — Bayesian optimization</h2>
+      <h2>Tuning the hyperparameters, Bayesian optimization</h2>
 
       <p>
         Everything in the previous section assumed we'd picked good
@@ -743,13 +743,13 @@
 
       <ul>
         <li>
-          <strong>$\alpha$ (learning rate)</strong> — how aggressively
+          <strong>$\alpha$ (learning rate)</strong>, how aggressively
           each TD update overwrites the existing $Q$-value. Higher =
           faster learning but more noise; lower = slower learning
           but more stable convergence. Range $[0.05, 0.95]$.
         </li>
         <li>
-          <strong>$\varepsilon$ decay length</strong> — the number of
+          <strong>$\varepsilon$ decay length</strong>, the number of
           steps over which exploration fades. Too short and the
           agent commits before finding the cycle; too long and it's
           still picking random actions when it should be exploiting.
@@ -758,7 +758,7 @@
       </ul>
 
       <p>
-        How do we pick them? Trial and error works but burns time —
+        How do we pick them? Trial and error works but burns time -
         every evaluation is a 20,000-step training run. A grid
         search would need hundreds of evaluations to cover the
         joint space densely. <strong>Bayesian optimization</strong>
@@ -768,18 +768,18 @@
       <h3>The BO recipe in one paragraph</h3>
 
       <p>
-        Maintain a Gaussian process over the search space — a
+        Maintain a Gaussian process over the search space, a
         statistical model that predicts the expected cumulative
         reward and the uncertainty at every $(\alpha, \mathrm{decay\_frac})$
         pair. After each evaluation, refit the GP. Then compute the
         <strong>Expected Improvement</strong> $\mathrm{EI}(x) =
-        \mathbb{E}[\max(0, f(x) - f^*)]$ on a grid — this is high
+        \mathbb{E}[\max(0, f(x) - f^*)]$ on a grid, this is high
         wherever the GP <em>either</em> predicts high mean
         (exploit) <em>or</em> has wide uncertainty (explore). Pick
         the $\mathrm{argmax}$ of EI as the next point to evaluate.
         Repeat. The acquisition function is doing the same
         explore/exploit dance that $\varepsilon$-greedy does for
-        the inner RL loop — just at the meta level of "which
+        the inner RL loop, just at the meta level of "which
         hyperparameters should I try."
       </p>
 
@@ -792,13 +792,13 @@
           <em>Top-left:</em> GP posterior mean over the
           $(\mathrm{decay\_frac}, \alpha)$ grid. White dots are
           evaluated points; gold star is the best-so-far.
-          <em>Top-right:</em> GP posterior standard deviation —
+          <em>Top-right:</em> GP posterior standard deviation -
           remaining uncertainty.
           <em>Bottom-left:</em> Expected Improvement acquisition
           surface; the red square marks the $\mathrm{argmax}$ where
           BO will evaluate next.
           <em>Bottom-right:</em> best cumulative reward so far as a
-          function of evaluation index. A step function — the long
+          function of evaluation index. A step function, the long
           plateaus are BO refining a local optimum, the sharp
           jumps are it discovering a better region.
         </figcaption>
@@ -817,14 +817,14 @@
       <p>
         <strong>The standard-deviation panel collapses over time.</strong>
         Light = uncertain; dark = sampled. The unexplored bottom
-        stays light through the whole run — correctly. The GP
+        stays light through the whole run, correctly. The GP
         knows it doesn't know what's there, but it also knows EI is
         low there so there's no point.
       </p>
 
       <p>
         <strong>The EI panel concentrates.</strong> Early frames
-        show a broad, low EI surface — BO is uncertain everywhere
+        show a broad, low EI surface, BO is uncertain everywhere
         and EI is small. By the end, EI has shrunk to one or two
         narrow spikes and the algorithm has nearly nothing left to
         gain.
@@ -837,7 +837,7 @@
         (cumulative reward goes from $\approx 1{,}180$ to $\approx 2{,}485$).
         The second, more dramatic jump happens at evaluation 20,
         when BO trusts an uncertain region and the resulting
-        evaluation lands at cumulative reward $\approx 5{,}024$ — a
+        evaluation lands at cumulative reward $\approx 5{,}024$, a
         $2\times$ improvement on the previous plateau. The whole
         run took 26 evaluations.
       </p>
@@ -845,7 +845,7 @@
       <blockquote>
         <p>
           The BO algorithm and the inner Q-learning algorithm are
-          structurally <em>the same idea</em> — maintain estimates,
+          structurally <em>the same idea</em>, maintain estimates,
           update them from data, balance exploration and
           exploitation. They operate at different levels (action
           choice vs. hyperparameter choice), with different
@@ -860,7 +860,7 @@
         The 2D BO above tunes $(\mathrm{decay\_frac}, α)$ and
         leaves everything else fixed. But the <em>actual</em>
         decision is a <strong>trajectory through hyperparameter
-        space</strong> — what does α do at step 0, at step 5,000,
+        space</strong>, what does α do at step 0, at step 5,000,
         at step 50,000? What about ε? What about γ?
       </p>
 
@@ -871,7 +871,7 @@
       </p>
 
       <ul>
-        <li>$γ$ — constant discount, one number</li>
+        <li>$γ$, constant discount, one number</li>
         <li>$α_\text{start}$, $α_\text{end}$, $α_\text{decay\_frac}$</li>
         <li>$ε_\text{start}$, $ε_\text{end}$, $ε_\text{decay\_frac}$</li>
       </ul>
@@ -892,7 +892,7 @@
         <figcaption>
           <strong>Convergence.</strong> 20 initial random samples
           (left of the dashed line) all stuck around cum reward
-          $\approx 80$ — the 7D space is wide and random samples
+          $\approx 80$, the 7D space is wide and random samples
           almost never land on a working trajectory. Then BO
           stair-steps up: first jump at evaluation 22 to
           $\approx 900$, then 28 to $\approx 1{,}000$, then 33 to
@@ -912,7 +912,7 @@
           training budget. Two non-obvious findings:
           (1) <strong>$α$ goes <em>up</em>, not down.</strong>
           BO picked $α_\text{start} = 0.17$ and $α_\text{end} = 0.50$,
-          decaying linearly over only the first 1,000 steps —
+          decaying linearly over only the first 1,000 steps -
           essentially a brief warm-up at low $α$, then
           constant at $0.5$. This is the <em>opposite</em> of the
           standard Robbins-Monro decay, but it makes sense
@@ -942,8 +942,8 @@
           short $α$ decay</strong> (the rising-α shape), and
           <strong>high $ε_\text{start}$, low $ε_\text{end}$, long
           $ε$ decay</strong> (the slowly-falling-ε shape). The
-          two shapes — α rising sharply, then plateauing; ε
-          falling slowly past the budget — are visible as a
+          two shapes, α rising sharply, then plateauing; ε
+          falling slowly past the budget, are visible as a
           consistent V-then-V signature across all the brightest
           lines.
         </figcaption>
@@ -959,7 +959,7 @@
         the 7D run would catch up.
         <strong>Two:</strong> the <em>shape</em> of the optimal
         trajectory is the interesting finding regardless of the
-        absolute reward — BO consistently picked an
+        absolute reward, BO consistently picked an
         anti-Robbins-Monro α schedule on this domain. That's
         worth a follow-up.
       </p>
@@ -967,7 +967,7 @@
       <blockquote>
         <p>
           The point of this section isn't that BO solves the
-          hyperparameter problem — it's that the structure of the
+          hyperparameter problem, it's that the structure of the
           solution surface is non-obvious enough that an automated
           search reveals things you wouldn't guess. The fact that
           $α$ wants to <em>rise</em> through training contradicts a
@@ -987,7 +987,7 @@
         run</strong>. Cumulative reward = total signed forward
         displacement, so the objective is literally "how far did
         the robot crawl." Two seeds is the minimum that gives <em>any</em>
-        variance estimate — and with high $ε$ early in training,
+        variance estimate, and with high $ε$ early in training,
         two seeds with the same hyperparameters can produce
         cumulative rewards differing by 5× depending on which one
         got lucky and found the cycle first.
@@ -996,7 +996,7 @@
       <p>
         The Gaussian process doesn't know about this noise. It
         treats the mean of 2 seeds as truth. That's a real
-        limitation — a config that <em>looks</em> better by 100
+        limitation, a config that <em>looks</em> better by 100
         units may simply be one where one of two seeds got lucky.
         The proper fix is some combination of:
       </p>
@@ -1005,11 +1005,11 @@
         <li><strong>More replicates per candidate</strong> ($n = 5$
             or $n = 10$ instead of 2), at proportionally larger
             wall-clock cost.</li>
-        <li><strong>Noise-aware surrogate</strong> — tell the GP
+        <li><strong>Noise-aware surrogate</strong>, tell the GP
             the objective is noisy via the <code>alpha</code>
             (noise variance) hyperparameter, so it does not
             over-trust individual lucky points.</li>
-        <li><strong>Adaptive replicates</strong> — evaluate new
+        <li><strong>Adaptive replicates</strong>, evaluate new
             candidates cheaply (1 seed), then re-evaluate the
             currently-leading candidate more times to confirm.
             This is "best-arm identification" with UCB-style
@@ -1022,7 +1022,7 @@
         an "arm," each evaluation a "pull," and the cumulative
         reward is a noisy estimate of arm value. UCB and Thompson
         sampling at the outer (hyperparameter) loop are the
-        textbook fixes — and they're closely related to the UCB1
+        textbook fixes, and they're closely related to the UCB1
         that runs on the inner (state-action) loop in the learning
         section above. Same algorithmic family, two levels.
       </p>
@@ -1065,7 +1065,7 @@
         state</em> of high-performing agents and perturb the
         hyperparameters. So hyperparameters
         <strong>evolve <em>during</em> training</strong>, not as an
-        outer loop. The output isn't a hyperparameter setting —
+        outer loop. The output isn't a hyperparameter setting -
         it's a <em>trajectory</em>, the actual sequence of values
         that won at each step. This is the closest natural match to
         the "find the best annealing pattern" question.
@@ -1084,7 +1084,7 @@
             score $\mathrm{score}(i) = \overline{r}_i + c \cdot
             \frac{\sigma_i}{\sqrt{n}}$ over its last 2,000-step
             reward stream. The $+c\sigma$ keeps high-variance
-            agents around — they might be lucky-good <em>or</em>
+            agents around, they might be lucky-good <em>or</em>
             unlucky-good, and we don't yet know.</li>
         <li><strong>Exploit + explore</strong> on the bottom
             quartile: each loser copies the Q-table of a randomly
@@ -1113,7 +1113,7 @@
           across the three stacked rows ($α$, $ε$, $γ$). Lines
           weave as agents copy each other's hyperparameters; by
           the end the population has clustered.
-          <em>Bottom-left:</em> the winning agent's $V^*(s)$ — the
+          <em>Bottom-left:</em> the winning agent's $V^*(s)$, the
           locomotion-cycle green pocket is visible.
           <em>Bottom-right:</em> all 16 cumulative reward curves
           over the 50,000-step training run; the winner highlighted.
@@ -1126,24 +1126,24 @@
       </p>
 
       <ul>
-        <li>$α \approx 0.99$  — high, not annealing</li>
-        <li>$ε \approx 0.79$  — high, not annealing either</li>
-        <li>$γ \approx 0.82$  — moderate discount</li>
+        <li>$α \approx 0.99$ , high, not annealing</li>
+        <li>$ε \approx 0.79$ , high, not annealing either</li>
+        <li>$γ \approx 0.82$ , moderate discount</li>
       </ul>
 
       <p>
-        With cumulative reward $\approx 625$ after 50k steps — much
+        With cumulative reward $\approx 625$ after 50k steps, much
         lower than the 2D BO's $\approx 5{,}024$. Two reasons. <strong>One:</strong>
         the population evolves <em>during</em> training, so the
         early generations spend their budget on un-tuned
         hyperparameters and don't accumulate as much reward as a
         well-tuned fixed-schedule run.
-        <strong>Two:</strong> PBT does no annealing — it found a
+        <strong>Two:</strong> PBT does no annealing, it found a
         constant-hyperparameter regime that works, but a decaying
         schedule probably beats it for a given budget. The right
         comparison is not "which optimizer produced higher cum
         reward" but "which optimizer produced a more useful
-        artifact" — and PBT's artifact is a <em>population</em>
+        artifact", and PBT's artifact is a <em>population</em>
         and an <em>evolutionary history</em>, not a single
         hyperparameter setting.
       </p>
@@ -1159,7 +1159,7 @@
           individually "right." The most sophisticated answer is
           probably the combination: <strong>PBT for trajectory
           discovery + noise-aware BO for fine-tuning the survivors
-          + Monte Carlo replicates everywhere</strong> — which is
+          + Monte Carlo replicates everywhere</strong>, which is
           essentially what DeepMind's AlphaStar setup did.
         </p>
       </blockquote>
@@ -1168,7 +1168,7 @@
 
       <p>
         The baseline PBT run above produced a 6× spread in outcomes
-        across 16 agents with near-identical hyperparameters — a
+        across 16 agents with near-identical hyperparameters, a
         sign that <em>policy luck</em> was dominating
         <em>hyperparameter quality</em> in the signal. To pin down
         what's actually happening, we ran three variants alongside:
@@ -1245,7 +1245,7 @@
       <p>
         <strong>1. PBT-Pure crushes Baseline (best: 1,578 vs 328,
         mean: 483 vs 162).</strong> This was the most surprising
-        result — and it contradicts the textbook story. In classical
+        result, and it contradicts the textbook story. In classical
         PBT the Q-table copy is the whole point: the loser
         <em>inherits</em> the donor's progress. But on this domain
         that inheritance actively hurts. When a loser copies a
@@ -1253,7 +1253,7 @@
         body trajectory, not its own. It can't <em>execute</em>
         that policy from its current physical state, so the
         copied Q-table is wasted at best and disruptive at worst.
-        PBT-Pure lets every agent develop its own Q-table — 16
+        PBT-Pure lets every agent develop its own Q-table, 16
         parallel chances to find the cycle, with the population
         only sharing the <em>schedule recipe</em>.
       </p>
@@ -1278,7 +1278,7 @@
         twice the generations to consolidate, and the population
         ended up agreeing about $γ$ within ±0.02 across all 16
         agents. The mean performance (399) is roughly midway
-        between Baseline (162) and PBT-Pure (483) — more compute
+        between Baseline (162) and PBT-Pure (483), more compute
         helps, but not as much as switching to hp-only copy.
       </p>
 
@@ -1287,13 +1287,13 @@
           The cleanest answer to <em>"was there real
           convergence?"</em> is: yes for γ (under all variants),
           partially for α and ε (under all variants), but the
-          baseline PBT was masking a serious failure mode —
-          policy-copy interference — that obscured how well the
+          baseline PBT was masking a serious failure mode -
+          policy-copy interference, that obscured how well the
           underlying hyperparameter search was actually doing. The
           most sophisticated PBT for this domain is the
           <strong>combination of PBT-Pure for high upside +
           Multi-Seed scoring for noise-resolved ranking + longer
-          training for hyperparameter consolidation</strong> — all
+          training for hyperparameter consolidation</strong>, all
           three at once. That's the next experiment.
         </p>
       </blockquote>
@@ -1301,12 +1301,12 @@
 
     <!-- ============ DP RECKONING ============ -->
     <section id="reckoning">
-      <h2>The DP reckoning — when the algorithm class is wrong</h2>
+      <h2>The DP reckoning, when the algorithm class is wrong</h2>
 
       <p>
-        After everything above — schedule sweeps, Bayesian optimization,
+        After everything above, schedule sweeps, Bayesian optimization,
         PBT, evolutionary refinement, scaling laws, axis sweeps, DQN,
-        reward shaping, count-based exploration — the best policy we
+        reward shaping, count-based exploration, the best policy we
         ever produced reaches <strong>$\max\_v \approx 0.41$</strong>,
         which is about <strong>46 %</strong> of optimal. We didn't know
         it was 46 % of optimal because we hadn't computed the optimum.
@@ -1329,9 +1329,9 @@
         <figcaption>
           The exact optimal policy via dynamic programming. Top-left:
           $V^*(s)$ heatmap. Top-right: optimal action $\pi^*(s)$ as an
-          arrow field — 87 % of states want a <em>down</em> action.
+          arrow field, 87 % of states want a <em>down</em> action.
           Bottom-left: the 16-step limit cycle simulated under $\pi^*$.
-          Bottom-right: optimal vs RL agents — the gap is real.
+          Bottom-right: optimal vs RL agents, the gap is real.
         </figcaption>
       </figure>
 
@@ -1339,20 +1339,20 @@
         The optimal policy reaches $x = 500$ in <strong>559 steps</strong>.
         Tabular Q-learning, after extensive hyperparameter optimization,
         takes about <strong>22,000 steps</strong> to cover the same
-        distance — a 40× speedup by switching to dynamic programming.
+        distance, a 40× speedup by switching to dynamic programming.
       </p>
 
       <p>
-        Worse than that: every algorithm we built — Bayesian
+        Worse than that: every algorithm we built, Bayesian
         optimization, PBT, evolutionary refinement, scaling-law
-        analysis — was optimizing <em>within</em> the basin of
+        analysis, was optimizing <em>within</em> the basin of
         attraction at 46 % of optimal. Every "improvement" we
         celebrated was an improvement within that basin. None of them
         touched the actual optimum.
       </p>
 
       <p>
-        Here is the optimal 16-step gait isolated on the state grid —
+        Here is the optimal 16-step gait isolated on the state grid -
         the limit cycle our RL agents were trying to discover but
         always missed:
       </p>
@@ -1373,7 +1373,7 @@
 
     <!-- ============ MODEL-BASED PIVOT ============ -->
     <section id="resolution">
-      <h2>The model-based pivot — closing the gap</h2>
+      <h2>The model-based pivot, closing the gap</h2>
 
       <p>
         Step back. Every algorithm above is <em>model-free</em>: the
@@ -1390,7 +1390,7 @@
         <figcaption>
           The three papers that close the gap. Each describes how to
           learn a transition table from experience and <em>plan</em>
-          with it — rather than treating Q-values as the only thing
+          with it, rather than treating Q-values as the only thing
           the agent learns.
         </figcaption>
       </figure>
@@ -1399,7 +1399,7 @@
         Brafman &amp; Tennenholtz's 2002 <strong>R-MAX</strong>
         algorithm: maintain the empirical transition table $T(s, a)$.
         Treat any unobserved $(s, a)$ as if it paid the maximum reward
-        $R_{\max}$ forever — so $V_{\text{opt}} = R_{\max} / (1 -
+        $R_{\max}$ forever, so $V_{\text{opt}} = R_{\max} / (1 -
         \gamma) \approx 100$ for $\gamma = 0.99$. Run value iteration
         on this <em>optimistic</em> model. Act greedy. Once the agent
         visits an unobserved $(s, a)$, the optimism for that pair
@@ -1419,10 +1419,10 @@
              alt="V*(s) heatmap evolving as R-MAX trains" />
         <figcaption>
           $V^*(s)$ for R-MAX over 10,000 environment steps. At step 0
-          every state is uniformly optimistic — bright yellow
+          every state is uniformly optimistic, bright yellow
           everywhere. As the model fills in, $V$ drops to its true
           value in each visited region, and the agent's greedy policy
-          locks in. The mechanism is "optimism under uncertainty" — the
+          locks in. The mechanism is "optimism under uncertainty", the
           agent doesn't need an exploration trick because unobserved
           $(s, a)$ pairs mathematically <em>are</em> the most attractive.
         </figcaption>
@@ -1434,10 +1434,10 @@
         <figcaption>
           The full arc, on one chart. ε-greedy at 46 % of optimal.
           Count-based at 53 %. Dyna-Q at 97 %. Dyna-Q+ at 97 %. R-MAX
-          at <strong>101 %</strong> — within seed noise of the DP
+          at <strong>101 %</strong>, within seed noise of the DP
           ceiling (the dashed line at 0.894, computed via Karp's
           max-mean-cycle algorithm from 1978). Each rung is a
-          different idea, a different paper, a different mechanism —
+          different idea, a different paper, a different mechanism -
           and each one is one unmistakable step closer to optimal.
         </figcaption>
       </figure>
@@ -1456,14 +1456,14 @@
           0.49 / step. R-MAX: <strong>0.89 / step</strong>. DP $\pi^*$:
           0.90 / step. R-MAX and DP $\pi^*$ match because R-MAX is
           essentially "online value iteration with directed
-          exploration" — on a deterministic finite MDP, it converges to
+          exploration", on a deterministic finite MDP, it converges to
           $\pi^*$ itself.
         </figcaption>
       </figure>
 
       <p>
-        And the gait it discovers — the <strong>16-step optimal
-        cycle</strong> the narrative kept referring to — looks like this
+        And the gait it discovers, the <strong>16-step optimal
+        cycle</strong> the narrative kept referring to, looks like this
         when slowed to 5 frames per second:
       </p>
 
@@ -1485,18 +1485,18 @@
         within the model-free regime: schedule shape, optimizer,
         function approximator, exploration trick, reward shaping. None
         of those touched the bottleneck. The moment we changed
-        <em>what the agent knows about the world</em> — from "Q-values
-        only" to "Q-values plus an empirical transition table" —
+        <em>what the agent knows about the world</em>, from "Q-values
+        only" to "Q-values plus an empirical transition table" -
         performance jumped from 46 % to 97 % in one move.
       </p>
 
       <p>
         RL's job is bridging environments you <em>can't</em> write
-        down — Atari, robotics with noisy contact dynamics, language
+        down, Atari, robotics with noisy contact dynamics, language
         games. The crawler isn't that. It's a 1,872-state deterministic
         MDP that DP can solve in three seconds. And here's the
         surprise: even on a problem DP could solve, <em>RL can match
-        DP</em> — but only if you let RL learn the model. R-MAX is RL
+        DP</em>, but only if you let RL learn the model. R-MAX is RL
         doing DP, with the model-learning step folded into the same
         training loop.
       </p>
@@ -1512,7 +1512,7 @@
       <h2>Watch the full story</h2>
 
       <p>
-        The above is a dashboard — every figure stands on its own and
+        The above is a dashboard, every figure stands on its own and
         you can dip in and out. If you'd rather walk through the whole
         arc as a single narrative, with the videos in the order the
         story expects them,
@@ -1522,7 +1522,7 @@
 
       <figure>
         <img src="img/crawler_optimal.gif"
-             alt="The optimal policy crawling — the cold-open shot" />
+             alt="The optimal policy crawling, the cold-open shot" />
         <figcaption>
           The optimal policy (discovered by R-MAX, verified against
           DP), running uninterrupted. This is the gait the rest of the
@@ -1601,16 +1601,16 @@ python3 scripts/make_narrative_figures.py all</code></pre>
     <section id="read-more">
       <h2>Read more</h2>
       <p>
-        The full pedagogical reference — agent stat blocks, the TD
+        The full pedagogical reference, agent stat blocks, the TD
         update mechanics walked through with numeric examples, the
         failure-mode catalog, the bias-variance discussion of the
-        decay-length sweep, gamified quests, and the glossary — lives
+        decay-length sweep, gamified quests, and the glossary, lives
         in <a href="https://github.com/scottn66/robot-arm-sim/blob/main/docs/LEARNING_GUIDE.md">docs/LEARNING_GUIDE.md</a>.
       </p>
       <p>
         The source repo is at
         <a href="https://github.com/scottn66/robot-arm-sim">github.com/scottn66/robot-arm-sim</a>.
-        Issues and pull requests welcome — quests 7 and 8 in the
+        Issues and pull requests welcome, quests 7 and 8 in the
         learning guide (SARSA(λ) and real walking physics for the
         multi-arm crawler) are wide-open and would be great
         contributions.
