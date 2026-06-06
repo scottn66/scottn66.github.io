@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Price of Knowing You · Decision Theory → Causality</title>
+  <meta name="description"
+        content="A topologically-sorted tour from Bayesian networks through utility,
+                 decision networks, the value of perfect information, interventions, and
+                 counterfactuals — built around an ad agent that climbs Pearl's ladder.
+                 Three interactive widgets; a modernized, runnable Defendotron." />
+  <link rel="icon"
+        href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🪜</text></svg>" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --code-bg:#F2F2F5;
+      --see:#2F7A4A; --do:#1F4E9E; --imagine:#8a4fbf;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:1.2rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    pre{background:#1f2430;color:#e6e6e6;padding:1rem 1.1rem;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.55}
+    pre code{background:none;color:inherit;padding:0}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar a{color:#cfe0ff;border:none}
+    .topbar a:hover{color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    .page{display:grid;grid-template-columns:230px minmax(0,760px);gap:2.4rem;max-width:1080px;margin:0 auto;padding:2rem 1.2rem 5rem}
+    .toc{position:sticky;top:3.4rem;align-self:start;font-size:.85rem;max-height:90vh;overflow:auto}
+    .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+    .toc li{counter-increment:t;margin:.15rem 0}
+    .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
+    .toc a{color:var(--muted);border:none}
+    .toc a:hover{color:var(--accent)}
+    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none}
+    .toc .act::before{content:""}
+    main{min-width:0}
+    h1{font-size:2.5rem;line-height:1.1;margin:.2rem 0 .6rem;letter-spacing:-.5px}
+    h2{font-size:1.5rem;margin:2.6rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
+    h3{font-size:1.12rem;margin:1.6rem 0 .3rem}
+    .lead{font-size:1.18rem;color:#333}
+    .badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .badge{font-size:.72rem;background:var(--accent-soft);color:var(--accent);padding:.2rem .6rem;border-radius:99px;border:none;font-weight:600}
+    .act-tag{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.18rem .55rem;border-radius:99px;color:#fff}
+    .act-see{background:var(--see)} .act-do{background:var(--do)} .act-imagine{background:var(--imagine)} .act-econ{background:var(--gold);color:#3a2e00}
+    .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--radius);padding:.8rem 1rem;margin:1.1rem 0;box-shadow:var(--shadow)}
+    .callout.good{border-left-color:var(--good)} .callout.warn{border-left-color:var(--warn)} .callout.gold{border-left-color:var(--gold)}
+    .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    figure{margin:1.2rem 0;text-align:center}
+    figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
+    table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
+    th,td{border:1px solid var(--rule);padding:.4rem .6rem;text-align:left;vertical-align:top}
+    th{background:var(--accent-soft);color:var(--accent)}
+    /* widgets */
+    .widget{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem 1.2rem;margin:1.3rem 0;box-shadow:var(--shadow)}
+    .widget h4{margin:.1rem 0 .2rem;font-size:1rem}
+    .widget .hint{font-size:.8rem;color:var(--muted);margin:0 0 .8rem}
+    .seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:.15rem .4rem .15rem 0}
+    .seg button{border:none;background:#fff;padding:.28rem .6rem;font-size:.82rem;cursor:pointer;color:var(--muted)}
+    .seg button.on{background:var(--accent);color:#fff}
+    .row{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:flex-start}
+    .col{flex:1;min-width:240px}
+    .bar{height:18px;background:var(--accent-soft);border-radius:4px;position:relative;margin:.25rem 0}
+    .bar>span{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px;transition:width .25s}
+    .barlabel{display:flex;justify-content:space-between;font-size:.8rem;margin-top:.5rem}
+    .slider{width:100%}
+    .readout{font-variant-numeric:tabular-nums}
+    .big{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .pill{display:inline-block;padding:.1rem .5rem;border-radius:99px;font-size:.78rem;font-weight:700}
+    .pill.a{background:var(--good-soft);color:var(--good)} .pill.b{background:var(--accent-soft);color:var(--accent)}
+    .twin{display:flex;gap:1.2rem;flex-wrap:wrap}
+    .twin .net{flex:1;min-width:220px;border:1px dashed var(--rule);border-radius:10px;padding:.6rem;text-align:center}
+    .steps{counter-reset:s;margin:.6rem 0}
+    .step{counter-increment:s;border-left:3px solid var(--rule);padding:.2rem 0 .2rem .9rem;margin:.4rem 0;opacity:.45;transition:opacity .2s}
+    .step.active{opacity:1;border-left-color:var(--imagine)}
+    .step .label::before{content:"Step " counter(s) " · "}
+    .step .label{font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--muted)}
+    button.go{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.4rem .9rem;font-size:.86rem;cursor:pointer}
+    button.go:hover{filter:brightness(1.08)}
+    .inputline{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;font-size:.85rem;margin:.3rem 0}
+    .inputline input{width:54px;padding:.2rem .3rem;border:1px solid var(--rule);border-radius:6px;font-family:inherit}
+    .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}
+    @media(max-width:880px){.page{grid-template-columns:1fr}.toc{display:none}h1{font-size:2rem}}
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="index.html">Scott Nelson</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="robot-arm-sim/index.html">robot-arm-sim</a>
+    <a href="resume.html">Resume</a>
+  </nav>
+
+  <div class="page">
+    <aside class="toc" aria-label="Contents">
+      <nav><ol>
+        <li class="act">Act I · Seeing</li>
+        <li><a href="#bayes-nets">Bayesian networks</a></li>
+        <li><a href="#dsep">d-separation</a></li>
+        <li><a href="#inference">Inference</a></li>
+        <li><a href="#widget-bn">▶ Inference toy</a></li>
+        <li class="act">Act II · Deciding</li>
+        <li><a href="#utility">Utility &amp; decision networks</a></li>
+        <li><a href="#defendotron">The Defendotron</a></li>
+        <li><a href="#vpi">Value of information</a></li>
+        <li><a href="#widget-vpi">▶ VPI calculator</a></li>
+        <li class="act">Act III · Doing</li>
+        <li><a href="#hierarchy">The causal hierarchy</a></li>
+        <li><a href="#do">The do-operator</a></li>
+        <li><a href="#backdoor">Backdoor &amp; adjustment</a></li>
+        <li class="act">Act IV · Imagining</li>
+        <li><a href="#scm">Structural causal models</a></li>
+        <li><a href="#counterfactuals">Counterfactuals</a></li>
+        <li><a href="#widget-cf">▶ Counterfactual stepper</a></li>
+        <li><a href="#ett">The ladder closes</a></li>
+        <li class="act">Coda</li>
+        <li><a href="#domains">Application domains</a></li>
+        <li><a href="#colophon">Sources &amp; honesty</a></li>
+      </ol></nav>
+    </aside>
+
+    <main>
+      <header id="hero">
+        <div class="badges">
+          <span class="badge">Bayes nets → utility → VPI → counterfactuals</span>
+          <span class="badge">3 interactive widgets</span>
+          <span class="badge">CMSI 3300 + 4320</span>
+        </div>
+        <h1>The Price of Knowing You</h1>
+        <p class="lead">
+          An ad agent wants to show you the right ad. To do it well, it has to
+          climb a ladder — from <em>seeing</em> correlations, to <em>deciding</em>
+          under uncertainty, to asking what a fact about you is <em>worth</em>,
+          all the way to <em>imagining</em> the ad it didn't show. This is a
+          topologically-sorted tour of that ladder: Bayesian networks → utility →
+          decision networks → value of perfect information → interventions →
+          counterfactuals. Each rung has a worked example you can poke at.
+        </p>
+        <div class="callout">
+          <span class="k">The spine</span>
+          <p style="margin:.3rem 0 0">
+            One agent — the <strong>Defendotron</strong>, a real homework I wrote
+            and have since modernized so it runs again — appears twice. At rung 2
+            it asks <em>"which ad, and is your demographic worth buying?"</em>
+            (value of information). At rung 3 the same agent asks <em>"given you
+            clicked, would you have clicked under a different ad?"</em>
+            (a counterfactual). Watching it climb is the whole story.
+          </p>
+        </div>
+        <p>
+          The framing follows Pearl's <strong>Ladder of Causation</strong> as
+          taught by <a href="https://forns.lmu.build/">Andrew Forney</a> (LMU
+          CMSI 4320), with the probabilistic machinery from Russell &amp; Norvig's
+          <em>AIMA</em>. The three tiers:
+        </p>
+        <figure>
+          <table style="max-width:560px;margin:0 auto">
+            <tr><th>Tier</th><th>Question</th><th>Example</th><th>Denizen</th></tr>
+            <tr><td><span class="act-tag act-imagine">3 · imagine</span></td><td>What if $X$ <em>had been</em> $x'$?</td><td>"Would I be home had I left the 405?"</td><td>Structural Causal Models</td></tr>
+            <tr><td><span class="act-tag act-do">2 · do</span></td><td>What if I <em>do</em> $X=x$?</td><td>"Will exercise lower my cholesterol?"</td><td>Causal Bayes nets · RL</td></tr>
+            <tr><td><span class="act-tag act-see">1 · see</span></td><td>What if I <em>see</em> $X=x$?</td><td>"Is symptom $X$ tied to disease $Y$?"</td><td>Bayesian networks</td></tr>
+          </table>
+          <figcaption>Each tier subsumes the ones below it. A tool stuck on tier 1 cannot answer a tier-2 question — which is why even a fluent associational model (an LLM) stumbles on "what would have happened if…".</figcaption>
+        </figure>
+
+        <!-- ===================== ACT I ===================== -->
+        <h2 id="bayes-nets"><span class="act-tag act-see">Act I · Seeing</span><br>Bayesian networks — what do I believe?</h2>
+        <p>
+          Start at the bottom. A <strong>Bayesian network</strong> answers
+          <em>"what do I believe?"</em> by storing a big joint distribution
+          cheaply: a DAG of cause-ish arrows, plus one small conditional
+          probability table (CPT) per node. The joint <em>factorizes</em> along
+          the structure:
+        </p>
+        <p>$$P(X_1,\dots,X_n)=\prod_i P\!\left(X_i \mid \text{parents}(X_i)\right)$$</p>
+        <p>
+          Our running example (Forney's, and the one we'll ride all the way up):
+          <strong>S</strong>tressed, <strong>V</strong>apes,
+          <strong>E</strong>xercises, develops <strong>H</strong>eart-disease,
+          with $S\to V$, $S\to E$, $V\to H$, $E\to H$. Instead of $2^4-1=15$ free
+          numbers, we store four little CPTs:
+        </p>
+        <p style="text-align:center">$$P(S)\,P(V\!\mid\!S)\,P(E\!\mid\!S)\,P(H\!\mid\!V,E)$$</p>
+
+        <h3 id="dsep">d-separation — independence you can read off the picture</h3>
+        <p>
+          The graph also tells you what's independent of what, via three local
+          rules. Conditioning on the middle node blocks a <em>fork</em>
+          ($X\!\leftarrow\!Z\!\to\!Y$) or a <em>chain</em>
+          ($X\!\to\!Z\!\to\!Y$); but conditioning on a <em>collider</em>
+          ($X\!\to\!Z\!\leftarrow\!Y$) <em>opens</em> it — observing a common
+          effect makes its causes dependent ("explaining away"). That collider
+          quirk is the seed of every spurious correlation we'll fight in Act III.
+        </p>
+
+        <h3 id="inference">Inference — asking the network questions</h3>
+        <p>
+          Given evidence $e$, we want $P(Q\mid e)$. Forney's four-step recipe:
+          find $P(Q,e)=\sum_y P(Q,e,y)$ from the factorization, find
+          $P(e)=\sum_q P(q,e)$, divide. That's <strong>enumeration</strong>
+          (AIMA's <code>enumeration_ask</code>); <strong>variable elimination</strong>
+          is the same idea with the sums pushed inward. When the network is too
+          big, you <strong>sample</strong> (likelihood weighting, Gibbs).
+        </p>
+
+        <!-- WIDGET 1 -->
+        <div class="widget" id="widget-bn">
+          <h4>▶ Widget 1 — Bayesian-network inference</h4>
+          <p class="hint">The vaping → heart-disease network. Click to fix evidence (—, 0, or 1) on any variable; the posteriors $P(\cdot=1\mid e)$ for the rest update by exact enumeration over all 16 worlds. Try fixing $V=1$: heart-disease risk jumps. Then add $S=1$ and watch it shift again.</p>
+          <div class="row">
+            <div class="col" id="bn-controls"></div>
+            <div class="col" id="bn-posteriors"></div>
+          </div>
+          <p class="hint" id="bn-note" style="margin-top:.7rem"></p>
+        </div>
+
+        <!-- ===================== ACT II ===================== -->
+        <h2 id="utility"><span class="act-tag act-econ">Act II · Deciding</span><br>Utility &amp; decision networks — what should I do?</h2>
+        <p>
+          Beliefs don't act. To <em>decide</em>, add what you <em>want</em>: a
+          <strong>utility</strong> $U(s)$ over outcomes. A rational agent picks
+          the action with the highest <strong>expected utility</strong>:
+        </p>
+        <p>$$\mathrm{EU}(a\mid e)=\sum_s P(s\mid e,a)\,U(s),\qquad \mathrm{MEU}(e)=\max_a \mathrm{EU}(a\mid e).$$</p>
+        <p>
+          A <strong>decision network</strong> is a Bayes net plus decision nodes
+          (your actions) and a utility node. You run inference inside an argmax
+          over actions. That's AIMA's <code>DecisionNetwork</code> — and it's
+          exactly what the Defendotron does.
+        </p>
+
+        <h3 id="defendotron">The Defendotron — a decision network on real data</h3>
+        <p>
+          For CMSI 3300 I built an ad-selection agent: learn a Bayes net from a
+          demographic CSV, then choose which ad to serve to maximize expected
+          payoff. It has hand-rolled <code>eu()</code>, <code>meu()</code>, and
+          <code>vpi()</code>. The catch Forney's students hit years later: it was
+          written against <code>pomegranate</code> 0.x and a 2022 <code>pgmpy</code>,
+          and <strong>stopped running</strong>. So I modernized it
+          (<code>BicScore→BIC</code>, <code>BayesianNetwork→DiscreteBayesianNetwork</code>,
+          fixed a utility-variable indexing bug) and re-ran it on the original
+          <code>adbot-data.csv</code>:
+        </p>
+        <pre><code># pgmpy 1.1.2 — verified MEU + VPI on the original adbot-data.csv
+MEU(no evidence)        → serve {Ad1:1, Ad2:0}   E[utility] ≈ 746.8
+MEU(T=0, G=0)           → serve {Ad1:0, Ad2:0}   E[utility] ≈ 797.0
+VPI("G" | -)            ≈ 20.77      # gender is worth ~21 utility units to learn
+VPI("F" | -)            ≈ 0          # feature F can't change the decision → worthless
+VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× more</code></pre>
+        <div class="callout good">
+          <span class="k">The reproduction</span>
+          <p style="margin:.3rem 0 0">The modernized run reproduced the original
+          test-suite's headline numbers — <code>MEU≈746.8</code> (author's value
+          746.72) and <code>VPI(G)=20.77</code> exactly. Where the structure-learner
+          lands on a slightly different DAG across <code>pgmpy</code> versions, the
+          downstream VPI shifts too (and can even dip numerically negative — which
+          is why you clamp it). That sensitivity is itself the lesson: VPI is only
+          as stable as the graph beneath it.</p>
+        </div>
+
+        <h3 id="vpi">Value of Perfect Information — the crown jewel</h3>
+        <p>
+          Now the question this whole project is named for. Before you act, is it
+          worth <em>learning one more fact</em>? The
+          <strong>value of perfect information</strong> of observing $E'$ is the
+          expected best-you-could-do after seeing it, minus the best-you-could-do
+          now — denominated in utility:
+        </p>
+        <p>$$\mathrm{VPI}_e(E')=\Big[\textstyle\sum_v P(E'\!=\!v\mid e)\,\mathrm{MEU}\!\big(e\cup\{E'\!=\!v\}\big)\Big]-\mathrm{MEU}(e).$$</p>
+        <p>
+          Three properties worth holding onto: VPI is <strong>never negative</strong>
+          (information can't hurt in expectation); it's <strong>non-additive</strong>
+          (two facts can be redundant or synergistic); and it is
+          <strong>zero exactly when the fact can't change your decision</strong> —
+          VPI measures <em>decision-relevance</em>, not Shannon information. That's
+          why <code>VPI(F)≈0</code> above: F is informative about the world but
+          irrelevant to which ad wins.
+        </p>
+        <p class="hint">My hand-rolled <code>vpi()</code> turns out to implement the
+          <em>identical</em> formula to AIMA's <code>InformationGatheringAgent.vpi()</code>
+          (Fig 16.9) — I re-derived the textbook on real data without knowing it.</p>
+
+        <!-- WIDGET 2 -->
+        <div class="widget" id="widget-vpi">
+          <h4>▶ Widget 2 — VPI calculator</h4>
+          <p class="hint">A clean ad-targeting net: a hidden viewer trait $X$ (young/old), two ads, and a click. Drag the click-probabilities and the base rate. The widget computes the best ad <em>blind</em>, the best ad <em>if you could see $X$ first</em>, and the gap — the dollar value of knowing $X$. Push the sliders until one ad dominates regardless of $X$ and watch VPI collapse to $0$.</p>
+          <div class="row">
+            <div class="col">
+              <div class="inputline"><span style="width:170px">$P(X=\text{young})$</span><input class="slider" type="range" id="vpi-px" min="0" max="1" step="0.05" value="0.5"><span class="readout" id="vpi-px-v">0.50</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{young})$</span><input class="slider" type="range" id="vpi-ay" min="0" max="1" step="0.05" value="0.8"><span class="readout" id="vpi-ay-v">0.80</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{old})$</span><input class="slider" type="range" id="vpi-ao" min="0" max="1" step="0.05" value="0.2"><span class="readout" id="vpi-ao-v">0.20</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{young})$</span><input class="slider" type="range" id="vpi-by" min="0" max="1" step="0.05" value="0.3"><span class="readout" id="vpi-by-v">0.30</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{old})$</span><input class="slider" type="range" id="vpi-bo" min="0" max="1" step="0.05" value="0.7"><span class="readout" id="vpi-bo-v">0.70</span></div>
+              <div class="inputline"><span style="width:170px">click value</span>$<input type="number" id="vpi-val" value="10" step="1" style="width:60px"></div>
+            </div>
+            <div class="col" id="vpi-out"></div>
+          </div>
+        </div>
+
+        <!-- ===================== ACT III ===================== -->
+        <h2 id="hierarchy"><span class="act-tag act-do">Act III · Doing</span><br>Why correlations aren't enough</h2>
+        <p>
+          The Defendotron is powerful, but it lives on tier 1: it knows how
+          variables <em>covary</em>, not what happens if you <em>act</em>. Ask it
+          "does vaping cause heart disease?" and the naive answer
+          $P(H\!=\!1\mid V\!=\!1)-P(H\!=\!1\mid V\!=\!0)$ is <strong>wrong</strong>,
+          for three reasons:
+        </p>
+        <ul>
+          <li><strong>Observational equivalence</strong> — $S\!\to\!V$ and
+            $V\!\to\!S$ encode the same independences but opposite causes.</li>
+          <li><strong>Spurious correlation</strong> — conditioning lets
+            information leak along the back-path $V\!\leftarrow\!S\!\to\!E\!\to\!H$,
+            tangential to the effect we want.</li>
+          <li><strong>Latent confounders</strong> — variables we never recorded
+            that drive two we did.</li>
+        </ul>
+        <p>Forney's tagline: <em>causal queries demand causal assumptions, encoded
+          in the model's structure.</em> Promote the Bayes net to a
+          <strong>Causal Bayesian Network</strong>, where an arrow
+          $\text{Parents}(Y)\to Y$ means $Y=f_Y(\text{Parents}(Y))$ — forcing a
+          cause changes the effect, but not vice-versa.</p>
+
+        <h3 id="do">The <em>do</em>-operator — surgery on the graph</h3>
+        <p>
+          Observing differs from intervening. We write $do(X=x)$ for
+          <em>forcing</em> $X$ to $x$ apart from its normal causes. Structurally,
+          $do(X=x)$ builds the <strong>mutilated graph</strong> $G_x$: the original
+          graph with <em>every inbound edge to $X$ cut</em>. $X$ is now set by
+          fiat, so its parents no longer explain it:
+        </p>
+        <figure>
+          <table style="max-width:560px;margin:0 auto">
+            <tr><th>world</th><th>graph</th><th>factorization</th></tr>
+            <tr><td>observe (nature)</td><td>$S\!\to\!V,\,S\!\to\!E,\,VE\!\to\!H$</td><td>$P(S)\,P(V\!\mid\!S)\,P(E\!\mid\!S)\,P(H\!\mid\!V,E)$</td></tr>
+            <tr><td>$do(V=v)$</td><td>cut $S\!\to\!V$</td><td>$P(S)\,\underline{\ 1\ }\,P(E\!\mid\!S)\,P(H\!\mid\!V\!=\!v,E)$</td></tr>
+          </table>
+          <figcaption>The $P(V\mid S)$ factor drops out — that's the only mechanism the intervention touches (this is the <em>truncated factorization</em>). Everything non-downstream of $V$ is untouched, which is why a Markovian causal effect is computable from purely observational CPTs.</figcaption>
+        </figure>
+        <p>
+          The payoff is striking: you can compute the answer to a randomized
+          experiment <em>you never ran</em> — provided your causal assumptions hold.
+        </p>
+
+        <h3 id="backdoor">Backdoor &amp; adjustment</h3>
+        <p>
+          When a confounder muddies $X\to Y$, block the non-causal back-paths by
+          conditioning on an admissible set $Z$ (the <strong>backdoor criterion</strong>):
+        </p>
+        <p>$$P(Y\mid do(X\!=\!x))=\sum_z P(Y\mid X\!=\!x,Z\!=\!z)\,P(Z\!=\!z).$$</p>
+        <p>
+          That adjustment formula is the heart of CMSI 4320's Assignment 4
+          ("Back Doors, Do, and other Funny Sounding Things"): translate an
+          English query to a $do$-expression, then hand-compute it — e.g.
+          $P(H\!=\!1\mid do(E\!=\!1),S\!=\!1)$ on the vaping net. A randomized
+          controlled trial <em>is</em> a physical $do()$; the algebra lets us
+          emulate one from observational data.
+        </p>
+
+        <!-- ===================== ACT IV ===================== -->
+        <h2 id="scm"><span class="act-tag act-imagine">Act IV · Imagining</span><br>Structural causal models &amp; the top rung</h2>
+        <p>
+          The most expressive model writes down the <em>mechanisms</em>
+          themselves. A <strong>structural causal model</strong> $M=\langle U,V,F\rangle$
+          has endogenous variables $V$, exogenous "luck" variables $U$ (one per
+          $V$, $E[U_i]=0$), and structural equations $V_i\gets f_{V_i}(\text{pa}_i,U_{V_i})$.
+          Fix the $U$ and everything is determined — that determinism is what makes
+          counterfactuals computable. When two variables secretly share a $U$
+          (in the linear case, $\mathrm{Cov}(U_X,U_Y)\neq 0$), you have an
+          <strong>unobserved confounder</strong>.
+        </p>
+
+        <h3 id="counterfactuals">Counterfactuals — abduction, action, prediction</h3>
+        <p>
+          A counterfactual conditions on what <em>actually</em> happened and asks
+          about a world where one thing was different — two worlds sharing the
+          same luck. You can't just intervene (that throws away the evidence about
+          the luck); you must first recover it. The three-step engine, on a
+          linear afterschool→GPA model
+          ($Z\gets 3X+U_Z,\ Y\gets 2X+4Z+U_Y$):
+        </p>
+        <ol>
+          <li><strong>Abduction</strong> — solve the $U$ from the observed facts.</li>
+          <li><strong>Action</strong> — apply $do(X=x')$ to the mutilated model, carrying the $U$ forward.</li>
+          <li><strong>Prediction</strong> — recompute the outcome.</li>
+        </ol>
+
+        <!-- WIDGET 3 -->
+        <div class="widget" id="widget-cf">
+          <h4>▶ Widget 3 — Counterfactual stepper</h4>
+          <p class="hint">A student did $X$ hours of an afterschool program, $Z$ hours of homework, and saw a GPA change $Y$. <em>What would $Y$ have been with $X'$ hours instead?</em> The model is linear, so abduction, action, and prediction are exact algebra. Edit the factual story and the counterfactual $X'$, then step through. The twin networks share the abducted luck $U$.</p>
+          <div class="inputline">
+            factual: $X=$<input type="number" id="cf-x" value="1" step="1">
+            $Z=$<input type="number" id="cf-z" value="2" step="1">
+            $Y=$<input type="number" id="cf-y" value="-2" step="1">
+            &nbsp;·&nbsp; counterfactual $X'=$<input type="number" id="cf-xp" value="3" step="1">
+            <button class="go" id="cf-run">Run the 3 steps ▸</button>
+          </div>
+          <div class="twin" id="cf-twin" style="margin-top:.6rem"></div>
+          <div class="steps" id="cf-steps"></div>
+          <p class="readout" id="cf-result" style="font-size:1.05rem"></p>
+        </div>
+
+        <h3 id="ett">The ladder closes — VPI becomes ETT</h3>
+        <p>
+          Here is the payoff the project was built around. CMSI 4320's Assignment 5
+          ("Ifs, Onlys, and Buts") pushes counterfactuals into named quantities.
+          The headline one is the <strong>Effect of Treatment on the Treated</strong>:
+        </p>
+        <p>$$\mathrm{ETT}=E\big[Y_{x'}-Y_{x}\ \big|\ X=x\big]$$</p>
+        <p>
+          — among those who <em>actually</em> took action $x$, what would have
+          happened under $x'$? And the assignment's worked instance is a
+          <strong>web-advertising</strong> system: demographics $\to$ ad shown
+          $\to$ clickthrough. <em>Given the people who clicked, would they have
+          clicked under a different ad?</em>
+        </p>
+        <div class="callout gold">
+          <span class="k">The spine, completed</span>
+          <p style="margin:.3rem 0 0">
+            That is the <strong>Defendotron's own question, one rung higher</strong>.
+            At tier 2 it asked <em>"is your demographic worth buying before I pick
+            an ad?"</em> (VPI). At tier 3 the same ad agent asks <em>"given you
+            clicked, would you have clicked under the ad I didn't show?"</em>
+            (ETT). Same machinery — beliefs, utilities, the value of information —
+            climbed from <em>seeing</em> to <em>imagining</em>. The ad agent walked
+            the whole ladder.
+          </p>
+        </div>
+        <p>
+          The same act yields <strong>attributable risk</strong> and
+          <strong>probability of necessity</strong> (the drug-liability question:
+          of those harmed after taking the drug, what fraction were harmed
+          <em>because of</em> it?), and Forney's research thread,
+          <strong>MABUC</strong> — multi-armed bandits with unobserved confounders,
+          where an agent uses its own <em>intent</em> (a counterfactual signal) to
+          beat a confounded slot machine. That's the bridge from this curriculum
+          into reinforcement learning.
+        </p>
+
+        <!-- ===================== CODA ===================== -->
+        <h2 id="domains">Where this shows up</h2>
+        <p>The same ladder, eight domains:</p>
+        <table>
+          <tr><th>Domain</th><th>Tier-1/2 (see / decide)</th><th>Tier-3 (imagine)</th></tr>
+          <tr><td><strong>Advertising</strong> (the spine)</td><td>Defendotron: which ad? VPI of a demographic</td><td>ETT: would they have clicked under another ad?</td></tr>
+          <tr><td>Medicine</td><td>vaping → heart-disease; exercise → cholesterol</td><td>drug-liability attributable risk; physician drug choice</td></tr>
+          <tr><td>Public policy</td><td>agricultural subsidy decision</td><td>terrorism-predictor causal structure</td></tr>
+          <tr><td>Education</td><td>study-habits MDP</td><td>afterschool → GPA counterfactual</td></tr>
+          <tr><td>Hiring</td><td>screen on predicted performance</td><td>counterfactual fairness: same hire under a different background?</td></tr>
+          <tr><td>Navigation</td><td>taxi-dispatch / grid-world MDP</td><td>"home by now had I left the 405?"</td></tr>
+          <tr><td>Genomics</td><td>DNA-sequence HMM (Viterbi)</td><td>—</td></tr>
+          <tr><td>Risk under uncertainty</td><td>tiger-doors POMDP; value of listening</td><td>—</td></tr>
+        </table>
+
+        <div class="callout">
+          <span class="k">Sibling project</span>
+          <p style="margin:.3rem 0 0">
+            The tier-2 bridge — MDPs, bandits, reinforcement learning — is its own
+            story. In <a href="robot-arm-sim/index.html">robot-arm-sim</a> a crawler
+            teaches itself to walk by Q-learning, and the punchline is the same as
+            here: a <em>model-based</em> method (one that can imagine roads not
+            taken) beats every model-free one. Decision theory and that RL project
+            are two halves of the same ladder.
+          </p>
+        </div>
+
+        <div class="colophon" id="colophon">
+          <p><strong>What's mine vs. what's cited.</strong> The
+            <strong>Defendotron</strong> ad agent (the <code>eu</code>/<code>meu</code>/<code>vpi</code>
+            engine, structure learning, and the modernization that got it running
+            again) is my CMSI 3300 homework, author-confirmed in the source. The
+            <strong>causal-hierarchy framing</strong>, the vaping and afterschool
+            examples, and the do/counterfactual machinery are from
+            <a href="https://forns.lmu.build/">Andrew Forney</a>'s CMSI 4320
+            lectures and assignments (Pearl's <em>Ladder of Causation</em>). The
+            inference and VPI reference implementations are from Russell &amp;
+            Norvig's <em>AIMA</em> (<code>probability.py</code>,
+            <code>making_simple_decision4e.py</code>, Ch. 13–16). The three widgets
+            above are my own, written to mirror the verified Python.</p>
+          <p>Built as a node of a larger indexed archive of my coursework.
+            Reproduce the Defendotron with <code>pip install pgmpy pandas</code>
+            and the original <code>adbot-data.csv</code>.</p>
+        </div>
+      </header>
+    </main>
+  </div>
+
+  <script>
+  /* =================== WIDGET 1 — Bayes-net inference (vaping net) =================== */
+  (function(){
+    // CPTs from Forney Lecture 7-2 (P of value=1)
+    const PS1=0.70;
+    const PV1={0:0.20,1:0.70};         // P(V=1|S)
+    const PE1={0:0.40,1:0.80};         // P(E=1|S)
+    const PH1={ "0,0":0.30,"0,1":0.10,"1,0":0.80,"1,1":0.60 }; // P(H=1|V,E)
+    const VARS=["S","V","E","H"];
+    const NAME={S:"Stressed",V:"Vapes",E:"Exercises",H:"Heart disease"};
+    let ev={S:null,V:null,E:null,H:null};
+    function joint(s,v,e,h){
+      const ps = s? PS1 : 1-PS1;
+      const pv = v? PV1[s] : 1-PV1[s];
+      const pe = e? PE1[s] : 1-PE1[s];
+      const ph = h? PH1[v+","+e] : 1-PH1[v+","+e];
+      return ps*pv*pe*ph;
+    }
+    function consistent(a,name){ return ev[name]===null || ev[name]===a; }
+    function posteriors(){
+      const num={S:0,V:0,E:0,H:0}; let den=0;
+      for(let s=0;s<2;s++)for(let v=0;v<2;v++)for(let e=0;e<2;e++)for(let h=0;h<2;h++){
+        if(!consistent(s,"S")||!consistent(v,"V")||!consistent(e,"E")||!consistent(h,"H"))continue;
+        const p=joint(s,v,e,h); den+=p;
+        if(s)num.S+=p; if(v)num.V+=p; if(e)num.E+=p; if(h)num.H+=p;
+      }
+      const out={}; for(const k of VARS) out[k]= den>0? num[k]/den : NaN;
+      return out;
+    }
+    function render(){
+      const c=document.getElementById("bn-controls");
+      c.innerHTML="<div style='font-size:.8rem;color:var(--muted);margin-bottom:.3rem'>Evidence</div>";
+      VARS.forEach(k=>{
+        const row=document.createElement("div"); row.style.margin=".3rem 0";
+        row.innerHTML=`<span style="display:inline-block;width:108px;font-size:.85rem">${NAME[k]}</span>`;
+        const seg=document.createElement("span"); seg.className="seg";
+        [["—",null],["0",0],["1",1]].forEach(([lab,val])=>{
+          const b=document.createElement("button"); b.textContent=lab;
+          if(ev[k]===val)b.className="on";
+          b.onclick=()=>{ev[k]=val;render();};
+          seg.appendChild(b);
+        });
+        row.appendChild(seg); c.appendChild(row);
+      });
+      const post=posteriors();
+      const o=document.getElementById("bn-posteriors");
+      o.innerHTML="<div style='font-size:.8rem;color:var(--muted);margin-bottom:.3rem'>Posterior P(·=1 | evidence)</div>";
+      VARS.forEach(k=>{
+        const fixed=ev[k]!==null;
+        const val=fixed? ev[k] : post[k];
+        const pct=Math.round((isNaN(val)?0:val)*100);
+        const d=document.createElement("div");
+        d.innerHTML=`<div class="barlabel"><span>${NAME[k]}${fixed?' <span class="pill b">fixed</span>':''}</span><span class="readout">${fixed?val:(isNaN(val)?'—':val.toFixed(3))}</span></div>
+        <div class="bar"><span style="width:${pct}%;background:${fixed?'var(--gold)':'var(--accent)'}"></span></div>`;
+        o.appendChild(d);
+      });
+      const note=document.getElementById("bn-note");
+      const base=posteriorsFor({}); const givenV=posteriorsFor({V:1});
+      note.innerHTML=`Prior risk of heart disease: <b>${base.H.toFixed(3)}</b>. Fix <b>V=1</b> (vapes) and it rises to <b>${givenV.H.toFixed(3)}</b> — exactly the lecture's $P(H{=}1\\mid V{=}1)\\approx0.65$.`;
+      if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([note]);
+    }
+    function posteriorsFor(e){ const save={...ev}; ev={S:null,V:null,E:null,H:null,...e}; const p=posteriors(); ev=save; return p; }
+    render();
+  })();
+
+  /* =================== WIDGET 2 — VPI calculator (clean ad net) =================== */
+  (function(){
+    const ids=["px","ay","ao","by","bo"];
+    const get=id=>parseFloat(document.getElementById("vpi-"+id).value);
+    function compute(){
+      const px=get("px"), val=parseFloat(document.getElementById("vpi-val").value)||0;
+      const cl={A:{y:get("ay"),o:get("ao")}, B:{y:get("by"),o:get("bo")}};
+      // blind: EU(ad) = val * [px*click|young + (1-px)*click|old]
+      const euA = val*(px*cl.A.y+(1-px)*cl.A.o);
+      const euB = val*(px*cl.B.y+(1-px)*cl.B.o);
+      const blindBest = euA>=euB? "A":"B"; const blindMEU=Math.max(euA,euB);
+      // see X first: pick best ad per value of X, weight by P(X)
+      const meuYoung = val*Math.max(cl.A.y,cl.B.y);
+      const meuOld   = val*Math.max(cl.A.o,cl.B.o);
+      const informedMEU = px*meuYoung+(1-px)*meuOld;
+      const vpi = informedMEU-blindMEU;
+      ids.forEach(id=>document.getElementById("vpi-"+id+"-v").textContent=get(id).toFixed(2));
+      document.getElementById("vpi-px-v").textContent=px.toFixed(2);
+      const flips = (cl.A.y>=cl.B.y)!==(cl.A.o>=cl.B.o);
+      document.getElementById("vpi-out").innerHTML=`
+        <div style="font-size:.8rem;color:var(--muted)">Decide <b>blind</b> (don't see X)</div>
+        <div>Best ad: <span class="pill ${blindBest==='A'?'a':'b'}">${blindBest}</span> &nbsp; MEU = <span class="readout">$${blindMEU.toFixed(2)}</span></div>
+        <div style="font-size:.8rem;color:var(--muted);margin-top:.6rem">Decide <b>after seeing X</b></div>
+        <div>young → <span class="pill ${cl.A.y>=cl.B.y?'a':'b'}">${cl.A.y>=cl.B.y?'A':'B'}</span> · old → <span class="pill ${cl.A.o>=cl.B.o?'a':'b'}">${cl.A.o>=cl.B.o?'A':'B'}</span> &nbsp; MEU = <span class="readout">$${informedMEU.toFixed(2)}</span></div>
+        <div style="margin-top:.9rem">VPI of knowing X</div>
+        <div class="big readout">$${vpi.toFixed(2)}</div>
+        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${vpi<1e-9?'Zero — the same ad wins for every X, so the fact cannot change your decision.':(flips?'The fact flips your choice between viewer types — that is where information earns its price.':'Positive, but the fact never flips the decision; you are just paying for sharper confidence.')}</div>`;
+    }
+    ["px","ay","ao","by","bo"].forEach(id=>document.getElementById("vpi-"+id).addEventListener("input",compute));
+    document.getElementById("vpi-val").addEventListener("input",compute);
+    compute();
+  })();
+
+  /* =================== WIDGET 3 — Counterfactual stepper (afterschool→GPA LSCM) =================== */
+  (function(){
+    const $=id=>document.getElementById(id);
+    function net(title,X,Z,Y,Uz,Uy,hl){
+      return `<div class="net"><div style="font-size:.78rem;font-weight:700;color:${hl||'var(--muted)'}">${title}</div>
+        <div style="font-size:.85rem;margin-top:.3rem;line-height:1.9">
+        $X=${fmt(X)}$<br>$Z=3X+U_Z=${fmt(Z)}$<br>$Y=2X+4Z+U_Y=${fmt(Y)}$<br>
+        <span style="color:var(--imagine)">$U_Z=${fmt(Uz)},\\ U_Y=${fmt(Uy)}$</span></div></div>`;
+    }
+    function fmt(n){ return (Math.round(n*100)/100).toString(); }
+    function run(){
+      const X=+$("cf-x").value, Z=+$("cf-z").value, Y=+$("cf-y").value, Xp=+$("cf-xp").value;
+      // Step 1 — abduction
+      const Uz=Z-3*X, Uy=Y-2*X-4*Z;
+      // Step 2/3 — action + prediction
+      const Zp=3*Xp+Uz, Yp=2*Xp+4*Zp+Uy;
+      $("cf-twin").innerHTML = net("Factual world (observed)",X,Z,Y,Uz,Uy)
+        + net("Counterfactual world (X→X')",Xp,Zp,Yp,Uz,Uy,'var(--imagine)');
+      $("cf-steps").innerHTML=`
+        <div class="step active"><div class="label">Abduction</div> Solve the luck from the facts: $U_Z=Z-3X=${fmt(Z)}-3(${fmt(X)})=${fmt(Uz)}$, &nbsp; $U_Y=Y-2X-4Z=${fmt(Uy)}$.</div>
+        <div class="step active"><div class="label">Action</div> Intervene $do(X=${fmt(Xp)})$ on the mutilated model, carrying $U_Z,U_Y$ forward.</div>
+        <div class="step active"><div class="label">Prediction</div> $Z'=3X'+U_Z=${fmt(Zp)}$, then $Y'=2X'+4Z'+U_Y=${fmt(Yp)}$.</div>`;
+      $("cf-result").innerHTML=`This student saw a GPA change of <b>${fmt(Y)}</b>. Had they done <b>${fmt(Xp)}</b> hours instead of ${fmt(X)}, the model says they would have seen <b style="color:var(--imagine)">${fmt(Yp)}</b>.`;
+      if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([$("cf-twin"),$("cf-steps"),$("cf-result")]);
+    }
+    $("cf-run").addEventListener("click",run);
+    run();
+  })();
+  </script>
+</body>
+</html>
