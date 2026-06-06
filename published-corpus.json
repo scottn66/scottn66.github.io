@@ -1,0 +1,79 @@
+[
+  {
+    "unit": "arxiv_scraper",
+    "url": "/arxiv_scraper.html",
+    "title": "arXiv Scraper &mdash; Knowledge Source Pipeline",
+    "last_modified": "2026-04-10T01:23:55-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "hmm",
+    "url": "/HMM.html",
+    "title": "Hidden Markov Models and Named Entity Recognition",
+    "last_modified": "2025-03-29T22:22:52-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "mab",
+    "url": "/MAB.html",
+    "title": "Multi-Armed Bandit Agents Project",
+    "last_modified": "2025-03-29T22:22:13-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "mandelbrot",
+    "url": "/mandelbrot.html",
+    "title": "Mandelbrot Explorer",
+    "last_modified": "2026-04-09T04:07:50-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "mandelbrot_landing",
+    "url": "/mandelbrot_landing.html",
+    "title": "Mandelbrot Explorer - Tutorial &amp; Background",
+    "last_modified": "2025-03-29T23:25:46-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "q",
+    "url": "/Q.html",
+    "title": "The Speedy Q-Learning Crawler, and the 60% gap we didn't see",
+    "last_modified": "2026-06-01T15:03:36-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "robot-arm-sim",
+    "url": "/robot-arm-sim/",
+    "title": "robot-arm-sim \u00b7 A crawler learns to walk",
+    "last_modified": "2026-06-01T15:03:36-07:00",
+    "kind": "project"
+  },
+  {
+    "unit": "sep_scraper",
+    "url": "/sep_scraper.html",
+    "title": "SEP Scraper &mdash; Knowledge Source Pipeline",
+    "last_modified": "2026-04-10T01:23:55-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "solar-viability",
+    "url": "/solar/",
+    "title": "Solar Viability Analysis | DATA 201 \u2014 Scott Nelson",
+    "last_modified": "2026-05-29T23:36:10-07:00",
+    "kind": "project"
+  },
+  {
+    "unit": "sun",
+    "url": "/sun/",
+    "title": "Solar Calculator",
+    "last_modified": "2023-06-23T14:12:43-07:00",
+    "kind": "project"
+  },
+  {
+    "unit": "wikipedia_scraper",
+    "url": "/wikipedia_scraper.html",
+    "title": "Wikipedia Scraper &mdash; Knowledge Source Pipeline",
+    "last_modified": "2026-04-10T01:23:55-07:00",
+    "kind": "page"
+  }
+]
