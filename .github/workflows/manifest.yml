@@ -1,0 +1,48 @@
+name: Build published-corpus manifest
+
+# Regenerates published-corpus.json (the P-plane machine-readable face
+# for the three-plane reconciliation rig) whenever site content changes.
+# Spec: AInt/_vault/_reconciliation.md
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'published-corpus.json'   # don't re-trigger on our own commit
+      - '.github/workflows/manifest.yml'
+  workflow_dispatch: {}            # allow manual runs
+
+permissions:
+  contents: write                  # needed to commit the regenerated manifest
+
+concurrency:
+  group: manifest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # full history so git log gives last_modified
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build manifest
+        run: python3 scripts/build_manifest.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- published-corpus.json; then
+            echo "published-corpus.json unchanged — nothing to commit."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add published-corpus.json
+            git commit -m "chore: regenerate published-corpus.json [skip ci]"
+            git push
+          fi

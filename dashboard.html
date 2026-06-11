@@ -74,6 +74,19 @@
       font-size: .65rem; padding: 1px 5px; border-radius: 3px;
       background: #f0f0f0; color: var(--muted);
     }
+    /* True-state badges (derived from published-corpus.json) */
+    .badge-published {
+      font-size: .62rem; padding: 1px 6px; border-radius: 3px;
+      background: #d1e7dd; color: #0f5132; font-weight: 700;
+    }
+    .badge-falsedone {
+      font-size: .62rem; padding: 1px 6px; border-radius: 3px;
+      background: #f8d7da; color: #842029; font-weight: 700;
+    }
+    .badge-track {
+      font-size: .6rem; padding: 1px 5px; border-radius: 3px;
+      background: #ede7f6; color: #5a3e8c; text-transform: uppercase;
+    }
 
     /* Modal overrides */
     .modal-body select { max-width: 200px; }
@@ -130,6 +143,12 @@
       <select class="form-select form-select-sm" id="filter-project" style="max-width:200px;">
         <option value="all">All Projects</option>
       </select>
+      <select class="form-select form-select-sm" id="filter-track" style="max-width:180px;" title="Default view is the efferent (publish) track">
+        <option value="efferent" selected>Efferent (publish)</option>
+        <option value="all">All Tracks</option>
+        <option value="project">Project backlog</option>
+        <option value="substrate">Substrate</option>
+      </select>
       <select class="form-select form-select-sm" id="filter-epic" style="max-width:220px;">
         <option value="all">All Epics</option>
       </select>
@@ -142,6 +161,9 @@
       </select>
       <button class="btn btn-sm btn-outline-danger ms-auto" id="btn-reset" title="Reset all changes to defaults"><i class="fas fa-undo me-1"></i>Reset</button>
     </div>
+
+    <!-- Drift banner — published units with no card (from published-corpus.json) -->
+    <div id="drift-banner"></div>
 
     <!-- Board -->
     <div id="board"></div>
@@ -172,7 +194,7 @@
   const PROJECTS = [
     {
       name: "LLM Wiki", color: "#0d6efd",
-      link: null,
+      link: null, track: "project", origin: "side-project",
       tasks: [
         // Epic 0 — Bootstrap
         { id:"E0-S1", title:"Create wiki directory skeleton", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"pillars/, concepts/, entities/, sources/, questions/, syntheses/, raw/ all exist", deps:[] },
@@ -224,30 +246,31 @@
     },
     {
       name: "Scrapers", color: "#198754",
-      link: "https://github.com/scottn66/wiki/pull/2",
+      link: "https://github.com/scottn66/wiki/pull/2", track: "efferent", origin: "side-project",
       tasks: [
-        { id:"SC-1", title:"Merge PR #2 to main", status:"todo", size:"S", epic:"Ship", urgency:"high", importance:"high", acceptance:"feat/scraper-showcase merged, main has README + .gitignore + all fixes", deps:[] },
-        { id:"SC-2", title:"Wikipedia showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"wikipedia_scraper.html live on scottn66.github.io", deps:[] },
-        { id:"SC-3", title:"SEP showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"sep_scraper.html live", deps:[] },
-        { id:"SC-4", title:"arXiv showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", acceptance:"arxiv_scraper.html live", deps:[] },
+        { id:"SC-1", title:"Merge PR #2 to main", status:"done", size:"S", epic:"Ship", urgency:"low", importance:"high", acceptance:"feat/scraper-showcase merged (2026-05-12), main has README + .gitignore + all fixes", deps:[] },
+        { id:"SC-2", title:"Wikipedia showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"wikipedia_scraper", acceptance:"wikipedia_scraper.html live on scottn66.github.io", deps:[] },
+        { id:"SC-3", title:"SEP showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"sep_scraper", acceptance:"sep_scraper.html live", deps:[] },
+        { id:"SC-4", title:"arXiv showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"arxiv_scraper", acceptance:"arxiv_scraper.html live", deps:[] },
         { id:"SC-5", title:"Hygiene: import guards + UA", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"medium", acceptance:"No import-time network, polite UA on all scrapers", deps:[] },
         { id:"SC-6", title:"Smoke tests pass (all 3)", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"high", acceptance:"Wiki, SEP, arXiv all fetch live data", deps:[] },
       ]
     },
     {
       name: "Portfolio", color: "#6f42c1",
-      link: "https://scottn66.github.io",
+      link: "https://scottn66.github.io", track: "efferent", origin: "lmu",
       tasks: [
-        { id:"PF-1", title:"MAB page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"MAB.html live with interactive sims", deps:[] },
-        { id:"PF-2", title:"Q-learning crawler page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"Q.html live", deps:[] },
-        { id:"PF-3", title:"HMM NER page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", acceptance:"HMM.html live", deps:[] },
-        { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", acceptance:"mandelbrot.html + landing page live", deps:[] },
-        { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", acceptance:"dashboard.html with kanban + Eisenhower views", deps:[] },
+        { id:"PF-1", title:"Multi-Armed Bandit agents", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"mab", acceptance:"MAB.html live with interactive sims", deps:[] },
+        { id:"PF-2", title:"Robot-arm crawler (Q-learning → BO → R-MAX)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"robot-arm-sim", acceptance:"robot-arm-sim/ live — 15-act narrative; modernized from the CMSI 4320 / Cognitive Systems Design crawler. Being enriched (back-prop candidates in MOC-cmsi4320-rl).", deps:[] },
+        { id:"PF-3", title:"HMM NER page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"hmm", acceptance:"HMM.html live", deps:[] },
+        { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", unit:"mandelbrot", origin:"side-project", acceptance:"mandelbrot.html + landing page live", deps:[] },
+        { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", origin:"meta", acceptance:"dashboard.html with kanban + Eisenhower + true-state reconciliation overlay", deps:[] },
+        { id:"PF-6", title:"Speedy Q-learning crawler (original page)", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"q", acceptance:"Q.html live — the earlier single-page crawler write-up; superseded in scope by PF-2 robot-arm-sim.", deps:[] },
       ]
     },
     {
       name: "AInt", color: "#5a3e8c",
-      link: null,
+      link: null, track: "substrate", origin: "meta",
       tasks: [
         // Epic — Substrate Hygiene (vault-layer cleanups from _duplicates-review.md + _questions.md Q-A2)
         { id:"AI-H1", title:"Audit 137 inventory notes for locked enum compliance", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"All notes use locked enums: status ∈ {described|partial|uncertain|deleted|empty|stub}, authorship ∈ {mine|vendored|mixed|unknown}; kind/empty-folder vs kind/stub vs kind/duplicate vs kind/snapshot distinguished. Q-A2 closes.", deps:[] },
@@ -259,18 +282,39 @@
         { id:"AI-H7", title:"Diff CS 3300 cw mirror (cluster B5)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"diff -r 3300/cw vs portfolio/AI/cw. If byte-identical, fold portfolio/AI/cw and replace with a stub note pointing to 3300/cw.", deps:[] },
         { id:"AI-H8", title:"Diff DataSci-4 FinalProjDataSci pair (cluster A3)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Determine whether twitterSentiment/FinalProjDataSci and Tweet Scraper/FinalProjDataSci are accidental macOS Keep-Both duplicates or substantive variants.", deps:[] },
 
-        // Epic — Publishable Extraction (action-potential canonical goal-state)
-        { id:"AI-P1", title:"Polish Huffman C++ capstone for publication", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", acceptance:"huffman.html live on scottn66.github.io alongside MAB.html / HMM.html / Q.html; explains compress/decompress roundtrip with code excerpts; cites Stanford CS 106B scaffolding.", deps:[] },
-        { id:"AI-P2", title:"Publish CTF Pacman linear-Q RL case study", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", acceptance:"pacman_ctf.html (or similar) live; documents the LearningOffensiveAgent3 + Sentinel team from 3420 final; hyperparameters and reward shaping per myTeam.py signature in inv-3420-final-turtles.md.", deps:[] },
-        { id:"AI-P3", title:"Publish bigram LM tutorial (with Will Judy attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", acceptance:"bigram_lm.html live; explains add-alpha smoothing + perplexity using the 5370 ps0 lm.py code; credits Scott + Will Judy as co-authors.", deps:[] },
-        { id:"AI-P4", title:"Publish exercise-log sequence tagger explainer (5370 midterm)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", acceptance:"sequence_tagger.html (or similar); explains the 5-tag BIO scheme (BE/IE/BF/IF/O), three-word context window LR baseline + LSTM tagger; uses tagger.py signature from inv-5370-midterm.md.", deps:[] },
-        { id:"AI-P5", title:"Publish MABUC paper explainer (Forney attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"low", acceptance:"mabuc.html (or similar): summarizes Forney's AAAI-19 HI-RCT paper using simulation parameters from inv-3420-misc-mabuc-paper-repo.md; cites paper, makes clear code is vendored.", deps:[] },
-        { id:"AI-P6", title:"Rotate Q15 credentials so 5370 summarizer can be considered publishable", status:"backlog", size:"S", epic:"Publishable Extraction", urgency:"low", importance:"low", acceptance:"OpenAI key rotated/revoked; GCP service-account JSON rotated; git history rewrite if archive ever goes public. Until then: blocked.", deps:[] },
+        // Epic — Publishable Extraction (action-potential canonical goal-state; efferent track)
+        { id:"AI-P1", title:"Polish Huffman C++ capstone for publication", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", track:"efferent", origin:"lmu", unit:"huffman", acceptance:"huffman.html live on scottn66.github.io alongside MAB.html / HMM.html / Q.html; explains compress/decompress roundtrip with code excerpts; cites Stanford CS 106B scaffolding.", deps:[] },
+        { id:"AI-P2", title:"Publish CTF Pacman linear-Q RL case study", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", track:"efferent", origin:"lmu", unit:"pacman_ctf", acceptance:"pacman_ctf.html (or similar) live; documents the LearningOffensiveAgent3 + Sentinel team from 3420 final; hyperparameters and reward shaping per myTeam.py signature in inv-3420-final-turtles.md.", deps:[] },
+        { id:"AI-P3", title:"Publish bigram LM tutorial (with Will Judy attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", track:"efferent", origin:"lmu", unit:"bigram_lm", acceptance:"bigram_lm.html live; explains add-alpha smoothing + perplexity using the 5370 ps0 lm.py code; credits Scott + Will Judy as co-authors.", deps:[] },
+        { id:"AI-P4", title:"Publish exercise-log sequence tagger explainer (5370 midterm)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", track:"efferent", origin:"lmu", unit:"sequence_tagger", acceptance:"sequence_tagger.html (or similar); explains the 5-tag BIO scheme (BE/IE/BF/IF/O), three-word context window LR baseline + LSTM tagger; uses tagger.py signature from inv-5370-midterm.md.", deps:[] },
+        { id:"AI-P5", title:"Publish MABUC paper explainer (Forney attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"low", track:"efferent", origin:"lmu", unit:"mabuc", acceptance:"mabuc.html (or similar): summarizes Forney's AAAI-19 HI-RCT paper using simulation parameters from inv-3420-misc-mabuc-paper-repo.md; cites paper, makes clear code is vendored.", deps:[] },
+        { id:"AI-P6", title:"Rotate Q15 credentials so 5370 summarizer can be considered publishable", status:"backlog", size:"S", epic:"Publishable Extraction", urgency:"low", importance:"low", track:"efferent", origin:"lmu", acceptance:"OpenAI key rotated/revoked; GCP service-account JSON rotated; git history rewrite if archive ever goes public. Until then: blocked.", deps:[] },
 
         // Epic — Meta / Vault Evolution
         { id:"AI-M1", title:"Add blocked_by frontmatter field on inventory notes", status:"backlog", size:"S", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"inv-5370-summarizer gets blocked_by: Q15. Schema documented in _vault/README.md tag taxonomy section.", deps:["AI-H1"] },
         { id:"AI-M2", title:"Vocabulary-hooks sweep across 11 remaining concept notes", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Each concept note has a Vocabulary handles section naming the orientation-vocabulary terms that activate it. (concept-causal-inference.md already done as the pattern.)", deps:[] },
         { id:"AI-M3", title:"Pass 4 — incremental update routine when archive gains a new folder", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Documented procedure: detect new leaves via find-vs-inventory mismatch; generate inventory note(s); cross-link to relevant MOC; update concept hooks if needed.", deps:[] },
+      ]
+    },
+    {
+      name: "Solar Viability", color: "#E8A33D",
+      link: "https://scottn66.github.io/solar/", track: "efferent", origin: "sjsu",
+      tasks: [
+        { id:"SV-1", title:"Multi-API ETL pipeline (NREL / NASA POWER / URDB / EIA / PVWatts)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", acceptance:"7 connector modules → DuckDB warehouse (2.6M rows); cleaned TOU schedules + NEM 3.0 rate tables.", deps:[] },
+        { id:"SV-2", title:"Economics engine + FastAPI quote service", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"high", acceptance:"25-year cashflow + LCOE / payback / NPV viability scoring; address → quote API.", deps:["SV-1"] },
+        { id:"SV-3", title:"Publish solar site (overview + 20 city reports + 2,593-ZIP heatmaps + paper)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"solar-viability", acceptance:"/solar/ live with overview, reports/, heatmap/, paper.pdf — SJSU DATA 201 (Database Technologies) final.", deps:["SV-2"] },
+      ]
+    },
+    {
+      name: "Decision Theory", color: "#2A9D8F",
+      link: null, track: "efferent", origin: "born-publishable",
+      tasks: [
+        { id:"DT-1", title:"Expand MOC to full 18-station topological DAG", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"MOC-decision-theory.md: 4 acts, 18 stations, prereq DAG, narrative spine 'The Price of Knowing You'.", deps:[] },
+        { id:"DT-2", title:"concept-value-of-information (quality bar)", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"VPI concept note authored as the depth bar for the rest of the Tier-3 spine.", deps:["DT-1"] },
+        { id:"DT-3", title:"5 new concept notes (bayes-nets, utility+DN, do-calculus, SCMs, counterfactuals)", status:"in_progress", size:"L", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"Tier-3 spine for Acts I–IV; concept-causal-inference is the rung-3 hub.", deps:["DT-2"] },
+        { id:"DT-4", title:"Smoke-test pgmpy Defendotron (MEU / VPI)", status:"backlog", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"Verified MEU + VPI numbers + runnable excerpts from the hand-rolled eu/meu/vpi (hw2).", deps:["DT-3"] },
+        { id:"DT-5", title:"Build decision-theory.html (4 acts + 3 interactive widgets)", status:"backlog", size:"L", epic:"Build", urgency:"low", importance:"high", unit:"decision-theory", acceptance:"Single long-form page: BN inference + VPI calculator + counterfactual stepper; Scott-authored spine, AIMA / Forney cited.", deps:["DT-4"] },
+        { id:"DT-6", title:"PR, publish, reconcile dashboard → publish_status done", status:"backlog", size:"S", epic:"Build", urgency:"low", importance:"medium", acceptance:"decision-theory.html live; MOC publish_status=done; manifest unit decision-theory PUBLISHED.", deps:["DT-5"] },
       ]
     }
   ];
@@ -292,18 +336,73 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
   }
 
-  function allTasks(filterProject, filterStatus, filterEpic) {
+  function allTasks(filterProject, filterStatus, filterEpic, filterTrack) {
     const out = [];
     for (const p of PROJECTS) {
       if (filterProject !== "all" && p.name !== filterProject) continue;
       for (const t of p.tasks) {
-        const merged = { ...getTask(t), project: p.name, projectColor: p.color };
+        // Project-level track/origin are defaults; a task's own field overrides.
+        const merged = { track: p.track, origin: p.origin, ...getTask(t), project: p.name, projectColor: p.color };
         if (filterStatus !== "all" && merged.status !== filterStatus) continue;
         if (filterEpic !== "all" && merged.epic !== filterEpic) continue;
+        if (filterTrack !== "all" && merged.track !== filterTrack) continue;
         out.push(merged);
       }
     }
     return out;
+  }
+
+  // ============================================================
+  // PUBLISHED-CORPUS MANIFEST (the P plane) + derived true-state
+  // ============================================================
+  let liveUnits = new Set();   // units with a live page, from published-corpus.json
+  let manifestEntries = [];
+
+  async function loadManifest() {
+    try {
+      const res = await fetch("published-corpus.json", { cache: "no-store" });
+      if (res.ok) {
+        manifestEntries = await res.json();
+        liveUnits = new Set(manifestEntries.map(e => e.unit));
+      }
+    } catch (e) {
+      // offline / file:// — degrade gracefully, no badges
+    }
+    renderUntrackedBanner();
+    render();
+  }
+
+  // trueState(unit) derived from the triple, per _reconciliation.md.
+  // The browser knows I (card status) + P (manifest); the W-plane joins
+  // (BUILT / ORPHANED / back-prop) belong to the weekly audit.
+  function trueStateBadge(t) {
+    if (!t.unit) return "";
+    if (liveUnits.has(t.unit))
+      return `<span class="badge-published" title="Live on the site (P-plane)"><i class="fas fa-circle-check"></i> PUBLISHED</span>`;
+    if (t.status === "done")
+      return `<span class="badge-falsedone" title="Card says done but no live page — the FALSE-DONE guardrail"><i class="fas fa-triangle-exclamation"></i> FALSE-DONE</span>`;
+    return "";
+  }
+
+  function cardUnits() {
+    const s = new Set();
+    for (const p of PROJECTS) for (const t of p.tasks) if (t.unit) s.add(t.unit);
+    return s;
+  }
+
+  function renderUntrackedBanner() {
+    const el = document.getElementById("drift-banner");
+    if (!el) return;
+    const known = cardUnits();
+    const untracked = manifestEntries.filter(e => !known.has(e.unit));
+    if (!untracked.length) { el.innerHTML = ""; return; }
+    el.innerHTML = `
+      <div class="alert alert-warning py-2 px-3" style="font-size:.85rem; margin-bottom:1rem;">
+        <i class="fas fa-triangle-exclamation me-1"></i>
+        <strong>${untracked.length} published unit(s) untracked:</strong>
+        ${untracked.map(e => `<a href="${e.url}" target="_blank" rel="noopener">${e.unit}</a>`).join(", ")}
+        — live on the site with no card. Add a card or decide to retire the page.
+      </div>`;
   }
 
   // ============================================================
@@ -321,6 +420,7 @@
         <span class="badge-project" style="background:${t.projectColor}">${t.project}</span>
         <span class="badge-size">${t.size}</span>
         <span class="badge-epic">${t.epic}</span>
+        ${trueStateBadge(t)}
       </div>`;
     el.addEventListener("click", () => openModal(t));
     return el;
@@ -397,7 +497,8 @@
     const fp = document.getElementById("filter-project").value;
     const fs = document.getElementById("filter-status").value;
     const fe = document.getElementById("filter-epic").value;
-    const tasks = allTasks(fp, fs, fe);
+    const ftk = document.getElementById("filter-track").value;
+    const tasks = allTasks(fp, fs, fe, ftk);
     renderStats(tasks);
     if (currentView === "kanban") renderKanban(tasks);
     else renderEisenhower(tasks);
@@ -440,6 +541,9 @@
       <dl class="detail-section">
         <dt>Project</dt><dd><span class="badge-project" style="background:${t.projectColor}">${t.project}</span></dd>
         <dt>Epic</dt><dd>${t.epic}</dd>
+        <dt>Track</dt><dd>${t.track || "—"} &middot; <span class="text-muted">origin: ${t.origin || "—"}</span></dd>
+        <dt>Unit (reconciliation key)</dt><dd>${t.unit ? `<code>${t.unit}</code>` : "<span class='text-muted'>— none (sub-task)</span>"}</dd>
+        <dt>True-state (Intent &times; Publish)</dt><dd>${t.unit ? (liveUnits.has(t.unit) ? "<span style='color:#0f5132;font-weight:600'>PUBLISHED</span> — live on site" : (t.status==="done" ? "<span style='color:#842029;font-weight:700'>⚠ FALSE-DONE</span> — card says done but no live page" : "PLANNED — not yet live")) : "<span class='text-muted'>— (no unit to validate)</span>"}</dd>
         <dt>Size</dt><dd>${t.size === "S" ? "Small (~30 min)" : t.size === "M" ? "Medium (~1-2 hr)" : "Large (half day+)"}</dd>
         <dt>Acceptance Criteria</dt><dd>${t.acceptance || "—"}</dd>
         <dt>Dependencies</dt><dd>${t.deps && t.deps.length ? t.deps.join(", ") : "None"}</dd>
@@ -499,6 +603,7 @@
   document.getElementById("filter-project").addEventListener("change", render);
   document.getElementById("filter-status").addEventListener("change", render);
   document.getElementById("filter-epic").addEventListener("change", render);
+  document.getElementById("filter-track").addEventListener("change", render);
   // Reset
   document.getElementById("btn-reset").addEventListener("click", () => {
     if (confirm("Reset all status/priority changes to defaults?")) {
@@ -507,8 +612,8 @@
       render();
     }
   });
-  // Go
-  render();
+  // Go — fetch the published-corpus manifest, then render (degrades if absent)
+  loadManifest();
   </script>
 </body>
 </html>
