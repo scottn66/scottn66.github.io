@@ -13,8 +13,12 @@
       background: #000;
       overflow: hidden;
     }
-    canvas { 
-      display: block; 
+    canvas {
+      display: block;
+      touch-action: none;          /* taps are handled in JS; no browser pan/zoom */
+      -webkit-touch-callout: none; /* no long-press callout on iOS */
+      -webkit-user-select: none;
+      user-select: none;
     }
   </style>
 </head>
@@ -26,7 +30,8 @@
     // Worker protocol (Mariani-Silver friendly):
     //   In:  { id, generation, coords: Int32Array [x0,y0, x1,y1, ...],
     //          r_min, r_max, i_min, i_max, canvas_w, canvas_h, max_iter, escape }
-    //   Out: { id, generation, coords, values: Int32Array [v0, v1, ...] }
+    //   Out: { id, generation, coords, values: Float32Array [v0, v1, ...] }
+    //        v = smooth (fractional) iteration count, or -1 for in-set.
     // Both coords and values are transferable buffers (zero-copy hand-off).
     var workerScript = `
       self.onmessage = function (event) {
@@ -35,31 +40,42 @@
           var escape = d.escape * d.escape;
           var max_iter = d.max_iter;
           var n = d.coords.length / 2;
-          var values = new Int32Array(n);
+          var values = new Float32Array(n);
           for (var k = 0; k < n; k++) {
               var px = d.coords[2*k];
               var py = d.coords[2*k + 1];
               var c_r = d.r_min + (d.r_max - d.r_min) * px / width;
               var c_i = d.i_max + (d.i_min - d.i_max) * py / height;
 
-              var iter;
+              var v;
               // Cardioid + period-2 bulb early-out
               var cr_m = c_r - 0.25;
               var q = cr_m*cr_m + c_i*c_i;
               if (q * (q + cr_m) < 0.25 * c_i*c_i) {
-                  iter = max_iter;
+                  v = -1;
               } else if ((c_r + 1)*(c_r + 1) + c_i*c_i < 0.0625) {
-                  iter = max_iter;
+                  v = -1;
               } else {
-                  var z_r = 0, z_i = 0;
-                  for (iter = 0; z_r*z_r + z_i*z_i < escape && iter < max_iter; iter++) {
+                  var z_r = 0, z_i = 0, m = 0, iter = 0;
+                  while (iter < max_iter) {
+                      m = z_r*z_r + z_i*z_i;
+                      if (m >= escape) break;
                       var tmp = z_r*z_r - z_i*z_i + c_r;
                       z_i = 2 * z_r * z_i + c_i;
                       z_r = tmp;
+                      iter++;
+                  }
+                  if (iter >= max_iter) {
+                      v = -1;
+                  } else {
+                      // Smooth (normalized) iteration count: subtracting
+                      // log2(log|z|) at escape makes the value continuous
+                      // across integer bands, so colors can interpolate.
+                      v = iter + 1 - Math.log(Math.log(m) * 0.5) / Math.LN2;
+                      if (v < 0) v = 0;
                   }
               }
-              if (iter === max_iter) iter = -1;
-              values[k] = iter;
+              values[k] = v;
           }
           self.postMessage({
               id: d.id,
@@ -76,14 +92,18 @@
     // ========================================================================
     // Mariani-Silver + Hilbert-ordered progressive renderer.
     //
-    // Mariani-Silver observation: the iteration-count function of the
-    // Mandelbrot set is continuous away from the set boundary, so if every
-    // pixel on a rectangle's border has the same iter count, every pixel
-    // inside that rectangle has that same count too. We can skip computing
-    // the interior entirely. For rectangles with a non-uniform border, we
-    // subdivide into four quadrants and recurse. The result: regions far
-    // from the set's boundary finalize in one border pass each; regions
-    // near the boundary keep subdividing until we hit MIN_RECT.
+    // Mariani-Silver observation: a rectangle whose border is uniform
+    // tells us about its interior. Two cases now that coloring is smooth:
+    //   - Border entirely in-set: the interior is in-set too (the set's
+    //     complement is connected, so escaped points can't be sealed
+    //     inside an all-in-set border). Flat-fill black and skip the
+    //     interior — the most expensive pixels in the image.
+    //   - Border entirely in one escape band: the interior is that band
+    //     too, but smooth coloring renders bands as gradients rather than
+    //     flat color, so the interior is computed directly. Cheap: the
+    //     iteration count there is low and known in advance.
+    // Rects with a mixed border subdivide into four quadrants and
+    // recurse, down to MIN_RECT, below which interiors compute outright.
     //
     // Hilbert ordering: the work queue is sorted by the Hilbert index of
     // each rect's center. Rects whose centers are close on the 2D canvas
@@ -132,8 +152,69 @@
           self.zoom_out(x, y);
           return false;
       }, false);
+
+      // Touch controls: one-finger tap zooms in (like click); two-finger
+      // tap zooms out (the touch stand-in for right-click). preventDefault
+      // suppresses the browser's synthetic click and double-tap zoom, so
+      // taps are handled here and only here.
+      var gesture = null;
+      var touch_xy = function(t) {
+          var rect = canvas.getBoundingClientRect();
+          return {
+              x: (t.clientX - rect.left) * (canvas.width  / rect.width),
+              y: (t.clientY - rect.top)  * (canvas.height / rect.height),
+          };
+      };
+      this.canvas.addEventListener("touchstart", function(event) {
+          event.preventDefault();
+          if (gesture === null) {
+              gesture = {t0: Date.now(), max_fingers: 0, moved: false, start: {}};
+          }
+          for (var i = 0; i < event.changedTouches.length; i++) {
+              var t = event.changedTouches[i];
+              gesture.start[t.identifier] = touch_xy(t);
+          }
+          gesture.max_fingers = Math.max(gesture.max_fingers, event.touches.length);
+      }, {passive: false});
+      this.canvas.addEventListener("touchmove", function(event) {
+          event.preventDefault();
+          if (gesture === null) return;
+          var slop = 12 * (window.devicePixelRatio || 1);
+          for (var i = 0; i < event.changedTouches.length; i++) {
+              var t = event.changedTouches[i];
+              var s = gesture.start[t.identifier];
+              if (!s) continue;
+              var p = touch_xy(t);
+              if (Math.abs(p.x - s.x) > slop || Math.abs(p.y - s.y) > slop) {
+                  gesture.moved = true;
+              }
+          }
+      }, {passive: false});
+      this.canvas.addEventListener("touchend", function(event) {
+          event.preventDefault();
+          if (gesture === null || event.touches.length > 0) return;
+          var g = gesture;
+          gesture = null;
+          if (g.moved || Date.now() - g.t0 > 350) return;
+          var pts = [];
+          for (var id in g.start) pts.push(g.start[id]);
+          if (g.max_fingers === 1 && pts.length === 1) {
+              self.click(pts[0].x, pts[0].y);
+          } else if (g.max_fingers === 2 && pts.length === 2) {
+              self.zoom_out((pts[0].x + pts[1].x) / 2,
+                            (pts[0].y + pts[1].y) / 2);
+          }
+      }, {passive: false});
+      this.canvas.addEventListener("touchcancel", function(event) {
+          gesture = null;
+      }, {passive: false});
+
+      // Re-render on resize/rotation, debounced so a window drag doesn't
+      // thrash full recomputes on every intermediate size.
+      var resize_timer = null;
       window.addEventListener("resize", function() {
-          self.resize_to_parent();
+          clearTimeout(resize_timer);
+          resize_timer = setTimeout(function() { self.resize_to_parent(); }, 150);
       }, false);
 
       // Worker pool
@@ -148,12 +229,9 @@
       }
 
       // Mandelbrot parameters
-      this.i_max = 1.5;
-      this.i_min = -1.5;
-      this.r_min = -2.5;
-      this.r_max = 1.5;
       this.max_iter = 256;
       this.escape = 100;
+      this.fit_default_view();
       this.make_palette();
 
       // rAF loop — flush the backing buffer to the canvas once per frame
@@ -298,30 +376,54 @@
       // Backing-buffer drawing — all writes hit `this.backing`, which
       // the rAF tick blits to the canvas at display rate.
       // ------------------------------------------------------------
-      iter_to_rgb: function(iter) {
-          if (iter < 0) return [0, 0, 0];
-          return this.palette[iter] || [0, 0, 0];
+      shade: function(v) {
+          // Map a smooth iteration count to a color by interpolating
+          // between adjacent palette entries; -1 (in-set) is black.
+          if (v < 0) return [0, 0, 0];
+          var i0 = v | 0;
+          if (i0 >= this.max_iter) i0 = this.max_iter - 1;
+          var f = v - i0;
+          var c0 = this.palette[i0], c1 = this.palette[i0 + 1];
+          return [
+              (c0[0] + (c1[0] - c0[0]) * f) | 0,
+              (c0[1] + (c1[1] - c0[1]) * f) | 0,
+              (c0[2] + (c1[2] - c0[2]) * f) | 0,
+          ];
       },
 
       draw_pixels: function(coords, values) {
           var data = this.backing.data;
           var w = this.canvas.width;
+          var pal = this.palette;
+          var last = this.max_iter - 1;
           for (var k = 0; k < values.length; k++) {
               var px = coords[2*k];
               var py = coords[2*k + 1];
               var v = values[k];
-              var rgb = v < 0 ? [0, 0, 0] : (this.palette[v] || [0, 0, 0]);
+              var r, g, b;
+              if (v < 0) {
+                  r = 0; g = 0; b = 0;
+              } else {
+                  // shade(), inlined to avoid an array allocation per pixel
+                  var i0 = v | 0;
+                  if (i0 > last) i0 = last;
+                  var f = v - i0;
+                  var c0 = pal[i0], c1 = pal[i0 + 1];
+                  r = (c0[0] + (c1[0] - c0[0]) * f) | 0;
+                  g = (c0[1] + (c1[1] - c0[1]) * f) | 0;
+                  b = (c0[2] + (c1[2] - c0[2]) * f) | 0;
+              }
               var idx = 4 * (py * w + px);
-              data[idx]     = rgb[0];
-              data[idx + 1] = rgb[1];
-              data[idx + 2] = rgb[2];
+              data[idx]     = r;
+              data[idx + 1] = g;
+              data[idx + 2] = b;
               data[idx + 3] = 255;
           }
           this.dirty = true;
       },
 
       fill_rect: function(rect, iter) {
-          var rgb = iter < 0 ? [0, 0, 0] : (this.palette[iter] || [0, 0, 0]);
+          var rgb = this.shade(iter);
           var r = rgb[0], g = rgb[1], b = rgb[2];
           var data = this.backing.data;
           var w = this.canvas.width;
@@ -437,22 +539,34 @@
           this.draw_pixels(data.coords, data.values);
 
           if (entry && entry.type === 'border') {
-              // Uniformity check: if every border pixel has the same iter
-              // count, the Mariani-Silver theorem says the interior is the
-              // same color — no compute needed.
-              var first = data.values[0];
-              var uniform = true;
-              for (var i = 1; i < data.values.length; i++) {
-                  if (data.values[i] !== first) { uniform = false; break; }
+              // Classify the border: all in-set, all in one escape band,
+              // or mixed.
+              var all_in_set = true;
+              var one_band = true;
+              var first_band = Math.floor(data.values[0]);
+              for (var i = 0; i < data.values.length; i++) {
+                  var vi = data.values[i];
+                  if (vi !== -1) all_in_set = false;
+                  if (Math.floor(vi) !== first_band) one_band = false;
+                  if (!all_in_set && !one_band) break;
               }
               var inner = this.inner_rect(entry.rect);
-              if (uniform) {
-                  if (inner) this.enqueue('interior', inner, first);
-              } else if (entry.rect.w <= this.MIN_RECT || entry.rect.h <= this.MIN_RECT) {
-                  // Too small to subdivide further — just fill in the interior.
+              if (all_in_set) {
+                  // The set's complement is connected, so escaped points
+                  // can't be sealed inside an all-in-set border: the
+                  // interior is in-set too. Flat-fill black, skipping the
+                  // most expensive pixels entirely.
+                  if (inner) this.enqueue('interior', inner, -1);
+              } else if (one_band || entry.rect.w <= this.MIN_RECT || entry.rect.h <= this.MIN_RECT) {
+                  // Single escape band: the interior is the same band, but
+                  // under smooth coloring a band is a gradient, not a flat
+                  // color — compute it directly. These are the cheap pixels
+                  // (low, already-known iteration count), and subdividing
+                  // further could never flat-fill anything anyway.
+                  // (Also the terminal case for rects too small to split.)
                   if (inner) this.enqueue('solid', inner);
               } else {
-                  // Subdivide into 4 quads and border-check each.
+                  // Mixed border: subdivide into 4 quads and border-check each.
                   var quads = this.subdivide(entry.rect);
                   for (var q = 0; q < quads.length; q++) {
                       this.enqueue('border', quads[q]);
@@ -469,10 +583,20 @@
           var click_r = this.r_min + width * x / this.canvas.width;
           var click_i = this.i_max + height * y / this.canvas.height;
 
-          this.r_min = click_r - width/8;
-          this.r_max = click_r + width/8;
-          this.i_max = click_i - height/8;
-          this.i_min = click_i + height/8;
+          // Depth floor: stop before a pixel shrinks to a few double-
+          // precision ulps (~1e12x zoom), where the render would degrade
+          // into blocky noise. The last click before the floor zooms
+          // partially; clicks at the floor are ignored.
+          var span_floor = this.canvas.width * 2e-15;
+          var new_width = Math.max(width / 4, span_floor);
+          if (new_width >= width) return;  // already bottomed out
+          var f = new_width / width;
+
+          this.r_min = click_r - width * f/2;
+          this.r_max = click_r + width * f/2;
+          this.i_max = click_i - height * f/2;
+          this.i_min = click_i + height * f/2;
+          this.at_default = false;
           this.redraw();
       },
 
@@ -487,7 +611,24 @@
           this.r_max = click_r + width*2;
           this.i_max = click_i - height*2;
           this.i_min = click_i + height*2;
+          this.at_default = false;
           this.redraw();
+      },
+
+      fit_default_view: function() {
+          // Pick the home view for this canvas aspect: landscape pins the
+          // imaginary span, portrait pins the real span, so the whole set
+          // (real [-2.0, 0.47], imag +-1.12) is in frame and undistorted
+          // for any device orientation. At 4:3 this reproduces the classic
+          // [-2.5, 1.5] x [-1.5, 1.5] framing.
+          var a = this.canvas.width / this.canvas.height;
+          var i_half = Math.max(1.5, 1.7 / a);
+          var r_half = i_half * a;
+          this.r_min = -0.5 - r_half;
+          this.r_max = -0.5 + r_half;
+          this.i_max = i_half;
+          this.i_min = -i_half;
+          this.at_default = true;
       },
 
       resize_to_parent: function() {
@@ -497,12 +638,20 @@
           this.canvas.style.width  = window.innerWidth  + 'px';
           this.canvas.style.height = window.innerHeight + 'px';
 
-          // Adjust horizontal scale to maintain aspect ratio.
-          var width = ((this.i_max - this.i_min) *
-                       this.canvas.width / this.canvas.height);
-          var r_mid = (this.r_max + this.r_min) / 2;
-          this.r_min = r_mid - width/2;
-          this.r_max = r_mid + width/2;
+          if (this.at_default) {
+              // Not exploring yet — re-fit the home view to the new
+              // aspect (e.g. a phone rotation).
+              this.fit_default_view();
+          } else {
+              // Mid-exploration: keep the view centered by holding the
+              // imaginary span and re-deriving the real span for the
+              // new aspect ratio.
+              var width = ((this.i_max - this.i_min) *
+                           this.canvas.width / this.canvas.height);
+              var r_mid = (this.r_max + this.r_min) / 2;
+              this.r_min = r_mid - width/2;
+              this.r_max = r_mid + width/2;
+          }
 
           // Reallocate the backing buffer and recompute Hilbert grid size.
           this.backing = this.ctx.createImageData(this.canvas.width, this.canvas.height);
@@ -519,8 +668,10 @@
       canvas.height = Math.floor(window.innerHeight * dpr);
       canvas.style.width  = window.innerWidth  + 'px';
       canvas.style.height = window.innerHeight + 'px';
-      var mandelbrot = new Mandelbrot(canvas, 4);
-      mandelbrot.redraw();
+      // One worker per core (capped); exposed on window for console tinkering.
+      var n_workers = Math.min(navigator.hardwareConcurrency || 4, 16);
+      window.mandelbrot = new Mandelbrot(canvas, n_workers);
+      window.mandelbrot.redraw();
     };
   </script>
 </body>
