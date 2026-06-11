@@ -7,6 +7,13 @@
     "kind": "page"
   },
   {
+    "unit": "decision-theory",
+    "url": "/decision-theory.html",
+    "title": "The Price of Knowing You \u00b7 Decision Theory \u2192 Causality",
+    "last_modified": "2026-06-05T17:22:23-07:00",
+    "kind": "page"
+  },
+  {
     "unit": "hmm",
     "url": "/HMM.html",
     "title": "Hidden Markov Models and Named Entity Recognition",
@@ -59,7 +66,7 @@
     "unit": "solar-viability",
     "url": "/solar/",
     "title": "Solar Viability Analysis | DATA 201 \u2014 Scott Nelson",
-    "last_modified": "2026-05-29T23:36:10-07:00",
+    "last_modified": "2026-06-05T20:36:36-07:00",
     "kind": "project"
   },
   {
