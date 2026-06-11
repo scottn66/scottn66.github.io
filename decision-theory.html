@@ -9,6 +9,13 @@
                  decision networks, the value of perfect information, interventions, and
                  counterfactuals. An ad agent climbs Pearl's ladder; three interactive
                  widgets; a modernized, runnable decision network." />
+  <meta name="author" content="Scott Nelson" />
+  <meta property="og:title" content="The Value of Knowing You: Decision Theory to Causality" />
+  <meta property="og:description" content="Bayes nets, VPI, do-calculus, counterfactuals; a modernized pgmpy decision network and three interactive widgets, by Scott Nelson." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://scottn66.github.io/decision-theory.html" />
+  <meta property="og:image" content="https://scottn66.github.io/assets/decision-theory-card.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon"
         href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🪜</text></svg>" />
   <script>
@@ -27,7 +34,7 @@
       --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
     }
     *,*::before,*::after{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:1.2rem}
+    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
     body{margin:0;background:var(--bg);color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
       font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -47,7 +54,7 @@
     .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
     .toc a{color:var(--muted);border:none}
     .toc a:hover{color:var(--accent)}
-    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none}
+    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none;counter-increment:none}
     .toc .act::before{content:""}
     .toc .digress a{font-style:italic}
     main{min-width:0}
@@ -68,6 +75,9 @@
     .aside-box .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
     .aside-box.prereq .k{color:var(--good)}
     .aside-box.digress .k{color:var(--gold)}
+    details.aside-box summary{cursor:pointer;font-weight:700;font-size:.8rem}
+    .toc-toggle{display:none}
+    mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
     figure{margin:1.2rem 0;text-align:center}
     figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
     table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
@@ -105,7 +115,15 @@
     .inputline{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;font-size:.85rem;margin:.3rem 0}
     .inputline input{width:54px;padding:.2rem .3rem;border:1px solid var(--rule);border-radius:6px;font-family:inherit}
     .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}
-    @media(max-width:880px){.page{grid-template-columns:1fr}.toc{display:none}h1{font-size:2rem}}
+    @media(max-width:880px){
+      .page{grid-template-columns:1fr}
+      h1{font-size:2rem}
+      .toc{display:block;position:static;max-height:none}
+      .toc>nav{display:none}
+      .toc.open>nav{display:block}
+      .toc-toggle{display:block;width:100%;text-align:left;background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .8rem;font-size:.9rem;cursor:pointer}
+      table{display:block;overflow-x:auto;white-space:normal}
+    }
   </style>
 </head>
 <body>
@@ -119,6 +137,7 @@
 
   <div class="page">
     <aside class="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
       <nav><ol>
         <li><a href="#ladder">The ladder</a></li>
         <li class="act">Act I · Seeing</li>
@@ -151,6 +170,7 @@
         <li><a href="#dag-building">Where DAGs come from</a></li>
         <li><a href="#data">What data feeds which rung</a></li>
         <li><a href="#advanced">The advanced shelf</a></li>
+        <li><a href="#cheatsheet">Cheat sheet</a></li>
         <li><a href="#colophon">Sources &amp; honesty</a></li>
       </ol></nav>
     </aside>
@@ -160,7 +180,8 @@
         <div class="badges">
           <span class="badge">Bayes nets → utility → VPI → counterfactuals</span>
           <span class="badge">3 interactive widgets</span>
-          <span class="badge">CMSI 3300 + 4320</span>
+          <span class="badge">5 parts · ~30 min read</span>
+          <a href="#colophon" style="border:none"><span class="badge">built &amp; verified by Scott Nelson</span></a>
         </div>
         <h1>The Value of Knowing You</h1>
         <p class="lead">
@@ -185,6 +206,20 @@
           </p>
         </div>
 
+        <div class="callout good">
+          <span class="k">What I built</span>
+          <ul style="margin:.3rem 0 0;padding-left:1.1rem;font-size:.93rem">
+            <li>The <a href="#defendotron">Defendotron's</a> <code>eu()</code>/<code>meu()</code>/<code>vpi()</code>
+              engine, modernized from dead pomegranate-0.x and 2022-pgmpy code
+              to pgmpy 1.1.2, fixing a latent indexing bug on the way.</li>
+            <li>Every number printed on this page is verified against fresh runs.</li>
+            <li>The three <a href="#widget-bn">interactive</a>
+              <a href="#widget-vpi">widgets</a> <a href="#widget-cf">below</a>,
+              vanilla JS mirroring the verified Python.
+              <a href="#colophon">Full provenance.</a></li>
+          </ul>
+        </div>
+
         <div class="aside-box prereq">
           <span class="k">Prerequisites</span>
           <p style="margin:.25rem 0 0">
@@ -195,6 +230,7 @@
             warm-up.
           </p>
         </div>
+      </header>
 
         <h2 id="ladder">The ladder we're climbing</h2>
         <p>
@@ -211,7 +247,7 @@
             <tr><td><span class="act-tag act-do">2 · do</span></td><td>What if I <em>do</em> $X=x$?</td><td>"Will exercise lower my cholesterol?"</td><td>Causal Bayes nets · RL</td></tr>
             <tr><td><span class="act-tag act-see">1 · see</span></td><td>What if I <em>see</em> $X=x$?</td><td>"Is symptom $X$ tied to disease $Y$?"</td><td>Bayesian networks</td></tr>
           </table>
-          <figcaption>Pearl &amp; Mackenzie, <em>The Book of Why</em> (2018). Each tier subsumes the ones below it; a tool stuck on tier 1 cannot answer a tier-2 question, which is why even a fluent associational model (an LLM) stumbles on "what would have happened if…".</figcaption>
+          <figcaption>Pearl &amp; Mackenzie, <em>The Book of Why</em> (2018). Each tier subsumes the ones below it; a tool stuck on tier 1 cannot answer tier-2 or tier-3 questions, which is arguably why a purely associational model (an LLM trained on text alone) stumbles on "what would have happened if…".</figcaption>
         </figure>
 
         <!-- ===================== ACT I ===================== -->
@@ -285,14 +321,36 @@
           <li><strong>$S\to V$</strong>: chronic stress plausibly drives people
             toward nicotine; knowing someone's stress level changes our
             expectation that they vape.</li>
-          <li><strong>$S\to E$</strong>: stress saps the time and energy that
-            exercise habits need; the dependence runs through lifestyle, not
-            chance.</li>
+          <li><strong>$S\to E$</strong>: stress reshapes exercise habits; in
+            the lecture's population the stressed are actually <em>likelier</em>
+            to hit the gym as an outlet ($P(E{=}1\mid S{=}1)=0.8$ versus
+            $0.4$ among the unstressed). The dependence runs through lifestyle,
+            not chance.</li>
           <li><strong>$V\to H$ and $E\to H$</strong>: vaping loads the
             cardiovascular system; exercise protects it. Heart disease "listens
             to" both (Pearl's phrase: an effect listens to its causes to decide
             its value).</li>
         </ul>
+        <figure>
+          <svg viewBox="0 0 360 210" width="360" style="max-width:100%" role="img"
+               aria-label="The SEVH network. S points to V and E; V and E point to H. The back-path from V through S and E to H is highlighted in red; the direct edge V to H is blue.">
+            <defs>
+              <marker id="arrB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker>
+              <marker id="arrR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--warn)"/></marker>
+            </defs>
+            <line x1="167" y1="44" x2="92" y2="86" stroke="var(--warn)" stroke-width="2" marker-end="url(#arrR)"/>
+            <line x1="193" y1="44" x2="268" y2="86" stroke="var(--warn)" stroke-width="2" marker-end="url(#arrR)"/>
+            <line x1="86" y1="128" x2="161" y2="170" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrB)"/>
+            <line x1="274" y1="128" x2="199" y2="170" stroke="var(--warn)" stroke-width="2" marker-end="url(#arrR)"/>
+            <g font-size="15" font-weight="700" text-anchor="middle">
+              <circle cx="180" cy="30" r="18" fill="var(--warn-soft)" stroke="var(--warn)"/><text x="180" y="35">S</text>
+              <circle cx="78" cy="107" r="18" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="78" y="112">V</text>
+              <circle cx="282" cy="107" r="18" fill="#fff" stroke="var(--muted)"/><text x="282" y="112">E</text>
+              <circle cx="180" cy="184" r="18" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="180" y="189">H</text>
+            </g>
+          </svg>
+          <figcaption>The SEVH network. Blue: the direct edge $V\to H$. Red: the back-path $V\leftarrow S\to E\to H$, open by default, through which association can flow even if vaping did nothing.</figcaption>
+        </figure>
         <p>
           The arrows we <em>refused</em> to draw are claims too, and just as
           important: no $V\!\to\!E$ (vaping doesn't make anyone exercise; the
@@ -354,8 +412,22 @@
           ($X\!\to\!Z\!\to\!Y$); but a <em>collider</em>
           ($X\!\to\!Z\!\leftarrow\!Y$) is blocked by default and conditioning on
           it <em>opens</em> it: observing a common effect makes its causes
-          compete to explain it ("explaining away"). That collider quirk is the
-          seed of every spurious correlation we fight in Act III.
+          compete to explain it ("explaining away"). An unblocked <em>fork</em>
+          is the confounding we fight in Act III. The collider quirk is the
+          mirror trap: a correlation you manufacture by conditioning. Berkson's
+          paradox is this rule loose in the world: among hospital inpatients,
+          two diseases independent in the general population anticorrelate,
+          because admission is their common effect. Any dataset filtered on an
+          outcome has a collider built into its sampling; we will meet it again
+          as survivorship bias in Part V.
+        </p>
+        <p>
+          Two predictions you can test in Widget 1 below. First, the fork: fix
+          $S{=}1$ and note $P(E{=}1)$. Decide <em>before clicking</em>: will
+          adding $V{=}1$ move it? Second, the collider: fix $H{=}1$ and note
+          $P(V{=}1)$. Will learning the patient exercises ($E{=}1$) raise or
+          lower your belief that they vape? Commit to answers, then use the
+          preset buttons to check.
         </p>
 
         <h3 id="inference">Asking the network questions: inference, as an outline</h3>
@@ -390,14 +462,25 @@
 
         <!-- WIDGET 1 -->
         <div class="widget" id="widget-bn">
-          <h4>▶ Widget 1 · Bayesian-network inference</h4>
-          <p class="hint">The vaping → heart-disease network with the lecture's CPTs. Click to fix evidence (—, 0, or 1) on any variable; the posteriors $P(\cdot=1\mid e)$ for the rest update by exact enumeration over all 16 worlds. Try fixing $V=1$: heart-disease risk jumps. Then add $S=1$ and watch it shift again.</p>
+          <h4>▶ Widget 1 · Bayesian-network inference <span class="act-tag act-see">1 · see</span></h4>
+          <p class="hint">Question: $P(Q\mid e)$, a belief over worlds as observed. The vaping → heart-disease network with the lecture's CPTs. Click to fix evidence (—, 0, or 1) on any variable; the posteriors $P(\cdot=1\mid e)$ for the rest update by exact enumeration over all 16 worlds. Try fixing $V=1$: heart-disease risk jumps. Then add $S=1$: risk dips slightly (0.649 to 0.640), because stress raises the chance of protective exercise here.</p>
+          <div style="margin:.2rem 0 .7rem;display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="go" id="bn-preset-fork" style="font-size:.78rem;padding:.3rem .7rem">Block the fork (S=1)</button>
+            <button class="go" id="bn-preset-ea" style="font-size:.78rem;padding:.3rem .7rem;background:var(--imagine)">Explaining away (H=1)</button>
+            <button class="go" id="bn-reset" style="font-size:.78rem;padding:.3rem .7rem;background:var(--muted)">Clear</button>
+          </div>
           <div class="row">
             <div class="col" id="bn-controls"></div>
             <div class="col" id="bn-posteriors"></div>
           </div>
           <p class="hint" id="bn-note" style="margin-top:.7rem"></p>
         </div>
+
+        <details class="aside-box"><summary>Check yourself · Act I</summary><ol style="margin:.4rem 0 0">
+          <li>SEVH needs how many free parameters, versus the raw joint? <em>9 versus 15; every saving is a missing arrow.</em></li>
+          <li>Observing $V{=}1$ raises belief in $S{=}1$. Which way does the arrow point, and why is reading it backwards legitimate? <em>$S\to V$; arrows are one-way structural claims, but evidence flows both ways along them.</em></li>
+          <li>Which path rule does explaining away come from? <em>The collider: blocked by default, opened by conditioning on the common effect.</em></li>
+        </ol></details>
 
         <!-- ===================== ACT II ===================== -->
         <h2 id="act2"><span class="act-tag act-econ">Act II · Deciding</span><br>Utility, belief, and the first step toward causation</h2>
@@ -418,11 +501,11 @@
         <p>
           A <strong>utility function</strong> $U(s)$ assigns a number to each
           outcome, encoding preference. The von Neumann–Morgenstern theorem says
-          that if an agent's preferences are coherent (complete, transitive,
-          continuous, independent of irrelevant alternatives), they behave
+          that if an agent's preferences are coherent (completeness,
+          transitivity, continuity, independence), they behave
           <em>as if</em> maximizing the expectation of some $U$:
         </p>
-        <p>$$\mathrm{EU}(a\mid e)=\sum_s P(s\mid e,a)\,U(s),\qquad \mathrm{MEU}(e)=\max_a \mathrm{EU}(a\mid e).$$</p>
+        <p id="eq-meu">$$\mathrm{EU}(a\mid e)=\sum_s P(s\mid e,a)\,U(s),\qquad \mathrm{MEU}(e)=\max_a \mathrm{EU}(a\mid e).$$</p>
         <p>
           Read it in words: for each action $a$, imagine every outcome $s$,
           weight how much you'd like it by how likely it is, and sum. Then pick
@@ -485,7 +568,9 @@
             <em>which worlds</em> the distribution ranges over.
             Rung 1: the world as observed, $P(s\mid e)$.
             Rung 2: worlds we would <em>create</em>, $P(s\mid do(a))$.
-            Rung 3: worlds that never happened, $P(s_{x'}\mid e)$.
+            Rung 3: worlds that never happened, $P(s_{x'}\mid e)$
+            (read $s_{x'}$ as: the value $s$ would have taken had $X$ been
+            forced to $x'$; Act IV defines this properly).
             Every formula in Acts III and IV is this landmark pointed at a new
             set of worlds.
           </p>
@@ -501,14 +586,9 @@
         <ul>
           <li>an <strong>ER triage</strong> system: beliefs about acuity from
             vitals; utilities over outcomes; choose who's seen next;</li>
-          <li>a <strong>loan underwriter</strong>: beliefs about default from
-            application features; utilities over interest earned vs. loss;
-            approve or decline;</li>
           <li>a <strong>central bank</strong> (we'll come back to this one):
             beliefs about inflation's path; utilities over the dual mandate;
             set the policy rate;</li>
-          <li>a <strong>transplant board</strong>: beliefs about graft survival;
-            utilities over life-years; allocate the organ;</li>
           <li>a <strong>spam filter</strong>: beliefs about spamminess;
             asymmetric utilities (a lost real email hurts more than a leaked
             spam); deliver or quarantine.</li>
@@ -526,9 +606,18 @@
           <code>vpi()</code>. The catch, years later: it was written against
           <code>pomegranate</code> 0.x and a 2022 <code>pgmpy</code>, and it
           <strong>stopped running</strong>. So I modernized it
-          (<code>BicScore→BIC</code>, <code>BayesianNetwork→DiscreteBayesianNetwork</code>,
-          plus a latent utility-variable indexing bug) and re-ran it on the
-          original <code>adbot-data.csv</code>:
+          (<code>BicScore→BIC</code>,
+          <code>BayesianNetwork→DiscreteBayesianNetwork</code>). The
+          modernization also surfaced a latent bug: <code>eu()</code> looked up
+          the utility table by the first <em>decision</em> variable's name
+          rather than the utility node's, and the modernized run turned that
+          silent slip into a hard <code>KeyError</code>. Diagnosing it meant
+          tracing how the learned network indexes its factors; reproducing the
+          original test-suite's numbers afterward is what confirmed the fix.
+          One reading note: G, F, T, H, P below are the ad dataset's anonymized
+          demographic columns (G is gender); they have nothing to do with Act
+          I's $S,V,E,H$, and in particular this H is not heart disease. The
+          re-run on the original <code>adbot-data.csv</code>:
         </p>
         <pre><code># pgmpy 1.1.2: verified MEU + VPI on the original adbot-data.csv
 MEU(no evidence)        → serve {Ad1:1, Ad2:0}   E[utility] ≈ 746.8
@@ -555,10 +644,13 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           best-you-could-do after seeing it, minus the best-you-could-do now,
           denominated in utility:
         </p>
-        <p>$$\mathrm{VPI}_e(E')=\Big[\textstyle\sum_v P(E'\!=\!v\mid e)\,\mathrm{MEU}\!\big(e\cup\{E'\!=\!v\}\big)\Big]-\mathrm{MEU}(e).$$</p>
+        <p id="eq-vpi">$$\mathrm{VPI}_e(E')=\Big[\textstyle\sum_v P(E'\!=\!v\mid e)\,\mathrm{MEU}\!\big(e\cup\{E'\!=\!v\}\big)\Big]-\mathrm{MEU}(e).$$</p>
         <p>
           Three properties worth holding onto: VPI is <strong>never
-          negative</strong> (information can't hurt in expectation); it's
+          negative</strong> (information can't hurt in expectation; exactly
+          true inside a fixed, correct model, while an estimated model can
+          produce numerically negative VPI, which is why the Defendotron
+          clamps it); it's
           <strong>non-additive</strong> (two facts can be redundant or
           synergistic); and it is <strong>zero exactly when the fact can't
           change your decision</strong>. VPI measures
@@ -569,23 +661,42 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         <p class="hint">My hand-rolled <code>vpi()</code> turns out to implement the
           <em>identical</em> formula to AIMA's <code>InformationGatheringAgent.vpi()</code>
           (Fig 16.9); I re-derived the textbook on real data without knowing it.</p>
+        <p>
+          Before you drag anything, the widget's opening position is a
+          derivation you can do by hand. Blind:
+          $EU(A)=\$10\,(0.5\cdot 0.8+0.5\cdot 0.2)=\$5.00$, and $EU(B)=\$5.00$
+          too, a dead tie. Informed: young means serve A and earn $\$8.00$;
+          old means serve B and earn $\$7.00$; so
+          $\mathrm{MEU}=0.5(8)+0.5(7)=\$7.50$. The gap is
+          $\mathrm{VPI}=\$2.50$, exactly what the widget shows on load.
+          Confirm it, then drag.
+        </p>
 
         <!-- WIDGET 2 -->
         <div class="widget" id="widget-vpi">
-          <h4>▶ Widget 2 · VPI calculator</h4>
-          <p class="hint">A clean ad-targeting net: a hidden viewer trait $X$ (young/old), two ads, and a click. Drag the click-probabilities and the base rate. The widget computes the best ad <em>blind</em>, the best ad <em>if you could see $X$ first</em>, and the gap: the dollar value of knowing $X$. Push the sliders until one ad dominates regardless of $X$ and watch VPI collapse to $0$.</p>
+          <h4>▶ Widget 2 · VPI calculator <span class="act-tag act-econ">2 · decide</span></h4>
+          <p class="hint">Question: is the MEU after seeing $X$ worth more than the MEU now? A clean ad-targeting net: a hidden viewer trait $X$ (young/old), two ads, and a click. Drag the click-probabilities and the base rate. The widget computes the best ad <em>blind</em>, the best ad <em>if you could see $X$ first</em>, and the gap: the dollar value of knowing $X$. Push the sliders until one ad dominates regardless of $X$ and watch VPI collapse to $0$.</p>
+          <div style="margin:.2rem 0 .7rem;display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="go" id="vpi-preset-dom" style="font-size:.78rem;padding:.3rem .7rem">One ad dominates → VPI = $0</button>
+            <button class="go" id="vpi-preset-reset" style="font-size:.78rem;padding:.3rem .7rem;background:var(--muted)">Reset · targeting matters</button>
+          </div>
           <div class="row">
             <div class="col">
-              <div class="inputline"><span style="width:170px">$P(X=\text{young})$</span><input class="slider" type="range" id="vpi-px" min="0" max="1" step="0.05" value="0.5"><span class="readout" id="vpi-px-v">0.50</span></div>
-              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{young})$</span><input class="slider" type="range" id="vpi-ay" min="0" max="1" step="0.05" value="0.8"><span class="readout" id="vpi-ay-v">0.80</span></div>
-              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{old})$</span><input class="slider" type="range" id="vpi-ao" min="0" max="1" step="0.05" value="0.2"><span class="readout" id="vpi-ao-v">0.20</span></div>
-              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{young})$</span><input class="slider" type="range" id="vpi-by" min="0" max="1" step="0.05" value="0.3"><span class="readout" id="vpi-by-v">0.30</span></div>
-              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{old})$</span><input class="slider" type="range" id="vpi-bo" min="0" max="1" step="0.05" value="0.7"><span class="readout" id="vpi-bo-v">0.70</span></div>
-              <div class="inputline"><span style="width:170px">click value</span>$<input type="number" id="vpi-val" value="10" step="1" style="width:60px"></div>
+              <div class="inputline"><span style="width:170px">$P(X=\text{young})$</span><input class="slider" type="range" id="vpi-px" min="0" max="1" step="0.05" value="0.5" aria-label="P(X = young)"><span class="readout" id="vpi-px-v">0.50</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{young})$</span><input class="slider" type="range" id="vpi-ay" min="0" max="1" step="0.05" value="0.8" aria-label="P(click given ad A, young)"><span class="readout" id="vpi-ay-v">0.80</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid A,\text{old})$</span><input class="slider" type="range" id="vpi-ao" min="0" max="1" step="0.05" value="0.2" aria-label="P(click given ad A, old)"><span class="readout" id="vpi-ao-v">0.20</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{young})$</span><input class="slider" type="range" id="vpi-by" min="0" max="1" step="0.05" value="0.3" aria-label="P(click given ad B, young)"><span class="readout" id="vpi-by-v">0.30</span></div>
+              <div class="inputline"><span style="width:170px">$P(\text{click}\mid B,\text{old})$</span><input class="slider" type="range" id="vpi-bo" min="0" max="1" step="0.05" value="0.7" aria-label="P(click given ad B, old)"><span class="readout" id="vpi-bo-v">0.70</span></div>
+              <div class="inputline"><span style="width:170px">click value (dollars, min 0)</span>$<input type="number" id="vpi-val" value="10" step="1" min="0" style="width:60px" aria-label="value of a click in dollars"></div>
             </div>
             <div class="col" id="vpi-out"></div>
           </div>
         </div>
+
+        <details class="aside-box"><summary>Check yourself · Act II</summary><ol style="margin:.4rem 0 0">
+          <li>What two objects does $\mathrm{EU}(a\mid e)$ fuse? <em>A belief $P(s\mid e,a)$ and a desire $U(s)$.</em></li>
+          <li>Why is $\mathrm{VPI}(F)=0$ even though $F$ is informative about the world? <em>VPI measures decision-relevance, not Shannon information; $F$ cannot change which ad wins.</em></li>
+        </ol></details>
 
         <!-- ===================== ACT III ===================== -->
         <h2 id="act3"><span class="act-tag act-do">Act III · Doing</span><br>Why seeing isn't enough</h2>
@@ -600,10 +711,10 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           <li><strong>Observational equivalence</strong>; $S\!\to\!V$ and
             $V\!\to\!S$ encode the same independences but opposite causes, so
             data alone cannot pick between them.</li>
-          <li><strong>Spurious correlation</strong>; conditioning lets
-            information leak along the back-path
-            $V\!\leftarrow\!S\!\to\!E\!\to\!H$, tangential to the effect we
-            want.</li>
+          <li><strong>Spurious correlation</strong>; the back-path
+            $V\!\leftarrow\!S\!\to\!E\!\to\!H$ is open <em>by default</em>, so
+            association leaks through it unless something blocks it, and the
+            naive comparison blocks nothing.</li>
           <li><strong>Latent confounders</strong>; variables we never recorded
             may drive two that we did.</li>
         </ul>
@@ -629,6 +740,25 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
             <tr><td>$do(V=v)$</td><td>cut $S\!\to\!V$</td><td>$P(S)\,\cdot\,1\,\cdot\,P(E\!\mid\!S)\,P(H\!\mid\!V\!=\!v,E)$</td></tr>
           </table>
           <figcaption>The truncated factorization: under $do(V=v)$, the factor $P(V\mid S)$ is deleted and everything else survives unchanged.</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 360 210" width="360" style="max-width:100%" role="img"
+               aria-label="The mutilated SEVH network under do of V. The edge from S to V is cut and shown dashed; V is set by fiat. The back-path can no longer reach V.">
+            <line x1="167" y1="44" x2="92" y2="86" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 5" opacity=".45"/>
+            <line x1="123" y1="55" x2="137" y2="75" stroke="var(--warn)" stroke-width="2.5"/>
+            <line x1="193" y1="44" x2="268" y2="86" stroke="var(--warn)" stroke-width="2" marker-end="url(#arrR)"/>
+            <line x1="86" y1="128" x2="161" y2="170" stroke="var(--accent)" stroke-width="2.5" marker-end="url(#arrB)"/>
+            <line x1="274" y1="128" x2="199" y2="170" stroke="var(--warn)" stroke-width="2" marker-end="url(#arrR)"/>
+            <g font-size="15" font-weight="700" text-anchor="middle">
+              <circle cx="180" cy="30" r="18" fill="var(--warn-soft)" stroke="var(--warn)"/><text x="180" y="35">S</text>
+              <circle cx="78" cy="107" r="18" fill="var(--gold-soft)" stroke="var(--gold)"/><text x="78" y="112">V</text>
+              <text x="42" y="107" font-size="11" fill="var(--muted)" font-weight="400">set by</text>
+              <text x="42" y="120" font-size="11" fill="var(--muted)" font-weight="400">fiat</text>
+              <circle cx="282" cy="107" r="18" fill="#fff" stroke="var(--muted)"/><text x="282" y="112">E</text>
+              <circle cx="180" cy="184" r="18" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="180" y="189">H</text>
+            </g>
+          </svg>
+          <figcaption>Graph surgery: under $do(V{=}v)$ the inbound edge $S\to V$ is cut. The back-path can no longer reach $V$, so whatever association remains between $V$ and $H$ is causal.</figcaption>
         </figure>
         <p>
           About that lone <strong>1</strong> in the second row: in the
@@ -658,12 +788,12 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           every back-door pipe without opening any collider and without touching
           descendants of $X$. Find one, and what's left flowing is causation:
         </p>
-        <p>$$P(Y \mid do(X{=}x)) = \sum_z P(Y \mid X{=}x, Z{=}z)\; P(Z{=}z) \qquad\text{(adjustment formula)}$$</p>
+        <p id="eq-adjustment">$$P(Y \mid do(X{=}x)) = \sum_z P(Y \mid X{=}x, Z{=}z)\; P(Z{=}z) \qquad\text{(adjustment formula)}$$</p>
         <p>
           Concretely, for "does vaping cause heart disease?": comparing vapers
           to non-vapers naively mixes two differences, the effect of vaping
           <em>and</em> the fact that vapers are more often stressed (and
-          stressed people exercise less). The fix is exactly what a careful
+          stress also shifts exercise habits). The fix is exactly what a careful
           epidemiologist would do by hand: compare vapers to non-vapers
           <em>within</em> the stressed group, compare them <em>within</em> the
           unstressed group, then average the two answers, weighting by how
@@ -676,14 +806,36 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           stress.
         </p>
         <p>
+          On the vaping net the whole argument fits in four lines, every number
+          read off Widget 1's CPTs. Doing:
+          $P(H{=}1\mid do(V{=}1))=\sum_s P(s)\sum_e P(e\mid s)\,P(H{=}1\mid V{=}1,e)
+          =0.3(0.72)+0.7(0.64)=0.664$, and $do(V{=}0)$ gives $0.164$. Seeing:
+          the observational $P(H{=}1\mid V{=}1)=0.649$ and
+          $P(H{=}1\mid V{=}0)=0.183$. So seeing estimates a risk difference of
+          $0.466$ while doing gives the true causal $0.500$; the gap is exactly
+          the confounding leaking through $S$. The numbers differ even in this
+          four-node toy, which is the entire point of the rung.
+        </p>
+        <div class="callout warn">
+          <span class="k">Simpson's paradox</span>
+          <p style="margin:.3rem 0 0">A treatment can look worse in the pooled
+          table yet better within every stratum; the classic kidney-stone
+          dataset does exactly this, because the harder cases were given the
+          better treatment. Both tables are computed correctly from the same
+          data, and rung 1 cannot tell you which to believe. The graph can: if
+          $Z$ causes both treatment and outcome, stratify; if $Z$ is a mediator
+          or a collider, stratifying is what creates the error. "Which table do
+          I trust" is a rung-2 question, and the most common way published
+          statistics mislead.</p>
+        </div>
+        <p>
           This is the substance of CMSI 4320's Assignment 4 ("Back Doors, Do,
           and other Funny Sounding Things"): translate an English query into a
           $do$-expression, find an admissible $Z$, and hand-compute, e.g.,
-          $P(H\!=\!1\mid do(E\!=\!1),S\!=\!1)$ on the vaping net. A randomized
-          controlled trial <em>is</em> a physical $do()$: randomization cuts
-          every inbound arrow to the treatment by brute force. The adjustment
-          formula is how you emulate one with observational data when the graph
-          permits.
+          $P(H\!=\!1\mid do(E\!=\!1),S\!=\!1)$ on the vaping net. The
+          adjustment formula is how you emulate a randomized trial with
+          observational data when the graph permits (the trial itself appears
+          in Part V's data table as a physical $do()$).
         </p>
 
         <div class="aside-box digress" id="central-bank">
@@ -708,13 +860,18 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           </p>
         </div>
 
+        <details class="aside-box"><summary>Check yourself · Act III</summary><ol style="margin:.4rem 0 0">
+          <li>The adjustment weight is $P(z)$, not $P(z\mid x)$; what does using $P(z\mid x)$ smuggle back in? <em>The confounding: it reimports the stress distribution among vapers instead of assigning vaping independently of stress.</em></li>
+          <li>Why is $P(H{=}1\mid V{=}1)=0.649$ but $P(H{=}1\mid do(V{=}1))=0.664$? <em>Seeing $V{=}1$ also raises belief in stress, and the stressed exercise more here, which protects; the intervention instead assigns vaping across the population's actual stress mix.</em></li>
+        </ol></details>
+
         <!-- ===================== ACT IV ===================== -->
         <h2 id="act4"><span class="act-tag act-imagine">Act IV · Imagining</span><br>Structural causal models &amp; the top rung</h2>
         <p id="scm">
           The most expressive model writes down the <em>mechanisms</em>
           themselves. A <strong>structural causal model</strong>
           $M=\langle U,V,F\rangle$ has endogenous variables $V$, exogenous
-          "luck" variables $U$ (one per $V$, with $E[U_i]=0$), and structural
+          "luck" variables $U$ (one per $V$ in the Markovian case), and structural
           equations $V_i\gets f_{V_i}(\text{pa}_i,U_{V_i})$. Fix the $U$ and
           everything is determined; that determinism is what makes
           counterfactuals computable. When two variables secretly share a $U$
@@ -771,14 +928,14 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
 
         <!-- WIDGET 3 -->
         <div class="widget" id="widget-cf">
-          <h4>▶ Widget 3 · Counterfactual stepper</h4>
-          <p class="hint">Variables: $X$ = weekly hours in the afterschool program · $Z$ = weekly homework hours · $Y$ = GPA change in quality points · $U_Z,U_Y$ = this student's bundled "everything else". Edit the factual story and the counterfactual $X'$, then step through Abduction → Action → Prediction. The twin networks share the abducted luck $U$.</p>
+          <h4>▶ Widget 3 · Counterfactual stepper <span class="act-tag act-imagine">3 · imagine</span></h4>
+          <p class="hint">Question: in the world where the facts happened, what would $Y$ have been had $X$ been $X'$? Variables: $X$ = weekly hours in the afterschool program · $Z$ = weekly homework hours · $Y$ = GPA change in quality points · $U_Z,U_Y$ = this student's bundled "everything else". Edit the factual story and the counterfactual $X'$, then step through Abduction → Action → Prediction. The twin networks share the abducted luck $U$.</p>
           <div class="inputline">
-            factual: $X=$<input type="number" id="cf-x" value="1" step="1">
-            $Z=$<input type="number" id="cf-z" value="2" step="1">
-            $Y=$<input type="number" id="cf-y" value="-2" step="1">
-            &nbsp;·&nbsp; counterfactual $X'=$<input type="number" id="cf-xp" value="3" step="1">
-            <button class="go" id="cf-run">Run the 3 steps ▸</button>
+            factual: $X=$<input type="number" id="cf-x" value="1" step="1" aria-label="factual X, program hours">
+            $Z=$<input type="number" id="cf-z" value="2" step="1" aria-label="factual Z, homework hours">
+            $Y=$<input type="number" id="cf-y" value="-2" step="1" aria-label="factual Y, GPA change">
+            &nbsp;·&nbsp; counterfactual $X'=$<input type="number" id="cf-xp" value="3" step="1" aria-label="counterfactual X prime, program hours">
+            <button class="go" id="cf-run">Run step 1 · Abduction ▸</button>
           </div>
           <div class="twin" id="cf-twin" style="margin-top:.6rem"></div>
           <div class="steps" id="cf-steps"></div>
@@ -793,9 +950,16 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           the harm have occurred?</em> That sentence is literally a rung-3
           query. With exposure $X$ and harm $Y$, the court is asking about
           $Y_{X=0}$ for a plaintiff whose actual history is $X{=}1, Y{=}1$.
+          Read $Y_{X=0}$ as: the value $Y$ would have taken for this same
+          individual had $X$ been forced to $0$. Same person, same exogenous
+          luck $U$, different action. Subscript means intervened; the
+          conditioning bar means observed. So
+          $P(Y_{X=0}{=}0\mid X{=}1,Y{=}1)$ mixes a world we make with facts we
+          saw, which is exactly what the three-step engine computes: abduct
+          $U$ from the facts, then intervene.
           Pearl gives the two faces of this question names:
         </p>
-        <p>$$\mathrm{PN} = P\big(Y_{X=0}{=}0 \;\big|\; X{=}1,\,Y{=}1\big)
+        <p id="eq-pnps">$$\mathrm{PN} = P\big(Y_{X=0}{=}0 \;\big|\; X{=}1,\,Y{=}1\big)
         \qquad
         \mathrm{PS} = P\big(Y_{X=1}{=}1 \;\big|\; X{=}0,\,Y{=}0\big)$$</p>
         <ul>
@@ -815,15 +979,34 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           injured users would have been injured anyway) yet often sufficient
           (it reliably injures the healthy), or the reverse; liability and
           regulation hinge on different counterfactuals. And this is exactly
-          where my CMSI 4320 Assignment 5 drug-liability problem lived: under a
-          monotonicity assumption (the drug never <em>prevents</em> the harm),
-          PN collapses to the <strong>excess risk ratio</strong>,
+          where my CMSI 4320 Assignment 5 drug-liability problem lived: under
+          monotonicity (the drug never <em>prevents</em> the harm) <em>plus</em>
+          exogeneity (the exposure unconfounded with the harm), PN collapses to
+          the <strong>excess risk ratio</strong>,
           $\big(P(y\mid x)-P(y\mid x')\big)/P(y\mid x)$, the classic
           "attributable fraction among the exposed", computable from data.
-          Without monotonicity, point identification fails and PN can only be
+          Drop either assumption and point identification from raw conditionals
+          fails: with confounding you also need the experimental quantity
+          $P(y\mid do(x'))$, and without monotonicity PN can only be
           <em>bounded</em>; we return to those bounds on the advanced shelf.
+          Event attribution science reports the same quantity under another
+          name: the fraction of attributable risk behind a headline like
+          "climate change doubled the odds of this heatwave" is this excess
+          risk ratio, computed against a counterfactual Earth that exists only
+          inside a structural model.
           <em>The Book of Why</em> devotes a chapter to exactly this
           courtroom logic.
+        </p>
+        <p>
+          Courts also fail one rung down. Presenting
+          $P(\text{evidence}\mid\text{innocent})$ as if it were
+          $P(\text{innocent}\mid\text{evidence})$ is the
+          <strong>prosecutor's fallacy</strong>: in the Sally Clark case, a
+          one-in-73-million figure for two natural infant deaths was allowed to
+          stand in for the probability of innocence, ignoring both the base
+          rate (double SIDS, while rare, is far more common than double
+          infanticide) and the dependence between the two deaths. That is the
+          gallery's "base-rate reasoning" entry: rung 1, misread.
         </p>
 
         <h3 id="ett">The ladder closes: VPI becomes ETT</h3>
@@ -834,7 +1017,9 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         <p>$$\mathrm{ETT}=E\big[Y_{x'}-Y_{x}\ \big|\ X=x\big]$$</p>
         <p>
           Among those who <em>actually</em> took action $x$, what would have
-          happened under $x'$? The assignment's worked instance is a
+          happened under $x'$? (Written here with the alternative first, since
+          our question asks about the ad not shown; Pearl's convention,
+          $E[Y_x - Y_{x'}\mid X=x]$, is the negative of this.) The assignment's worked instance is a
           <strong>web-advertising</strong> system: demographics, then ad shown,
           then clickthrough. <em>Given the people who clicked, would they have
           clicked under a different ad?</em>
@@ -852,6 +1037,11 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           </p>
         </div>
 
+        <details class="aside-box"><summary>Check yourself · Act IV</summary><ol style="margin:.4rem 0 0">
+          <li>The model says a generic student scores $Y=14X$, so $do(X{=}3)$ gives $42$; why does our student get only $26$? <em>Abduction found $U_Z=-1$ and $U_Y=-12$. Rung 3 keeps this student's luck; rung 2 averages over everyone's.</em></li>
+          <li>In $P(Y_{X=0}{=}0\mid X{=}1,Y{=}1)$, which part is a world we make and which is facts we saw? <em>The subscript $X{=}0$ is the intervention; the conditioning bar holds the observed history. Mixing them is exactly what abduction-action-prediction computes.</em></li>
+        </ol></details>
+
         <!-- ===================== PART V ===================== -->
         <h2 id="domains">Part V · In the wild</h2>
         <p>
@@ -860,19 +1050,35 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           practical questions every new reader should ask (where do the graphs
           come from? what data do you need?), and finally the advanced shelf.
         </p>
+        <div class="callout gold">
+          <span class="k">Field guide · which rung is this claim on?</span>
+          <ul style="margin:.3rem 0 0;padding-left:1.1rem">
+            <li><strong>"linked to / associated with"</strong> is rung 1. Ask:
+              what shared cause could generate it, and was the sample filtered
+              on a common effect (a collider)?</li>
+            <li><strong>"causes / cuts risk by"</strong> needs rung 2. Ask:
+              where did the $do()$ come from: randomization, a natural
+              experiment, or adjustment, and adjusted for what?</li>
+            <li><strong>"would have / root cause / to blame"</strong> is rung 3.
+              Ask: what model supplied the counterfactual? An incident
+              postmortem's "root cause" is a but-for test, and "five whys" is
+              abduction done by hand.</li>
+          </ul>
+        </div>
 
         <h3>The gallery</h3>
         <table>
           <tr><th>Domain</th><th>Tier-1/2 (see / decide / do)</th><th>Tier-3 (imagine)</th></tr>
           <tr><td><strong>Advertising</strong> (the spine)</td><td>Defendotron: which ad? VPI of a demographic</td><td>ETT: would they have clicked under another ad?</td></tr>
+          <tr><td><strong>A/B testing &amp; recommenders</strong></td><td>an A/B test is a physical $do()$; a recommender trained on its own logs inherits its past policy's confounding, so rung-1 retraining amplifies its own biases</td><td>uplift modeling: spend only on persuadables, users whose click the ad <em>causes</em>; "would have clicked anyway" is sufficiency without necessity</td></tr>
           <tr><td><strong>Central banking</strong></td><td>$do(\text{raise rate})$: transmission into credit creation; surprise-based identification</td><td>"Had the Fed held rates, would inflation have persisted?" (structural macro models)</td></tr>
           <tr><td>Medicine</td><td>vaping → heart-disease; exercise → cholesterol; treatment choice under uncertainty</td><td>drug-liability PN; "would this patient have recovered untreated?"</td></tr>
           <tr><td>Law</td><td>screening evidence; base-rate reasoning</td><td>but-for causation; necessity vs sufficiency; preponderance as PN &gt; 0.5</td></tr>
-          <tr><td>Public policy</td><td>agricultural subsidy decisions; terrorism-predictor structure</td><td>policy counterfactuals ("had the program not run…")</td></tr>
+          <tr><td>Public policy</td><td>quasi-experiments: difference-in-differences, regression discontinuity, instrumental variables (the central-bank surprise method is an IV); each hunts a natural $do()$ in observational data</td><td>policy counterfactuals ("had the program not run…")</td></tr>
           <tr><td>Education</td><td>study-habits decisions</td><td>afterschool → GPA counterfactual (the widget)</td></tr>
           <tr><td>Hiring</td><td>screen on predicted performance</td><td>counterfactual fairness: same hire under a different background?</td></tr>
           <tr><td>Navigation &amp; ops</td><td>taxi-dispatch and grid-world decisions</td><td>"home by now had I left the 405?"</td></tr>
-          <tr><td>Genomics</td><td>DNA-sequence HMMs (Viterbi decoding)</td><td>—</td></tr>
+          <tr><td>Genomics</td><td>DNA-sequence HMMs (Viterbi); Mendelian randomization: genotype as nature's coin flip, a free $do()$ for exposures you could never ethically randomize</td><td>—</td></tr>
           <tr><td>Risk under uncertainty</td><td>tiger-doors POMDP; paying for one more observation (VPI again)</td><td>—</td></tr>
         </table>
 
@@ -928,14 +1134,17 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           data alone: counterfactual questions always borrow strength from a
           <em>model</em> (the SCM's structural equations), with data serving to
           pin down the model's parameters and your individual's exogenous luck.
-          Practical notes for the data you collect: timestamps help orient
-          arrows (causes precede effects); record the variables your experts
-          name as confounders <em>before</em> you need them; and beware
-          selection effects, because filtering a dataset on some criterion is
-          conditioning on a collider if that criterion is a common effect, and
-          it will manufacture associations out of nothing (survivorship bias is
-          d-separation's revenge).
         </p>
+        <p>Practical notes for the data you collect:</p>
+        <ul>
+          <li>timestamps help orient arrows (causes precede effects);</li>
+          <li>record the variables your experts name as confounders
+            <em>before</em> you need them;</li>
+          <li>filtering a dataset on a common effect is conditioning on a
+            collider, and it will manufacture associations out of nothing
+            (survivorship bias is d-separation's revenge; Act I's Berkson
+            example is the same trap).</li>
+        </ul>
         <p>
           So which data are "most applicable" for counterfactual questions? The
           honest answer: <strong>a combination</strong>. Observational data
@@ -966,8 +1175,8 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
             Bayes-net inference on the doubled graph (this is exactly what
             Widget 3 renders).</li>
           <li><strong>Counterfactuals inside the decision loop: MABUC.</strong>
-            Forney's research thread, multi-armed bandits with unobserved
-            confounders: an agent that conditions on its own <em>intent</em>
+            Forney's research thread, <a href="MAB.html">multi-armed bandits</a>
+            with unobserved confounders: an agent that conditions on its own <em>intent</em>
             (what it was about to do is a symptom of the confounder) earns a
             counterfactual signal worth real regret reductions. This is the
             bridge from this page back into reinforcement learning, and the
@@ -987,14 +1196,28 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
             The tier-2 bridge into sequential decisions (MDPs, bandits,
             reinforcement learning) is its own story. In
             <a href="robot-arm-sim/index.html">robot-arm-sim</a> a crawler
-            teaches itself to walk by Q-learning, and the punchline is the same
+            teaches itself to walk by <a href="Q.html">Q-learning</a>, and the punchline is the same
             as here: a <em>model-based</em> method, one that can imagine roads
             not taken, beats every model-free one. Decision theory and that RL
             project are two halves of the same ladder.
           </p>
         </div>
 
-        <div class="colophon" id="colophon">
+        <h3 id="cheatsheet">Appendix · the cheat sheet</h3>
+        <table style="max-width:680px">
+          <tr><th>Symbol</th><th>Reads as</th><th>Rung</th><th>Defined in</th></tr>
+          <tr><td>$P(Q\mid e)$</td><td>belief in $Q$ given what was observed</td><td>1</td><td><a href="#inference">Inference</a></td></tr>
+          <tr><td>$\mathrm{EU},\ \mathrm{MEU}$</td><td>expected utility of an action; the best achievable</td><td>1–2</td><td><a href="#eq-meu">Utility</a></td></tr>
+          <tr><td>$\mathrm{VPI}_e(E')$</td><td>what learning $E'$ is worth before acting</td><td>2</td><td><a href="#eq-vpi">VPI</a></td></tr>
+          <tr><td>$do(X{=}x)$</td><td>force $X{=}x$; cut its inbound arrows</td><td>2</td><td><a href="#do">do-operator</a></td></tr>
+          <tr><td>$\sum_z P(Y\mid x,z)P(z)$</td><td>emulate a trial: stratify, then average by $P(z)$</td><td>2</td><td><a href="#eq-adjustment">Backdoor</a></td></tr>
+          <tr><td>$\langle U,V,F\rangle$</td><td>mechanisms plus luck: a world generator</td><td>3</td><td><a href="#scm">SCM</a></td></tr>
+          <tr><td>$Y_x$</td><td>$Y$ had $X$ been forced to $x$, same luck $U$</td><td>3</td><td><a href="#butfor">Courtroom</a></td></tr>
+          <tr><td>$\mathrm{PN},\ \mathrm{PS}$</td><td>was it necessary? would it have sufficed?</td><td>3</td><td><a href="#eq-pnps">Courtroom</a></td></tr>
+          <tr><td>$\mathrm{ETT}$</td><td>effect of treatment on those actually treated</td><td>3</td><td><a href="#ett">Ladder closes</a></td></tr>
+        </table>
+
+        <footer class="colophon" id="colophon">
           <p><strong>What's mine vs. what's cited.</strong> The
             <strong>Defendotron</strong> ad agent (the <code>eu</code>/<code>meu</code>/<code>vpi</code>
             engine, structure learning, and the modernization that got it
@@ -1011,11 +1234,17 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
             &amp; Norvig's <em>AIMA</em> (<code>probability.py</code>,
             <code>making_simple_decision4e.py</code>, Ch. 13–16). The three
             widgets are my own, written to mirror the verified Python.</p>
-          <p>Built as a node of a larger indexed archive of my coursework.
+          <p>Built as a node of a <a href="index.html#projects">larger indexed
+            archive</a> of my coursework.
             Reproduce the Defendotron with <code>pip install pgmpy pandas</code>
-            and the original <code>adbot-data.csv</code>.</p>
-        </div>
-      </header>
+            and the original <code>adbot-data.csv</code>. The homework source
+            itself stays unpublished for academic-integrity reasons; the
+            modernization diff is available on request.</p>
+          <p>More: <a href="https://github.com/scottn66">github.com/scottn66</a>
+            · siblings <a href="MAB.html">multi-armed bandits</a> and
+            <a href="Q.html">Q-learning</a> · contact via the
+            <a href="resume.html">resume page</a>.</p>
+        </footer>
     </main>
   </div>
 
@@ -1030,6 +1259,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
     const VARS=["S","V","E","H"];
     const NAME={S:"Stressed",V:"Vapes",E:"Exercises",H:"Heart disease"};
     let ev={S:null,V:null,E:null,H:null};
+    let presetMsg="";
     function joint(s,v,e,h){
       const ps = s? PS1 : 1-PS1;
       const pv = v? PV1[s] : 1-PV1[s];
@@ -1057,8 +1287,13 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         const seg=document.createElement("span"); seg.className="seg";
         [["—",null],["0",0],["1",1]].forEach(([lab,val])=>{
           const b=document.createElement("button"); b.textContent=lab;
+          b.dataset.k=k; b.dataset.v=lab;
+          b.setAttribute("aria-pressed",String(ev[k]===val));
+          b.setAttribute("aria-label",NAME[k]+": evidence "+(lab==="—"?"cleared":"= "+lab));
           if(ev[k]===val)b.className="on";
-          b.onclick=()=>{ev[k]=val;render();};
+          b.onclick=()=>{ev[k]=val;render();
+            const nb=document.querySelector('#bn-controls button[data-k="'+k+'"][data-v="'+lab+'"]');
+            if(nb)nb.focus();};
           seg.appendChild(b);
         });
         row.appendChild(seg); c.appendChild(row);
@@ -1077,10 +1312,35 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
       });
       const note=document.getElementById("bn-note");
       const base=posteriorsFor({}); const givenV=posteriorsFor({V:1});
-      note.innerHTML=`Prior risk of heart disease: <b>${base.H.toFixed(3)}</b>. Fix <b>V=1</b> (vapes) and it rises to <b>${givenV.H.toFixed(3)}</b>, exactly the lecture's $P(H{=}1\\mid V{=}1)\\approx0.65$.`;
+      note.innerHTML=`Prior risk of heart disease: <b>${base.H.toFixed(3)}</b>. Fix <b>V=1</b> (vapes) and it rises to <b>${givenV.H.toFixed(3)}</b>, exactly the lecture's $P(H{=}1\\mid V{=}1)\\approx0.65$.${presetMsg}`;
       if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([note]);
     }
     function posteriorsFor(e){ const save={...ev}; ev={S:null,V:null,E:null,H:null,...e}; const p=posteriors(); ev=save; return p; }
+    let eaStage=0;
+    const eaBtn=document.getElementById("bn-preset-ea");
+    document.getElementById("bn-preset-fork").onclick=()=>{
+      ev={S:1,V:null,E:null,H:null};
+      eaStage=0; eaBtn.textContent="Explaining away (H=1)";
+      presetMsg=" <b>Fork blocked:</b> with S=1 fixed, P(E=1)=0.800. Now toggle V: it stays 0.800 either way. S blocks the fork, so V has nothing left to say about E.";
+      render();
+    };
+    eaBtn.onclick=function(){
+      if(eaStage===0){
+        ev={S:null,V:null,E:null,H:1};
+        presetMsg=" <b>Collider opened:</b> given H=1, P(V=1)=0.813. Predict the direction, then click this button again to add E=1.";
+        this.textContent="… now add E=1"; eaStage=1;
+      } else {
+        ev={S:null,V:null,E:1,H:1};
+        presetMsg=" <b>Explaining away:</b> adding E=1 pushed P(V=1) up to 0.904. Exercise protects the heart, so it cannot explain this disease; vaping must.";
+        this.textContent="Explaining away (H=1)"; eaStage=0;
+      }
+      render();
+    };
+    document.getElementById("bn-reset").onclick=()=>{
+      ev={S:null,V:null,E:null,H:null};
+      eaStage=0; eaBtn.textContent="Explaining away (H=1)";
+      presetMsg=""; render();
+    };
     render();
   })();
 
@@ -1102,29 +1362,36 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
       const vpi = informedMEU-blindMEU;
       ids.forEach(id=>document.getElementById("vpi-"+id+"-v").textContent=get(id).toFixed(2));
       document.getElementById("vpi-px-v").textContent=px.toFixed(2);
-      const flips = (cl.A.y>=cl.B.y)!==(cl.A.o>=cl.B.o);
       document.getElementById("vpi-out").innerHTML=`
         <div style="font-size:.8rem;color:var(--muted)">Decide <b>blind</b> (don't see X)</div>
+        <div style="font-size:.85rem">EU(A) = <span class="readout">$${euA.toFixed(2)}</span> · EU(B) = <span class="readout">$${euB.toFixed(2)}</span></div>
         <div>Best ad: <span class="pill ${blindBest==='A'?'a':'b'}">${blindBest}</span> &nbsp; MEU = <span class="readout">$${blindMEU.toFixed(2)}</span></div>
         <div style="font-size:.8rem;color:var(--muted);margin-top:.6rem">Decide <b>after seeing X</b></div>
         <div>young → <span class="pill ${cl.A.y>=cl.B.y?'a':'b'}">${cl.A.y>=cl.B.y?'A':'B'}</span> · old → <span class="pill ${cl.A.o>=cl.B.o?'a':'b'}">${cl.A.o>=cl.B.o?'A':'B'}</span> &nbsp; MEU = <span class="readout">$${informedMEU.toFixed(2)}</span></div>
         <div style="margin-top:.9rem">VPI of knowing X</div>
         <div class="big readout">$${vpi.toFixed(2)}</div>
-        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${vpi<1e-9?'Zero: the same ad wins for every X, so the fact cannot change your decision.':(flips?'The fact flips your choice between viewer types; that is where information earns its price.':'Positive, but the fact never flips the decision; you are just paying for sharper confidence.')}</div>`;
+        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${vpi<1e-9?((px===0||px===1)?'Zero: you already know X for certain, so observing it cannot tell you anything new. VPI prices the resolution of uncertainty, and there is none left.':'Zero: the same ad wins for every X, so the fact cannot change your decision.'):'The fact flips your choice between viewer types; that is where information earns its price.'}</div>`;
     }
     ["px","ay","ao","by","bo"].forEach(id=>document.getElementById("vpi-"+id).addEventListener("input",compute));
-    document.getElementById("vpi-val").addEventListener("input",compute);
+    document.getElementById("vpi-val").addEventListener("input",function(){
+      if(parseFloat(this.value)<0)this.value=0;
+      compute();
+    });
+    function setS(v){["px","ay","ao","by","bo"].forEach((id,i)=>{document.getElementById("vpi-"+id).value=v[i];});compute();}
+    document.getElementById("vpi-preset-dom").onclick=()=>setS([0.5,0.8,0.7,0.3,0.2]);
+    document.getElementById("vpi-preset-reset").onclick=()=>setS([0.5,0.8,0.2,0.3,0.7]);
     compute();
   })();
 
   /* =================== WIDGET 3 — Counterfactual stepper (afterschool→GPA LSCM) =================== */
   (function(){
     const $=id=>document.getElementById(id);
-    function net(title,X,Z,Y,Uz,Uy,hl){
+    let stage=0;
+    function net(title,X,Z,Y,Uz,Uy,hl,showU){
       return `<div class="net"><div style="font-size:.78rem;font-weight:700;color:${hl||'var(--muted)'}">${title}</div>
         <div style="font-size:.85rem;margin-top:.3rem;line-height:1.9">
         $X=${fmt(X)}$<br>$Z=3X+U_Z=${fmt(Z)}$<br>$Y=2X+4Z+U_Y=${fmt(Y)}$<br>
-        <span style="color:var(--imagine)">$U_Z=${fmt(Uz)},\\ U_Y=${fmt(Uy)}$</span></div></div>`;
+        ${showU?`<span style="color:var(--imagine)">$U_Z=${fmt(Uz)},\\ U_Y=${fmt(Uy)}$</span>`:`<span style="color:var(--muted)">$U_Z=?,\\ U_Y=?$</span>`}</div></div>`;
     }
     function fmt(n){ return (Math.round(n*100)/100).toString(); }
     function run(){
@@ -1133,18 +1400,30 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
       const Uz=Z-3*X, Uy=Y-2*X-4*Z;
       // Step 2/3 — action + prediction
       const Zp=3*Xp+Uz, Yp=2*Xp+4*Zp+Uy;
-      $("cf-twin").innerHTML = net("Factual world (observed)",X,Z,Y,Uz,Uy)
-        + net("Counterfactual world (X→X')",Xp,Zp,Yp,Uz,Uy,'var(--imagine)');
+      $("cf-twin").innerHTML = net("Factual world (observed)",X,Z,Y,Uz,Uy,null,stage>=1)
+        + (stage>=2? net("Counterfactual world (X→X')",Xp,Zp,Yp,Uz,Uy,'var(--imagine)',true) : "");
       $("cf-steps").innerHTML=`
-        <div class="step active"><div class="label">Abduction</div> Solve the luck from the facts: $U_Z=Z-3X=${fmt(Z)}-3(${fmt(X)})=${fmt(Uz)}$, &nbsp; $U_Y=Y-2X-4Z=${fmt(Uy)}$.</div>
-        <div class="step active"><div class="label">Action</div> Intervene $do(X=${fmt(Xp)})$ on the mutilated model, carrying $U_Z,U_Y$ forward.</div>
-        <div class="step active"><div class="label">Prediction</div> $Z'=3X'+U_Z=${fmt(Zp)}$, then $Y'=2X'+4Z'+U_Y=${fmt(Yp)}$.</div>`;
-      $("cf-result").innerHTML=`This student saw a GPA change of <b>${fmt(Y)}</b>. Had they done <b>${fmt(Xp)}</b> hours instead of ${fmt(X)}, the model says they would have seen <b style="color:var(--imagine)">${fmt(Yp)}</b>.`;
+        <div class="step${stage>=1?' active':''}"><div class="label">Abduction</div> ${stage>=1?`Solve the luck from the facts: $U_Z=Z-3X=${fmt(Z)}-3(${fmt(X)})=${fmt(Uz)}$, &nbsp; $U_Y=Y-2X-4Z=${fmt(Uy)}$.`:`Solve this student's luck $U_Z,U_Y$ from the observed facts.`}</div>
+        <div class="step${stage>=2?' active':''}"><div class="label">Action</div> ${stage>=2?`Intervene $do(X=${fmt(Xp)})$ on the mutilated model, carrying $U_Z,U_Y$ forward.`:`Intervene on the mutilated model, keeping the same luck.`}</div>
+        <div class="step${stage>=3?' active':''}"><div class="label">Prediction</div> ${stage>=3?`$Z'=3X'+U_Z=${fmt(Zp)}$, then $Y'=2X'+4Z'+U_Y=${fmt(Yp)}$.`:`Recompute the counterfactual world.`}</div>`;
+      $("cf-result").innerHTML = stage>=3
+        ? `This student saw a GPA change of <b>${fmt(Y)}</b>. Had they done <b>${fmt(Xp)}</b> hours instead of ${fmt(X)}, the model says they would have seen <b style="color:var(--imagine)">${fmt(Yp)}</b>. Compare the rungs: an <em>average</em> student forced to the same hours (rung 2, $do(X'{=}${fmt(Xp)})$ with $U=0$) scores $14X'=${fmt(14*Xp)}$; this student's own luck ($U_Y=${fmt(Uy)}$) travels to the counterfactual world with them.`
+        : `The question: had this student done <b>${fmt(Xp)}</b> hours instead of ${fmt(X)}, what GPA change would they have seen? Step through to find out.`;
       if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([$("cf-twin"),$("cf-steps"),$("cf-result")]);
     }
-    $("cf-run").addEventListener("click",run);
-    run();
+    const btn=$("cf-run");
+    function setBtn(){ btn.textContent = stage===0?"Run step 1 · Abduction ▸" : stage===1?"Next step · Action ▸" : stage===2?"Next step · Prediction ▸" : "Re-run from step 1 ▸"; }
+    btn.addEventListener("click",()=>{ stage = stage>=3? 1 : stage+1; run(); setBtn(); });
+    ["cf-x","cf-z","cf-y","cf-xp"].forEach(id=>$(id).addEventListener("input",()=>{ stage=0; run(); setBtn(); }));
+    setBtn(); run();
   })();
+
+  /* =================== mobile TOC disclosure =================== */
+  document.getElementById("toc-toggle").addEventListener("click",function(){
+    const t=document.querySelector(".toc");
+    t.classList.toggle("open");
+    this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
+  });
   </script>
 </body>
 </html>
