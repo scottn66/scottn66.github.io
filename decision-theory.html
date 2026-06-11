@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Price of Knowing You · Decision Theory → Causality</title>
+  <title>The Value of Knowing You · Decision Theory → Causality</title>
   <meta name="description"
-        content="A topologically-sorted tour from Bayesian networks through utility,
+        content="A topologically-sorted curriculum from Bayesian networks through utility,
                  decision networks, the value of perfect information, interventions, and
-                 counterfactuals — built around an ad agent that climbs Pearl's ladder.
-                 Three interactive widgets; a modernized, runnable Defendotron." />
+                 counterfactuals. An ad agent climbs Pearl's ladder; three interactive
+                 widgets; a modernized, runnable decision network." />
   <link rel="icon"
         href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🪜</text></svg>" />
   <script>
@@ -22,8 +22,8 @@
     :root{
       --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
       --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
-      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --code-bg:#F2F2F5;
-      --see:#2F7A4A; --do:#1F4E9E; --imagine:#8a4fbf;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --gold-soft:#F6EFD8; --code-bg:#F2F2F5;
+      --see:#2F7A4A; --do:#1F4E9E; --imagine:#8a4fbf; --imagine-soft:#EDE3F7;
       --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
     }
     *,*::before,*::after{box-sizing:border-box}
@@ -49,6 +49,7 @@
     .toc a:hover{color:var(--accent)}
     .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none}
     .toc .act::before{content:""}
+    .toc .digress a{font-style:italic}
     main{min-width:0}
     h1{font-size:2.5rem;line-height:1.1;margin:.2rem 0 .6rem;letter-spacing:-.5px}
     h2{font-size:1.5rem;margin:2.6rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
@@ -60,12 +61,21 @@
     .act-see{background:var(--see)} .act-do{background:var(--do)} .act-imagine{background:var(--imagine)} .act-econ{background:var(--gold);color:#3a2e00}
     .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--radius);padding:.8rem 1rem;margin:1.1rem 0;box-shadow:var(--shadow)}
     .callout.good{border-left-color:var(--good)} .callout.warn{border-left-color:var(--warn)} .callout.gold{border-left-color:var(--gold)}
+    .callout.landmark{border-left-color:var(--imagine);background:var(--imagine-soft)}
     .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    /* aside boxes: prerequisites + digressions, distinct from the curriculum spine */
+    .aside-box{border:1px dashed var(--rule);border-radius:var(--radius);padding:.75rem 1rem;margin:1.1rem 0;background:#FCFCFD;font-size:.93rem}
+    .aside-box .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+    .aside-box.prereq .k{color:var(--good)}
+    .aside-box.digress .k{color:var(--gold)}
     figure{margin:1.2rem 0;text-align:center}
     figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
     table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
     th,td{border:1px solid var(--rule);padding:.4rem .6rem;text-align:left;vertical-align:top}
     th{background:var(--accent-soft);color:var(--accent)}
+    ol.outline{counter-reset:o;list-style:none;padding-left:0}
+    ol.outline>li{counter-increment:o;margin:.5rem 0;padding-left:2.1rem;position:relative}
+    ol.outline>li::before{content:counter(o);position:absolute;left:0;top:.1rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--accent);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center}
     /* widgets */
     .widget{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem 1.2rem;margin:1.3rem 0;box-shadow:var(--shadow)}
     .widget h4{margin:.1rem 0 .2rem;font-size:1rem}
@@ -110,27 +120,37 @@
   <div class="page">
     <aside class="toc" aria-label="Contents">
       <nav><ol>
+        <li><a href="#ladder">The ladder</a></li>
         <li class="act">Act I · Seeing</li>
-        <li><a href="#bayes-nets">Bayesian networks</a></li>
+        <li><a href="#definitions">First, the words</a></li>
+        <li><a href="#sevh">The SEVH story</a></li>
+        <li><a href="#factorization">The factorization</a></li>
         <li><a href="#dsep">d-separation</a></li>
-        <li><a href="#inference">Inference</a></li>
+        <li><a href="#inference">Inference, outlined</a></li>
         <li><a href="#widget-bn">▶ Inference toy</a></li>
         <li class="act">Act II · Deciding</li>
-        <li><a href="#utility">Utility &amp; decision networks</a></li>
+        <li><a href="#utility">Utility</a></li>
+        <li><a href="#belief">What is a belief?</a></li>
+        <li><a href="#decision-networks">Decision networks</a></li>
         <li><a href="#defendotron">The Defendotron</a></li>
         <li><a href="#vpi">Value of information</a></li>
         <li><a href="#widget-vpi">▶ VPI calculator</a></li>
         <li class="act">Act III · Doing</li>
-        <li><a href="#hierarchy">The causal hierarchy</a></li>
+        <li><a href="#hierarchy">Why seeing isn't enough</a></li>
         <li><a href="#do">The do-operator</a></li>
-        <li><a href="#backdoor">Backdoor &amp; adjustment</a></li>
+        <li><a href="#backdoor">Backdoor, with intuition</a></li>
+        <li class="digress"><a href="#central-bank">· Central banks</a></li>
         <li class="act">Act IV · Imagining</li>
         <li><a href="#scm">Structural causal models</a></li>
         <li><a href="#counterfactuals">Counterfactuals</a></li>
         <li><a href="#widget-cf">▶ Counterfactual stepper</a></li>
+        <li><a href="#butfor">The courtroom</a></li>
         <li><a href="#ett">The ladder closes</a></li>
-        <li class="act">Coda</li>
-        <li><a href="#domains">Application domains</a></li>
+        <li class="act">Part V · In the wild</li>
+        <li><a href="#domains">The gallery</a></li>
+        <li><a href="#dag-building">Where DAGs come from</a></li>
+        <li><a href="#data">What data feeds which rung</a></li>
+        <li><a href="#advanced">The advanced shelf</a></li>
         <li><a href="#colophon">Sources &amp; honesty</a></li>
       </ol></nav>
     </aside>
@@ -142,87 +162,236 @@
           <span class="badge">3 interactive widgets</span>
           <span class="badge">CMSI 3300 + 4320</span>
         </div>
-        <h1>The Price of Knowing You</h1>
+        <h1>The Value of Knowing You</h1>
         <p class="lead">
-          An ad agent wants to show you the right ad. To do it well, it has to
-          climb a ladder — from <em>seeing</em> correlations, to <em>deciding</em>
-          under uncertainty, to asking what a fact about you is <em>worth</em>,
-          all the way to <em>imagining</em> the ad it didn't show. This is a
-          topologically-sorted tour of that ladder: Bayesian networks → utility →
-          decision networks → value of perfect information → interventions →
-          counterfactuals. Each rung has a worked example you can poke at.
+          An ad agent wants to show you the right ad, and to do it well it has to
+          climb a ladder: from <em>seeing</em> patterns, to <em>deciding</em>
+          under uncertainty, to putting a number on what one more fact about you
+          is <em>worth</em>, all the way up to <em>imagining</em> the ad it never
+          showed. This page is a topologically-sorted curriculum for that climb,
+          and every rung has a worked example you can poke at. The destination is
+          genuinely exciting: by the end, the machinery answers questions courts,
+          central banks, and doctors ask every day.
         </p>
         <div class="callout">
           <span class="k">The spine</span>
           <p style="margin:.3rem 0 0">
-            One agent — the <strong>Defendotron</strong>, a real homework I wrote
-            and have since modernized so it runs again — appears twice. At rung 2
-            it asks <em>"which ad, and is your demographic worth buying?"</em>
-            (value of information). At rung 3 the same agent asks <em>"given you
-            clicked, would you have clicked under a different ad?"</em>
-            (a counterfactual). Watching it climb is the whole story.
+            One agent, the <strong>Defendotron</strong> (a real homework of mine,
+            since modernized so it runs again), appears twice. At rung 2 it asks
+            <em>"which ad, and is your demographic worth buying?"</em> (the value
+            of information). At rung 3 the same agent asks <em>"given you clicked,
+            would you have clicked under a different ad?"</em> (a counterfactual).
+            Watching one agent climb the whole ladder is the story.
           </p>
         </div>
+
+        <div class="aside-box prereq">
+          <span class="k">Prerequisites</span>
+          <p style="margin:.25rem 0 0">
+            Comfort with conditional probability notation $P(A\mid B)$, summation
+            notation $\sum$, and reading a diagram of circles and arrows. That's
+            it; every other object used on this page is defined on this page.
+            If $P(A\mid B)$ is new, any introduction to Bayes' rule is the right
+            warm-up.
+          </p>
+        </div>
+
+        <h2 id="ladder">The ladder we're climbing</h2>
         <p>
-          The framing follows Pearl's <strong>Ladder of Causation</strong> as
-          taught by <a href="https://forns.lmu.build/">Andrew Forney</a> (LMU
-          CMSI 4320), with the probabilistic machinery from Russell &amp; Norvig's
-          <em>AIMA</em>. The three tiers:
+          The organizing image is the <strong>Ladder of Causation</strong> from
+          Judea Pearl and Dana Mackenzie's <em>The Book of Why</em> (2018), the
+          popular companion to Pearl's <em>Causality</em>. The version here
+          follows Andrew Forney's classroom rendering (LMU CMSI 4320), with the
+          probabilistic machinery from Russell &amp; Norvig's <em>AIMA</em>:
         </p>
         <figure>
           <table style="max-width:560px;margin:0 auto">
             <tr><th>Tier</th><th>Question</th><th>Example</th><th>Denizen</th></tr>
-            <tr><td><span class="act-tag act-imagine">3 · imagine</span></td><td>What if $X$ <em>had been</em> $x'$?</td><td>"Would I be home had I left the 405?"</td><td>Structural Causal Models</td></tr>
+            <tr><td><span class="act-tag act-imagine">3 · imagine</span></td><td>What if $X$ <em>had been</em> $x'$?</td><td>"Would I be home by now had I gotten off the 405?"</td><td>Structural Causal Models</td></tr>
             <tr><td><span class="act-tag act-do">2 · do</span></td><td>What if I <em>do</em> $X=x$?</td><td>"Will exercise lower my cholesterol?"</td><td>Causal Bayes nets · RL</td></tr>
             <tr><td><span class="act-tag act-see">1 · see</span></td><td>What if I <em>see</em> $X=x$?</td><td>"Is symptom $X$ tied to disease $Y$?"</td><td>Bayesian networks</td></tr>
           </table>
-          <figcaption>Each tier subsumes the ones below it. A tool stuck on tier 1 cannot answer a tier-2 question — which is why even a fluent associational model (an LLM) stumbles on "what would have happened if…".</figcaption>
+          <figcaption>Pearl &amp; Mackenzie, <em>The Book of Why</em> (2018). Each tier subsumes the ones below it; a tool stuck on tier 1 cannot answer a tier-2 question, which is why even a fluent associational model (an LLM) stumbles on "what would have happened if…".</figcaption>
         </figure>
 
         <!-- ===================== ACT I ===================== -->
-        <h2 id="bayes-nets"><span class="act-tag act-see">Act I · Seeing</span><br>Bayesian networks — what do I believe?</h2>
-        <p>
-          Start at the bottom. A <strong>Bayesian network</strong> answers
-          <em>"what do I believe?"</em> by storing a big joint distribution
-          cheaply: a DAG of cause-ish arrows, plus one small conditional
-          probability table (CPT) per node. The joint <em>factorizes</em> along
-          the structure:
-        </p>
-        <p>$$P(X_1,\dots,X_n)=\prod_i P\!\left(X_i \mid \text{parents}(X_i)\right)$$</p>
-        <p>
-          Our running example (Forney's, and the one we'll ride all the way up):
-          <strong>S</strong>tressed, <strong>V</strong>apes,
-          <strong>E</strong>xercises, develops <strong>H</strong>eart-disease,
-          with $S\to V$, $S\to E$, $V\to H$, $E\to H$. Instead of $2^4-1=15$ free
-          numbers, we store four little CPTs:
-        </p>
-        <p style="text-align:center">$$P(S)\,P(V\!\mid\!S)\,P(E\!\mid\!S)\,P(H\!\mid\!V,E)$$</p>
+        <h2 id="act1"><span class="act-tag act-see">Act I · Seeing</span><br>Bayesian networks: what do I believe?</h2>
 
-        <h3 id="dsep">d-separation — independence you can read off the picture</h3>
+        <h3 id="definitions">First, the words</h3>
         <p>
-          The graph also tells you what's independent of what, via three local
-          rules. Conditioning on the middle node blocks a <em>fork</em>
-          ($X\!\leftarrow\!Z\!\to\!Y$) or a <em>chain</em>
-          ($X\!\to\!Z\!\to\!Y$); but conditioning on a <em>collider</em>
-          ($X\!\to\!Z\!\leftarrow\!Y$) <em>opens</em> it — observing a common
-          effect makes its causes dependent ("explaining away"). That collider
-          quirk is the seed of every spurious correlation we'll fight in Act III.
+          Three definitions carry this whole act. They're short, and everything
+          later leans on them.
+        </p>
+        <div class="callout">
+          <span class="k">Definition · joint distribution</span>
+          <p style="margin:.3rem 0 0">
+            A <strong>random variable</strong> is a quantity that takes one of
+            several values with some probability ($S$ below is "is this person
+            stressed?", values $\{0,1\}$). The <strong>joint distribution</strong>
+            $P(X_1,\dots,X_n)$ assigns a probability to <em>every combination</em>
+            of values at once; it is the complete statistical description of the
+            system. The catch is its size: $n$ binary variables need a table with
+            $2^n$ rows ($2^n-1$ free numbers, since they must sum to 1). Four
+            variables: 15 numbers, fine. Thirty variables: over a billion. The
+            joint is the thing we want and cannot afford to store raw.
+          </p>
+        </div>
+        <div class="callout">
+          <span class="k">Definition · DAG</span>
+          <p style="margin:.3rem 0 0">
+            A <strong>directed acyclic graph</strong> is a set of nodes (one per
+            variable) connected by one-way arrows, with no cycles: you can never
+            leave a node, follow arrows, and return to it. No variable is its own
+            ancestor. The nodes pointing into $X$ are its
+            <strong>parents</strong>, written $\mathrm{pa}(X)$.
+          </p>
+        </div>
+        <div class="callout">
+          <span class="k">Definition · what an arrow claims (at this tier)</span>
+          <p style="margin:.3rem 0 0">
+            At tier 1, an arrow $S\!\to\!V$ is a claim about <strong>direct
+            statistical dependence</strong>: $V$'s distribution is written as a
+            function of $S$, and once you know a variable's parents, its
+            non-descendants tell you nothing more about it (the <em>local Markov
+            property</em>). An arrow is <em>not yet</em> a claim that $S$ causes
+            $V$. That upgrade is precisely what Act III earns. Hold the
+            distinction now: <strong>association</strong> is about what
+            co-occurs; <strong>causation</strong> is about what would change if
+            you reached in and changed something. The same data can support
+            arrows drawn in either direction (we'll meet this as "observational
+            equivalence"), and a useful slogan to carry: correlation does not
+            imply causation, but there is no correlation <em>without</em>
+            causation somewhere generating it.
+          </p>
+        </div>
+        <p>
+          A <strong>Bayesian network</strong> is a DAG plus one small
+          <strong>conditional probability table</strong> (CPT) per node:
+          $P(X_i \mid \mathrm{pa}(X_i))$. The promise: those small tables,
+          multiplied together, reconstruct the entire unaffordable joint.
         </p>
 
-        <h3 id="inference">Inference — asking the network questions</h3>
+        <h3 id="sevh">The SEVH story: where the arrows come from</h3>
         <p>
-          Given evidence $e$, we want $P(Q\mid e)$. Forney's four-step recipe:
-          find $P(Q,e)=\sum_y P(Q,e,y)$ from the factorization, find
-          $P(e)=\sum_q P(q,e)$, divide. That's <strong>enumeration</strong>
-          (AIMA's <code>enumeration_ask</code>); <strong>variable elimination</strong>
-          is the same idea with the sums pushed inward. When the network is too
-          big, you <strong>sample</strong> (likelihood weighting, Gibbs).
+          Our running network models heart-disease risk in a population with four
+          binary variables: <strong>S</strong>tressed, <strong>V</strong>apes,
+          <strong>E</strong>xercises, <strong>H</strong>eart disease. The graph
+          is $S\!\to\!V$, $S\!\to\!E$, $V\!\to\!H$, $E\!\to\!H$. But a graph
+          should never be handed down from the sky; each arrow is a posited,
+          defensible modeling claim, the kind a clinician or epidemiologist
+          supplies:
+        </p>
+        <ul>
+          <li><strong>$S\to V$</strong>: chronic stress plausibly drives people
+            toward nicotine; knowing someone's stress level changes our
+            expectation that they vape.</li>
+          <li><strong>$S\to E$</strong>: stress saps the time and energy that
+            exercise habits need; the dependence runs through lifestyle, not
+            chance.</li>
+          <li><strong>$V\to H$ and $E\to H$</strong>: vaping loads the
+            cardiovascular system; exercise protects it. Heart disease "listens
+            to" both (Pearl's phrase: an effect listens to its causes to decide
+            its value).</li>
+        </ul>
+        <p>
+          The arrows we <em>refused</em> to draw are claims too, and just as
+          important: no $V\!\to\!E$ (vaping doesn't make anyone exercise; the
+          vaping–exercise correlation in data is fully explained by their shared
+          parent $S$), and no $H\!\to\!S$ (in the time window we model, the
+          disease hasn't yet fed back into stress). One subtlety about
+          "information flow": the arrows are one-way as <em>structural</em>
+          claims, but <em>evidence</em> travels both directions along them.
+          Observing $V=1$ raises our belief in $S=1$ (reading the arrow
+          backwards is legitimate inference), and through $S$ it shifts our
+          belief about $E$. The graph disciplines these flows; it doesn't forbid
+          them.
+        </p>
+
+        <h3 id="factorization">From graph to numbers: the factorization, term by term</h3>
+        <p>
+          Start from something that is always true, graph or no graph, the
+          <strong>chain rule of probability</strong>. For any ordering of the
+          variables:
+        </p>
+        <p>$$P(X_1,\dots,X_n)=\prod_{i=1}^{n} P\!\left(X_i \mid X_1,\dots,X_{i-1}\right).$$</p>
+        <p>
+          Here $i$ indexes the variables one at a time, and each factor
+          conditions on <em>everything before it</em>. No savings yet; the last
+          factor is as big as ever. The graph's gift is that each variable only
+          needs its <em>parents</em>, not its entire history:
+        </p>
+        <p>$$P(X_1,\dots,X_n)=\prod_{i=1}^{n} P\!\left(X_i \mid \mathrm{pa}(X_i)\right)
+        \qquad\text{(the Markov factorization)}$$</p>
+        <p>
+          where $i$ runs over the $n$ nodes in any order that respects the
+          arrows (parents before children), and each factor
+          $P(X_i\mid\mathrm{pa}(X_i))$ is exactly one CPT. Watch it play out on
+          SEVH, ordering $S,V,E,H$:
+        </p>
+        <p>$$\begin{aligned}
+        P(S,V,E,H) &= P(S)\;P(V\mid S)\;P(E\mid S,V)\;P(H\mid S,V,E) &&\text{chain rule}\\[2pt]
+                   &= P(S)\;P(V\mid S)\;P(E\mid S)\;P(H\mid V,E) &&\text{graph}
+        \end{aligned}$$</p>
+        <p>
+          Two deletions happened on that second line, and each is one of our
+          modeling claims cashing out: $P(E\mid S,V)$ became $P(E\mid S)$
+          because $E$'s only parent is $S$ (the missing $V\!\to\!E$ arrow), and
+          $P(H\mid S,V,E)$ became $P(H\mid V,E)$ because $H$'s parents are
+          exactly $\{V,E\}$ (no direct $S\!\to\!H$ arrow; stress reaches the
+          heart only through behavior). Count the parameters: the raw joint
+          needed $2^4-1=15$ numbers; the factored form needs
+          $1+2+2+4=9$ (one number for $P(S{=}1)$, two for $P(V{=}1\mid S)$, two
+          for $P(E{=}1\mid S)$, four for $P(H{=}1\mid V,E)$). Nine instead of
+          fifteen is cute; at thirty variables the same move is the difference
+          between a billion numbers and a few hundred.
+        </p>
+
+        <h3 id="dsep">d-separation: independence you can read off the picture</h3>
+        <p>
+          The structure also tells you what is independent of what, by three
+          local rules about paths. Conditioning on the middle node
+          <em>blocks</em> a fork ($X\!\leftarrow\!Z\!\to\!Y$) and a chain
+          ($X\!\to\!Z\!\to\!Y$); but a <em>collider</em>
+          ($X\!\to\!Z\!\leftarrow\!Y$) is blocked by default and conditioning on
+          it <em>opens</em> it: observing a common effect makes its causes
+          compete to explain it ("explaining away"). That collider quirk is the
+          seed of every spurious correlation we fight in Act III.
+        </p>
+
+        <h3 id="inference">Asking the network questions: inference, as an outline</h3>
+        <p>
+          Given evidence $e$ (things we observed), we want the posterior
+          $P(Q\mid e)$ for a query variable $Q$. The by-hand method,
+          <strong>enumeration</strong>, is a four-step outline:
+        </p>
+        <ol class="outline">
+          <li><strong>Label</strong> the variables: query $Q$, evidence $e$, and
+            everything else hidden, $Y$. The target is
+            $P(Q\mid e)=P(Q,e)/P(e)$.</li>
+          <li><strong>Numerator.</strong> Compute
+            $P(Q,e)=\sum_{y} P(Q,e,y)$, where each term in the sum is a full
+            joint probability, read directly off the Markov factorization (a
+            product of CPT lookups).</li>
+          <li><strong>Denominator.</strong> Compute
+            $P(e)=\sum_{q} P(q,e)$, reusing the very table you built in step 2
+            and summing over the query's values.</li>
+          <li><strong>Divide:</strong> $P(Q\mid e)=\dfrac{P(Q,e)}{P(e)}$.</li>
+        </ol>
+        <p>
+          Everything fancier is an efficiency upgrade on that outline:
+          <strong>variable elimination</strong> pushes the sums inward so you
+          never materialize the whole table, and when networks get too large for
+          exact answers, <strong>sampling</strong> (rejection, likelihood
+          weighting, Gibbs) approximates the same posterior by simulating worlds
+          and counting. The widget below runs the honest four-step version,
+          because with four binary variables there are only sixteen worlds to
+          sum.
         </p>
 
         <!-- WIDGET 1 -->
         <div class="widget" id="widget-bn">
-          <h4>▶ Widget 1 — Bayesian-network inference</h4>
-          <p class="hint">The vaping → heart-disease network. Click to fix evidence (—, 0, or 1) on any variable; the posteriors $P(\cdot=1\mid e)$ for the rest update by exact enumeration over all 16 worlds. Try fixing $V=1$: heart-disease risk jumps. Then add $S=1$ and watch it shift again.</p>
+          <h4>▶ Widget 1 · Bayesian-network inference</h4>
+          <p class="hint">The vaping → heart-disease network with the lecture's CPTs. Click to fix evidence (—, 0, or 1) on any variable; the posteriors $P(\cdot=1\mid e)$ for the rest update by exact enumeration over all 16 worlds. Try fixing $V=1$: heart-disease risk jumps. Then add $S=1$ and watch it shift again.</p>
           <div class="row">
             <div class="col" id="bn-controls"></div>
             <div class="col" id="bn-posteriors"></div>
@@ -231,33 +400,137 @@
         </div>
 
         <!-- ===================== ACT II ===================== -->
-        <h2 id="utility"><span class="act-tag act-econ">Act II · Deciding</span><br>Utility &amp; decision networks — what should I do?</h2>
+        <h2 id="act2"><span class="act-tag act-econ">Act II · Deciding</span><br>Utility, belief, and the first step toward causation</h2>
         <p>
-          Beliefs don't act. To <em>decide</em>, add what you <em>want</em>: a
-          <strong>utility</strong> $U(s)$ over outcomes. A rational agent picks
-          the action with the highest <strong>expected utility</strong>:
+          This act is the hinge of the whole curriculum. Acts I and III/IV get
+          the press (Bayes nets! counterfactuals!), but the move that happens
+          here, from passively describing the world to <em>acting in it</em>, is
+          where <em>The Book of Why</em> locates the difference between seeing
+          and doing. An agent that chooses an action is already, implicitly,
+          asking a tier-2 question: "what happens if I <em>do</em> this?" We
+          will build the choosing machinery first with associational tools, see
+          how far it gets (surprisingly far), and let its limits push us up the
+          ladder. Two new objects are needed: a preference you can score, and a
+          belief you can compute with.
+        </p>
+
+        <h3 id="utility">Utility theory: what do I want?</h3>
+        <p>
+          A <strong>utility function</strong> $U(s)$ assigns a number to each
+          outcome, encoding preference. The von Neumann–Morgenstern theorem says
+          that if an agent's preferences are coherent (complete, transitive,
+          continuous, independent of irrelevant alternatives), they behave
+          <em>as if</em> maximizing the expectation of some $U$:
         </p>
         <p>$$\mathrm{EU}(a\mid e)=\sum_s P(s\mid e,a)\,U(s),\qquad \mathrm{MEU}(e)=\max_a \mathrm{EU}(a\mid e).$$</p>
         <p>
-          A <strong>decision network</strong> is a Bayes net plus decision nodes
-          (your actions) and a utility node. You run inference inside an argmax
-          over actions. That's AIMA's <code>DecisionNetwork</code> — and it's
-          exactly what the Defendotron does.
+          Read it in words: for each action $a$, imagine every outcome $s$,
+          weight how much you'd like it by how likely it is, and sum. Then pick
+          the action with the best total. That maximum, $\mathrm{MEU}(e)$, is
+          the score of acting optimally given what you currently know.
         </p>
 
-        <h3 id="defendotron">The Defendotron — a decision network on real data</h3>
+        <h3 id="belief">What is a belief? (the landmark)</h3>
+        <p>
+          The formula above quietly fused two things: $U(s)$, a desire, and
+          $P(s\mid e,a)$, a <em>belief</em>. We've been using beliefs all
+          through Act I without saying what one is. It's worth a real answer,
+          because the same object climbs every rung from here. Three lenses:
+        </p>
+        <ul>
+          <li><strong>Statistics.</strong> A belief is a <em>degree of
+            credence</em>: a probability distribution over the ways the world
+            could be, updated by Bayes' rule as evidence arrives. This is the
+            subjective (Bayesian) reading of probability, where $P$ measures
+            confidence rather than long-run frequency.</li>
+          <li><strong>Computation.</strong> A belief is a <em>data
+            structure</em>: the factored posterior a Bayes net maintains, or the
+            "belief state" an agent carries. In partially observable decision
+            problems (POMDPs), the belief state is provably a <em>sufficient
+            statistic</em>: an agent that tracks only its posterior over hidden
+            states loses nothing for optimal action. Belief is what a rational
+            agent is licensed to compress its whole history into.</li>
+          <li><strong>Neuroscience.</strong> The Bayesian-brain research program
+            treats perception itself as inference: neural populations encode
+            distributions, perception combines prior and likelihood, and
+            prediction errors drive updates. The dopamine system's
+            reward-prediction-error signal mirrors, almost equation for
+            equation, the temporal-difference error of reinforcement learning.
+            Wetware appears to run a cousin of the very update rules in this
+            curriculum.</li>
+        </ul>
+        <p>
+          And the deepest answer runs the arrow backwards. You might worry that
+          "degree of belief" is circular: where do the numbers come from? Frank
+          Ramsey and Bruno de Finetti's move: <strong>measure belief by
+          behavior</strong>. Your degree of belief in an event <em>is</em> the
+          betting odds you'd accept on it. If your credences violate the
+          probability axioms, a bookie can assemble a set of bets you'd accept
+          that loses you money no matter what happens (a "Dutch book"), so
+          coherence forces beliefs to be probabilities. Leonard Savage completed
+          the construction: an agent whose <em>preferences</em> satisfy a short
+          list of rationality axioms behaves exactly as if it has a unique
+          probability distribution (its beliefs) and a utility function (its
+          desires), and maximizes expected utility. So belief doesn't merely
+          <em>combine</em> with weighted utility; in the foundations, belief
+          <em>emerges from</em> utility-weighted choice. Decision theory isn't
+          built on top of probability; the two co-emerge from coherent
+          preference.
+        </p>
+        <div class="callout landmark">
+          <span class="k">Landmark · carry this up the ladder</span>
+          <p style="margin:.3rem 0 0">
+            <strong>A belief is a probability distribution over ways a world
+            could be.</strong> The ladder never changes that object; it changes
+            <em>which worlds</em> the distribution ranges over.
+            Rung 1: the world as observed, $P(s\mid e)$.
+            Rung 2: worlds we would <em>create</em>, $P(s\mid do(a))$.
+            Rung 3: worlds that never happened, $P(s_{x'}\mid e)$.
+            Every formula in Acts III and IV is this landmark pointed at a new
+            set of worlds.
+          </p>
+        </div>
+
+        <h3 id="decision-networks">Decision networks: belief + preference + choice</h3>
+        <p>
+          A <strong>decision network</strong> (influence diagram) is a Bayes net
+          extended with decision nodes (the actions under your control) and a
+          utility node. The agent runs Act I inference inside an argmax over
+          actions. This one pattern is everywhere once you see it:
+        </p>
+        <ul>
+          <li>an <strong>ER triage</strong> system: beliefs about acuity from
+            vitals; utilities over outcomes; choose who's seen next;</li>
+          <li>a <strong>loan underwriter</strong>: beliefs about default from
+            application features; utilities over interest earned vs. loss;
+            approve or decline;</li>
+          <li>a <strong>central bank</strong> (we'll come back to this one):
+            beliefs about inflation's path; utilities over the dual mandate;
+            set the policy rate;</li>
+          <li>a <strong>transplant board</strong>: beliefs about graft survival;
+            utilities over life-years; allocate the organ;</li>
+          <li>a <strong>spam filter</strong>: beliefs about spamminess;
+            asymmetric utilities (a lost real email hurts more than a leaked
+            spam); deliver or quarantine.</li>
+        </ul>
+        <p>
+          Different stakes, same skeleton: beliefs × utilities → argmax. Our
+          worked instance is deliberately smaller and a little mischievous.
+        </p>
+
+        <h3 id="defendotron">The Defendotron: a decision network on real data</h3>
         <p>
           For CMSI 3300 I built an ad-selection agent: learn a Bayes net from a
           demographic CSV, then choose which ad to serve to maximize expected
           payoff. It has hand-rolled <code>eu()</code>, <code>meu()</code>, and
-          <code>vpi()</code>. The catch Forney's students hit years later: it was
-          written against <code>pomegranate</code> 0.x and a 2022 <code>pgmpy</code>,
-          and <strong>stopped running</strong>. So I modernized it
+          <code>vpi()</code>. The catch, years later: it was written against
+          <code>pomegranate</code> 0.x and a 2022 <code>pgmpy</code>, and it
+          <strong>stopped running</strong>. So I modernized it
           (<code>BicScore→BIC</code>, <code>BayesianNetwork→DiscreteBayesianNetwork</code>,
-          fixed a utility-variable indexing bug) and re-ran it on the original
-          <code>adbot-data.csv</code>:
+          plus a latent utility-variable indexing bug) and re-ran it on the
+          original <code>adbot-data.csv</code>:
         </p>
-        <pre><code># pgmpy 1.1.2 — verified MEU + VPI on the original adbot-data.csv
+        <pre><code># pgmpy 1.1.2: verified MEU + VPI on the original adbot-data.csv
 MEU(no evidence)        → serve {Ad1:1, Ad2:0}   E[utility] ≈ 746.8
 MEU(T=0, G=0)           → serve {Ad1:0, Ad2:0}   E[utility] ≈ 797.0
 VPI("G" | -)            ≈ 20.77      # gender is worth ~21 utility units to learn
@@ -266,40 +539,41 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         <div class="callout good">
           <span class="k">The reproduction</span>
           <p style="margin:.3rem 0 0">The modernized run reproduced the original
-          test-suite's headline numbers — <code>MEU≈746.8</code> (author's value
-          746.72) and <code>VPI(G)=20.77</code> exactly. Where the structure-learner
-          lands on a slightly different DAG across <code>pgmpy</code> versions, the
-          downstream VPI shifts too (and can even dip numerically negative — which
-          is why you clamp it). That sensitivity is itself the lesson: VPI is only
-          as stable as the graph beneath it.</p>
+          test-suite's headline numbers: <code>MEU≈746.8</code> (author's value
+          746.72) and <code>VPI(G)=20.77</code> exactly. Where the structure
+          learner lands on a slightly different DAG across <code>pgmpy</code>
+          versions, the downstream VPI shifts too (and can even dip numerically
+          negative, which is why you clamp it). That sensitivity is itself a
+          lesson: VPI is only as stable as the graph beneath it.</p>
         </div>
 
-        <h3 id="vpi">Value of Perfect Information — the crown jewel</h3>
+        <h3 id="vpi">Value of Perfect Information: the crown jewel</h3>
         <p>
-          Now the question this whole project is named for. Before you act, is it
-          worth <em>learning one more fact</em>? The
-          <strong>value of perfect information</strong> of observing $E'$ is the
-          expected best-you-could-do after seeing it, minus the best-you-could-do
-          now — denominated in utility:
+          Now the question this page is named for. Before you act, is it worth
+          <em>learning one more fact</em>? The <strong>value of perfect
+          information</strong> of observing $E'$ is the expected
+          best-you-could-do after seeing it, minus the best-you-could-do now,
+          denominated in utility:
         </p>
         <p>$$\mathrm{VPI}_e(E')=\Big[\textstyle\sum_v P(E'\!=\!v\mid e)\,\mathrm{MEU}\!\big(e\cup\{E'\!=\!v\}\big)\Big]-\mathrm{MEU}(e).$$</p>
         <p>
-          Three properties worth holding onto: VPI is <strong>never negative</strong>
-          (information can't hurt in expectation); it's <strong>non-additive</strong>
-          (two facts can be redundant or synergistic); and it is
-          <strong>zero exactly when the fact can't change your decision</strong> —
-          VPI measures <em>decision-relevance</em>, not Shannon information. That's
-          why <code>VPI(F)≈0</code> above: F is informative about the world but
+          Three properties worth holding onto: VPI is <strong>never
+          negative</strong> (information can't hurt in expectation); it's
+          <strong>non-additive</strong> (two facts can be redundant or
+          synergistic); and it is <strong>zero exactly when the fact can't
+          change your decision</strong>. VPI measures
+          <em>decision-relevance</em>, not Shannon information. That's why
+          <code>VPI(F)≈0</code> above: F is informative about the world but
           irrelevant to which ad wins.
         </p>
         <p class="hint">My hand-rolled <code>vpi()</code> turns out to implement the
           <em>identical</em> formula to AIMA's <code>InformationGatheringAgent.vpi()</code>
-          (Fig 16.9) — I re-derived the textbook on real data without knowing it.</p>
+          (Fig 16.9); I re-derived the textbook on real data without knowing it.</p>
 
         <!-- WIDGET 2 -->
         <div class="widget" id="widget-vpi">
-          <h4>▶ Widget 2 — VPI calculator</h4>
-          <p class="hint">A clean ad-targeting net: a hidden viewer trait $X$ (young/old), two ads, and a click. Drag the click-probabilities and the base rate. The widget computes the best ad <em>blind</em>, the best ad <em>if you could see $X$ first</em>, and the gap — the dollar value of knowing $X$. Push the sliders until one ad dominates regardless of $X$ and watch VPI collapse to $0$.</p>
+          <h4>▶ Widget 2 · VPI calculator</h4>
+          <p class="hint">A clean ad-targeting net: a hidden viewer trait $X$ (young/old), two ads, and a click. Drag the click-probabilities and the base rate. The widget computes the best ad <em>blind</em>, the best ad <em>if you could see $X$ first</em>, and the gap: the dollar value of knowing $X$. Push the sliders until one ad dominates regardless of $X$ and watch VPI collapse to $0$.</p>
           <div class="row">
             <div class="col">
               <div class="inputline"><span style="width:170px">$P(X=\text{young})$</span><input class="slider" type="range" id="vpi-px" min="0" max="1" step="0.05" value="0.5"><span class="readout" id="vpi-px-v">0.50</span></div>
@@ -314,97 +588,191 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         </div>
 
         <!-- ===================== ACT III ===================== -->
-        <h2 id="hierarchy"><span class="act-tag act-do">Act III · Doing</span><br>Why correlations aren't enough</h2>
-        <p>
+        <h2 id="act3"><span class="act-tag act-do">Act III · Doing</span><br>Why seeing isn't enough</h2>
+        <p id="hierarchy">
           The Defendotron is powerful, but it lives on tier 1: it knows how
-          variables <em>covary</em>, not what happens if you <em>act</em>. Ask it
-          "does vaping cause heart disease?" and the naive answer
+          variables <em>covary</em>, not what happens if you <em>act</em>. Ask
+          it "does vaping cause heart disease?" and the naive answer
           $P(H\!=\!1\mid V\!=\!1)-P(H\!=\!1\mid V\!=\!0)$ is <strong>wrong</strong>,
           for three reasons:
         </p>
         <ul>
-          <li><strong>Observational equivalence</strong> — $S\!\to\!V$ and
-            $V\!\to\!S$ encode the same independences but opposite causes.</li>
-          <li><strong>Spurious correlation</strong> — conditioning lets
-            information leak along the back-path $V\!\leftarrow\!S\!\to\!E\!\to\!H$,
-            tangential to the effect we want.</li>
-          <li><strong>Latent confounders</strong> — variables we never recorded
-            that drive two we did.</li>
+          <li><strong>Observational equivalence</strong>; $S\!\to\!V$ and
+            $V\!\to\!S$ encode the same independences but opposite causes, so
+            data alone cannot pick between them.</li>
+          <li><strong>Spurious correlation</strong>; conditioning lets
+            information leak along the back-path
+            $V\!\leftarrow\!S\!\to\!E\!\to\!H$, tangential to the effect we
+            want.</li>
+          <li><strong>Latent confounders</strong>; variables we never recorded
+            may drive two that we did.</li>
         </ul>
-        <p>Forney's tagline: <em>causal queries demand causal assumptions, encoded
-          in the model's structure.</em> Promote the Bayes net to a
+        <p>Forney's tagline: <em>causal queries demand causal assumptions,
+          encoded in the model's structure.</em> Promote the Bayes net to a
           <strong>Causal Bayesian Network</strong>, where an arrow
-          $\text{Parents}(Y)\to Y$ means $Y=f_Y(\text{Parents}(Y))$ — forcing a
-          cause changes the effect, but not vice-versa.</p>
+          $\text{Parents}(Y)\to Y$ now means $Y=f_Y(\text{Parents}(Y))$:
+          forcing a cause changes the effect, but not vice-versa. The arrows
+          finally mean what Act I warned you they didn't yet.</p>
 
-        <h3 id="do">The <em>do</em>-operator — surgery on the graph</h3>
+        <h3 id="do">The <em>do</em>-operator: surgery on the graph</h3>
         <p>
           Observing differs from intervening. We write $do(X=x)$ for
-          <em>forcing</em> $X$ to $x$ apart from its normal causes. Structurally,
-          $do(X=x)$ builds the <strong>mutilated graph</strong> $G_x$: the original
-          graph with <em>every inbound edge to $X$ cut</em>. $X$ is now set by
-          fiat, so its parents no longer explain it:
+          <em>forcing</em> $X$ to $x$ apart from its normal causes.
+          Structurally, $do(X=x)$ builds the <strong>mutilated graph</strong>
+          $G_x$: the original graph with <em>every inbound edge to $X$ cut</em>.
+          $X$ is now set by fiat, so its parents no longer explain it:
         </p>
         <figure>
           <table style="max-width:560px;margin:0 auto">
             <tr><th>world</th><th>graph</th><th>factorization</th></tr>
             <tr><td>observe (nature)</td><td>$S\!\to\!V,\,S\!\to\!E,\,VE\!\to\!H$</td><td>$P(S)\,P(V\!\mid\!S)\,P(E\!\mid\!S)\,P(H\!\mid\!V,E)$</td></tr>
-            <tr><td>$do(V=v)$</td><td>cut $S\!\to\!V$</td><td>$P(S)\,\underline{\ 1\ }\,P(E\!\mid\!S)\,P(H\!\mid\!V\!=\!v,E)$</td></tr>
+            <tr><td>$do(V=v)$</td><td>cut $S\!\to\!V$</td><td>$P(S)\,\cdot\,1\,\cdot\,P(E\!\mid\!S)\,P(H\!\mid\!V\!=\!v,E)$</td></tr>
           </table>
-          <figcaption>The $P(V\mid S)$ factor drops out — that's the only mechanism the intervention touches (this is the <em>truncated factorization</em>). Everything non-downstream of $V$ is untouched, which is why a Markovian causal effect is computable from purely observational CPTs.</figcaption>
+          <figcaption>The truncated factorization: under $do(V=v)$, the factor $P(V\mid S)$ is deleted and everything else survives unchanged.</figcaption>
         </figure>
         <p>
-          The payoff is striking: you can compute the answer to a randomized
-          experiment <em>you never ran</em> — provided your causal assumptions hold.
+          About that lone <strong>1</strong> in the second row: in the
+          observational world, $V$ carries the factor $P(V\mid S)$ because $V$
+          listens to $S$. The intervention unplugs that wire. $V$ now takes the
+          value $v$ with certainty, so its factor becomes the constant $1$,
+          while $S$ keeps its prior, $E$ keeps $P(E\mid S)$, and $H$ keeps
+          $P(H\mid V{=}v,E)$. Deleting a factor is the algebraic shadow of
+          deleting an arrow. And because only $V$'s own mechanism changed, a
+          Markovian causal effect is computable from purely observational CPTs;
+          you can calculate the result of a randomized experiment <em>you never
+          ran</em>, provided the causal assumptions in the graph hold.
         </p>
 
-        <h3 id="backdoor">Backdoor &amp; adjustment</h3>
+        <h3 id="backdoor">Backdoor &amp; adjustment, with the intuition first</h3>
         <p>
-          When a confounder muddies $X\to Y$, block the non-causal back-paths by
-          conditioning on an admissible set $Z$ (the <strong>backdoor criterion</strong>):
+          Picture association as water flowing through every unblocked path
+          between $X$ and $Y$, in either direction along the pipes. The
+          <em>causal</em> effect is only the water moving along directed paths
+          $X\!\to\!\dots\!\to\!Y$. Any path that enters $X$ through an inbound
+          arrow (through $X$'s "back door", like
+          $V\!\leftarrow\!S\!\to\!E\!\to\!H$) leaks non-causal association into
+          your comparison. Conditioning is the valve system: conditioning on a
+          node in a fork or chain <em>closes</em> that pipe; conditioning on a
+          collider <em>opens</em> one that was shut. The
+          <strong>backdoor criterion</strong> asks for a set $Z$ that closes
+          every back-door pipe without opening any collider and without touching
+          descendants of $X$. Find one, and what's left flowing is causation:
         </p>
-        <p>$$P(Y\mid do(X\!=\!x))=\sum_z P(Y\mid X\!=\!x,Z\!=\!z)\,P(Z\!=\!z).$$</p>
+        <p>$$P(Y \mid do(X{=}x)) = \sum_z P(Y \mid X{=}x, Z{=}z)\; P(Z{=}z) \qquad\text{(adjustment formula)}$$</p>
         <p>
-          That adjustment formula is the heart of CMSI 4320's Assignment 4
-          ("Back Doors, Do, and other Funny Sounding Things"): translate an
-          English query to a $do$-expression, then hand-compute it — e.g.
+          Concretely, for "does vaping cause heart disease?": comparing vapers
+          to non-vapers naively mixes two differences, the effect of vaping
+          <em>and</em> the fact that vapers are more often stressed (and
+          stressed people exercise less). The fix is exactly what a careful
+          epidemiologist would do by hand: compare vapers to non-vapers
+          <em>within</em> the stressed group, compare them <em>within</em> the
+          unstressed group, then average the two answers, weighting by how
+          common stress is in the population. That sentence <em>is</em> the
+          adjustment formula. One subtlety that rewards a pause: the weight is
+          $P(z)$, the population's stress distribution, not $P(z\mid x)$, the
+          stress distribution <em>among vapers</em>. Using the latter would
+          smuggle the confounding right back in; the whole point of $do$ is to
+          ask what happens when vaping is assigned <em>independently</em> of
+          stress.
+        </p>
+        <p>
+          This is the substance of CMSI 4320's Assignment 4 ("Back Doors, Do,
+          and other Funny Sounding Things"): translate an English query into a
+          $do$-expression, find an admissible $Z$, and hand-compute, e.g.,
           $P(H\!=\!1\mid do(E\!=\!1),S\!=\!1)$ on the vaping net. A randomized
-          controlled trial <em>is</em> a physical $do()$; the algebra lets us
-          emulate one from observational data.
+          controlled trial <em>is</em> a physical $do()$: randomization cuts
+          every inbound arrow to the treatment by brute force. The adjustment
+          formula is how you emulate one with observational data when the graph
+          permits.
         </p>
+
+        <div class="aside-box digress" id="central-bank">
+          <span class="k">Digression · the biggest do() in economics</span>
+          <p style="margin:.25rem 0 0">
+            When a central bank raises its policy rate, that is a literal
+            intervention: $do(\text{rate}{=}r)$ propagates through banks'
+            funding costs into loan pricing, and credit creation slows. The
+            reason this is <em>hard</em> to measure is pure Act III: rates and
+            credit covary in the data, but the bank also <em>reacts</em> to the
+            economy (it hikes when credit booms), which is confounding by
+            indication, the same structure as a physician prescribing the
+            strongest drug to the sickest patients. Economists' fixes are
+            causal-inference moves wearing macro clothing: high-frequency
+            "surprise" components of rate announcements serve as
+            quasi-randomization (a natural $do()$), and narrative records of
+            policy deliberations are used to argue back-door paths shut. The
+            counterfactual version ("had the Fed held rates in 2022, would
+            inflation have persisted?") needs Act IV machinery: a structural
+            model of the economy, which is what DSGE models are, SCMs at
+            national scale.
+          </p>
+        </div>
 
         <!-- ===================== ACT IV ===================== -->
-        <h2 id="scm"><span class="act-tag act-imagine">Act IV · Imagining</span><br>Structural causal models &amp; the top rung</h2>
-        <p>
+        <h2 id="act4"><span class="act-tag act-imagine">Act IV · Imagining</span><br>Structural causal models &amp; the top rung</h2>
+        <p id="scm">
           The most expressive model writes down the <em>mechanisms</em>
-          themselves. A <strong>structural causal model</strong> $M=\langle U,V,F\rangle$
-          has endogenous variables $V$, exogenous "luck" variables $U$ (one per
-          $V$, $E[U_i]=0$), and structural equations $V_i\gets f_{V_i}(\text{pa}_i,U_{V_i})$.
-          Fix the $U$ and everything is determined — that determinism is what makes
+          themselves. A <strong>structural causal model</strong>
+          $M=\langle U,V,F\rangle$ has endogenous variables $V$, exogenous
+          "luck" variables $U$ (one per $V$, with $E[U_i]=0$), and structural
+          equations $V_i\gets f_{V_i}(\text{pa}_i,U_{V_i})$. Fix the $U$ and
+          everything is determined; that determinism is what makes
           counterfactuals computable. When two variables secretly share a $U$
           (in the linear case, $\mathrm{Cov}(U_X,U_Y)\neq 0$), you have an
-          <strong>unobserved confounder</strong>.
+          <strong>unobserved confounder</strong>. And recall the Act II
+          landmark: a belief is a distribution over ways a world could be. The
+          SCM is the machine that <em>generates</em> those worlds, one per
+          setting of $U$, which is exactly why it can range over worlds that
+          never happened.
         </p>
 
-        <h3 id="counterfactuals">Counterfactuals — abduction, action, prediction</h3>
+        <h3 id="counterfactuals">Counterfactuals: abduction, action, prediction</h3>
         <p>
-          A counterfactual conditions on what <em>actually</em> happened and asks
-          about a world where one thing was different — two worlds sharing the
-          same luck. You can't just intervene (that throws away the evidence about
-          the luck); you must first recover it. The three-step engine, on a
-          linear afterschool→GPA model
-          ($Z\gets 3X+U_Z,\ Y\gets 2X+4Z+U_Y$):
+          A counterfactual conditions on what <em>actually</em> happened and
+          asks about a world where one thing was different: two worlds sharing
+          the same background luck. You cannot just intervene (that throws away
+          the evidence about the luck); you must first recover it. Our worked
+          model is a linear SCM of an afterschool program's effect on grades.
+          Define the variables precisely:
         </p>
-        <ol>
-          <li><strong>Abduction</strong> — solve the $U$ from the observed facts.</li>
-          <li><strong>Action</strong> — apply $do(X=x')$ to the mutilated model, carrying the $U$ forward.</li>
-          <li><strong>Prediction</strong> — recompute the outcome.</li>
+        <table style="max-width:620px">
+          <tr><th>Variable</th><th>Meaning</th><th>Structural equation</th></tr>
+          <tr><td>$X$</td><td>hours per week the student attends the afterschool program</td><td>$X \gets U_X$ (chosen outside the model)</td></tr>
+          <tr><td>$Z$</td><td>hours per week of homework completed (the program assigns and supervises homework, so $X$ drives $Z$)</td><td>$Z \gets 3X + U_Z$</td></tr>
+          <tr><td>$Y$</td><td>change in GPA quality points since enrolling (positive = improvement)</td><td>$Y \gets 2X + 4Z + U_Y$</td></tr>
+          <tr><td>$U_X,U_Z,U_Y$</td><td>everything else, bundled per variable: aptitude, sleep, home environment, luck</td><td>exogenous, mean 0</td></tr>
+        </table>
+        <p>
+          The path coefficients say: each program-hour directly adds 2 quality
+          points (mentoring), and each homework-hour adds 4; the program also
+          generates 3 homework-hours per program-hour. Now the query:
+          <em>a student did $X{=}1$ hour, completed $Z{=}2$ homework-hours, and
+          actually <strong>lost</strong> 2 quality points ($Y{=}{-}2$). What
+          would their GPA change have been with $X{=}3$ hours instead?</em>
+          The three-step engine:
+        </p>
+        <ol class="outline">
+          <li><strong>Abduction.</strong> Solve this student's luck from the
+            observed facts: $U_Z = Z-3X = -1$ (they did one homework-hour fewer
+            than the program predicts) and $U_Y = Y-2X-4Z = -12$ (a large
+            unlucky residual: something outside the model was dragging this
+            student's grades hard).</li>
+          <li><strong>Action.</strong> Intervene $do(X{=}3)$ on the mutilated
+            model, carrying the abducted $U_Z, U_Y$ forward unchanged; the
+            counterfactual world keeps the same luck.</li>
+          <li><strong>Prediction.</strong> Recompute:
+            $Z' = 3(3)+(-1) = 8$, then $Y' = 2(3)+4(8)+(-12) = 26$.</li>
         </ol>
+        <p>
+          Because the model is linear, every step is exact algebra, which is why
+          this is the act's widget: edit the factual story, watch the twin
+          worlds share their $U$.
+        </p>
 
         <!-- WIDGET 3 -->
         <div class="widget" id="widget-cf">
-          <h4>▶ Widget 3 — Counterfactual stepper</h4>
-          <p class="hint">A student did $X$ hours of an afterschool program, $Z$ hours of homework, and saw a GPA change $Y$. <em>What would $Y$ have been with $X'$ hours instead?</em> The model is linear, so abduction, action, and prediction are exact algebra. Edit the factual story and the counterfactual $X'$, then step through. The twin networks share the abducted luck $U$.</p>
+          <h4>▶ Widget 3 · Counterfactual stepper</h4>
+          <p class="hint">Variables: $X$ = weekly hours in the afterschool program · $Z$ = weekly homework hours · $Y$ = GPA change in quality points · $U_Z,U_Y$ = this student's bundled "everything else". Edit the factual story and the counterfactual $X'$, then step through Abduction → Action → Prediction. The twin networks share the abducted luck $U$.</p>
           <div class="inputline">
             factual: $X=$<input type="number" id="cf-x" value="1" step="1">
             $Z=$<input type="number" id="cf-z" value="2" step="1">
@@ -417,83 +785,232 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           <p class="readout" id="cf-result" style="font-size:1.05rem"></p>
         </div>
 
-        <h3 id="ett">The ladder closes — VPI becomes ETT</h3>
+        <h3 id="butfor">The courtroom: "but for", necessity, and sufficiency</h3>
         <p>
-          Here is the payoff the project was built around. CMSI 4320's Assignment 5
-          ("Ifs, Onlys, and Buts") pushes counterfactuals into named quantities.
-          The headline one is the <strong>Effect of Treatment on the Treated</strong>:
+          Here is a framing where counterfactuals stop being philosophy and
+          start deciding verdicts. Tort law's standard test of causation is the
+          <strong>but-for test</strong>: <em>but for the defendant's act, would
+          the harm have occurred?</em> That sentence is literally a rung-3
+          query. With exposure $X$ and harm $Y$, the court is asking about
+          $Y_{X=0}$ for a plaintiff whose actual history is $X{=}1, Y{=}1$.
+          Pearl gives the two faces of this question names:
+        </p>
+        <p>$$\mathrm{PN} = P\big(Y_{X=0}{=}0 \;\big|\; X{=}1,\,Y{=}1\big)
+        \qquad
+        \mathrm{PS} = P\big(Y_{X=1}{=}1 \;\big|\; X{=}0,\,Y{=}0\big)$$</p>
+        <ul>
+          <li><strong>Probability of necessity (PN)</strong>: among those who
+            were exposed and harmed, how likely is it the harm would
+            <em>not</em> have happened but for the exposure? This is the
+            liability question, and the civil "preponderance of the evidence"
+            standard reads naturally as $\mathrm{PN} > 0.5$: more likely than
+            not, the exposure was necessary for this plaintiff's harm.</li>
+          <li><strong>Probability of sufficiency (PS)</strong>: among the
+            unexposed and unharmed, how likely is it the exposure <em>would</em>
+            have produced the harm? This is the regulator's question: how
+            dangerous is it to introduce this thing to people currently fine?</li>
+        </ul>
+        <p>
+          The distinction has teeth. A drug can be rarely necessary (most
+          injured users would have been injured anyway) yet often sufficient
+          (it reliably injures the healthy), or the reverse; liability and
+          regulation hinge on different counterfactuals. And this is exactly
+          where my CMSI 4320 Assignment 5 drug-liability problem lived: under a
+          monotonicity assumption (the drug never <em>prevents</em> the harm),
+          PN collapses to the <strong>excess risk ratio</strong>,
+          $\big(P(y\mid x)-P(y\mid x')\big)/P(y\mid x)$, the classic
+          "attributable fraction among the exposed", computable from data.
+          Without monotonicity, point identification fails and PN can only be
+          <em>bounded</em>; we return to those bounds on the advanced shelf.
+          <em>The Book of Why</em> devotes a chapter to exactly this
+          courtroom logic.
+        </p>
+
+        <h3 id="ett">The ladder closes: VPI becomes ETT</h3>
+        <p>
+          The same assignment pushes counterfactuals into one more named
+          quantity, the <strong>Effect of Treatment on the Treated</strong>:
         </p>
         <p>$$\mathrm{ETT}=E\big[Y_{x'}-Y_{x}\ \big|\ X=x\big]$$</p>
         <p>
-          — among those who <em>actually</em> took action $x$, what would have
-          happened under $x'$? And the assignment's worked instance is a
-          <strong>web-advertising</strong> system: demographics $\to$ ad shown
-          $\to$ clickthrough. <em>Given the people who clicked, would they have
+          Among those who <em>actually</em> took action $x$, what would have
+          happened under $x'$? The assignment's worked instance is a
+          <strong>web-advertising</strong> system: demographics, then ad shown,
+          then clickthrough. <em>Given the people who clicked, would they have
           clicked under a different ad?</em>
         </p>
         <div class="callout gold">
           <span class="k">The spine, completed</span>
           <p style="margin:.3rem 0 0">
-            That is the <strong>Defendotron's own question, one rung higher</strong>.
-            At tier 2 it asked <em>"is your demographic worth buying before I pick
-            an ad?"</em> (VPI). At tier 3 the same ad agent asks <em>"given you
-            clicked, would you have clicked under the ad I didn't show?"</em>
-            (ETT). Same machinery — beliefs, utilities, the value of information —
-            climbed from <em>seeing</em> to <em>imagining</em>. The ad agent walked
-            the whole ladder.
+            That is the <strong>Defendotron's own question, one rung
+            higher</strong>. At tier 2 it asked <em>"is your demographic worth
+            buying before I pick an ad?"</em> (VPI). At tier 3 the same ad agent
+            asks <em>"given you clicked, would you have clicked under the ad I
+            didn't show?"</em> (ETT). Same machinery, beliefs and utilities and
+            the value of information, climbed from <em>seeing</em> to
+            <em>imagining</em>. The ad agent walked the whole ladder.
           </p>
         </div>
+
+        <!-- ===================== PART V ===================== -->
+        <h2 id="domains">Part V · In the wild</h2>
         <p>
-          The same act yields <strong>attributable risk</strong> and
-          <strong>probability of necessity</strong> (the drug-liability question:
-          of those harmed after taking the drug, what fraction were harmed
-          <em>because of</em> it?), and Forney's research thread,
-          <strong>MABUC</strong> — multi-armed bandits with unobserved confounders,
-          where an agent uses its own <em>intent</em> (a counterfactual signal) to
-          beat a confounded slot machine. That's the bridge from this curriculum
-          into reinforcement learning.
+          The curriculum is done; this last part is the payoff tour, ordered
+          from familiar to frontier. First the gallery of domains, then the two
+          practical questions every new reader should ask (where do the graphs
+          come from? what data do you need?), and finally the advanced shelf.
         </p>
 
-        <!-- ===================== CODA ===================== -->
-        <h2 id="domains">Where this shows up</h2>
-        <p>The same ladder, eight domains:</p>
+        <h3>The gallery</h3>
         <table>
-          <tr><th>Domain</th><th>Tier-1/2 (see / decide)</th><th>Tier-3 (imagine)</th></tr>
+          <tr><th>Domain</th><th>Tier-1/2 (see / decide / do)</th><th>Tier-3 (imagine)</th></tr>
           <tr><td><strong>Advertising</strong> (the spine)</td><td>Defendotron: which ad? VPI of a demographic</td><td>ETT: would they have clicked under another ad?</td></tr>
-          <tr><td>Medicine</td><td>vaping → heart-disease; exercise → cholesterol</td><td>drug-liability attributable risk; physician drug choice</td></tr>
-          <tr><td>Public policy</td><td>agricultural subsidy decision</td><td>terrorism-predictor causal structure</td></tr>
-          <tr><td>Education</td><td>study-habits MDP</td><td>afterschool → GPA counterfactual</td></tr>
+          <tr><td><strong>Central banking</strong></td><td>$do(\text{raise rate})$: transmission into credit creation; surprise-based identification</td><td>"Had the Fed held rates, would inflation have persisted?" (structural macro models)</td></tr>
+          <tr><td>Medicine</td><td>vaping → heart-disease; exercise → cholesterol; treatment choice under uncertainty</td><td>drug-liability PN; "would this patient have recovered untreated?"</td></tr>
+          <tr><td>Law</td><td>screening evidence; base-rate reasoning</td><td>but-for causation; necessity vs sufficiency; preponderance as PN &gt; 0.5</td></tr>
+          <tr><td>Public policy</td><td>agricultural subsidy decisions; terrorism-predictor structure</td><td>policy counterfactuals ("had the program not run…")</td></tr>
+          <tr><td>Education</td><td>study-habits decisions</td><td>afterschool → GPA counterfactual (the widget)</td></tr>
           <tr><td>Hiring</td><td>screen on predicted performance</td><td>counterfactual fairness: same hire under a different background?</td></tr>
-          <tr><td>Navigation</td><td>taxi-dispatch / grid-world MDP</td><td>"home by now had I left the 405?"</td></tr>
-          <tr><td>Genomics</td><td>DNA-sequence HMM (Viterbi)</td><td>—</td></tr>
-          <tr><td>Risk under uncertainty</td><td>tiger-doors POMDP; value of listening</td><td>—</td></tr>
+          <tr><td>Navigation &amp; ops</td><td>taxi-dispatch and grid-world decisions</td><td>"home by now had I left the 405?"</td></tr>
+          <tr><td>Genomics</td><td>DNA-sequence HMMs (Viterbi decoding)</td><td>—</td></tr>
+          <tr><td>Risk under uncertainty</td><td>tiger-doors POMDP; paying for one more observation (VPI again)</td><td>—</td></tr>
         </table>
+
+        <h3 id="dag-building">Where do the DAGs come from?</h3>
+        <p>
+          Every result above conditioned on "given the graph". Three honest
+          sources, usually combined:
+        </p>
+        <ol class="outline">
+          <li><strong>Domain expertise.</strong> The SEVH story scaled up: a
+            human who understands the mechanisms posits each arrow and, just as
+            deliberately, each <em>absence</em>. In serious applications this is
+            an elicitation exercise with experts, and every edge should survive
+            the challenge "defend this arrow, and defend the arrows you didn't
+            draw."</li>
+          <li><strong>Score-based learning.</strong> Treat structure as a search
+            problem: propose a DAG, score how well it explains the data
+            penalized for complexity (e.g. BIC), and hill-climb through
+            edge-additions/deletions/reversals. This is exactly what the
+            Defendotron does (<code>HillClimbSearch</code> +
+            <code>BIC</code> over <code>adbot-data.csv</code>).</li>
+          <li><strong>Constraint-based learning.</strong> Run conditional
+            independence tests on the data, build the skeleton of edges
+            consistent with them, then orient what logic allows (colliders
+            first). This is the PC algorithm; I used it via CMU's Tetrad on an
+            exam-anxiety study in CMSI 4320's Assignment 4.</li>
+        </ol>
+        <p>
+          And the structural limit from Act III applies with force:
+          observational data identifies a graph only up to its
+          <strong>equivalence class</strong>. Some arrows can never be oriented
+          by associations alone; they need an intervention, time order
+          (causes precede effects), or background knowledge ("biological sex
+          cannot be caused by weight"). Structure learning is where Act I's
+          association and Act III's causation actually meet.
+        </p>
+
+        <h3 id="data">What data feeds which rung?</h3>
+        <p>
+          The ladder's tiers correspond to <em>kinds of data</em>, and knowing
+          which kind you hold tells you which questions you've earned:
+        </p>
+        <table style="max-width:680px">
+          <tr><th>Data</th><th>Rung it natively answers</th><th>Character</th></tr>
+          <tr><td><strong>Observational</strong> (logs, surveys, medical records, market data)</td><td>1 · seeing</td><td>Cheap, plentiful, and confounded; the world chose who got "treated."</td></tr>
+          <tr><td><strong>Experimental</strong> (RCTs, A/B tests)</td><td>2 · doing</td><td>A physical $do()$: randomization cuts every inbound arrow to the treatment. Expensive, slow, sometimes unethical or impossible (you cannot randomize smoking, or interest rates).</td></tr>
+          <tr><td><strong>Counterfactual</strong></td><td>3 · imagining</td><td><em>Does not exist.</em> No dataset contains $Y_{x'}$ for an individual who received $x$; the road not taken is never logged.</td></tr>
+        </table>
+        <p>
+          That last row is the deep one. Act III's adjustment machinery exists
+          precisely to <em>promote</em> rung-1 data to rung-2 answers when the
+          graph permits; that's its whole job. Rung 3 can never be reached by
+          data alone: counterfactual questions always borrow strength from a
+          <em>model</em> (the SCM's structural equations), with data serving to
+          pin down the model's parameters and your individual's exogenous luck.
+          Practical notes for the data you collect: timestamps help orient
+          arrows (causes precede effects); record the variables your experts
+          name as confounders <em>before</em> you need them; and beware
+          selection effects, because filtering a dataset on some criterion is
+          conditioning on a collider if that criterion is a common effect, and
+          it will manufacture associations out of nothing (survivorship bias is
+          d-separation's revenge).
+        </p>
+        <p>
+          So which data are "most applicable" for counterfactual questions? The
+          honest answer: <strong>a combination</strong>. Observational data
+          captures how the world behaves under nature's choices; experimental
+          data captures behavior under forced choices; an SCM stitches them
+          together; and remarkably, the <em>pair</em> of them constrains
+          counterfactual quantities more tightly than either alone.
+        </p>
+
+        <h3 id="advanced">The advanced shelf</h3>
+        <p>Saved for last, as promised: the live edge of this material.</p>
+        <ul>
+          <li><strong>Bounding the unidentifiable.</strong> When assumptions
+            like monotonicity fail, PN and PS cannot be computed exactly, but
+            Tian &amp; Pearl showed that combining observational and
+            experimental data yields provable <em>bounds</em>: a court can
+            sometimes know $\mathrm{PN}\in[0.8, 1.0]$ without any untestable
+            modeling leap, which is more than enough for a preponderance
+            standard.</li>
+          <li><strong>ETT identification.</strong> The treated-group
+            counterfactual from the spine is identifiable from observational
+            data under backdoor-style conditions; CMSI 4320's "counterfactual
+            backdoor" material works out when the twin network lets adjustment
+            reach across worlds.</li>
+          <li><strong>Twin networks as a computation device.</strong> The
+            factual and counterfactual worlds drawn as one graph, sharing
+            exogenous $U$ nodes; counterfactual inference becomes ordinary
+            Bayes-net inference on the doubled graph (this is exactly what
+            Widget 3 renders).</li>
+          <li><strong>Counterfactuals inside the decision loop: MABUC.</strong>
+            Forney's research thread, multi-armed bandits with unobserved
+            confounders: an agent that conditions on its own <em>intent</em>
+            (what it was about to do is a symptom of the confounder) earns a
+            counterfactual signal worth real regret reductions. This is the
+            bridge from this page back into reinforcement learning, and the
+            frontier where "the value of knowing" becomes "the value of knowing
+            <em>yourself</em>."</li>
+          <li><strong>Where it's heading.</strong> Counterfactual fairness
+            (would the decision differ had the applicant's protected attribute
+            differed?), harm attribution for autonomous systems (a robotic
+            but-for test), and personalized medicine's holy grail, the effect
+            of treatment on <em>this</em> patient, which is ETT asked at the
+            bedside.</li>
+        </ul>
 
         <div class="callout">
           <span class="k">Sibling project</span>
           <p style="margin:.3rem 0 0">
-            The tier-2 bridge — MDPs, bandits, reinforcement learning — is its own
-            story. In <a href="robot-arm-sim/index.html">robot-arm-sim</a> a crawler
-            teaches itself to walk by Q-learning, and the punchline is the same as
-            here: a <em>model-based</em> method (one that can imagine roads not
-            taken) beats every model-free one. Decision theory and that RL project
-            are two halves of the same ladder.
+            The tier-2 bridge into sequential decisions (MDPs, bandits,
+            reinforcement learning) is its own story. In
+            <a href="robot-arm-sim/index.html">robot-arm-sim</a> a crawler
+            teaches itself to walk by Q-learning, and the punchline is the same
+            as here: a <em>model-based</em> method, one that can imagine roads
+            not taken, beats every model-free one. Decision theory and that RL
+            project are two halves of the same ladder.
           </p>
         </div>
 
         <div class="colophon" id="colophon">
           <p><strong>What's mine vs. what's cited.</strong> The
             <strong>Defendotron</strong> ad agent (the <code>eu</code>/<code>meu</code>/<code>vpi</code>
-            engine, structure learning, and the modernization that got it running
-            again) is my CMSI 3300 homework, author-confirmed in the source. The
-            <strong>causal-hierarchy framing</strong>, the vaping and afterschool
-            examples, and the do/counterfactual machinery are from
-            <a href="https://forns.lmu.build/">Andrew Forney</a>'s CMSI 4320
-            lectures and assignments (Pearl's <em>Ladder of Causation</em>). The
-            inference and VPI reference implementations are from Russell &amp;
-            Norvig's <em>AIMA</em> (<code>probability.py</code>,
-            <code>making_simple_decision4e.py</code>, Ch. 13–16). The three widgets
-            above are my own, written to mirror the verified Python.</p>
+            engine, structure learning, and the modernization that got it
+            running again) is my CMSI 3300 homework, author-confirmed in the
+            source. The <strong>causal-hierarchy framing</strong>, the vaping
+            and afterschool examples, and the do/counterfactual machinery are
+            from <a href="https://forns.lmu.build/">Andrew Forney</a>'s CMSI
+            4320 lectures and assignments. The ladder itself is from Judea
+            Pearl &amp; Dana Mackenzie, <em>The Book of Why: The New Science of
+            Cause and Effect</em> (Basic Books, 2018), with the formal
+            machinery in Pearl's <em>Causality</em> (2009); the
+            necessity/sufficiency bounds are due to Tian &amp; Pearl (2000).
+            The inference and VPI reference implementations are from Russell
+            &amp; Norvig's <em>AIMA</em> (<code>probability.py</code>,
+            <code>making_simple_decision4e.py</code>, Ch. 13–16). The three
+            widgets are my own, written to mirror the verified Python.</p>
           <p>Built as a node of a larger indexed archive of my coursework.
             Reproduce the Defendotron with <code>pip install pgmpy pandas</code>
             and the original <code>adbot-data.csv</code>.</p>
@@ -560,7 +1077,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
       });
       const note=document.getElementById("bn-note");
       const base=posteriorsFor({}); const givenV=posteriorsFor({V:1});
-      note.innerHTML=`Prior risk of heart disease: <b>${base.H.toFixed(3)}</b>. Fix <b>V=1</b> (vapes) and it rises to <b>${givenV.H.toFixed(3)}</b> — exactly the lecture's $P(H{=}1\\mid V{=}1)\\approx0.65$.`;
+      note.innerHTML=`Prior risk of heart disease: <b>${base.H.toFixed(3)}</b>. Fix <b>V=1</b> (vapes) and it rises to <b>${givenV.H.toFixed(3)}</b>, exactly the lecture's $P(H{=}1\\mid V{=}1)\\approx0.65$.`;
       if(window.MathJax&&MathJax.typesetPromise)MathJax.typesetPromise([note]);
     }
     function posteriorsFor(e){ const save={...ev}; ev={S:null,V:null,E:null,H:null,...e}; const p=posteriors(); ev=save; return p; }
@@ -593,7 +1110,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         <div>young → <span class="pill ${cl.A.y>=cl.B.y?'a':'b'}">${cl.A.y>=cl.B.y?'A':'B'}</span> · old → <span class="pill ${cl.A.o>=cl.B.o?'a':'b'}">${cl.A.o>=cl.B.o?'A':'B'}</span> &nbsp; MEU = <span class="readout">$${informedMEU.toFixed(2)}</span></div>
         <div style="margin-top:.9rem">VPI of knowing X</div>
         <div class="big readout">$${vpi.toFixed(2)}</div>
-        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${vpi<1e-9?'Zero — the same ad wins for every X, so the fact cannot change your decision.':(flips?'The fact flips your choice between viewer types — that is where information earns its price.':'Positive, but the fact never flips the decision; you are just paying for sharper confidence.')}</div>`;
+        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${vpi<1e-9?'Zero: the same ad wins for every X, so the fact cannot change your decision.':(flips?'The fact flips your choice between viewer types; that is where information earns its price.':'Positive, but the fact never flips the decision; you are just paying for sharper confidence.')}</div>`;
     }
     ["px","ay","ao","by","bo"].forEach(id=>document.getElementById("vpi-"+id).addEventListener("input",compute));
     document.getElementById("vpi-val").addEventListener("input",compute);
