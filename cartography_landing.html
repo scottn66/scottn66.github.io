@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>City Cartography — Roads, Topography &amp; Beyond</title>
+  <meta name="unit" content="cartography-landing">
+  <meta name="description" content="A topographic recreation of anvaka/city-roads — OpenStreetMap road networks rendered with elevation contours, hillshade, water, and green space, plus a brainstorm of cartographic enhancements.">
+  <style>
+    :root {
+      --primary-color: #314d69;
+      --secondary-color: #ff5742;
+      --bg-color: #ffffff;
+      --text-color: #333;
+      --muted: #6b7783;
+      --card-bg: #f6f3ea;
+      --card-border: #e3ddcc;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+    header, main, footer {
+      max-width: 860px;
+      margin: auto;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      border-bottom: 2px solid var(--secondary-color);
+    }
+    header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.8rem;
+      color: var(--primary-color);
+      margin: 0;
+    }
+    header p.tagline { color: var(--muted); margin: 8px 0 0; font-size: 1.05rem; }
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.9rem;
+      color: var(--primary-color);
+      margin-top: 42px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    p { margin: 15px 0; }
+    a { color: var(--secondary-color); }
+    a.btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: var(--secondary-color);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+    a.btn:hover { background-color: #d8412f; }
+    a.btn.ghost { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); margin-left: 8px; }
+    a.btn.ghost:hover { background: var(--primary-color); color: #fff; }
+    ul { padding-left: 22px; }
+    li { margin: 7px 0; }
+    code { background: #f0ece2; padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 18px; }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 16px 18px;
+    }
+    .card h3 { font-family: 'Montserrat', sans-serif; margin: 0 0 6px; font-size: 1.05rem; color: var(--primary-color); }
+    .card .tag {
+      display: inline-block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; font-weight: 700;
+    }
+    .tag.done { background: #d8f0df; color: #1f7a44; }
+    .tag.easy { background: #fdeccb; color: #9a6a14; }
+    .tag.hard { background: #f3d9d4; color: #a23b29; }
+    .card p { margin: 6px 0 0; font-size: 0.92rem; color: #4a4a4a; }
+    .compare { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.92rem; }
+    .compare th, .compare td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #e6e1d4; vertical-align: top; }
+    .compare th { font-family: 'Montserrat', sans-serif; color: var(--primary-color); }
+    .compare td:first-child { font-weight: 600; white-space: nowrap; }
+    .pipeline { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 18px; font-size: 0.92rem; }
+    .pipeline ol { padding-left: 20px; margin: 6px 0; }
+    footer { text-align: center; font-size: 0.9rem; border-top: 1px solid #ccc; margin-top: 48px; padding-top: 14px; color: var(--muted); }
+    .cta { text-align: center; margin: 26px 0; }
+    .note { background: #fff8e6; border-left: 4px solid var(--secondary-color); padding: 10px 14px; border-radius: 4px; font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>City Cartography</h1>
+    <p class="tagline">A topographic recreation of <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener">anvaka / city-roads</a></p>
+  </header>
+
+  <main>
+    <div class="cta">
+      <a href="cartography.html" class="btn">Launch the map →</a>
+      <a href="https://github.com/anvaka/city-roads" class="btn ghost" target="_blank" rel="noopener">See the original</a>
+    </div>
+
+    <h2 class="section-title">Background</h2>
+    <p>
+      Andrei Kashcha's <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener">city-roads</a> is a small, beautiful idea:
+      type a city name and it draws <em>every</em> road in it — nothing else. It pulls the road network live from
+      <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> through the
+      <a href="https://overpass-api.de/" target="_blank" rel="noopener">Overpass API</a>, then renders the lines with WebGL.
+      The result is a clean, poster-like fingerprint of a place built purely from its streets.
+    </p>
+    <p>
+      This recreation keeps that spirit but asks a question the original deliberately leaves out: <strong>what does the land underneath the
+      streets look like?</strong> Roads bend around hills, hug rivers, and climb passes — so this version layers the city's road network on
+      top of <strong>real elevation data</strong>, plus water, green space, and rail, to make a richer map. Everything runs in the browser with
+      no API keys and no build step, matching the rest of this site.
+    </p>
+
+    <h2 class="section-title">What's different here</h2>
+    <table class="compare">
+      <tr><th>Aspect</th><th>Original city-roads</th><th>This version</th></tr>
+      <tr><td>Roads</td><td>Uniform line weight</td><td>Weighted by class — motorways thick, footpaths thin</td></tr>
+      <tr><td>Terrain</td><td>None</td><td>Elevation contours + optional hillshade from real DEM tiles</td></tr>
+      <tr><td>Underwater</td><td>None</td><td>Bathymetry — ocean &amp; bay depth shading with isobaths (negative topography)</td></tr>
+      <tr><td>Other features</td><td>Roads only</td><td>Water, green space, rail, and optional buildings</td></tr>
+      <tr><td>Styling</td><td>Custom color picker</td><td>Cartographic theme presets (topo / blueprint / ink / night)</td></tr>
+      <tr><td>Rendering</td><td>WebGL (w-gl)</td><td>Canvas 2D — simpler, still smooth for city-scale data</td></tr>
+      <tr><td>Export</td><td>SVG / PNG poster</td><td>PNG (SVG export is on the roadmap below)</td></tr>
+    </table>
+
+    <h2 class="section-title">Where the topography comes from</h2>
+    <p>
+      The hard part of "add terrain" is getting elevation into the browser without a backend. This map uses the openly-licensed
+      <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">AWS Terrain Tiles</a> (Mapzen "Terrarium" encoding),
+      which pack height into the RGB channels of ordinary PNG tiles:
+    </p>
+    <div class="pipeline">
+      <code>elevation_metres = (red × 256 + green + blue ÷ 256) − 32768</code>
+      <ol>
+        <li>Figure out which map tiles cover the city's bounding box and download them.</li>
+        <li>Decode every pixel back into a height value to build an elevation grid.</li>
+        <li>Trace <strong>contour lines</strong> through that grid with a <a href="https://en.wikipedia.org/wiki/Marching_squares" target="_blank" rel="noopener">marching-squares</a> algorithm.</li>
+        <li>Optionally compute a <strong>hillshade</strong> (shaded relief) by lighting the slopes from the northwest.</li>
+        <li>For the <strong>bathymetry</strong> layer, read the <em>below-sea-level</em> values the same way and shade the ocean and bays by depth (log-scaled, so a shallow bay stays visible next to a deep abyss) with isobaths.</li>
+        <li>Project contours, relief, depth, and roads through the <em>same</em> Web-Mercator transform so they line up perfectly.</li>
+      </ol>
+    </div>
+
+    <h2 class="section-title">How to use it</h2>
+    <ul>
+      <li>Type a place (<code>Boulder, Colorado</code>) or tap a suggestion chip, then press <strong>Render map</strong>.</li>
+      <li><strong>Drag</strong> to pan, <strong>scroll / pinch</strong> to zoom. Press <strong>PNG</strong> to download a poster.</li>
+      <li>Toggle layers — roads, contours, hillshade, <strong>bathymetry</strong>, water, green, rail, buildings — and pick a theme. Turn on <strong>Bathymetry</strong> for coastal places to shade the sea floor by depth.</li>
+      <li>Tune the <strong>contour interval</strong>, <strong>line weight</strong>, and <strong>road detail</strong> to taste.</li>
+    </ul>
+    <p class="note">
+      Topographic cities are the most fun: try <strong>Innsbruck</strong>, <strong>Cape Town</strong>, <strong>San Francisco</strong>, or
+      <strong>Kyoto</strong>. Very large cities can be slow or hit Overpass rate limits — switch to "Major roads" or pick a smaller place.
+    </p>
+
+    <h2 class="section-title">Brainstorm: candidates to push the cartography further</h2>
+    <p>
+      The whole point of the exercise is layering <em>more</em> meaning onto the map. Here are the enhancement candidates I considered —
+      the ones tagged <span class="tag done" style="margin:0;">shipped</span> are already in the viewer; the rest are the roadmap.
+    </p>
+    <div class="cards">
+      <div class="card"><span class="tag done">Shipped</span><h3>Elevation contours</h3><p>Marching-squares isolines with bold index contours every fifth line and an auto-chosen interval.</p></div>
+      <div class="card"><span class="tag done">Shipped</span><h3>Hillshade relief</h3><p>NW-lit shaded relief blended under the streets to give the terrain a tactile, 3-D feel.</p></div>
+      <div class="card"><span class="tag done">Shipped</span><h3>Road hierarchy</h3><p>Line weight scales with road class so the arterial skeleton reads at a glance.</p></div>
+      <div class="card"><span class="tag done">Shipped</span><h3>Water · green · rail</h3><p>Rivers, lakes, parks, forests, and railways as styled layers — context the original omits.</p></div>
+      <div class="card"><span class="tag done">Shipped</span><h3>Bathymetry (negative topo)</h3><p>Shades the ocean &amp; bays by depth with isobaths, decoded from the DEM's below-sea-level values. Inland lakes above sea level read flat — the open data stores their surface, not the bed.</p></div>
+      <div class="card"><span class="tag easy">Roadmap</span><h3>SVG / poster export</h3><p>Vector output for crisp large-format printing, matching the original's poster use-case.</p></div>
+      <div class="card"><span class="tag easy">Roadmap</span><h3>Hypsometric tint</h3><p>Color the land by elevation band (greens → browns → white) like a classic relief atlas.</p></div>
+      <div class="card"><span class="tag easy">Roadmap</span><h3>Place &amp; street labels</h3><p>Curved street-name labels and neighborhood text with collision-aware placement.</p></div>
+      <div class="card"><span class="tag hard">Roadmap</span><h3>Slope-aware roads</h3><p>Color or thicken roads by the gradient they climb — a literal "hilliness" map for cyclists.</p></div>
+      <div class="card"><span class="tag hard">Roadmap</span><h3>3-D terrain view</h3><p>Drape the road network over the DEM and tilt the camera (WebGL) for an oblique relief view.</p></div>
+      <div class="card"><span class="tag hard">Roadmap</span><h3>Transit &amp; cycle networks</h3><p>Overlay bus/metro lines, cycle routes, and trails as a distinct mobility layer.</p></div>
+      <div class="card"><span class="tag hard">Roadmap</span><h3>Watershed &amp; flow</h3><p>Derive drainage direction from the DEM to draw synthetic streams and basin boundaries.</p></div>
+    </div>
+
+    <h2 class="section-title">Data &amp; credit</h2>
+    <p>
+      Roads and features: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors (ODbL),
+      fetched via <a href="https://overpass-api.de/" target="_blank" rel="noopener">Overpass API</a>.
+      Geocoding by <a href="https://nominatim.org/" target="_blank" rel="noopener">Nominatim</a>.
+      Elevation from <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">AWS Terrain Tiles</a> (Mapzen / Tilezen, public domain & various open sources).
+      Original concept &amp; inspiration: <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener">city-roads</a> by Andrei Kashcha (MIT).
+    </p>
+
+    <div class="cta">
+      <a href="cartography.html" class="btn">Launch the map →</a>
+    </div>
+  </main>
+
+  <footer>
+    <p><a href="index.html">← Back to scottn66.github.io</a> &nbsp;·&nbsp; &copy; 2026 Scott Nelson</p>
+  </footer>
+</body>
+</html>

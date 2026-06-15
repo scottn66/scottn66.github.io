@@ -226,6 +226,7 @@
           <li class="nav-item"><a class="nav-link" href="solar/">Solar</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
           <li class="nav-item"><a class="nav-link" href="mandelbrot_landing.html">Mandelbrot</a></li>
+          <li class="nav-item"><a class="nav-link" href="cartography_landing.html">Cartography</a></li>
         </ul>
       </div>
     </div>
@@ -379,6 +380,72 @@
               </div>
               <div class="card-footer bg-light border-0">
                 <a href="decision-theory.html" class="btn btn-primary w-100" target="_blank">View Project</a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <hr class="my-4">
+        <h3 class="text-center mt-5 mb-4" style="color: var(--primary-color);">Interactive Visualizations</h3>
+        <p class="text-center text-muted mb-4">Self-contained, in-browser explorables — no backend, rendered live on canvas.</p>
+        <div class="row justify-content-center">
+          <!-- City Cartography Card -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <svg class="card-img-top" viewBox="0 0 400 200" role="img" aria-label="City map with elevation contours">
+                <rect width="400" height="200" fill="#f3ecdb"/>
+                <g fill="none" stroke="#c9b18a" stroke-width="1.5">
+                  <path d="M-5,60 C80,40 140,90 200,70 C270,48 330,95 405,72"/>
+                  <path d="M-5,90 C80,72 150,118 210,98 C280,75 340,120 405,100"/>
+                  <path d="M-5,120 C90,104 150,146 215,128 C285,108 345,150 405,132"/>
+                  <path d="M-5,150 C90,138 160,172 220,158 C290,142 350,178 405,162"/>
+                </g>
+                <g stroke="#7da7c7" stroke-width="3" fill="none"><path d="M40,205 C70,150 60,110 100,60 C120,35 110,10 130,-5"/></g>
+                <g stroke="#3a2f25" fill="none" stroke-linecap="round">
+                  <path d="M0,30 L400,150" stroke-width="3"/>
+                  <path d="M60,-5 L300,205" stroke-width="2.4"/>
+                  <path d="M0,170 L400,40" stroke-width="2"/>
+                  <path d="M150,-5 L240,205" stroke-width="1.4"/>
+                  <path d="M0,90 L400,110" stroke-width="1.4"/>
+                  <path d="M210,-5 L330,205" stroke-width="1"/>
+                  <path d="M0,130 L260,205" stroke-width="1"/>
+                </g>
+              </svg>
+              <div class="card-body">
+                <h5 class="card-title">City Cartography</h5>
+                <p class="card-text">A topographic recreation of anvaka/city-roads: OpenStreetMap road networks drawn live, layered over real elevation contours, hillshade, water, and green space.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="cartography_landing.html" class="btn btn-primary w-100">Explore &rarr;</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Mandelbrot Card -->
+          <article class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+              <svg class="card-img-top" viewBox="0 0 400 200" role="img" aria-label="Mandelbrot set">
+                <defs>
+                  <radialGradient id="mb" cx="38%" cy="50%" r="62%">
+                    <stop offset="0%" stop-color="#000"/><stop offset="55%" stop-color="#1a0a3a"/>
+                    <stop offset="78%" stop-color="#6a1f8f"/><stop offset="92%" stop-color="#ff7a3c"/>
+                    <stop offset="100%" stop-color="#ffe08a"/>
+                  </radialGradient>
+                </defs>
+                <rect width="400" height="200" fill="url(#mb)"/>
+                <g fill="#000">
+                  <ellipse cx="168" cy="100" rx="58" ry="74"/>
+                  <circle cx="96" cy="100" r="34"/>
+                  <circle cx="58" cy="100" r="15"/>
+                  <circle cx="168" cy="30" r="11"/><circle cx="168" cy="170" r="11"/>
+                </g>
+              </svg>
+              <div class="card-body">
+                <h5 class="card-title">Mandelbrot Explorer</h5>
+                <p class="card-text">A deep-zoom fractal renderer: web-worker Mariani–Silver subdivision with Hilbert-curve ordering and smooth iteration coloring, down to the precision floor.</p>
+              </div>
+              <div class="card-footer bg-light border-0">
+                <a href="mandelbrot_landing.html" class="btn btn-primary w-100">Explore &rarr;</a>
               </div>
             </div>
           </article>

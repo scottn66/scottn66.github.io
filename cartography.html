@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>City Cartography — Roads + Topography</title>
+  <meta name="unit" content="cartography">
+  <meta name="description" content="A topographic recreation of anvaka/city-roads: OpenStreetMap road networks rendered with elevation contours, hillshade, water, green space, and rail.">
+  <style>
+    :root {
+      --panel-bg: rgba(20, 24, 28, 0.92);
+      --panel-fg: #e9eef2;
+      --panel-muted: #9aa6b1;
+      --accent: #ff5742;
+      --accent-2: #5aa9e6;
+      --field-bg: #11151a;
+      --field-border: #2c343d;
+      --ok: #5fd08a;
+      --warn: #ffc861;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: #0c0f12; overflow: hidden;
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    #map {
+      display: block; position: absolute; inset: 0;
+      touch-action: none; -webkit-user-select: none; user-select: none;
+      cursor: grab;
+    }
+    #map.dragging { cursor: grabbing; }
+
+    /* ---- Control panel ---- */
+    #panel {
+      position: absolute; top: 14px; left: 14px; z-index: 10;
+      width: 312px; max-width: calc(100vw - 28px);
+      max-height: calc(100vh - 28px); overflow-y: auto;
+      background: var(--panel-bg); color: var(--panel-fg);
+      border: 1px solid var(--field-border); border-radius: 12px;
+      padding: 14px 16px 16px; backdrop-filter: blur(8px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
+      font-size: 13px; line-height: 1.45;
+    }
+    #panel h1 {
+      font-family: 'Montserrat', sans-serif; font-size: 17px; margin: 0 0 2px;
+      letter-spacing: 0.2px; display: flex; align-items: center; gap: 8px;
+    }
+    #panel .sub { color: var(--panel-muted); font-size: 11.5px; margin: 0 0 12px; }
+    #panel label.field-label { display: block; font-weight: 600; margin: 12px 0 5px; font-size: 11.5px;
+      text-transform: uppercase; letter-spacing: 0.6px; color: var(--panel-muted); }
+    .row { display: flex; gap: 8px; }
+    input[type=text], select {
+      width: 100%; padding: 9px 10px; border-radius: 8px; font-size: 13px;
+      background: var(--field-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
+    }
+    input[type=text]:focus, select:focus { outline: none; border-color: var(--accent-2); }
+    button {
+      font-family: inherit; cursor: pointer; border: none; border-radius: 8px;
+      padding: 9px 12px; font-size: 13px; font-weight: 600; transition: filter .15s, background .15s;
+    }
+    button:disabled { opacity: .5; cursor: default; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+    .btn-ghost { background: var(--field-bg); color: var(--panel-fg); border: 1px solid var(--field-border); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--accent-2); }
+    .examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+    .chip {
+      font-size: 11px; padding: 4px 9px; border-radius: 20px; background: var(--field-bg);
+      border: 1px solid var(--field-border); color: var(--panel-muted); cursor: pointer;
+    }
+    .chip:hover { color: var(--panel-fg); border-color: var(--accent-2); }
+    .layers { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-top: 4px; }
+    .layers label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12.5px; }
+    .layers input { accent-color: var(--accent-2); }
+    .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+    .ctrl-row span.lbl { font-size: 12px; color: var(--panel-muted); }
+    input[type=range] { flex: 1; accent-color: var(--accent); }
+    .swatch { display:inline-block; width: 11px; height: 11px; border-radius: 2px; vertical-align: -1px; }
+    #status {
+      margin-top: 12px; font-size: 12px; min-height: 17px; color: var(--panel-muted);
+      border-top: 1px solid var(--field-border); padding-top: 10px;
+    }
+    #status.err { color: var(--warn); }
+    #status .bar { height: 3px; background: var(--field-border); border-radius: 2px; margin-top: 6px; overflow: hidden; display: none; }
+    #status.loading .bar { display: block; }
+    #status .bar i { display: block; height: 100%; width: 40%; background: var(--accent-2);
+      animation: slide 1.1s ease-in-out infinite; }
+    @keyframes slide { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+    .foot { margin-top: 12px; font-size: 10.5px; color: var(--panel-muted); line-height: 1.5; }
+    .foot a { color: var(--accent-2); text-decoration: none; }
+    details { margin-top: 6px; }
+    details summary { cursor: pointer; color: var(--panel-muted); font-size: 11.5px; user-select: none; }
+    .collapse-toggle {
+      position: absolute; top: 14px; left: 14px; z-index: 11; display: none;
+      background: var(--panel-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
+      border-radius: 8px; width: 38px; height: 38px; font-size: 18px;
+    }
+    body.collapsed #panel { display: none; }
+    body.collapsed .collapse-toggle { display: block; }
+    #legend {
+      position: absolute; bottom: 12px; left: 14px; z-index: 9;
+      background: var(--panel-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 7px 11px; font-size: 11px; display: none; max-width: 60vw;
+    }
+    #legend.show { display: block; }
+    #legend b { font-family: 'Montserrat', sans-serif; }
+    #attrib {
+      position: absolute; bottom: 6px; right: 8px; z-index: 9; font-size: 10px;
+      color: rgba(255,255,255,0.55); background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 5px;
+    }
+    #attrib a { color: rgba(255,255,255,0.8); }
+    .hint-zoom {
+      position: absolute; top: 14px; right: 14px; z-index: 9; font-size: 11px; color: var(--panel-muted);
+      background: var(--panel-bg); border: 1px solid var(--field-border); border-radius: 8px; padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="map"></canvas>
+  <button class="collapse-toggle" id="showPanel" title="Show controls">☰</button>
+
+  <div id="panel">
+    <h1>🗺 City Cartography</h1>
+    <p class="sub">A topographic take on <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener" style="color:var(--accent-2)">city-roads</a> — roads + elevation, drawn live from OpenStreetMap.</p>
+
+    <label class="field-label" for="place">Place</label>
+    <div class="row">
+      <input type="text" id="place" placeholder="e.g. Boulder, Colorado" autocomplete="off">
+    </div>
+    <div class="examples" id="examples"></div>
+
+    <label class="field-label">Layers</label>
+    <div class="layers">
+      <label><input type="checkbox" id="ly-roads" checked> <span><span class="swatch" id="sw-roads"></span> Roads</span></label>
+      <label><input type="checkbox" id="ly-contours" checked> <span><span class="swatch" id="sw-contours"></span> Contours</span></label>
+      <label><input type="checkbox" id="ly-hillshade"> <span><span class="swatch" style="background:#888"></span> Hillshade</span></label>
+      <label><input type="checkbox" id="ly-water" checked> <span><span class="swatch" id="sw-water"></span> Water</span></label>
+      <label><input type="checkbox" id="ly-green" checked> <span><span class="swatch" id="sw-green"></span> Green</span></label>
+      <label><input type="checkbox" id="ly-rail"> <span><span class="swatch" id="sw-rail"></span> Rail</span></label>
+      <label><input type="checkbox" id="ly-bathy"> <span><span class="swatch" id="sw-bathy"></span> Bathymetry</span></label>
+      <label><input type="checkbox" id="ly-build"> <span><span class="swatch" id="sw-build"></span> Buildings</span></label>
+    </div>
+
+    <label class="field-label" for="theme">Theme</label>
+    <select id="theme">
+      <option value="topo">Topographic (cream)</option>
+      <option value="blueprint">Blueprint</option>
+      <option value="ink">Ink on paper</option>
+      <option value="night">Night glow</option>
+    </select>
+
+    <div class="ctrl-row">
+      <span class="lbl">Contour interval</span>
+      <select id="cinterval" style="width:auto; padding:4px 8px;">
+        <option value="auto" selected>Auto</option>
+        <option value="10">10 m</option>
+        <option value="20">20 m</option>
+        <option value="50">50 m</option>
+        <option value="100">100 m</option>
+        <option value="200">200 m</option>
+      </select>
+    </div>
+    <div class="ctrl-row">
+      <span class="lbl">Line weight</span>
+      <input type="range" id="weight" min="0.4" max="2.5" step="0.1" value="1">
+    </div>
+    <div class="ctrl-row">
+      <span class="lbl">Road detail</span>
+      <select id="detail" style="width:auto; padding:4px 8px;">
+        <option value="major">Major roads</option>
+        <option value="all" selected>All streets</option>
+        <option value="paths">Streets + paths</option>
+      </select>
+    </div>
+
+    <div class="row" style="margin-top:14px;">
+      <button class="btn-primary" id="render" style="flex:2;">Render map</button>
+      <button class="btn-ghost" id="download" style="flex:1;" disabled>PNG</button>
+    </div>
+    <div class="row" style="margin-top:6px;">
+      <button class="btn-ghost" id="hide" style="flex:1;">Hide panel</button>
+      <button class="btn-ghost" id="fit" style="flex:1;" disabled>Re-fit</button>
+    </div>
+
+    <div id="status">Enter a place and press <b>Render map</b>.<div class="bar"><i></i></div></div>
+
+    <details>
+      <summary>About &amp; tips</summary>
+      <div class="foot">
+        Drag to pan, scroll / pinch to zoom. Contours, hillshade &amp; bathymetry come from
+        <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">AWS Terrain&nbsp;Tiles</a>;
+        roads &amp; features from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+        via <a href="https://overpass-api.de/" target="_blank" rel="noopener">Overpass</a>.
+        <b>Bathymetry</b> shades water by depth (ocean &amp; bays) — inland lakes above sea level read flat,
+        since the open elevation data stores their water surface, not the lake bed.
+        Large cities take longer and may hit API limits — try a smaller place or "Major roads".
+        Changing layers/detail re-fetches on the next Render.
+      </div>
+    </details>
+    <div class="foot" id="stats"></div>
+  </div>
+
+  <div class="hint-zoom" id="zoomHint">scroll to zoom · drag to pan</div>
+  <div id="legend"></div>
+  <div id="attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Terrain: AWS / Mapzen</div>
+
+<script>
+"use strict";
+(function () {
+
+  // ---------------------------------------------------------------------------
+  // Constants & endpoints
+  // ---------------------------------------------------------------------------
+  var OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+  ];
+  var NOMINATIM = "https://nominatim.openstreetmap.org/search";
+  var TERRAIN = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/";
+  var MAX_SPAN_DEG = 0.55;        // clamp very large bboxes (~60km) to keep things responsive
+  var TARGET_TILES = 12;          // aim for ~this many terrain tiles across the view
+  var MAX_TILES = 30;             // hard cap on terrain tiles fetched
+  var GRID_MAX = 420;             // max grid dim for marching squares / hillshade
+
+  // ---------------------------------------------------------------------------
+  // Themes  (colors per layer)
+  // ---------------------------------------------------------------------------
+  var THEMES = {
+    topo: {
+      bg: "#f3ecdb", roads: "#3a2f25", roadGlow: null, water: "#8fb8d6",
+      waterLine: "#7da7c7", green: "#cddcc0", contour: "#cBae8e", contourIndex: "#a98b63",
+      rail: "#5a4f45", build: "rgba(120,104,86,0.30)", buildLine: "rgba(90,76,60,0.0)",
+      hillAlpha: 0.30, hillBlend: "multiply",
+      bathyShallow: "#cfe6f0", bathyDeep: "#173b5c", isobath: "#79a6c6", isobathIndex: "#4a7ba2"
+    },
+    blueprint: {
+      bg: "#0d2840", roads: "#dCe9f5", roadGlow: null, water: "#15406a",
+      waterLine: "#3f7fb5", green: "#123a5c", contour: "#2f5e8a", contourIndex: "#5b9bd1",
+      rail: "#9fc3e6", build: "rgba(120,170,220,0.16)", buildLine: "rgba(0,0,0,0)",
+      hillAlpha: 0.22, hillBlend: "screen",
+      bathyShallow: "#3a7cb8", bathyDeep: "#06203a", isobath: "#76b2e6", isobathIndex: "#a9d4f7"
+    },
+    ink: {
+      bg: "#faf8f2", roads: "#1a1a1a", roadGlow: null, water: "#cfd8dc",
+      waterLine: "#9fb0b8", green: "#e6ece0", contour: "#cfc6b4", contourIndex: "#a89f8a",
+      rail: "#444", build: "rgba(0,0,0,0.10)", buildLine: "rgba(0,0,0,0)",
+      hillAlpha: 0.18, hillBlend: "multiply",
+      bathyShallow: "#dde9f1", bathyDeep: "#5f7d92", isobath: "#9fb4c2", isobathIndex: "#73909f"
+    },
+    night: {
+      bg: "#0a0c10", roads: "#ffd9a0", roadGlow: "rgba(255,180,90,0.20)", water: "#0f2233",
+      waterLine: "#244a63", green: "#0f1a14", contour: "#283038", contourIndex: "#3c4a55",
+      rail: "#8a93a0", build: "rgba(255,210,150,0.08)", buildLine: "rgba(0,0,0,0)",
+      hillAlpha: 0.30, hillBlend: "screen",
+      bathyShallow: "#11526f", bathyDeep: "#02090f", isobath: "#2f6f95", isobathIndex: "#57a0c8"
+    }
+  };
+
+  // road class -> relative line weight
+  var ROAD_WEIGHT = {
+    motorway: 3.0, motorway_link: 1.6, trunk: 2.6, trunk_link: 1.4,
+    primary: 2.1, primary_link: 1.2, secondary: 1.6, secondary_link: 1.0,
+    tertiary: 1.25, tertiary_link: 0.9, unclassified: 0.85, residential: 0.85,
+    living_street: 0.7, service: 0.5, pedestrian: 0.6, road: 0.85,
+    track: 0.45, path: 0.4, footway: 0.4, cycleway: 0.45, steps: 0.4, bridleway: 0.4
+  };
+  var MAJOR_ONLY = ["motorway","trunk","primary","secondary","tertiary"];
+
+  // ---------------------------------------------------------------------------
+  // DOM
+  // ---------------------------------------------------------------------------
+  var canvas = document.getElementById("map");
+  var ctx = canvas.getContext("2d");
+  var $ = function (id) { return document.getElementById(id); };
+  var placeInput = $("place");
+
+  // ---------------------------------------------------------------------------
+  // Web-Mercator projection.  world coords are in [0,1] x [0,1].
+  // ---------------------------------------------------------------------------
+  function lon2wx(lon) { return (lon + 180) / 360; }
+  function lat2wy(lat) {
+    var s = Math.sin(lat * Math.PI / 180);
+    s = Math.max(-0.9999, Math.min(0.9999, s));
+    return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI);
+  }
+
+  // View transform: screenPx = world * k + t   (k in CSS px per world-unit)
+  var view = { k: 1, tx: 0, ty: 0 };
+  var dpr = Math.max(1, window.devicePixelRatio || 1);
+  var cssW = 0, cssH = 0;
+
+  function sx(wx) { return wx * view.k + view.tx; }
+  function sy(wy) { return wy * view.k + view.ty; }
+
+  function resize() {
+    cssW = window.innerWidth; cssH = window.innerHeight;
+    canvas.style.width = cssW + "px"; canvas.style.height = cssH + "px";
+    canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Scene state (everything stored in world coords so render is just project+stroke)
+  // ---------------------------------------------------------------------------
+  var scene = {
+    bbox: null,                  // {s,w,n,e}
+    worldBounds: null,           // {x0,y0,x1,y1}
+    roads: [],                   // [{w:weight, pts:[wx,wy,...]}]
+    water: [], waterLines: [], green: [], rail: [], buildings: [],
+    contours: { index: [], normal: [] }, // arrays of segments [x1,y1,x2,y2]
+    hill: null,                  // offscreen canvas + world rect (land hillshade)
+    bathy: null,                 // { tint:{canvas,worldBounds}, iso:{index,normal}, seaMin }
+    loaded: false
+  };
+
+  // ---------------------------------------------------------------------------
+  // Status helpers
+  // ---------------------------------------------------------------------------
+  var statusEl = $("status");
+  function status(msg, opts) {
+    opts = opts || {};
+    statusEl.innerHTML = msg + '<div class="bar"><i></i></div>';
+    statusEl.className = (opts.loading ? "loading " : "") + (opts.err ? "err" : "");
+  }
+  function setStats(s) { $("stats").textContent = s || ""; }
+
+  // ---------------------------------------------------------------------------
+  // Geocode via Nominatim
+  // ---------------------------------------------------------------------------
+  function geocode(q) {
+    var url = NOMINATIM + "?format=jsonv2&limit=1&polygon_geojson=0&q=" + encodeURIComponent(q);
+    return fetch(url, { headers: { "Accept": "application/json" } })
+      .then(function (r) { if (!r.ok) throw new Error("Geocoder " + r.status); return r.json(); })
+      .then(function (j) {
+        if (!j || !j.length) throw new Error("Place not found: " + q);
+        var b = j[0].boundingbox.map(parseFloat); // [s, n, w, e]
+        return { name: j[0].display_name, s: b[0], n: b[1], w: b[2], e: b[3],
+                 lat: parseFloat(j[0].lat), lon: parseFloat(j[0].lon) };
+      });
+  }
+
+  function clampBbox(g) {
+    var s = g.s, n = g.n, w = g.w, e = g.e;
+    if (n - s > MAX_SPAN_DEG) { var cy = (n + s) / 2; s = cy - MAX_SPAN_DEG / 2; n = cy + MAX_SPAN_DEG / 2; }
+    // longitude span scaled by latitude so the clamp feels even on the map
+    var lonSpan = MAX_SPAN_DEG / Math.max(0.25, Math.cos((n + s) / 2 * Math.PI / 180));
+    if (e - w > lonSpan) { var cx = (e + w) / 2; w = cx - lonSpan / 2; e = cx + lonSpan / 2; }
+    return { s: s, n: n, w: w, e: e };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Overpass query + fetch (with endpoint fallback)
+  // ---------------------------------------------------------------------------
+  function buildQuery(bb, layers, detail) {
+    var box = bb.s + "," + bb.w + "," + bb.n + "," + bb.e;
+    var parts = [];
+    if (layers.roads) {
+      if (detail === "major") {
+        parts.push('way["highway"~"^(' + MAJOR_ONLY.join("|") + ')"](' + box + ');');
+      } else if (detail === "paths") {
+        parts.push('way["highway"](' + box + ');');
+      } else { // all streets, no foot/cycle paths
+        parts.push('way["highway"]["highway"!~"^(footway|path|cycleway|steps|bridleway|construction|proposed)$"](' + box + ');');
+      }
+    }
+    if (layers.water) {
+      parts.push('way["natural"="water"](' + box + ');');
+      parts.push('way["waterway"~"^(river|stream|canal|riverbank)$"](' + box + ');');
+      parts.push('relation["natural"="water"](' + box + ');');
+    }
+    if (layers.green) {
+      parts.push('way["leisure"~"^(park|garden|nature_reserve|golf_course)$"](' + box + ');');
+      parts.push('way["landuse"~"^(forest|grass|meadow|recreation_ground|cemetery|village_green)$"](' + box + ');');
+      parts.push('way["natural"~"^(wood|scrub|grassland|heath)$"](' + box + ');');
+    }
+    if (layers.rail) parts.push('way["railway"~"^(rail|light_rail|subway|tram|narrow_gauge)$"](' + box + ');');
+    if (layers.build) {
+      parts.push('way["building"](' + box + ');');
+    }
+    return "[out:json][timeout:90];(" + parts.join("") + ");out geom;";
+  }
+
+  function overpass(query, onTry) {
+    var i = 0;
+    function attempt() {
+      var ep = OVERPASS_ENDPOINTS[i];
+      if (onTry) onTry(i, ep);
+      return fetch(ep, { method: "POST", body: "data=" + encodeURIComponent(query),
+                         headers: { "Content-Type": "application/x-www-form-urlencoded" } })
+        .then(function (r) {
+          if (r.status === 429 || r.status === 504 || r.status === 503) throw new Error("busy " + r.status);
+          if (!r.ok) throw new Error("Overpass " + r.status);
+          return r.json();
+        })
+        .catch(function (err) {
+          i++;
+          if (i < OVERPASS_ENDPOINTS.length) return attempt();
+          throw err;
+        });
+    }
+    return attempt();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Parse Overpass elements into world-coord features
+  // ---------------------------------------------------------------------------
+  function geomToWorld(geometry) {
+    var pts = new Array(geometry.length * 2);
+    for (var i = 0; i < geometry.length; i++) {
+      pts[i * 2] = lon2wx(geometry[i].lon);
+      pts[i * 2 + 1] = lat2wy(geometry[i].lat);
+    }
+    return pts;
+  }
+
+  function categorize(elements) {
+    var roads = [], water = [], waterLines = [], green = [], rail = [], buildings = [];
+    for (var i = 0; i < elements.length; i++) {
+      var el = elements[i];
+      var geom = el.geometry;
+      if (!geom || geom.length < 2) continue;
+      var t = el.tags || {};
+      var pts = geomToWorld(geom);
+
+      if (t.highway && ROAD_WEIGHT[t.highway] != null) {
+        roads.push({ w: ROAD_WEIGHT[t.highway], pts: pts });
+      } else if (t.highway) {
+        roads.push({ w: 0.7, pts: pts });
+      } else if (t.building) {
+        buildings.push(pts);
+      } else if (t.railway) {
+        rail.push(pts);
+      } else if (t.natural === "water" || /water/.test(t.natural || "")) {
+        water.push(pts);
+      } else if (t.waterway) {
+        waterLines.push(pts);
+      } else if (t.leisure || t.landuse || t.natural) {
+        green.push(pts);
+      }
+    }
+    return { roads: roads, water: water, waterLines: waterLines, green: green, rail: rail, buildings: buildings };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Terrain: slippy-tile math, tile fetch, elevation grid, contours, hillshade
+  // ---------------------------------------------------------------------------
+  function pickZoom(bb) {
+    var wWorld = lon2wx(bb.e) - lon2wx(bb.w);
+    for (var z = 14; z >= 6; z--) {
+      var tilesAcross = wWorld * Math.pow(2, z);
+      if (tilesAcross <= TARGET_TILES) return z;
+    }
+    return 7;
+  }
+
+  function loadTile(z, x, y, tries) {
+    tries = tries || 0;
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = function () { resolve({ x: x, y: y, img: img }); };
+      img.onerror = function () {
+        if (tries < 2) resolve(loadTile(z, x, y, tries + 1));  // retry transient failures
+        else resolve(null);
+      };
+      img.src = TERRAIN + z + "/" + x + "/" + y + ".png" + (tries ? "?r=" + tries : "");
+    });
+  }
+
+  // Fill exactly-0 (NoData) cells by dilating real values inward, ring by ring.
+  // Missing or blank-ocean tiles decode to 0; without this they render as transparent
+  // sea-level holes in the depth tint. Genuine elevation almost never lands on exactly 0,
+  // so 0 is a safe NoData sentinel; inland grids with no zeros are left untouched.
+  //
+  // Two passes, sea-biased: first flood only sea/bathymetry (negative) values into connected
+  // NoData, so a big ocean gap fills with sea — never bleeding coastal land into the water.
+  // The second pass fills any genuinely landlocked NoData holes from whatever neighbours remain.
+  function repairNoData(grid, W, H) {
+    var N = W * H;
+    var nod = new Uint8Array(N), anyData = false, anyNod = false;
+    for (var i = 0; i < N; i++) { if (grid[i] === 0) { nod[i] = 1; anyNod = true; } else anyData = true; }
+    if (!anyData || !anyNod) return;
+    function pass(seaOnly) {
+      var guard = 0;
+      while (guard++ < 800) {
+        var todo = [];
+        for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+          var c = y * W + x; if (grid[c] !== 0) continue;  // only NoData cells
+          var s = -1, n;
+          n = c - 1;  if (x > 0     && grid[n] !== 0 && (!seaOnly || grid[n] < 0)) s = n;
+          if (s < 0) { n = c + 1;  if (x < W - 1 && grid[n] !== 0 && (!seaOnly || grid[n] < 0)) s = n; }
+          if (s < 0) { n = c - W;  if (y > 0     && grid[n] !== 0 && (!seaOnly || grid[n] < 0)) s = n; }
+          if (s < 0) { n = c + W;  if (y < H - 1 && grid[n] !== 0 && (!seaOnly || grid[n] < 0)) s = n; }
+          if (s >= 0) todo.push(c, s);
+        }
+        if (!todo.length) break;
+        for (var t = 0; t < todo.length; t += 2) grid[todo[t]] = grid[todo[t + 1]];
+      }
+    }
+    pass(true);   // flood sea/bathymetry into connected ocean NoData
+    pass(false);  // fill any remaining landlocked NoData from nearest data
+    // Smooth the synthetic fill (Laplace relaxation over only the filled cells) so the
+    // copy-nearest plateaus become a continuous gradient — no banding or spurious isobaths.
+    for (var it = 0; it < 24; it++) {
+      for (var yy = 0; yy < H; yy++) for (var xx = 0; xx < W; xx++) {
+        var cc = yy * W + xx; if (!nod[cc]) continue;
+        var sum = 0, cnt = 0;
+        if (xx > 0)     { sum += grid[cc - 1]; cnt++; }
+        if (xx < W - 1) { sum += grid[cc + 1]; cnt++; }
+        if (yy > 0)     { sum += grid[cc - W]; cnt++; }
+        if (yy < H - 1) { sum += grid[cc + W]; cnt++; }
+        if (cnt) grid[cc] = sum / cnt;
+      }
+    }
+  }
+
+  // Build an elevation grid (Float32) spanning whole-tile coverage of bbox.
+  function loadTerrain(bb, onProgress) {
+    var z = pickZoom(bb);
+    var n = Math.pow(2, z);
+    var x0 = Math.floor(lon2wx(bb.w) * n), x1 = Math.floor(lon2wx(bb.e) * n);
+    var y0 = Math.floor(lat2wy(bb.n) * n), y1 = Math.floor(lat2wy(bb.s) * n);
+    var nx = x1 - x0 + 1, ny = y1 - y0 + 1;
+    if (nx * ny > MAX_TILES) {  // too many tiles: drop a zoom level
+      while (nx * ny > MAX_TILES && z > 6) {
+        z--; n = Math.pow(2, z);
+        x0 = Math.floor(lon2wx(bb.w) * n); x1 = Math.floor(lon2wx(bb.e) * n);
+        y0 = Math.floor(lat2wy(bb.n) * n); y1 = Math.floor(lat2wy(bb.s) * n);
+        nx = x1 - x0 + 1; ny = y1 - y0 + 1;
+      }
+    }
+    var tiles = [];
+    for (var ty = y0; ty <= y1; ty++) for (var tx = x0; tx <= x1; tx++) tiles.push([tx, ty]);
+
+    var done = 0, total = tiles.length;
+    var proms = tiles.map(function (t) {
+      return loadTile(z, t[0], t[1]).then(function (r) {
+        done++; if (onProgress) onProgress(done, total); return r;
+      });
+    });
+
+    return Promise.all(proms).then(function (results) {
+      // mosaic of nx*256 x ny*256 pixels
+      var TS = 256, mW = nx * TS, mH = ny * TS;
+      var off = document.createElement("canvas"); off.width = TS; off.height = TS;
+      var octx = off.getContext("2d", { willReadFrequently: true });
+      var elev = new Float32Array(mW * mH);  // failed/missing tiles stay 0 (NoData) — repaired below
+      var loaded = 0;
+      for (var r = 0; r < results.length; r++) {
+        var res = results[r];
+        if (!res) continue;
+        loaded++;
+        var px = (res.x - x0) * TS, py = (res.y - y0) * TS;
+        octx.clearRect(0, 0, TS, TS); octx.drawImage(res.img, 0, 0);
+        var data = octx.getImageData(0, 0, TS, TS).data;
+        for (var j = 0; j < TS; j++) {
+          var rowBase = (py + j) * mW + px;
+          var dBase = j * TS * 4;
+          for (var k = 0; k < TS; k++) {
+            var p = dBase + k * 4;
+            elev[rowBase + k] = (data[p] * 256 + data[p + 1] + data[p + 2] / 256) - 32768;
+          }
+        }
+      }
+      if (!loaded) return null;
+      // world rect covered by the mosaic
+      var wb = { x0: x0 / n, y0: y0 / n, x1: (x1 + 1) / n, y1: (y1 + 1) / n };
+      // downsample for compute speed
+      var stride = Math.max(1, Math.ceil(Math.max(mW, mH) / GRID_MAX));
+      var gW = Math.floor(mW / stride), gH = Math.floor(mH / stride);
+      // Keep raw values (incl. negative bathymetry). Land features clamp to >=0 at
+      // compute time; the bathymetry layer uses the negatives directly.
+      var grid = new Float32Array(gW * gH);
+      for (var gy = 0; gy < gH; gy++) for (var gx = 0; gx < gW; gx++)
+        grid[gy * gW + gx] = elev[(gy * stride) * mW + (gx * stride)];
+      repairNoData(grid, gW, gH);  // fill exactly-0 NoData cells (missing/blank ocean tiles)
+      var mn = Infinity, mx = -Infinity;
+      var landMin = Infinity, landMax = -Infinity, seaMin = Infinity, seaCount = 0;
+      for (var gi = 0; gi < gW * gH; gi++) {
+        var v = grid[gi];
+        if (v < mn) mn = v; if (v > mx) mx = v;
+        if (v >= 0) { if (v < landMin) landMin = v; if (v > landMax) landMax = v; }
+        else { seaCount++; if (v < seaMin) seaMin = v; }
+      }
+      if (landMin === Infinity) { landMin = 0; landMax = 0; }
+      if (seaMin === Infinity) seaMin = 0;
+      var hasSea = seaCount > gW * gH * 0.003;  // need a meaningful patch of water
+      return { grid: grid, gW: gW, gH: gH, min: mn, max: mx,
+               landMin: landMin, landMax: landMax, seaMin: seaMin, hasSea: hasSea,
+               worldBounds: wb, mosaicW: mW, mosaicH: mH, fullElev: elev };
+    });
+  }
+
+  function niceInterval(range) {
+    var raw = range / 12;
+    var steps = [5, 10, 20, 25, 50, 100, 200, 500, 1000];
+    for (var i = 0; i < steps.length; i++) if (raw <= steps[i]) return steps[i];
+    return 1000;
+  }
+
+  // Generic marching squares over `grid` for the given iso-levels.
+  // levels: [{ v:<level>, idx:<bold? bool> }].  lo/hi clamp each sampled corner so the
+  // same routine traces land-only (0..Inf) or sea-only (-Inf..0) without copying the grid.
+  // Returns { index:[seg…], normal:[seg…] } as flat [x1,y1,x2,y2] arrays in world coords.
+  function marchGrid(grid, W, H, wb, levels, lo, hi) {
+    function gx2wx(gx) { return wb.x0 + (gx / (W - 1)) * (wb.x1 - wb.x0); }
+    function gy2wy(gy) { return wb.y0 + (gy / (H - 1)) * (wb.y1 - wb.y0); }
+    function cl(v) { return v < lo ? lo : (v > hi ? hi : v); }
+    var indexSeg = [], normalSeg = [];
+    for (var li = 0; li < levels.length; li++) {
+      var lev = levels[li].v;
+      var out = levels[li].idx ? indexSeg : normalSeg;
+      for (var y = 0; y < H - 1; y++) {
+        for (var x = 0; x < W - 1; x++) {
+          var tl = cl(grid[y * W + x]), tr = cl(grid[y * W + x + 1]);
+          var bl = cl(grid[(y + 1) * W + x]), br = cl(grid[(y + 1) * W + x + 1]);
+          var idx = (tl > lev ? 8 : 0) | (tr > lev ? 4 : 0) | (br > lev ? 2 : 0) | (bl > lev ? 1 : 0);
+          if (idx === 0 || idx === 15) continue;
+          var T = function () { var t = (lev - tl) / (tr - tl); return [x + t, y]; };
+          var R = function () { var t = (lev - tr) / (br - tr); return [x + 1, y + t]; };
+          var B = function () { var t = (lev - br) / (bl - br); return [x + 1 - t, y + 1]; };
+          var Lf = function () { var t = (lev - bl) / (tl - bl); return [x, y + 1 - t]; };
+          var a, b;
+          switch (idx) {
+            case 1: case 14: a = Lf(); b = B(); break;
+            case 2: case 13: a = B(); b = R(); break;
+            case 3: case 12: a = Lf(); b = R(); break;
+            case 4: case 11: a = T(); b = R(); break;
+            case 6: case 9:  a = T(); b = B(); break;
+            case 7: case 8:  a = Lf(); b = T(); break;
+            case 5: // saddle: two segments
+              out.push(gx2wx(Lf()[0]), gy2wy(Lf()[1]), gx2wx(T()[0]), gy2wy(T()[1]));
+              a = B(); b = R(); break;
+            case 10:
+              out.push(gx2wx(Lf()[0]), gy2wy(Lf()[1]), gx2wx(B()[0]), gy2wy(B()[1]));
+              a = T(); b = R(); break;
+            default: continue;
+          }
+          out.push(gx2wx(a[0]), gy2wy(a[1]), gx2wx(b[0]), gy2wy(b[1]));
+        }
+      }
+    }
+    return { index: indexSeg, normal: normalSeg };
+  }
+
+  // Land contours (negatives clamped to sea level; level 0 traces the coastline).
+  function computeContours(terr, intervalOpt) {
+    var base = terr.hasSea ? 0 : terr.landMin;
+    var range = terr.landMax - base;
+    if (range < 4) return { index: [], normal: [], interval: 0 };
+    var interval = (intervalOpt && intervalOpt !== "auto") ? parseFloat(intervalOpt) : niceInterval(range);
+    function buildLevels() {
+      var lv = [], first = terr.hasSea ? 0 : Math.ceil(base / interval) * interval;
+      for (var L = first; L <= terr.landMax; L += interval) lv.push({ v: L, idx: Math.round(L / interval) % 5 === 0 });
+      return lv;
+    }
+    var levels = buildLevels();
+    if (levels.length > 70) { interval *= Math.ceil(levels.length / 70); levels = buildLevels(); }
+    var res = marchGrid(terr.grid, terr.gW, terr.gH, terr.worldBounds, levels, 0, Infinity);
+    res.interval = interval;
+    return res;
+  }
+
+  // Bathymetry: a log-scaled depth tint (sea floor color) + log-spaced isobaths.
+  // Inland lakes/reservoirs above sea level carry no depth in the open DEM, so they
+  // produce nothing here — only true below-sea-level water (ocean, bays) is rendered.
+  var ISOBATH_LEVELS = [-5, -10, -20, -30, -50, -100, -200, -500, -1000, -2000, -5000, -8000];
+  var ISOBATH_BOLD = { "-10": 1, "-50": 1, "-200": 1, "-1000": 1, "-5000": 1 };
+
+  function hexToRgb(h) {
+    h = h.replace("#", "");
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  function computeBathymetry(terr, th) {
+    if (!terr.hasSea || !(terr.seaMin < 0)) return null;
+    var grid = terr.grid, W = terr.gW, H = terr.gH;
+    var off = document.createElement("canvas"); off.width = W; off.height = H;
+    var octx = off.getContext("2d");
+    var img = octx.createImageData(W, H), d = img.data;
+    var sh = hexToRgb(th.bathyShallow), dp = hexToRgb(th.bathyDeep);
+    var denom = Math.log(1 + Math.abs(terr.seaMin)) || 1;  // log scale keeps shallow water visible next to deep
+    for (var i = 0; i < W * H; i++) {
+      var v = grid[i], p = i * 4;
+      if (v >= 0) { d[p + 3] = 0; continue; }   // land: transparent
+      var t = Math.log(1 + (-v)) / denom;
+      if (t < 0) t = 0; else if (t > 1) t = 1;
+      d[p]     = Math.round(sh[0] + (dp[0] - sh[0]) * t);
+      d[p + 1] = Math.round(sh[1] + (dp[1] - sh[1]) * t);
+      d[p + 2] = Math.round(sh[2] + (dp[2] - sh[2]) * t);
+      d[p + 3] = 255;
+    }
+    octx.putImageData(img, 0, 0);
+    var levels = [];
+    for (var k = 0; k < ISOBATH_LEVELS.length; k++) {
+      var Lv = ISOBATH_LEVELS[k];
+      if (Lv > terr.seaMin) levels.push({ v: Lv, idx: !!ISOBATH_BOLD[String(Lv)] });
+    }
+    var iso = marchGrid(grid, W, H, terr.worldBounds, levels, -Infinity, 0);
+    return { tint: { canvas: off, worldBounds: terr.worldBounds }, iso: iso, seaMin: terr.seaMin };
+  }
+
+  // Hillshade rendered to an offscreen canvas at grid resolution.
+  function computeHillshade(terr) {
+    var grid = terr.grid, W = terr.gW, H = terr.gH;
+    var off = document.createElement("canvas"); off.width = W; off.height = H;
+    var octx = off.getContext("2d");
+    var img = octx.createImageData(W, H);
+    var d = img.data;
+    var az = 315 * Math.PI / 180, alt = 45 * Math.PI / 180;
+    var zen = Math.PI / 2 - alt;
+    // metres per grid cell (approx) for slope scaling
+    var latMid = 0; // shading is relative; use a fixed exaggeration
+    var cell = Math.max(1, (terr.max - terr.min) > 0 ? 30 : 30);
+    var zScale = 2.0;
+    for (var y = 0; y < H; y++) {
+      for (var x = 0; x < W; x++) {
+        var xm = Math.max(0, x - 1), xp = Math.min(W - 1, x + 1);
+        var ym = Math.max(0, y - 1), yp = Math.min(H - 1, y + 1);
+        // clamp sea/bathymetry to 0 so the shoreline isn't a hillshade "cliff"
+        var exp = Math.max(0, grid[y * W + xp]), exm = Math.max(0, grid[y * W + xm]);
+        var eyp = Math.max(0, grid[yp * W + x]), eym = Math.max(0, grid[ym * W + x]);
+        var dzdx = ((exp - exm) / 2) * zScale / cell;
+        var dzdy = ((eyp - eym) / 2) * zScale / cell;
+        var slope = Math.atan(Math.sqrt(dzdx * dzdx + dzdy * dzdy));
+        var aspect = Math.atan2(dzdy, -dzdx);
+        var hs = Math.cos(zen) * Math.cos(slope) + Math.sin(zen) * Math.sin(slope) * Math.cos(az - aspect);
+        hs = Math.max(0, hs);
+        var v = Math.round(hs * 255);
+        var p = (y * W + x) * 4;
+        d[p] = d[p + 1] = d[p + 2] = v; d[p + 3] = 255;
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    return { canvas: off, worldBounds: terr.worldBounds };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Fit view to world bounds
+  // ---------------------------------------------------------------------------
+  function fitTo(wb, padFrac) {
+    padFrac = padFrac == null ? 0.04 : padFrac;
+    var vw = cssW || window.innerWidth || 1024;   // guard against an unmeasured viewport
+    var vh = cssH || window.innerHeight || 768;
+    var ww = wb.x1 - wb.x0, wh = wb.y1 - wb.y0;
+    if (!(ww > 0) || !(wh > 0)) return;
+    var pad = 1 - padFrac * 2;
+    var k = Math.min(vw / ww, vh / wh) * pad;
+    view.k = k;
+    var cx = (wb.x0 + wb.x1) / 2, cy = (wb.y0 + wb.y1) / 2;
+    view.tx = vw / 2 - cx * k;
+    view.ty = vh / 2 - cy * k;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
+  function strokePolylines(list, color, baseWidth, weighted, dash) {
+    ctx.strokeStyle = color;
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    if (dash) ctx.setLineDash(dash); else ctx.setLineDash([]);
+    if (weighted) {
+      // group strokes by width bucket to reduce state changes
+      for (var i = 0; i < list.length; i++) {
+        var f = list[i];
+        ctx.lineWidth = Math.max(0.35, f.w * baseWidth);
+        ctx.beginPath();
+        var p = f.pts;
+        ctx.moveTo(sx(p[0]), sy(p[1]));
+        for (var j = 2; j < p.length; j += 2) ctx.lineTo(sx(p[j]), sy(p[j + 1]));
+        ctx.stroke();
+      }
+    } else {
+      ctx.lineWidth = baseWidth;
+      ctx.beginPath();
+      for (var a = 0; a < list.length; a++) {
+        var pts = list[a];
+        ctx.moveTo(sx(pts[0]), sy(pts[1]));
+        for (var b = 2; b < pts.length; b += 2) ctx.lineTo(sx(pts[b]), sy(pts[b + 1]));
+      }
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }
+
+  function fillPolys(list, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    for (var a = 0; a < list.length; a++) {
+      var pts = list[a];
+      if (pts.length < 6) continue;
+      ctx.moveTo(sx(pts[0]), sy(pts[1]));
+      for (var b = 2; b < pts.length; b += 2) ctx.lineTo(sx(pts[b]), sy(pts[b + 1]));
+      ctx.closePath();
+    }
+    ctx.fill("evenodd");
+  }
+
+  function strokeSegments(segs, color, width) {
+    if (!segs || !segs.length) return;
+    ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = "round";
+    ctx.beginPath();
+    for (var i = 0; i < segs.length; i += 4) {
+      ctx.moveTo(sx(segs[i]), sy(segs[i + 1]));
+      ctx.lineTo(sx(segs[i + 2]), sy(segs[i + 3]));
+    }
+    ctx.stroke();
+  }
+
+  // Recompute terrain layers from the cached grid (no network).
+  // Returns true if terrain was available, false if a fresh Render is needed.
+  function ensureTopo() {
+    var L = currentLayers();
+    if (!scene._terr) return false;
+    var th = THEMES[$("theme").value];
+    if (L.contours) scene.contours = computeContours(scene._terr, $("cinterval").value);
+    if (L.hillshade && !scene.hill) scene.hill = computeHillshade(scene._terr);
+    if (L.bathy && !scene.bathy) scene.bathy = computeBathymetry(scene._terr, th);
+    updateTerrStats();
+    return true;
+  }
+
+  // Derive the stats line + legend from the cached terrain grid and current layers.
+  function updateTerrStats() {
+    var t = scene._terr;
+    if (!t) { scene._terrStats = null; setStats(""); buildLegend(false, 0); return; }
+    var L = currentLayers();
+    var landMin = t.hasSea ? 0 : Math.round(t.landMin);
+    var interval = (scene.contours && scene.contours.interval) ||
+                   (scene._terrStats ? scene._terrStats.interval : 0);
+    scene._terrStats = { landMin: landMin, landMax: Math.round(t.landMax),
+                         seaMin: Math.round(t.seaMin), hasSea: t.hasSea, interval: interval };
+    var s = "Elevation " + landMin + "–" + scene._terrStats.landMax + " m";
+    if (interval) s += " · contour " + interval + " m";
+    if (t.hasSea && L.bathy && scene.bathy) s += " · sea floor to " + scene._terrStats.seaMin + " m";
+    setStats(s);
+    buildLegend(true, interval);
+  }
+
+  function currentLayers() {
+    return {
+      roads: $("ly-roads").checked, contours: $("ly-contours").checked,
+      hillshade: $("ly-hillshade").checked, water: $("ly-water").checked,
+      green: $("ly-green").checked, rail: $("ly-rail").checked, build: $("ly-build").checked,
+      bathy: $("ly-bathy").checked
+    };
+  }
+
+  function render() {
+    var th = THEMES[$("theme").value];
+    var bw = parseFloat($("weight").value);
+    var L = currentLayers();
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS px, crisp on HiDPI
+    ctx.fillStyle = th.bg; ctx.fillRect(0, 0, cssW, cssH);
+
+    if (!scene.loaded) { ctx.restore(); return; }
+
+    // hillshade (under everything)
+    if (L.hillshade && scene.hill) {
+      var hb = scene.hill.worldBounds;
+      var x = sx(hb.x0), y = sy(hb.y0), w = (hb.x1 - hb.x0) * view.k, h = (hb.y1 - hb.y0) * view.k;
+      ctx.save();
+      ctx.globalAlpha = th.hillAlpha;
+      ctx.globalCompositeOperation = th.hillBlend;
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(scene.hill.canvas, x, y, w, h);
+      ctx.restore();
+    }
+
+    // bathymetry depth tint (sea floor) — opaque over sub-sea pixels, transparent on land
+    var bathyOn = L.bathy && scene.bathy;
+    if (bathyOn) {
+      var bb = scene.bathy.tint.worldBounds;
+      ctx.save(); ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(scene.bathy.tint.canvas, sx(bb.x0), sy(bb.y0),
+                    (bb.x1 - bb.x0) * view.k, (bb.y1 - bb.y0) * view.k);
+      ctx.restore();
+    }
+
+    if (L.green && scene.green.length) fillPolys(scene.green, th.green);
+    if (L.water) {
+      if (scene.water.length) {
+        if (bathyOn) { ctx.save(); ctx.globalAlpha = 0.45; fillPolys(scene.water, th.water); ctx.restore(); }
+        else fillPolys(scene.water, th.water);
+      }
+      if (scene.waterLines.length) strokePolylines(scene.waterLines, th.waterLine, Math.max(0.8, bw * 1.1), false);
+    }
+    if (bathyOn) {  // isobaths on top of the water surface
+      strokeSegments(scene.bathy.iso.normal, th.isobath, Math.max(0.4, bw * 0.5));
+      strokeSegments(scene.bathy.iso.index, th.isobathIndex, Math.max(0.7, bw * 0.85));
+    }
+    if (L.contours && scene.contours) {
+      strokeSegments(scene.contours.normal, th.contour, Math.max(0.5, bw * 0.55));
+      strokeSegments(scene.contours.index, th.contourIndex, Math.max(0.8, bw * 0.9));
+    }
+    if (L.build && scene.buildings.length) fillPolys(scene.buildings, th.build);
+    if (L.rail && scene.rail.length) strokePolylines(scene.rail, th.rail, Math.max(0.6, bw * 0.7), false, [bw * 3, bw * 3]);
+    if (L.roads && scene.roads.length) {
+      if (th.roadGlow) {
+        // soft glow underlay for night theme
+        ctx.save(); ctx.globalCompositeOperation = "lighter";
+        strokeWeightedGlow(scene.roads, th.roadGlow, bw);
+        ctx.restore();
+      }
+      strokePolylines(scene.roads, th.roads, bw, true);
+    }
+    ctx.restore();
+  }
+
+  function strokeWeightedGlow(list, color, bw) {
+    ctx.strokeStyle = color; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    for (var i = 0; i < list.length; i++) {
+      var f = list[i];
+      ctx.lineWidth = Math.max(1, f.w * bw) + 3;
+      ctx.beginPath();
+      var p = f.pts;
+      ctx.moveTo(sx(p[0]), sy(p[1]));
+      for (var j = 2; j < p.length; j += 2) ctx.lineTo(sx(p[j]), sy(p[j + 1]));
+      ctx.stroke();
+    }
+  }
+
+  // throttle re-render with rAF
+  var rafQueued = false;
+  function requestRender() {
+    if (rafQueued) return;
+    rafQueued = true;
+    requestAnimationFrame(function () { rafQueued = false; render(); });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Pan / zoom interaction
+  // ---------------------------------------------------------------------------
+  var drag = null;
+  canvas.addEventListener("mousedown", function (e) {
+    drag = { x: e.clientX, y: e.clientY, tx: view.tx, ty: view.ty };
+    canvas.classList.add("dragging");
+  });
+  window.addEventListener("mousemove", function (e) {
+    if (!drag) return;
+    view.tx = drag.tx + (e.clientX - drag.x);
+    view.ty = drag.ty + (e.clientY - drag.y);
+    requestRender();
+  });
+  window.addEventListener("mouseup", function () { drag = null; canvas.classList.remove("dragging"); });
+
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    zoomAt(e.clientX, e.clientY, Math.pow(1.0015, -e.deltaY));
+  }, { passive: false });
+
+  function zoomAt(px, py, factor) {
+    var wx = (px - view.tx) / view.k, wy = (py - view.ty) / view.k;
+    view.k *= factor;
+    view.tx = px - wx * view.k;
+    view.ty = py - wy * view.k;
+    requestRender();
+  }
+
+  // touch: one-finger pan, two-finger pinch
+  var touch = null;
+  canvas.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 1) {
+      touch = { mode: "pan", x: e.touches[0].clientX, y: e.touches[0].clientY, tx: view.tx, ty: view.ty };
+    } else if (e.touches.length === 2) {
+      var d = dist(e.touches);
+      touch = { mode: "pinch", d: d, k: view.k, tx: view.tx, ty: view.ty,
+                cx: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                cy: (e.touches[0].clientY + e.touches[1].clientY) / 2 };
+    }
+  }, { passive: false });
+  canvas.addEventListener("touchmove", function (e) {
+    e.preventDefault();
+    if (!touch) return;
+    if (touch.mode === "pan" && e.touches.length === 1) {
+      view.tx = touch.tx + (e.touches[0].clientX - touch.x);
+      view.ty = touch.ty + (e.touches[0].clientY - touch.y);
+      requestRender();
+    } else if (touch.mode === "pinch" && e.touches.length === 2) {
+      var nd = dist(e.touches), f = nd / touch.d;
+      var wx = (touch.cx - touch.tx) / touch.k, wy = (touch.cy - touch.ty) / touch.k;
+      view.k = touch.k * f;
+      view.tx = touch.cx - wx * view.k;
+      view.ty = touch.cy - wy * view.k;
+      requestRender();
+    }
+  }, { passive: false });
+  canvas.addEventListener("touchend", function (e) { if (e.touches.length === 0) touch = null; }, { passive: false });
+  function dist(t) { var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY; return Math.hypot(dx, dy); }
+
+  // ---------------------------------------------------------------------------
+  // Main: render pipeline
+  // ---------------------------------------------------------------------------
+  var rendering = false;
+  function runRender() {
+    if (rendering) return;
+    var q = placeInput.value.trim();
+    if (!q) { status("Enter a place name first.", { err: true }); return; }
+    rendering = true;
+    $("render").disabled = true; $("download").disabled = true;
+    var layers = currentLayers();
+    var detail = $("detail").value;
+    var bb;
+
+    status("Locating “" + q + "” …", { loading: true });
+    geocode(q).then(function (g) {
+      bb = clampBbox(g);
+      scene.bbox = bb;
+      status("Fetching map data from OpenStreetMap …", { loading: true });
+      return overpass(buildQuery(bb, layers, detail), function (i, ep) {
+        if (i > 0) status("Retrying via mirror " + (i + 1) + " …", { loading: true });
+      });
+    }).then(function (osm) {
+      var cat = categorize(osm.elements || []);
+      scene.roads = cat.roads; scene.water = cat.water; scene.waterLines = cat.waterLines;
+      scene.green = cat.green; scene.rail = cat.rail; scene.buildings = cat.buildings;
+      scene.worldBounds = { x0: lon2wx(bb.w), y0: lat2wy(bb.n), x1: lon2wx(bb.e), y1: lat2wy(bb.s) };
+
+      var needTopo = layers.contours || layers.hillshade || layers.bathy;
+      if (!needTopo) return null;
+      status("Fetching elevation tiles …", { loading: true });
+      return loadTerrain(bb, function (d, t) {
+        status("Fetching elevation tiles … " + d + "/" + t, { loading: true });
+      });
+    }).then(function (terr) {
+      scene.contours = { index: [], normal: [] }; scene.hill = null; scene.bathy = null;
+      scene._terr = terr || null;  // cache the raw grid so toggles/interval recompute without refetch
+      scene._terrStats = null;
+      if (terr) {
+        var th = THEMES[$("theme").value];
+        status("Computing terrain — contours, relief, depth …", { loading: true });
+        if (layers.contours) scene.contours = computeContours(terr, $("cinterval").value);
+        if (layers.hillshade) scene.hill = computeHillshade(terr);
+        if (layers.bathy) scene.bathy = computeBathymetry(terr, th);
+      }
+      scene.loaded = true;
+      fitTo(scene.worldBounds);
+      // if the viewport wasn't measurable yet, re-fit on the next frame
+      if (!isFinite(view.k) || view.k <= 0) {
+        requestAnimationFrame(function () { resize(); fitTo(scene.worldBounds); render(); });
+      }
+      render();
+      finishRender(layers);
+    }).catch(function (err) {
+      console.error(err);
+      status("⚠ " + err.message + " — try a smaller place, fewer layers, or press Render again.", { err: true });
+    }).then(function () {
+      rendering = false; $("render").disabled = false;
+    });
+  }
+
+  function finishRender(layers) {
+    $("download").disabled = false; $("fit").disabled = false;
+    var nRoads = scene.roads.length;
+    var msg = "Rendered " + nRoads.toLocaleString() + " road ways";
+    var bits = [];
+    if (scene.water.length || scene.waterLines.length) bits.push((scene.water.length + scene.waterLines.length) + " water");
+    if (scene.green.length) bits.push(scene.green.length + " green");
+    if (scene.rail.length) bits.push(scene.rail.length + " rail");
+    if (scene.buildings.length) bits.push(scene.buildings.length.toLocaleString() + " buildings");
+    if (bits.length) msg += ", " + bits.join(", ");
+    msg += ".";
+    status(msg);
+    updateTerrStats();
+  }
+
+  function buildLegend(hasTopo, interval) {
+    var th = THEMES[$("theme").value];
+    var L = currentLayers();
+    var items = [];
+    function row(color, label, dash) {
+      return '<span style="display:inline-flex;align-items:center;gap:5px;margin-right:10px;">' +
+             '<span style="display:inline-block;width:16px;height:0;border-top:3px ' + (dash ? "dashed" : "solid") +
+             ' ' + color + '"></span>' + label + '</span>';
+    }
+    function swatchRow(color, label) {
+      return '<span style="display:inline-flex;align-items:center;gap:5px;margin-right:10px;">' +
+             '<span style="display:inline-block;width:14px;height:11px;border-radius:2px;background:' + color + '"></span>' +
+             label + '</span>';
+    }
+    if (L.roads) items.push(row(th.roads, "Roads"));
+    if (L.contours && hasTopo) items.push(row(th.contourIndex, "Contour (" + interval + " m)"));
+    if (L.bathy && scene.bathy) items.push(swatchRow("linear-gradient(90deg," + th.bathyShallow + "," + th.bathyDeep + ")", "Depth"));
+    if (L.water) items.push(row(th.waterLine, "Water"));
+    if (L.rail) items.push(row(th.rail, "Rail", true));
+    var lg = $("legend");
+    if (items.length && scene.loaded) { lg.innerHTML = "<b>" + (scene.bbox ? "" : "") + "</b>" + items.join(""); lg.classList.add("show"); }
+    else lg.classList.remove("show");
+  }
+
+  // ---------------------------------------------------------------------------
+  // Export PNG
+  // ---------------------------------------------------------------------------
+  function download() {
+    var url = canvas.toDataURL("image/png");
+    var a = document.createElement("a");
+    var name = (placeInput.value.trim() || "city").replace(/[^\w]+/g, "-").toLowerCase();
+    a.href = url; a.download = "cartography-" + name + ".png";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Wire up UI
+  // ---------------------------------------------------------------------------
+  var EXAMPLES = ["Boulder, Colorado", "San Francisco", "Kyoto, Japan", "Cape Town", "Venice, Italy", "Innsbruck, Austria"];
+  (function () {
+    var box = $("examples");
+    EXAMPLES.forEach(function (c) {
+      var b = document.createElement("span");
+      b.className = "chip"; b.textContent = c;
+      b.onclick = function () { placeInput.value = c; runRender(); };
+      box.appendChild(b);
+    });
+  })();
+
+  function paintSwatches() {
+    var th = THEMES[$("theme").value];
+    var map = { "sw-roads": th.roads, "sw-contours": th.contourIndex, "sw-water": th.waterLine,
+                "sw-green": th.green, "sw-rail": th.rail, "sw-build": th.build };
+    Object.keys(map).forEach(function (id) { var el = $(id); if (el) el.style.background = map[id]; });
+    var sb = $("sw-bathy"); if (sb) sb.style.background = "linear-gradient(135deg," + th.bathyShallow + "," + th.bathyDeep + ")";
+  }
+
+  $("render").onclick = runRender;
+  $("download").onclick = download;
+  $("fit").onclick = function () { if (scene.worldBounds) { fitTo(scene.worldBounds); render(); } };
+  $("hide").onclick = function () { document.body.classList.add("collapsed"); };
+  $("showPanel").onclick = function () { document.body.classList.remove("collapsed"); };
+  placeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") runRender(); });
+  // theme & weight: re-render instantly without refetch (depth tint bakes theme colors, so rebuild it)
+  $("theme").addEventListener("change", function () {
+    paintSwatches();
+    if (scene._terr && currentLayers().bathy) scene.bathy = computeBathymetry(scene._terr, THEMES[this.value]);
+    buildLegend(!!scene._terrStats, scene._terrStats ? scene._terrStats.interval : 0);
+    render();
+  });
+  $("weight").addEventListener("input", requestRender);
+  // toggling a layer re-renders from cached data when possible; some layers may need a refetch
+  ["ly-roads","ly-water","ly-green","ly-rail","ly-build","ly-contours","ly-hillshade","ly-bathy"].forEach(function (id) {
+    $(id).addEventListener("change", function () {
+      if (id === "ly-contours" || id === "ly-hillshade" || id === "ly-bathy") {
+        // recompute from the cached terrain grid; only refetch if we never loaded terrain
+        if (this.checked) {
+          if (!ensureTopo()) status("Press Render to fetch elevation data.", {});
+          else if (id === "ly-bathy" && !scene.bathy)
+            status("No below-sea-level water in view — inland, or the DEM has no depth here (lakes above sea level read flat).", {});
+        }
+      } else if (this.checked) {
+        if (id === "ly-build" && !scene.buildings.length) status("Press Render to fetch buildings.", {});
+        else if (id === "ly-rail" && !scene.rail.length) status("Press Render to fetch rail.", {});
+      }
+      buildLegend(!!scene._terrStats, scene._terrStats ? scene._terrStats.interval : 0);
+      render();
+    });
+  });
+  // contour interval: recompute instantly from the cached grid
+  $("cinterval").addEventListener("change", function () {
+    if (scene._terr) { ensureTopo(); render(); }
+  });
+
+  window.addEventListener("resize", function () {
+    resize();
+    // recover a collapsed/never-established view without overriding a valid one
+    if (scene.loaded && scene.worldBounds && (!isFinite(view.k) || view.k <= 0)) fitTo(scene.worldBounds);
+    render();
+  });
+
+  // init
+  resize();
+  paintSwatches();
+  render();
+  placeInput.focus();
+
+  // hide zoom hint after first interaction
+  ["wheel","mousedown","touchstart"].forEach(function (ev) {
+    canvas.addEventListener(ev, function () { var h = $("zoomHint"); if (h) h.style.display = "none"; }, { once: true });
+  });
+
+  // expose for console debugging
+  window.cartography = { scene: scene, view: view, render: render, run: runRender };
+})();
+</script>
+</body>
+</html>
