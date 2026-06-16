@@ -7,6 +7,13 @@
     "kind": "page"
   },
   {
+    "unit": "bitcoin-power-law",
+    "url": "/bitcoin-power-law/",
+    "title": "Does Bitcoin Follow a Power Law? \u2014 An Econometric Autopsy",
+    "last_modified": "2026-06-15T14:45:47-07:00",
+    "kind": "project"
+  },
+  {
     "unit": "cartography",
     "url": "/cartography.html",
     "title": "City Cartography \u2014 Roads + Topography",
