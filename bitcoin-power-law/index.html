@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Does Bitcoin Follow a Power Law? — An Econometric Autopsy</title>
+<meta name="description" content="An interactive, multi-lens econometric scrutiny of the Bitcoin power law: fit, inference, stationarity, model selection, mean reversion, LPPLS bubbles, structural stability, and risk."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<script src="assets/data.js"></script>
+<style>
+  :root{
+    --bg:#0a0d12; --bg2:#0e131a; --card:#121821; --card2:#0f141c; --line:#1f2731;
+    --ink:#e8eef5; --mute:#93a1b2; --dim:#6b7787;
+    --orange:#f7931a; --blue:#4c93f7; --green:#3fb950; --red:#f85149; --purple:#a371f7; --teal:#39c5cf;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:
+      radial-gradient(1100px 520px at 82% -8%, rgba(247,147,26,.10), transparent 60%),
+      radial-gradient(900px 480px at -5% 4%, rgba(76,147,247,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.65;
+    -webkit-font-smoothing:antialiased;}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+    background:rgba(10,13,18,.82);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;gap:6px;align-items:center;height:52px;overflow-x:auto;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav .brand{font-weight:700;margin-right:14px;white-space:nowrap;color:var(--ink)}
+  nav .brand b{color:var(--orange)}
+  nav a{color:var(--mute);font-size:13px;padding:6px 10px;border-radius:7px;white-space:nowrap;font-weight:500}
+  nav a:hover{background:var(--card);color:var(--ink);text-decoration:none}
+  /* hero */
+  header.hero{padding:56px 0 26px;border-bottom:1px solid var(--line)}
+  .eyebrow{color:var(--orange);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.05;margin:14px 0 14px;font-weight:800;letter-spacing:-1.2px}
+  h1 .g{background:linear-gradient(95deg,var(--orange),#ffb454);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .lede{font-size:18px;color:var(--mute);max-width:760px}
+  .byline{margin-top:18px;color:var(--dim);font-size:13.5px}
+  .byline a{color:var(--mute)}
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;min-width:120px}
+  .chip .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+  .chip .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  /* sections */
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  .lenstag{display:inline-flex;align-items:center;gap:8px;color:var(--mute);font-size:12.5px;font-weight:600;
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .lensnum{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;
+    background:rgba(247,147,26,.14);color:var(--orange);font-weight:700;font-size:12px}
+  h2{font-size:26px;font-weight:750;letter-spacing:-.5px;margin:6px 0 8px}
+  h3{font-size:17px;font-weight:650;margin:22px 0 8px}
+  p{color:#cdd6e1}
+  .q{color:var(--mute);font-style:italic;font-size:16.5px;margin:0 0 14px;border-left:2px solid var(--line);padding-left:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+  .plot{width:100%;min-height:300px}
+  figure{margin:16px 0}
+  figure img{width:100%;border:1px solid var(--line);border-radius:12px;display:block;background:var(--card2)}
+  figcaption{color:var(--dim);font-size:12.5px;margin-top:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .verdict{border-radius:12px;padding:14px 16px;margin-top:16px;font-size:14.5px;border:1px solid}
+  .v-real{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.32)}
+  .v-warn{background:rgba(247,147,26,.08);border-color:rgba(247,147,26,.32)}
+  .v-bad{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.30)}
+  .verdict b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:"JetBrains Mono",monospace}
+  .win{color:var(--green);font-weight:600}
+  .eq{overflow-x:auto;padding:6px 2px;color:#dbe4ee}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mute)}
+  .pill.ok{color:var(--green);border-color:rgba(63,185,80,.4)}
+  .pill.no{color:var(--red);border-color:rgba(248,81,73,.4)}
+  .scorecard{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .scorecard ul{margin:8px 0 0;padding-left:18px}
+  .scorecard li{margin:7px 0;font-size:14px;color:#cdd6e1}
+  footer{padding:34px 0 70px;color:var(--dim);font-size:13px}
+  footer code{color:var(--mute)}
+  @media(max-width:820px){.grid2,.scorecard{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="/" style="color:var(--mute);font-weight:600;margin-right:4px" title="Back to portfolio">← Portfolio</a>
+  <span class="brand"><b>₿</b> Power Law</span>
+  <a href="#claim">The claim</a>
+  <a href="#fit">Fit &amp; inference</a>
+  <a href="#spurious">Spurious?</a>
+  <a href="#models">Model tournament</a>
+  <a href="#reversion">Mean reversion</a>
+  <a href="#bubbles">Bubbles (LPPLS)</a>
+  <a href="#stability">Stability</a>
+  <a href="#risk">Risk</a>
+  <a href="#scorecard">Scorecard</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Quantitative Research Note</div>
+  <h1>Does Bitcoin follow a <span class="g">power&nbsp;law</span>?<br/>An econometric autopsy.</h1>
+  <p class="lede">Bitcoin's price has tracked a straight line on log–log axes for over a decade — a power law in time. This note interrogates that claim from eight angles: not just <i>does it fit</i>, but <i>does the fit mean anything</i>. Every chart is interactive; every test is reproducible.</p>
+  <div class="byline">Built with Python · statsmodels · Plotly · seaborn — on 10 years of real Coinbase data. <span id="gen"></span></div>
+  <div class="chips" id="chips"></div>
+</div></header>
+
+<main>
+
+<section id="claim"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">0</span> The hypothesis</div>
+  <h2>One line across six orders of magnitude</h2>
+  <p>The Bitcoin power-law model (Santostasi; Burger) says price grows as a fixed power of Bitcoin's <em>age</em>, not exponentially:</p>
+  <div class="card eq">
+    $$ P(t) \;=\; A\,\bigl(t\bigr)^{\,n}, \qquad\Longleftrightarrow\qquad \log_{10} P \;=\; a \;+\; n\,\log_{10} t $$
+    <p style="margin:8px 0 0;color:var(--mute);font-size:14px">where $t$ = days since the genesis block (2009-01-03). A power law is a <b>straight line in log–log space</b>; the slope is the exponent $n$. Contrast the exponential $P = A e^{kt}$, which is a straight line in <i>log–linear</i> space and implies a constant doubling time — something Bitcoin has never had.</p>
+  </div>
+  <div class="card">
+    <div id="hero" class="plot" style="min-height:520px"></div>
+    <figcaption>Interactive: hover for fair-value vs. actual, drag to zoom, double-click to reset, toggle the Y-axis between log and linear to see why log scaling is non-negotiable. Orange = fitted power law &amp; its 5–95% / 25–75% corridor; blue = BTC (Coinbase, weekly); green = independent 2010–2015 reference prices.</figcaption>
+  </div>
+  <div class="verdict v-real">The visual case is strong: a single straight line spans from $0.05 (2010) to six figures (2026). Independent early-era prices — from a different market structure entirely — land on the same line. <b>But a straight-looking line on log–log axes is where the real work begins, not ends.</b></div>
+</div></section>
+
+<section id="fit"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">1</span> Lens 1 — Fit &amp; honest inference</div>
+  <h2>The exponent is real — but far less precise than it looks</h2>
+  <p class="q">"R² = 0.94 sounds decisive. What's the actual uncertainty on the exponent?"</p>
+  <p>Ordinary least squares gives a tight-looking standard error, but it assumes independent observations. Bitcoin's daily deviations from trend are <b>almost perfectly autocorrelated</b> (lag-1 ρ ≈ 0.998) — consecutive days carry nearly the same information, so the <i>effective</i> sample size is a tiny fraction of the ~3,650 days. Naive SEs are meaningless here.</p>
+  <p>The honest fix is two-fold: Newey–West (HAC) standard errors, and a moving-block bootstrap that resamples blocks of days to preserve the autocorrelation. Both blow the confidence interval wide open:</p>
+  <div class="card"><table id="fittab"></table></div>
+  <div class="verdict v-warn">The exponent is genuinely positive and near the literature's ~5.8 — but once you respect the autocorrelation, it's <b>5.4 with a 95% bootstrap interval of roughly [4.3, 6.2]</b>, not a three-decimal constant. Any narrative built on a precise exponent is overselling the data.</div>
+</div></section>
+
+<section id="spurious"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">2</span> Lens 2 — Is it a spurious regression?</div>
+  <h2>High R² between two trending series proves almost nothing</h2>
+  <p class="q">"Regress any rising series on time and you get R² &gt; 0.9. How do we know this isn't that?"</p>
+  <p>Granger &amp; Newbold's classic warning: two unrelated trending series routinely produce a high R² and a near-zero Durbin–Watson. Bitcoin's fit shows exactly that fingerprint — <span class="mono" id="rdw"></span> — the prosecution's strongest single fact.</p>
+  <p><b>The honest nuance the internet usually botches:</b> the regressor here, $\log_{10}(\text{days})$, is a <i>deterministic clock</i>, not a stochastic trend. So formal <em>cointegration is technically undefined</em>, and calling the fit "spurious" in the strict Granger–Newbold sense is wrong. The defensible question is narrower and sharper: <b>are the residuals stationary?</b> If not, price never reliably mean-reverts to the line, and OLS inference is invalid (Lens 1).</p>
+  <div class="grid2">
+    <div class="card"><table id="statab"></table>
+      <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">ADF null = unit root (non-stationary); KPSS null = stationary. They are designed to disagree — quoting one alone is cherry-picking.</p>
+    </div>
+    <figure><img src="assets/fig_acf.png" alt="Autocorrelation of residuals"/>
+      <figcaption>Residual autocorrelation decays only over <i>hundreds</i> of days — the signature of a near-unit-root process. This is why naive standard errors fail.</figcaption></figure>
+  </div>
+  <figure><img src="assets/fig_qq.png" alt="QQ plot of residuals" style="max-width:560px"/>
+    <figcaption>Q–Q plot: residuals are heavier-tailed than Gaussian, so even the bootstrap CI is optimistic at the extremes.</figcaption></figure>
+  <div class="verdict v-bad">Verdict: the residuals fail to show clean stationarity (ADF can't reject a unit root). <b>So the power law is a <i>descriptive</i> trend, not a proven structural law</b> — and "it has a high R²" is not evidence in its favor, because that's mechanically guaranteed against any monotone clock.</div>
+</div></section>
+
+<section id="models"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">3</span> Lens 3 — Model tournament</div>
+  <h2>Power law vs. exponential vs. stretched-exp vs. logistic</h2>
+  <p class="q">"If you let other growth curves compete fairly, does the power law actually win?"</p>
+  <p>Four models, same data, same log-price space, ranked by AIC (which penalizes extra parameters). The result is a genuinely split decision:</p>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:4px">Full history · 2010–2026</h3>
+      <table id="mtab_full"></table>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:4px">Recent only · 2016–2026</h3>
+      <table id="mtab_recent"></table>
+    </div>
+  </div>
+  <figure><img src="assets/fig_aic.png" alt="Model selection AIC comparison"/>
+    <figcaption>ΔAIC (lower = better). The pure exponential is crushed in both windows — Bitcoin's doubling time is <i>not</i> constant. Over full history the power law wins; over the last decade a saturating logistic edges it out.</figcaption></figure>
+  <div class="verdict v-warn">Two honest takeaways. <b>(1) The exponential is decisively dead</b> — that part of the power-law thesis is robust. <b>(2) The "power law beats everything" claim does not survive:</b> on the recent window a logistic S-curve fits better, hinting at deceleration. But that logistic edge is partly an artifact — with ρ≈0.998 the effective sample is tiny, so AIC gaps are inflated, and a logistic can always bend to a finite window. The data simply <i>cannot distinguish</i> a decelerating power law from early-stage saturation. That ambiguity is the real finding.</div>
+</div></section>
+
+<section id="reversion"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">4</span> Lens 4 — The corridor as a mean-reverting process</div>
+  <h2>How fast does Bitcoin snap back to the line?</h2>
+  <p class="q">"If the residual is a signal, what's its half-life — and where are we now?"</p>
+  <p>Model the deviation $r(t)=\log_{10}P-\text{trend}$ as an Ornstein–Uhlenbeck process, $dr=-\lambda r\,dt+\sigma\,dW$, with half-life $\ln 2/\lambda$. Fitting an AR(1) to the residuals gives the speed of reversion and lets us standardize today's deviation into a z-score "oscillator."</p>
+  <div class="card">
+    <div id="osc" class="plot" style="min-height:360px"></div>
+    <figcaption>The power-law oscillator: standardized deviation from fair value. Shaded ±1σ / ±2σ bands. Below the midline = historically cheap; above = expensive.</figcaption>
+  </div>
+  <div class="grid2">
+    <figure><img src="assets/fig_residual_dist.png" alt="Residual distribution"/>
+      <figcaption>Distribution of deviations, with today's position marked.</figcaption></figure>
+    <div class="card" id="mrcard"></div>
+  </div>
+  <div class="verdict v-warn">Mean reversion is real but <b>slow and weak</b>: a half-life of ~9 months and a near-unit-root process mean the "corridor" is a loose tendency, not a tradeable spring. Today Bitcoin sits below fair value — historically a favorable zone — but Lens 2 warns that "below the line" can persist for years.</div>
+</div></section>
+
+<section id="bubbles"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">5</span> Lens 5 — Bubbles &amp; finite-time singularities (LPPLS)</div>
+  <h2>Does a power-law backbone coexist with log-periodic bubbles?</h2>
+  <p class="q">"Sornette says bubbles accelerate super-exponentially with log-periodic wobbles. Can we see one?"</p>
+  <p>The Log-Periodic Power-Law Singularity model fits a critical time $t_c$ — a finite-time singularity the price accelerates toward before correcting:</p>
+  <div class="card eq" style="font-size:15px">
+    $$ \ln p(t) = A + B\,(t_c-t)^m + C\,(t_c-t)^m\cos\!\bigl(\omega\ln(t_c-t)-\phi\bigr) $$
+  </div>
+  <p>Fitted to the 2020–2021 run-up (Filimonov–Sornette reduction, bounded search):</p>
+  <div class="card">
+    <div id="lppls" class="plot" style="min-height:380px"></div>
+    <figcaption>Log-price (white) vs. LPPLS fit (orange). Dashed line = fitted critical time $t_c$; green = the actual cycle peak.</figcaption>
+  </div>
+  <div class="card" id="lpplscard"></div>
+  <div class="verdict v-warn">The log-periodic acceleration is visible and the fitted $t_c$ lands remarkably close to the actual top — but in full honesty, $\omega$ pins to the lower search boundary and <b>fails the strict acceptance filter</b> ($\omega\in[6,13]$) that distinguishes signal from over-fit. LPPLS here is a <b>suggestive within-episode diagnostic, not a validated crash predictor</b>. One cycle cannot establish out-of-sample skill.</div>
+</div></section>
+
+<section id="stability"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">6</span> Lens 6 — Structural stability</div>
+  <h2>Is the exponent a constant, or does it drift?</h2>
+  <p class="q">"A law has a stable parameter. Does Bitcoin's exponent hold across halvings?"</p>
+  <div class="card">
+    <div id="roll" class="plot" style="min-height:340px"></div>
+    <figcaption>Exponent re-estimated on a rolling 2-year window. A true constant would be flat; instead it drifts within a band.</figcaption>
+  </div>
+  <div class="card"><table id="chowtab"></table>
+    <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">Chow test for a structural break in the exponent at each halving. p &lt; 0.05 ⇒ the slope shifts.</p>
+  </div>
+  <div class="verdict v-bad">The exponent is <b>not structurally stationary</b> — Chow tests flag breaks at the halvings, and the rolling estimate wanders. The power law is a strong <i>descriptive envelope</i>, but its single "constant" exponent is really a slowly-moving average of regime-dependent slopes.</div>
+</div></section>
+
+<section id="risk"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">7</span> Lens 7 — Risk &amp; deceleration</div>
+  <h2>Diminishing returns are a feature, not a bug</h2>
+  <p class="q">"Each cycle's gains are smaller. Does that break the power law — or confirm it?"</p>
+  <p>A constant log-log slope <em>mathematically requires</em> arithmetic returns to shrink over calendar time: holding $d\log P / d\log t = n$ fixed means each price doubling takes ever longer. The data agree emphatically:</p>
+  <div class="grid2">
+    <figure><img src="assets/fig_cycles.png" alt="Diminishing cycle returns"/>
+      <figcaption>Peak-to-peak multiple, cycle over cycle.</figcaption></figure>
+    <div class="card" id="riskcard"></div>
+  </div>
+  <div class="verdict v-real">Shrinking cycle multiples (≈25× → 4× → 2×) are <b>exactly what a decelerating power law predicts</b> — and exactly what an exponential model cannot accommodate. This is the strongest <i>internal-consistency</i> evidence for the power-law frame, even as Lens 3 reminds us a logistic predicts the same deceleration.</div>
+</div></section>
+
+<section id="scorecard"><div class="wrap">
+  <div class="lenstag">★ The honest scorecard</div>
+  <h2>What survives scrutiny — and what doesn't</h2>
+  <div class="scorecard">
+    <div class="card" style="border-color:rgba(63,185,80,.3)">
+      <h3 style="margin-top:2px;color:var(--green)">✓ Holds up</h3>
+      <ul>
+        <li>As a <b>descriptive growth envelope</b>, the log–log trend is excellent and spans six orders of magnitude.</li>
+        <li>The <b>exponential model is decisively rejected</b> — Bitcoin's doubling time is not constant.</li>
+        <li><b>Diminishing cycle returns</b> are internally consistent with a decelerating power law.</li>
+        <li>A <b>weak, slow mean reversion</b> to the trend is detectable (~9-month half-life).</li>
+        <li>LPPLS shows <b>real log-periodic structure</b> within bubble episodes (as a hedged diagnostic).</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="margin-top:2px;color:var(--red)">✗ Does not survive</h3>
+      <ul>
+        <li><b>"High R² proves a law."</b> It's mechanical against any monotone clock — worthless as evidence.</li>
+        <li><b>A precise exponent.</b> Honest CI is ≈[4.3, 6.2], not 5.8 ± 0.01.</li>
+        <li><b>"Power law beats all models."</b> A logistic fits the recent decade better; the data can't separate them.</li>
+        <li><b>A stable parameter.</b> The exponent breaks at halvings (Chow) and drifts.</li>
+        <li><b>LPPLS as a crash-date predictor</b>, and the strict "spurious-regression" label (cointegration is undefined vs. a deterministic clock).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verdict v-warn" style="margin-top:18px"><b>Bottom line.</b> Bitcoin <i>has</i> followed a power law as a remarkably durable descriptive trend — but it is a fragile <i>law</i>: imprecise, non-stationary in its residuals, statistically indistinguishable from a saturating S-curve over the recent window, and with an exponent that drifts. It is a useful lens for valuation context, not a law of physics. The most interesting open question isn't "power law: yes or no?" — it's <b>"power law or the early arm of a logistic?"</b>, which only time resolves.</div>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <p><b>Method &amp; reproducibility.</b> $t$ = days since genesis (2009-01-03). Base fit: OLS of $\log_{10}P$ on $\log_{10}t$ with Newey–West (HAC, 365-lag) errors and a 180-day moving-block bootstrap. Stationarity: ADF, KPSS, Durbin–Watson, Ljung–Box. Model selection: AIC/BIC in shared log-price space (power / exponential / stretched-exponential / logistic). Mean reversion: AR(1)→OU half-life. Bubbles: Filimonov–Sornette LPPLS with bounded search and a strict acceptance filter. Stability: rolling-window exponent + Chow tests at halvings.</p>
+  <p><b>Data.</b> 2016–2026 real Coinbase BTC-USD daily closes (≈3,650 obs) for all formal tests; 2010–2015 well-documented reference prices extend the visual to Bitcoin's full history. <span id="datanote"></span></p>
+  <p style="color:var(--dim)">Generated <span id="genfoot"></span> · Built with statsmodels, Plotly, seaborn, scipy. Educational analysis — not investment advice. Critiques drawing on Stolte and Sornette–Johansen; model popularized by G. Santostasi &amp; H.C. Burger.</p>
+</div></footer>
+
+<script>
+(function(){
+  const PL = window.PL || {};
+  const GEN = Date.parse('2009-01-03T00:00:00Z');
+  const dayOf = d => (Date.parse(d) - GEN) / 86400000;
+  const fmtUSD = v => v>=1e9?('$'+(v/1e9).toFixed(1)+'B'):v>=1e6?('$'+(v/1e6).toFixed(1)+'M'):v>=1e3?('$'+Math.round(v/1e3)+'k'):v>=1?('$'+Math.round(v)):('$'+v.toFixed(2));
+  const C={orange:'#f7931a',blue:'#4c93f7',green:'#3fb950',mute:'#93a1b2',line:'#1f2731',purple:'#a371f7',red:'#f85149'};
+  const baseLayout = (over={}) => Object.assign({
+    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+    font:{color:'#cdd6e1', family:'Inter, sans-serif', size:12.5},
+    margin:{l:62,r:18,t:14,b:48}, hovermode:'closest',
+    legend:{orientation:'h', y:1.06, x:0, font:{size:11.5}, bgcolor:'rgba(0,0,0,0)'},
+    xaxis:{gridcolor:C.line, zerolinecolor:C.line, linecolor:C.line},
+    yaxis:{gridcolor:C.line, zerolinecolor:C.line, linecolor:C.line},
+  }, over);
+  const CFG={displayModeBar:true, responsive:true, displaylogo:false,
+    modeBarButtonsToRemove:['lasso2d','select2d','autoScale2d']};
+
+  // ---- chips ----
+  const f=PL.fit_full||{}, cur=PL.current||{}, mr=PL.mean_reversion||{}, fc=PL.fit_coinbase||{};
+  const chips=[
+    ['Exponent n', (f.n||0).toFixed(2)+' ', C.orange],
+    ['Fit R²', (f.r2||0).toFixed(3), C.green],
+    ['Price ÷ model', (cur.ratio_to_model||0).toFixed(2)+'×', C.blue],
+    ['Corridor', Math.round(cur.corridor_percentile||0)+'%', C.purple],
+    ['Exponential model', 'rejected', C.red],
+  ];
+  document.getElementById('chips').innerHTML = chips.map(c=>
+    `<div class="chip"><div class="k">${c[0]}</div><div class="v" style="color:${c[2]}">${c[1]}</div></div>`).join('');
+  document.getElementById('gen').textContent = '· data through '+(cur.date||'');
+  document.getElementById('genfoot').textContent = PL.generated_at||'';
+  document.getElementById('datanote').textContent = '';
+
+  // ---- HERO: log-log ----
+  (function(){
+    const ml=PL.model_line; if(!ml) return;
+    const mlDays=ml.dates.map(dayOf);
+    const ser=PL.series, anch=PL.anchors;
+    const yTick=[0.1,1,10,100,1e3,1e4,1e5,1e6,1e7];
+    const yText=yTick.map(fmtUSD);
+    const xYears=[]; const xVals=[];
+    for(let y=2011;y<=2034;y+=2){const dd=(y-2009)*365.2425; xVals.push(dd); xYears.push(String(y));}
+    const inv=v=>'rgba(0,0,0,0)';
+    const tr=[];
+    // outer band
+    tr.push({x:mlDays,y:ml.q95,mode:'lines',line:{width:0,color:inv()},hoverinfo:'skip',showlegend:false});
+    tr.push({x:mlDays,y:ml.q05,mode:'lines',line:{width:0,color:inv()},fill:'tonexty',fillcolor:'rgba(247,147,26,0.09)',name:'5–95% corridor',hoverinfo:'skip'});
+    // inner band
+    tr.push({x:mlDays,y:ml.q75,mode:'lines',line:{width:0,color:inv()},hoverinfo:'skip',showlegend:false});
+    tr.push({x:mlDays,y:ml.q25,mode:'lines',line:{width:0,color:inv()},fill:'tonexty',fillcolor:'rgba(247,147,26,0.16)',name:'25–75% corridor',hoverinfo:'skip'});
+    // fit
+    tr.push({x:mlDays,y:ml.mid,mode:'lines',line:{color:C.orange,width:2.6},name:'power-law fit',
+      hovertemplate:'fair value %{y:$,.0f}<extra></extra>'});
+    // series
+    tr.push({x:ser.map(s=>dayOf(s.date)),y:ser.map(s=>s.price),customdata:ser.map(s=>s.date),
+      mode:'lines',line:{color:C.blue,width:1.5},name:'BTC price',
+      hovertemplate:'%{customdata}<br>%{y:$,.0f}<extra></extra>'});
+    // anchors
+    tr.push({x:anch.map(a=>dayOf(a.date)),y:anch.map(a=>a.price),customdata:anch.map(a=>a.note),
+      mode:'markers',marker:{color:C.green,size:7,line:{color:'#0a0d12',width:1}},name:'2010–15 reference',
+      hovertemplate:'%{customdata}<br>%{y:$,.2f}<extra></extra>'});
+    // current
+    tr.push({x:[cur.day],y:[cur.price],mode:'markers',marker:{color:C.blue,size:11,line:{color:'#fff',width:2}},
+      name:'today',hovertemplate:'today '+fmtUSD(cur.price)+'<extra></extra>'});
+    const lay=baseLayout({
+      xaxis:{type:'log',tickvals:xVals,ticktext:xYears,gridcolor:C.line,title:{text:'year — log scale (days since genesis)',font:{size:12}}},
+      yaxis:{type:'log',tickvals:yTick,ticktext:yText,gridcolor:C.line,title:{text:'BTC price (USD)',font:{size:12}}},
+      shapes:[{type:'rect',xref:'x',yref:'paper',x0:cur.day,x1:mlDays[mlDays.length-1],y0:0,y1:1,
+        fillcolor:'rgba(247,147,26,0.04)',line:{width:0}}],
+      updatemenus:[{type:'buttons',direction:'right',x:0,y:1.13,bgcolor:'#121821',bordercolor:C.line,
+        font:{size:11,color:'#cdd6e1'},buttons:[
+        {label:'log price',method:'relayout',args:[{'yaxis.type':'log'}]},
+        {label:'linear price',method:'relayout',args:[{'yaxis.type':'linear'}]},
+      ]}],
+    });
+    Plotly.newPlot('hero',tr,lay,CFG);
+  })();
+
+  // ---- fit inference table ----
+  (function(){
+    const ci=fc.n_ci_boot||[null,null];
+    const rows=[
+      ['Exponent n (point estimate)', (fc.n||0).toFixed(3)],
+      ['Naive OLS — looks precise', '± small (invalid here)'],
+      ['Newey–West HAC std. error', '± '+(fc.n_se_hac||0).toFixed(2)],
+      ['Block-bootstrap 95% CI', '['+(ci[0]||0).toFixed(1)+', '+(ci[1]||0).toFixed(1)+']'],
+      ['Residual lag-1 autocorrelation', '≈ 0.998'],
+      ['R² (log–log)', (fc.r2||0).toFixed(3)],
+    ];
+    document.getElementById('fittab').innerHTML =
+      '<thead><tr><th>Coinbase window 2016–2026</th><th class="num">value</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td></tr>`).join('')+'</tbody>';
+  })();
+
+  // ---- spurious / stationarity ----
+  (function(){
+    const c=PL.cointegration||{};
+    document.getElementById('rdw').textContent =
+      `R² ≈ ${(fc.r2||0).toFixed(2)},  Durbin–Watson ≈ ${(c.durbin_watson||0).toFixed(3)}  →  R² ≫ DW`;
+    const rows=[
+      ['ADF (null: unit root)', (c.adf_p||0).toFixed(3), (c.adf_p<0.05?'stationary':'cannot reject unit root')],
+      ['KPSS (null: stationary)', (c.kpss_p||0).toFixed(3), (c.kpss_p<0.05?'rejects stationarity':'consistent w/ stationary')],
+      ['Engle–Granger p', (c.eg_p||0).toFixed(3), (c.eg_p<0.05?'cointegrated':'no cointegration')],
+      ['Durbin–Watson', (c.durbin_watson||0).toFixed(3), 'extreme autocorrelation'],
+      ['Ljung–Box p (20)', (c.ljungbox_p||0).toFixed(3), 'residuals serially dependent'],
+    ];
+    document.getElementById('statab').innerHTML =
+      '<thead><tr><th>Test</th><th class="num">p / stat</th><th>reading</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td style="color:var(--mute)">${r[2]}</td></tr>`).join('')+'</tbody>';
+  })();
+
+  // ---- model tournament tables ----
+  function modelTable(elid, mc){
+    const rows=mc.models.map(m=>{
+      const win=m.delta_aic===0;
+      return `<tr><td>${win?'<span class="win">▸ </span>':''}${m.model}</td>`+
+        `<td class="num">${m.r2.toFixed(3)}</td>`+
+        `<td class="num">${m.params}</td>`+
+        `<td class="num ${win?'win':''}">${m.delta_aic===0?'0':'+'+Math.round(m.delta_aic)}</td></tr>`;
+    }).join('');
+    document.getElementById(elid).innerHTML=
+      '<thead><tr><th>Model</th><th class="num">R²</th><th class="num">k</th><th class="num">ΔAIC</th></tr></thead><tbody>'+rows+'</tbody>';
+  }
+  if(PL.model_comparison_full) modelTable('mtab_full', PL.model_comparison_full);
+  if(PL.model_comparison) modelTable('mtab_recent', PL.model_comparison);
+
+  // ---- oscillator ----
+  (function(){
+    const r=PL.residuals; if(!r) return;
+    const x=r.dates, z=r.z;
+    const band=(lo,hi,col)=>({x:x.concat(x.slice().reverse()),
+      y:x.map(()=>hi).concat(x.map(()=>lo)),fill:'toself',fillcolor:col,line:{width:0},hoverinfo:'skip',showlegend:false});
+    const tr=[
+      band(-2,2,'rgba(247,147,26,0.06)'),
+      band(-1,1,'rgba(247,147,26,0.10)'),
+      {x:x,y:z,mode:'lines',line:{color:C.purple,width:1.4},name:'z-score',
+        hovertemplate:'%{x}<br>z = %{y:.2f}<extra></extra>'},
+      {x:[x[x.length-1]],y:[z[z.length-1]],mode:'markers',marker:{color:C.blue,size:9,line:{color:'#fff',width:1.5}},
+        name:'today',hovertemplate:'today z = %{y:.2f}<extra></extra>'},
+    ];
+    const lay=baseLayout({
+      xaxis:{gridcolor:C.line},
+      yaxis:{gridcolor:C.line,title:{text:'standardized deviation (σ)',font:{size:12}},zeroline:true,zerolinecolor:'#3a4452'},
+      shapes:[{type:'line',xref:'paper',x0:0,x1:1,y0:0,y1:0,line:{color:C.orange,width:1.2,dash:'dash'}}],
+    });
+    Plotly.newPlot('osc',tr,lay,CFG);
+  })();
+
+  // ---- mean reversion card ----
+  (function(){
+    const m=PL.mean_reversion||{};
+    document.getElementById('mrcard').innerHTML=
+      `<h3 style="margin-top:2px">Ornstein–Uhlenbeck fit</h3>
+       <table>
+       <tr><td>Half-life of reversion</td><td class="num">${Math.round(m.half_life_days)} days (~${(m.half_life_days/30.4).toFixed(1)} mo)</td></tr>
+       <tr><td>AR(1) ρ</td><td class="num">${(m.ar1_rho||0).toFixed(3)}</td></tr>
+       <tr><td>Today’s z-score</td><td class="num">${(m.current_zscore||0).toFixed(2)}σ</td></tr>
+       <tr><td>Corridor percentile</td><td class="num">${Math.round(m.current_percentile)}%</td></tr>
+       </table>
+       <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${m.interpretation||''}</p>`;
+  })();
+
+  // ---- LPPLS ----
+  (function(){
+    const lp=PL.lppls; if(!lp) return;
+    const peakDay=lp.actual_peak_date;
+    const tr=[
+      {x:lp.dates,y:lp.log_price,mode:'lines',line:{color:'#dbe4ee',width:1.4},name:'ln(price)',
+        hovertemplate:'%{x}<extra></extra>'},
+      {x:lp.dates,y:lp.lppls_fit,mode:'lines',line:{color:C.orange,width:2},name:'LPPLS fit'},
+    ];
+    const lay=baseLayout({
+      xaxis:{gridcolor:C.line},
+      yaxis:{gridcolor:C.line,title:{text:'ln(price)',font:{size:12}}},
+      shapes:[
+        {type:'line',x0:lp.tc_date,x1:lp.tc_date,yref:'paper',y0:0,y1:1,line:{color:C.orange,width:1.4,dash:'dash'}},
+        {type:'line',x0:peakDay,x1:peakDay,yref:'paper',y0:0,y1:1,line:{color:C.green,width:1.4,dash:'dot'}},
+      ],
+      annotations:[
+        {x:lp.tc_date,yref:'paper',y:1.0,text:'t_c '+lp.tc_date,showarrow:false,font:{color:C.orange,size:11},xanchor:'right'},
+        {x:peakDay,yref:'paper',y:0.06,text:'actual peak',showarrow:false,font:{color:C.green,size:11},xanchor:'left'},
+      ],
+    });
+    Plotly.newPlot('lppls',tr,lay,CFG);
+    document.getElementById('lpplscard').innerHTML=
+      `<table>
+       <tr><td>Fitted critical time t_c</td><td class="num">${lp.tc_date}</td></tr>
+       <tr><td>Actual cycle peak</td><td class="num">${lp.actual_peak_date}</td></tr>
+       <tr><td>Exponent m (bound 0–1)</td><td class="num">${lp.m.toFixed(2)} ${lp.valid_m?'<span class="pill ok">in range</span>':'<span class="pill no">out</span>'}</td></tr>
+       <tr><td>Angular freq ω</td><td class="num">${lp.omega.toFixed(1)} ${lp.passes_strict_filter?'<span class="pill ok">passes [6,13]</span>':'<span class="pill no">fails strict [6,13]</span>'}</td></tr>
+       <tr><td>Fit R²</td><td class="num">${lp.r2.toFixed(3)}</td></tr>
+       </table>`;
+  })();
+
+  // ---- rolling exponent ----
+  (function(){
+    const s=PL.stability; if(!s||!s.rolling_exponent) return;
+    const re=s.rolling_exponent;
+    const ci=(PL.fit_coinbase||{}).n_ci_boot||[null,null];
+    const tr=[
+      {x:re.map(e=>e.date),y:re.map(e=>e.n),mode:'lines',line:{color:C.green,width:1.8},name:'rolling exponent (2y)',
+        hovertemplate:'%{x}<br>n = %{y:.2f}<extra></extra>'},
+    ];
+    const lay=baseLayout({
+      xaxis:{gridcolor:C.line},
+      yaxis:{gridcolor:C.line,title:{text:'exponent n (rolling)',font:{size:12}}},
+      shapes:[{type:'line',xref:'paper',x0:0,x1:1,y0:(fc.n||5.4),y1:(fc.n||5.4),line:{color:C.orange,width:1.2,dash:'dash'}}],
+      annotations:[{xref:'paper',x:1,y:(fc.n||5.4),text:'full-sample n='+(fc.n||0).toFixed(2),showarrow:false,
+        font:{color:C.orange,size:11},xanchor:'right',yanchor:'bottom'}],
+    });
+    Plotly.newPlot('roll',tr,lay,CFG);
+    const chow=(s.chow_tests||[]);
+    document.getElementById('chowtab').innerHTML=
+      '<thead><tr><th>Halving</th><th class="num">Chow F</th><th class="num">p-value</th><th>break?</th></tr></thead><tbody>'+
+      chow.map(c=>`<tr><td>${c.halving}</td><td class="num">${c.F.toFixed(1)}</td><td class="num">${c.p<0.001?'<0.001':c.p.toFixed(3)}</td>`+
+        `<td>${c.break?'<span class="pill no">break</span>':'<span class="pill ok">stable</span>'}</td></tr>`).join('')+'</tbody>';
+  })();
+
+  // ---- risk card ----
+  (function(){
+    const rk=PL.risk||{};
+    const p2p=(rk.peak_to_peak||[]).map(p=>`${p.multiple.toFixed(1)}×`).join('  →  ');
+    document.getElementById('riskcard').innerHTML=
+      `<h3 style="margin-top:2px">Cycle mathematics</h3>
+       <table>
+       <tr><td>Peak-to-peak multiples</td><td class="num">${p2p}</td></tr>
+       <tr><td>Worst drawdown on record</td><td class="num">${Math.round(rk.max_drawdown_pct)}%</td></tr>
+       </table>
+       <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${rk.interpretation||''}</p>`;
+  })();
+})();
+</script>
+</body>
+</html>
