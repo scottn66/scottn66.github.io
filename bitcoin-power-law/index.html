@@ -95,7 +95,6 @@
 <body>
 
 <nav><div class="wrap">
-  <a href="/" style="color:var(--mute);font-weight:600;margin-right:4px" title="Back to portfolio">← Portfolio</a>
   <span class="brand"><b>₿</b> Power Law</span>
   <a href="#claim">The claim</a>
   <a href="#fit">Fit &amp; inference</a>
@@ -124,122 +123,156 @@
   <p>The Bitcoin power-law model (Santostasi; Burger) says price grows as a fixed power of Bitcoin's <em>age</em>, not exponentially:</p>
   <div class="card eq">
     $$ P(t) \;=\; A\,\bigl(t\bigr)^{\,n}, \qquad\Longleftrightarrow\qquad \log_{10} P \;=\; a \;+\; n\,\log_{10} t $$
-    <p style="margin:8px 0 0;color:var(--mute);font-size:14px">where $t$ = days since the genesis block (2009-01-03). A power law is a <b>straight line in log–log space</b>; the slope is the exponent $n$. Contrast the exponential $P = A e^{kt}$, which is a straight line in <i>log–linear</i> space and implies a constant doubling time — something Bitcoin has never had.</p>
+    <p style="margin:8px 0 0;color:var(--mute);font-size:14px">where $t$ = days since the genesis block (2009-01-03). On <b>log–log axes</b> a power law is a <b>straight line</b> — the slope is the exponent $n$. Switch the chart to <b>calendar time with log price</b> and the same law becomes a gentle <b>log curve</b> that flattens as growth decelerates — the clearest view of the modern price-vs-age relationship. (A pure exponential would instead be a <i>straight</i> line on that semi-log view, implying a constant doubling time Bitcoin has never had — which is why it loses in Lens 3.)</p>
   </div>
   <div class="card">
-    <div id="hero" class="plot" style="min-height:520px"></div>
-    <figcaption>Interactive: hover for fair-value vs. actual, drag to zoom, double-click to reset, toggle the Y-axis between log and linear to see why log scaling is non-negotiable. Orange = fitted power law &amp; its 5–95% / 25–75% corridor; blue = BTC (Coinbase, weekly); green = independent 2010–2015 reference prices.</figcaption>
+    <div id="hero" class="plot" style="min-height:540px"></div>
+    <figcaption>Interactive: hover for fair value vs. actual, drag to zoom, double-click to reset. Use the buttons to switch between <b>log–log</b> (power law = straight line) and <b>calendar time · log price</b> (the same law as a log curve). The orange line is the fitted trend; the shaded bands are its <b>±1σ and ±2σ corridor</b>, and the bell on the right edge is that same dispersion drawn as a <b>Gaussian</b> — Bitcoin spends ≈68% of its days within ±1σ of fair value and ≈95% within ±2σ. Blue = BTC (Coinbase, weekly); green = independent 2010–2015 reference prices.</figcaption>
   </div>
-  <div class="verdict v-real">The visual case is strong: a single straight line spans from $0.05 (2010) to six figures (2026). Independent early-era prices — from a different market structure entirely — land on the same line. <b>But a straight-looking line on log–log axes is where the real work begins, not ends.</b></div>
+  <div class="verdict v-real">The visual case is strong: a single straight line spans from $0.05 (2010) to six figures (2026), and independent early-era prices land on it. The corridor says deviations behave roughly like a Gaussian in σ. <b>But a straight-looking line on log–log axes is where the real work begins, not ends.</b></div>
 </div></section>
 
 <section id="fit"><div class="wrap">
   <div class="lenstag"><span class="lensnum">1</span> Lens 1 — Fit &amp; honest inference</div>
   <h2>The exponent is real — but far less precise than it looks</h2>
   <p class="q">"R² = 0.94 sounds decisive. What's the actual uncertainty on the exponent?"</p>
-  <p>Ordinary least squares gives a tight-looking standard error, but it assumes independent observations. Bitcoin's daily deviations from trend are <b>almost perfectly autocorrelated</b> (lag-1 ρ ≈ 0.998) — consecutive days carry nearly the same information, so the <i>effective</i> sample size is a tiny fraction of the ~3,650 days. Naive SEs are meaningless here.</p>
-  <p>The honest fix is two-fold: Newey–West (HAC) standard errors, and a moving-block bootstrap that resamples blocks of days to preserve the autocorrelation. Both blow the confidence interval wide open:</p>
+  <p><b>First, the intuition.</b> A fit's error bars depend on how many <i>independent</i> facts the data really contains. Bitcoin doesn't teleport — today's distance above or below the trend line is almost exactly yesterday's. So ~3,650 daily prices are not 3,650 independent observations; they're more like a few dozen genuinely different "situations," each smeared across weeks of nearly-identical days. The picture below <em>is</em> the whole problem in one frame:</p>
+  <div class="grid2">
+    <figure><img src="assets/fig_lag.png" alt="Today's deviation versus yesterday's"/>
+      <figcaption>Today's deviation from trend vs. yesterday's. Each dot is a day; they sit almost perfectly on the 45° line (ρ = 0.998). <b>That near-1 correlation is what "autocorrelated" means</b> — and why a naive standard error, which assumes the dots are scattered independently, lies.</figcaption></figure>
+    <div class="card">
+      <h3 style="margin-top:2px">Two fixes, one humbling answer</h3>
+      <p style="font-size:14px;margin:6px 0"><b>Newey–West (HAC) errors</b> — a <i>discount for repetition.</i> Picture a crowd where everyone just parrots their neighbor: HAC measures how long opinions stay correlated, counts the independent <i>voices</i> rather than the headcount, and widens the error bars to match.</p>
+      <p style="font-size:14px;margin:6px 0"><b>Moving-block bootstrap</b> — <i>resample in streaks, not single days.</i> Slice history into overlapping 180-day blocks, shuffle the blocks, and re-fit thousands of times. Each block keeps a run of correlated days intact, so the synthetic histories are exactly as "sticky" as the real one. The spread of exponents across those refits <em>is</em> the honest 95% interval.</p>
+      <p style="font-size:13px;color:var(--mute);margin:8px 0 0"><b>Mnemonic:</b> HAC fixes the <i>formula</i>; the bootstrap <i>simulates</i> the uncertainty — two roads to the same place.</p>
+    </div>
+  </div>
+  <p><b>So what's a more appropriate sampling mechanism?</b> Either thin the data to roughly-independent chunks (sample monthly, not daily), or — better — keep every day but tell the math how correlated it is. The two methods above do exactly that: both shrink the <i>effective</i> sample size and widen the interval honestly, instead of pretending each day is fresh evidence.</p>
   <div class="card"><table id="fittab"></table></div>
+  <p><b>"But how can the residuals be 99.8% autocorrelated and the fit still explain only 86%?"</b> Because those measure different things. R² asks <i>how much of the giant up-and-to-the-right does the trend capture?</i> — almost all of it. Autocorrelation asks <i>how sticky are the leftover wiggles?</i> — extremely. A ball rolling down a long ramp: the ramp explains the journey (high R²), yet the ball's slow side-to-side wobble persists for months (high residual autocorrelation). They coexist happily. And that wobble isn't random noise — it's <b>money supply, halving cycles, ETF flows, regulation, war.</b> The model has <em>one</em> input, time; everything else the world does to Bitcoin lands in the residual. That, ultimately, is why the honest error bars are wide.</p>
   <div class="verdict v-warn">The exponent is genuinely positive and near the literature's ~5.8 — but once you respect the autocorrelation, it's <b>5.4 with a 95% bootstrap interval of roughly [4.3, 6.2]</b>, not a three-decimal constant. Any narrative built on a precise exponent is overselling the data.</div>
 </div></section>
 
 <section id="spurious"><div class="wrap">
-  <div class="lenstag"><span class="lensnum">2</span> Lens 2 — Is it a spurious regression?</div>
-  <h2>High R² between two trending series proves almost nothing</h2>
+  <div class="lenstag"><span class="lensnum">2</span> Lens 2 — Is the correlation even real?</div>
+  <h2>Two things that both go up will always look related</h2>
   <p class="q">"Regress any rising series on time and you get R² &gt; 0.9. How do we know this isn't that?"</p>
-  <p>Granger &amp; Newbold's classic warning: two unrelated trending series routinely produce a high R² and a near-zero Durbin–Watson. Bitcoin's fit shows exactly that fingerprint — <span class="mono" id="rdw"></span> — the prosecution's strongest single fact.</p>
-  <p><b>The honest nuance the internet usually botches:</b> the regressor here, $\log_{10}(\text{days})$, is a <i>deterministic clock</i>, not a stochastic trend. So formal <em>cointegration is technically undefined</em>, and calling the fit "spurious" in the strict Granger–Newbold sense is wrong. The defensible question is narrower and sharper: <b>are the residuals stationary?</b> If not, price never reliably mean-reverts to the line, and OLS inference is invalid (Lens 1).</p>
+  <p>The two series here are simply <b>(1) Bitcoin's log price</b> and <b>(2) its log age</b> — a clock. Both rise relentlessly, so a high correlation is nearly guaranteed whether or not one has anything to do with the other. Granger &amp; Newbold's classic warning is that this kind of <i>spurious regression</i> leaves a fingerprint in the leftover errors: they trickle in one direction instead of scattering.</p>
+  <p><b>The sanity check, in plain words.</b> If the trend genuinely captured the relationship, its errors should look like random static — a miss above the line just as likely to be followed by a miss below. Bitcoin's don't: a miss above is almost always followed by another miss above (that's the 45° plot from Lens 1, again). The <a href="https://en.wikipedia.org/wiki/Durbin%E2%80%93Watson_statistic" target="_blank" rel="noopener">Durbin–Watson statistic</a> is just one number from 0 to 4 that scores this trickle — <b>2 means "random static," near 0 means "errors marching in lockstep."</b> Bitcoin's is ≈0.005, practically a conga line. <span style="color:var(--mute)"><i>Mnemonic: DW = 2 is a fair coin; DW ≈ 0 is a skipping record.</i></span></p>
+  <p><b>Here's the subtlety most takedowns miss.</b> One of our two "trending series" isn't random at all — log(age) is a <i>deterministic clock</i> with no surprises in it; the stochasticity all lives in the price, not the clock. Bitcoin's actual drama — bull runs, crashes, ETF approvals — never enters the regressor. So the honest model isn't "price = clock"; it's <b>"price = clock + everything the world did,"</b> where that second term is large, random, and entirely absent from our two-variable fit. A faithful specification would add an <b>exogenous stochastic term</b> — a stand-in for liquidity, policy, and sentiment — rather than pretend time alone moves price. That missing term is precisely what shows up as the fat, sticky residual.</p>
+  <p>Which leaves the question this whole section is really circling: when price strays from the clock, does something <b>pull it back</b>, or does it wander off and stay gone? That is <i>mean reversion</i> — measured directly in <a href="#reversion">Lens 4</a>. The stationarity tests below are its formal version: do deviations eventually die out, or persist forever?</p>
   <div class="grid2">
     <div class="card"><table id="statab"></table>
-      <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">ADF null = unit root (non-stationary); KPSS null = stationary. They are designed to disagree — quoting one alone is cherry-picking.</p>
+      <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">ADF and KPSS are built with <i>opposite</i> null hypotheses, so quoting one alone is cherry-picking. Together they ask the mean-reversion question: do deviations from the line eventually die out (stationary), or persist forever (unit root → wandering)?</p>
     </div>
-    <figure><img src="assets/fig_acf.png" alt="Autocorrelation of residuals"/>
-      <figcaption>Residual autocorrelation decays only over <i>hundreds</i> of days — the signature of a near-unit-root process. This is why naive standard errors fail.</figcaption></figure>
+    <figure><img src="assets/fig_qq.png" alt="Q–Q plot of residuals"/>
+      <figcaption>Are the deviations Gaussian? Mostly — the dots track the line through the middle — but the tails bend away, so Bitcoin's biggest moves are fatter than a bell curve predicts. Even the wide bootstrap interval is a touch optimistic at the extremes.</figcaption></figure>
   </div>
-  <figure><img src="assets/fig_qq.png" alt="QQ plot of residuals" style="max-width:560px"/>
-    <figcaption>Q–Q plot: residuals are heavier-tailed than Gaussian, so even the bootstrap CI is optimistic at the extremes.</figcaption></figure>
-  <div class="verdict v-bad">Verdict: the residuals fail to show clean stationarity (ADF can't reject a unit root). <b>So the power law is a <i>descriptive</i> trend, not a proven structural law</b> — and "it has a high R²" is not evidence in its favor, because that's mechanically guaranteed against any monotone clock.</div>
+  <div class="verdict v-bad">Verdict: the residuals fail to show clean stationarity — the ADF test can't reject a wandering unit root. <b>So the power law is a <i>descriptive</i> trend, not a proven structural law</b>, and a high R² is no evidence in its favor: it's mechanically guaranteed the moment you regress anything that rises against a clock that also rises.</div>
 </div></section>
 
 <section id="models"><div class="wrap">
   <div class="lenstag"><span class="lensnum">3</span> Lens 3 — Model tournament</div>
   <h2>Power law vs. exponential vs. stretched-exp vs. logistic</h2>
   <p class="q">"If you let other growth curves compete fairly, does the power law actually win?"</p>
-  <p>Four models, same data, same log-price space, ranked by AIC (which penalizes extra parameters). The result is a genuinely split decision:</p>
+  <p>All four models are fit in the <em>same</em> log-price space on the <em>same</em> data, then ranked by the <a href="https://en.wikipedia.org/wiki/Akaike_information_criterion" target="_blank" rel="noopener">Akaike Information Criterion (AIC)</a>. AIC rewards goodness-of-fit but charges a toll of <b>2 points per free parameter</b> — a model only earns its complexity if it explains enough extra variance to pay for it.</p>
+  <p><b>Two things readers usually get wrong here.</b> First, the models do <i>not</i> share a parameter count $k$ — that asymmetry is the whole point of the penalty: power law and exponential each have $k=2$, stretched-exponential $k=3$, logistic $k=4$. Second, <b>a ΔAIC of 0 does not mean a perfect model.</b> AIC is purely <i>relative</i>: "0" just labels the best of <i>this</i> lineup — the absolute fit could still be mediocre. ΔAIC is the gap back to that leader (rule of thumb: &lt;2 ≈ a tie, &gt;10 = decisively worse).</p>
+  <div class="card">
+    <h3 style="margin-top:2px">What each curve actually claims</h3>
+    <table>
+      <thead><tr><th>Model</th><th class="num">k</th><th>Shape of growth it assumes</th></tr></thead>
+      <tbody>
+        <tr><td><b>Power law</b> &nbsp;$P=A\,t^{n}$</td><td class="num">2</td><td>Growth <i>rate</i> fades like $n/t$ — each doubling takes proportionally longer. A straight line on log–log.</td></tr>
+        <tr><td><b>Exponential</b> &nbsp;$P=A\,e^{kt}$</td><td class="num">2</td><td><b>Constant</b> % growth → a fixed doubling time. Straight on semi-log. The shape BTC has never obeyed.</td></tr>
+        <tr><td><b>Stretched-exp</b> &nbsp;$\log P=a+b\,t^{c}$</td><td class="num">3</td><td>A dial <i>between</i> the two ($c{<}1$ ⇒ sub-exponential). Flexible middle ground.</td></tr>
+        <tr><td><b>Logistic</b> &nbsp;S-curve</td><td class="num">4</td><td>Power-law-like early, then bends to a hard <b>ceiling</b> — assumes eventual saturation.</td></tr>
+      </tbody>
+    </table>
+    <p style="color:var(--mute);font-size:13px;margin:10px 0 0"><b>Power law vs. exponential — the one that matters.</b> To the eye they look almost identical, but the assumption underneath is opposite: the exponential locks in a <i>constant doubling time</i>, while the power law lets the doubling time <i>stretch</i> without limit. Bitcoin's doubling time has demonstrably lengthened (Lens 7) — which is exactly why the exponential is crushed below.</p>
+  </div>
   <div class="grid2">
-    <div class="card">
-      <h3 style="margin-top:4px">Full history · 2010–2026</h3>
-      <table id="mtab_full"></table>
-    </div>
-    <div class="card">
-      <h3 style="margin-top:4px">Recent only · 2016–2026</h3>
-      <table id="mtab_recent"></table>
-    </div>
+    <div class="card"><h3 style="margin-top:4px">Full history · 2010–2026</h3><table id="mtab_full"></table></div>
+    <div class="card"><h3 style="margin-top:4px">Recent only · 2016–2026</h3><table id="mtab_recent"></table></div>
   </div>
   <figure><img src="assets/fig_aic.png" alt="Model selection AIC comparison"/>
-    <figcaption>ΔAIC (lower = better). The pure exponential is crushed in both windows — Bitcoin's doubling time is <i>not</i> constant. Over full history the power law wins; over the last decade a saturating logistic edges it out.</figcaption></figure>
-  <div class="verdict v-warn">Two honest takeaways. <b>(1) The exponential is decisively dead</b> — that part of the power-law thesis is robust. <b>(2) The "power law beats everything" claim does not survive:</b> on the recent window a logistic S-curve fits better, hinting at deceleration. But that logistic edge is partly an artifact — with ρ≈0.998 the effective sample is tiny, so AIC gaps are inflated, and a logistic can always bend to a finite window. The data simply <i>cannot distinguish</i> a decelerating power law from early-stage saturation. That ambiguity is the real finding.</div>
+    <figcaption>ΔAIC (lower = better; 0 = best of the lineup, <i>not</i> "perfect"). The pure exponential is crushed in both windows — Bitcoin's doubling time is not constant. Over full history the power law wins; over the last decade a saturating logistic edges it.</figcaption></figure>
+  <div class="verdict v-warn">Two honest takeaways. <b>(1) The exponential is decisively dead</b> — that part of the power-law thesis is robust. <b>(2) "Power law beats everything" does not survive:</b> on the recent window a logistic S-curve fits better, hinting at deceleration. But that edge is partly an artifact — with ρ≈0.998 the effective sample is tiny, so AIC gaps are inflated, and a 4-parameter logistic can always bend to a finite window. The data simply <i>cannot distinguish</i> a decelerating power law from early-stage saturation. That ambiguity is the real finding.</div>
 </div></section>
 
 <section id="reversion"><div class="wrap">
   <div class="lenstag"><span class="lensnum">4</span> Lens 4 — The corridor as a mean-reverting process</div>
-  <h2>How fast does Bitcoin snap back to the line?</h2>
-  <p class="q">"If the residual is a signal, what's its half-life — and where are we now?"</p>
-  <p>Model the deviation $r(t)=\log_{10}P-\text{trend}$ as an Ornstein–Uhlenbeck process, $dr=-\lambda r\,dt+\sigma\,dW$, with half-life $\ln 2/\lambda$. Fitting an AR(1) to the residuals gives the speed of reversion and lets us standardize today's deviation into a z-score "oscillator."</p>
+  <h2>How fast does Bitcoin snap back — and how hard does it get shoved?</h2>
+  <p class="q">"If the deviation is a signal, what governs it — its pull, its equilibrium, and its shocks?"</p>
+  <p>Treat the deviation from trend, $r(t)=\log_{10}P-\text{trend}$, as an <a href="https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process" target="_blank" rel="noopener">Ornstein–Uhlenbeck process</a> — the canonical "spring with random kicks":</p>
+  <div class="card eq">
+    <div>$$ dr_t \;=\; \underbrace{\lambda\,(\theta - r_t)}_{\text{pull toward fair value}}\,dt \;+\; \underbrace{\sigma\,dW_t}_{\text{random shock}} $$</div>
+    <p style="color:var(--mute);font-size:13.5px;margin:8px 0 0">$\theta$ = the equilibrium it's pulled toward (here, the power-law line itself), $\lambda$ = the <i>strength</i> of that pull (bigger ⇒ snappier; half-life $=\ln 2/\lambda$), $\sigma$ = the size of the random shocks, and $dW_t$ is <a href="https://en.wikipedia.org/wiki/Wiener_process" target="_blank" rel="noopener">Brownian motion</a> (idealized noise). Estimating all three is exact, because an OU process sampled daily <em>is</em> an <b>AR(1)</b> — an autoregression in which today equals a fraction $\phi=e^{-\lambda}$ of yesterday plus a fresh shock. Regress $r_t$ on $r_{t-1}$: the slope gives $\lambda$, the intercept gives $\theta$, the residual spread gives $\sigma$.</p>
+  </div>
+  <div class="grid2">
+    <div class="card" id="oucard"></div>
+    <div class="card">
+      <h3 style="margin-top:2px">The shock term isn't constant — that's the catch</h3>
+      <p style="font-size:14px">The clean equation above assumes one fixed $\sigma$. Reality disagrees: the 90-day volatility of $r$ swings across <b id="volrange"></b> between regimes (a <b id="volratio"></b> span). That non-stationary $\sigma$ is the <b>exogenous, stochastic term</b> from Lens 2 made concrete — liquidity, leverage, and macro shocks don't kick with constant force. The honest next step is to let $\sigma$ itself follow a process (e.g. GARCH), turning the constant-$\sigma$ spring into a regime-switching one.</p>
+    </div>
+  </div>
   <div class="card">
     <div id="osc" class="plot" style="min-height:360px"></div>
-    <figcaption>The power-law oscillator: standardized deviation from fair value. Shaded ±1σ / ±2σ bands. Below the midline = historically cheap; above = expensive.</figcaption>
+    <figcaption>The power-law oscillator: the deviation $r$ standardized into σ-units. Shaded ±1σ / ±2σ bands; below the midline = historically cheap, above = expensive.</figcaption>
   </div>
   <div class="grid2">
     <figure><img src="assets/fig_residual_dist.png" alt="Residual distribution"/>
-      <figcaption>Distribution of deviations, with today's position marked.</figcaption></figure>
+      <figcaption>The stationary distribution the spring settles into, with today's position marked.</figcaption></figure>
     <div class="card" id="mrcard"></div>
   </div>
-  <div class="verdict v-warn">Mean reversion is real but <b>slow and weak</b>: a half-life of ~9 months and a near-unit-root process mean the "corridor" is a loose tendency, not a tradeable spring. Today Bitcoin sits below fair value — historically a favorable zone — but Lens 2 warns that "below the line" can persist for years.</div>
+  <div class="verdict v-warn">Mean reversion is real but <b>slow and weak</b>: a half-life near <span id="hlmonths"></span> months and a near-unit-root pull make the corridor a loose tendency, not a tradeable spring — and because the shock term $\sigma$ is itself non-stationary, "below the line" can persist for years (Lens 2). Today Bitcoin sits below fair value, historically a favorable zone.</div>
 </div></section>
 
 <section id="bubbles"><div class="wrap">
   <div class="lenstag"><span class="lensnum">5</span> Lens 5 — Bubbles &amp; finite-time singularities (LPPLS)</div>
   <h2>Does a power-law backbone coexist with log-periodic bubbles?</h2>
-  <p class="q">"Sornette says bubbles accelerate super-exponentially with log-periodic wobbles. Can we see one?"</p>
-  <p>The Log-Periodic Power-Law Singularity model fits a critical time $t_c$ — a finite-time singularity the price accelerates toward before correcting:</p>
+  <p class="q">"Sornette says bubbles accelerate super-exponentially with log-periodic wobbles. Are they really there — in <i>every</i> cycle, or just the one you picked?"</p>
+  <p>The Log-Periodic Power-Law Singularity model — the <a href="https://en.wikipedia.org/wiki/Didier_Sornette" target="_blank" rel="noopener">Johansen–Ledoit–Sornette</a> framework — says a bubble accelerates toward a finite-time <i>critical time</i> $t_c$ while oscillating ever faster (log-periodically) on the way up:</p>
   <div class="card eq" style="font-size:15px">
     $$ \ln p(t) = A + B\,(t_c-t)^m + C\,(t_c-t)^m\cos\!\bigl(\omega\ln(t_c-t)-\phi\bigr) $$
   </div>
-  <p>Fitted to the 2020–2021 run-up (Filimonov–Sornette reduction, bounded search):</p>
+  <p>Two parameters carry the meaning, and their bounds aren't arbitrary. <b>$m\in(0,1)$</b> forces growth that is super-exponential yet stays <i>finite</i> at $t_c$ (the slope blows up; the price doesn't). <b>$\omega$</b> is the angular frequency of the wobble — how many oscillations the bubble packs in as it nears $t_c$. Sornette's empirical and theoretical work finds genuine bubbles cluster at <b>$\omega\approx 6$–$13$</b>: much below ~4 the "oscillation" is so slow it just melts into the trend (no real signal); much above ~15 it's chasing high-frequency noise. So we <i>search</i> $\omega\in[4,15]$ but only <i>accept</i> a fit as a bona-fide bubble if $\omega\in[6,13]$ and $m\in[0.1,0.9]$.</p>
+  <p><b>The fix for cherry-picking: run the exact same fit on every cycle's run-up, not just the flattering one.</b></p>
+  <div class="card"><table id="lpplstab"></table></div>
   <div class="card">
-    <div id="lppls" class="plot" style="min-height:380px"></div>
-    <figcaption>Log-price (white) vs. LPPLS fit (orange). Dashed line = fitted critical time $t_c$; green = the actual cycle peak.</figcaption>
+    <div id="lppls" class="plot" style="min-height:360px"></div>
+    <figcaption>The 2021 run-up shown in detail: log-price (white) vs. LPPLS fit (orange). Dashed = fitted $t_c$; green = the actual peak.</figcaption>
   </div>
-  <div class="card" id="lpplscard"></div>
-  <div class="verdict v-warn">The log-periodic acceleration is visible and the fitted $t_c$ lands remarkably close to the actual top — but in full honesty, $\omega$ pins to the lower search boundary and <b>fails the strict acceptance filter</b> ($\omega\in[6,13]$) that distinguishes signal from over-fit. LPPLS here is a <b>suggestive within-episode diagnostic, not a validated crash predictor</b>. One cycle cannot establish out-of-sample skill.</div>
+  <div class="verdict v-warn">Tested across all three cycles, the result is honest and humbling: <b>only the 2024–25 cycle passes the strict filter</b> — there $t_c$ lands within a day of the peak with $\omega\approx 8$. The 2017 and 2021 fits hit a plausible $t_c$ but their frequency $\omega$ <b>collapses to the search floor</b>, meaning the log-periodic wobble — LPPLS's whole signature — isn't robustly present. So LPPLS is a <i>suggestive but inconsistent</i> diagnostic here, not a reliable crash predictor; the viral "two days from the top!" single-cycle fits are partly luck of the window.</div>
 </div></section>
 
 <section id="stability"><div class="wrap">
   <div class="lenstag"><span class="lensnum">6</span> Lens 6 — Structural stability</div>
-  <h2>Is the exponent a constant, or does it drift?</h2>
-  <p class="q">"A law has a stable parameter. Does Bitcoin's exponent hold across halvings?"</p>
+  <h2>Is the exponent one constant, or a different slope each era?</h2>
+  <p class="q">"A law has a fixed parameter. Does Bitcoin's exponent survive the halvings?"</p>
+  <p>Roughly every four years Bitcoin's new-supply rate halves — a scheduled shock to the asset's economics. If the power law were a fixed structural law, the exponent $n$ should be the <i>same</i> on both sides of each halving. The <a href="https://en.wikipedia.org/wiki/Chow_test" target="_blank" rel="noopener">Chow test</a> checks exactly that: fit one pooled line across a candidate break date, then two separate lines (before and after), and ask — via an F-test — whether splitting cuts the error by more than chance would. <b>A "structural break" simply means the two-line model wins: the slope genuinely changed at that date.</b> A small p-value flags a real break; here the candidate dates are the halvings.</p>
   <div class="card">
-    <div id="roll" class="plot" style="min-height:340px"></div>
-    <figcaption>Exponent re-estimated on a rolling 2-year window. A true constant would be flat; instead it drifts within a band.</figcaption>
+    <div id="roll" class="plot" style="min-height:360px"></div>
+    <figcaption>Exponent re-estimated on a rolling 2-year window (green); dashed orange = the full-sample $n$. Vertical guides mark the halvings — a fixed law would sit flat across them; instead each supply era carries its own slope.</figcaption>
   </div>
   <div class="card"><table id="chowtab"></table>
-    <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">Chow test for a structural break in the exponent at each halving. p &lt; 0.05 ⇒ the slope shifts.</p>
+    <p style="color:var(--dim);font-size:12.5px;margin:10px 0 0">Each row tests "did the exponent change at this halving?" via an F-test on the pooled vs. split fits. p &lt; 0.05 ⇒ a statistically significant break.</p>
   </div>
-  <div class="verdict v-bad">The exponent is <b>not structurally stationary</b> — Chow tests flag breaks at the halvings, and the rolling estimate wanders. The power law is a strong <i>descriptive envelope</i>, but its single "constant" exponent is really a slowly-moving average of regime-dependent slopes.</div>
+  <div class="verdict v-bad">The exponent is <b>not structurally stationary</b>: the Chow test flags a significant break at every halving, and the rolling estimate visibly wanders between them. The single "constant" $n$ everyone quotes is really a <b>slow-moving average of regime-dependent slopes</b> — one per supply era — not a law of nature with one fixed coefficient.</div>
 </div></section>
 
 <section id="risk"><div class="wrap">
-  <div class="lenstag"><span class="lensnum">7</span> Lens 7 — Risk &amp; deceleration</div>
-  <h2>Diminishing returns are a feature, not a bug</h2>
-  <p class="q">"Each cycle's gains are smaller. Does that break the power law — or confirm it?"</p>
-  <p>A constant log-log slope <em>mathematically requires</em> arithmetic returns to shrink over calendar time: holding $d\log P / d\log t = n$ fixed means each price doubling takes ever longer. The data agree emphatically:</p>
+  <div class="lenstag"><span class="lensnum">7</span> Lens 7 — Risk, deceleration &amp; the next cycle</div>
+  <h2>Diminishing returns are a feature — and they hint at the fourth point</h2>
+  <p class="q">"Each cycle's gains shrink. Does that break the power law, confirm it — and what's the next data point?"</p>
+  <p>A constant log–log slope <em>mathematically requires</em> arithmetic returns to shrink: holding $d\log P/d\log t = n$ fixed means a given % gain needs an ever-longer stretch of calendar time. <b>One assumption to be honest about:</b> this is a statement about the <i>envelope of cycle peaks</i>, not day-to-day price — Bitcoin is anything but monotonic between peaks (its worst drawdown reached <span id="ddpct" class="mono"></span>). The deceleration shows up cleanly only peak-to-peak:</p>
   <div class="grid2">
     <figure><img src="assets/fig_cycles.png" alt="Diminishing cycle returns"/>
-      <figcaption>Peak-to-peak multiple, cycle over cycle.</figcaption></figure>
+      <figcaption>Peak-to-peak multiple, cycle over cycle — three observed points.</figcaption></figure>
     <div class="card" id="riskcard"></div>
   </div>
-  <div class="verdict v-real">Shrinking cycle multiples (≈25× → 4× → 2×) are <b>exactly what a decelerating power law predicts</b> — and exactly what an exponential model cannot accommodate. This is the strongest <i>internal-consistency</i> evidence for the power-law frame, even as Lens 3 reminds us a logistic predicts the same deceleration.</div>
+  <p><b>Three points — and an estimate of the fourth.</b> The observed multiples (<span id="obsmults" class="mono"></span>) decelerate fast. Two simple extrapolations bracket the current cycle's likely peak-to-peak gain: a <i>gentle</i> one (the excess multiple, $\text{mult}-1$, decaying geometrically toward a no-gain floor of 1×) and a <i>steep</i> one (log-linear in cycle number).</p>
+  <div class="card" id="predcard"></div>
+  <div class="verdict v-real">Shrinking multiples (≈25× → 4× → 2×, next likely ≲1.5×) are <b>exactly what a decelerating power law predicts</b> and exactly what an exponential cannot accommodate — the strongest internal-consistency evidence for the power-law frame. The honest hedges: a logistic predicts the same deceleration (Lens 3), three points can't pin a fourth precisely, and this concerns peaks — not the violent ride between them.</div>
 </div></section>
 
 <section id="scorecard"><div class="wrap">
@@ -311,25 +344,29 @@
   document.getElementById('genfoot').textContent = PL.generated_at||'';
   document.getElementById('datanote').textContent = '';
 
-  // ---- HERO: log-log ----
+  // ---- HERO: log-log with sigma corridor + Gaussian marginal ----
   (function(){
     const ml=PL.model_line; if(!ml) return;
     const mlDays=ml.dates.map(dayOf);
     const ser=PL.series, anch=PL.anchors;
+    const sigma=(PL.fit_full||{}).resid_sigma||0.276;     // dex (log10 units)
+    const up=(m,k)=>m*Math.pow(10,k*sigma), dn=(m,k)=>m/Math.pow(10,k*sigma);
+    const band2u=ml.mid.map(m=>up(m,2)), band2l=ml.mid.map(m=>dn(m,2));
+    const band1u=ml.mid.map(m=>up(m,1)), band1l=ml.mid.map(m=>dn(m,1));
     const yTick=[0.1,1,10,100,1e3,1e4,1e5,1e6,1e7];
     const yText=yTick.map(fmtUSD);
-    const xYears=[]; const xVals=[];
+    const xVals=[],xYears=[];
     for(let y=2011;y<=2034;y+=2){const dd=(y-2009)*365.2425; xVals.push(dd); xYears.push(String(y));}
-    const inv=v=>'rgba(0,0,0,0)';
+    const NIL='rgba(0,0,0,0)';
     const tr=[];
-    // outer band
-    tr.push({x:mlDays,y:ml.q95,mode:'lines',line:{width:0,color:inv()},hoverinfo:'skip',showlegend:false});
-    tr.push({x:mlDays,y:ml.q05,mode:'lines',line:{width:0,color:inv()},fill:'tonexty',fillcolor:'rgba(247,147,26,0.09)',name:'5–95% corridor',hoverinfo:'skip'});
-    // inner band
-    tr.push({x:mlDays,y:ml.q75,mode:'lines',line:{width:0,color:inv()},hoverinfo:'skip',showlegend:false});
-    tr.push({x:mlDays,y:ml.q25,mode:'lines',line:{width:0,color:inv()},fill:'tonexty',fillcolor:'rgba(247,147,26,0.16)',name:'25–75% corridor',hoverinfo:'skip'});
+    // ±2σ band
+    tr.push({x:mlDays,y:band2u,mode:'lines',line:{width:0,color:NIL},hoverinfo:'skip',showlegend:false});
+    tr.push({x:mlDays,y:band2l,mode:'lines',line:{width:0,color:NIL},fill:'tonexty',fillcolor:'rgba(247,147,26,0.08)',name:'±2σ',hoverinfo:'skip'});
+    // ±1σ band
+    tr.push({x:mlDays,y:band1u,mode:'lines',line:{width:0,color:NIL},hoverinfo:'skip',showlegend:false});
+    tr.push({x:mlDays,y:band1l,mode:'lines',line:{width:0,color:NIL},fill:'tonexty',fillcolor:'rgba(247,147,26,0.16)',name:'±1σ',hoverinfo:'skip'});
     // fit
-    tr.push({x:mlDays,y:ml.mid,mode:'lines',line:{color:C.orange,width:2.6},name:'power-law fit',
+    tr.push({x:mlDays,y:ml.mid,mode:'lines',line:{color:C.orange,width:2.6},name:'power-law fit (μ)',
       hovertemplate:'fair value %{y:$,.0f}<extra></extra>'});
     // series
     tr.push({x:ser.map(s=>dayOf(s.date)),y:ser.map(s=>s.price),customdata:ser.map(s=>s.date),
@@ -342,15 +379,37 @@
     // current
     tr.push({x:[cur.day],y:[cur.price],mode:'markers',marker:{color:C.blue,size:11,line:{color:'#fff',width:2}},
       name:'today',hovertemplate:'today '+fmtUSD(cur.price)+'<extra></extra>'});
+
+    // ---- Gaussian marginal on the right (xaxis2), aligned to fit at right edge ----
+    const midLast=ml.mid[ml.mid.length-1];
+    const gz=[],gx=[];
+    for(let i=0;i<=64;i++){const r=-3*sigma+i*(6*sigma/64); gz.push(midLast*Math.pow(10,r)); gx.push(Math.exp(-0.5*Math.pow(r/sigma,2)));}
+    tr.push({x:gx,y:gz,xaxis:'x2',yaxis:'y',mode:'lines',line:{color:C.orange,width:1.6},
+      fill:'tozerox',fillcolor:'rgba(247,147,26,0.12)',name:'Gaussian (σ)',hoverinfo:'skip'});
+    // sigma reference levels (lines across marginal + ticks)
+    const sigShapes=[], sigAnno=[];
+    [[2,'+2σ'],[1,'+1σ'],[0,'μ'],[-1,'−1σ'],[-2,'−2σ']].forEach(([k,lab])=>{
+      const yv=midLast*Math.pow(10,k*sigma);
+      sigShapes.push({type:'line',xref:'x2 domain',x0:0,x1:1,yref:'y',y0:yv,y1:yv,
+        line:{color:(k===0?C.orange:C.mute),width:1,dash:(k===0?'solid':'dot')},opacity:k===0?0.8:0.5});
+      sigAnno.push({xref:'x2 domain',x:1,yref:'y',y:yv,text:lab,showarrow:false,
+        font:{color:(k===0?C.orange:C.mute),size:10.5},xanchor:'left',xshift:2});
+    });
+
     const lay=baseLayout({
-      xaxis:{type:'log',tickvals:xVals,ticktext:xYears,gridcolor:C.line,title:{text:'year — log scale (days since genesis)',font:{size:12}}},
+      margin:{l:62,r:16,t:18,b:50},
+      xaxis:{domain:[0,0.84],type:'log',tickvals:xVals,ticktext:xYears,gridcolor:C.line,
+        title:{text:'year — log scale (days since genesis)',font:{size:12}}},
+      xaxis2:{domain:[0.855,1.0],anchor:'y',range:[0,1.12],fixedrange:true,showgrid:false,zeroline:false,
+        showticklabels:false,title:{text:'density',font:{size:10,color:C.mute}}},
       yaxis:{type:'log',tickvals:yTick,ticktext:yText,gridcolor:C.line,title:{text:'BTC price (USD)',font:{size:12}}},
       shapes:[{type:'rect',xref:'x',yref:'paper',x0:cur.day,x1:mlDays[mlDays.length-1],y0:0,y1:1,
-        fillcolor:'rgba(247,147,26,0.04)',line:{width:0}}],
-      updatemenus:[{type:'buttons',direction:'right',x:0,y:1.13,bgcolor:'#121821',bordercolor:C.line,
+        fillcolor:'rgba(247,147,26,0.04)',line:{width:0}}].concat(sigShapes),
+      annotations:sigAnno,
+      updatemenus:[{type:'buttons',direction:'right',x:0,y:1.14,bgcolor:'#121821',bordercolor:C.line,
         font:{size:11,color:'#cdd6e1'},buttons:[
-        {label:'log price',method:'relayout',args:[{'yaxis.type':'log'}]},
-        {label:'linear price',method:'relayout',args:[{'yaxis.type':'linear'}]},
+        {label:'log–log (age)',method:'relayout',args:[{'xaxis.type':'log'}]},
+        {label:'calendar time · log price',method:'relayout',args:[{'xaxis.type':'linear'}]},
       ]}],
     });
     Plotly.newPlot('hero',tr,lay,CFG);
@@ -375,18 +434,16 @@
   // ---- spurious / stationarity ----
   (function(){
     const c=PL.cointegration||{};
-    document.getElementById('rdw').textContent =
-      `R² ≈ ${(fc.r2||0).toFixed(2)},  Durbin–Watson ≈ ${(c.durbin_watson||0).toFixed(3)}  →  R² ≫ DW`;
     const rows=[
-      ['ADF (null: unit root)', (c.adf_p||0).toFixed(3), (c.adf_p<0.05?'stationary':'cannot reject unit root')],
-      ['KPSS (null: stationary)', (c.kpss_p||0).toFixed(3), (c.kpss_p<0.05?'rejects stationarity':'consistent w/ stationary')],
-      ['Engle–Granger p', (c.eg_p||0).toFixed(3), (c.eg_p<0.05?'cointegrated':'no cointegration')],
-      ['Durbin–Watson', (c.durbin_watson||0).toFixed(3), 'extreme autocorrelation'],
-      ['Ljung–Box p (20)', (c.ljungbox_p||0).toFixed(3), 'residuals serially dependent'],
+      ['ADF', 'Do deviations eventually die out?', (c.adf_p||0).toFixed(3), (c.adf_p<0.05?'stationary':'no — can’t reject a wandering unit root')],
+      ['KPSS', 'Are deviations stable around the line?', (c.kpss_p||0).toFixed(3), (c.kpss_p<0.05?'rejects stability':'borderline, leans unstable')],
+      ['Engle–Granger', 'Do price &amp; clock co-move long-run?', (c.eg_p||0).toFixed(3), (c.eg_p<0.05?'cointegrated':'no cointegration')],
+      ['Durbin–Watson', 'Do errors scatter (2) or trickle (0)?', (c.durbin_watson||0).toFixed(3), '≈0 → errors in lockstep'],
+      ['Ljung–Box', 'Any structure left in the errors?', (c.ljungbox_p||0).toFixed(3), 'yes — serially dependent'],
     ];
     document.getElementById('statab').innerHTML =
-      '<thead><tr><th>Test</th><th class="num">p / stat</th><th>reading</th></tr></thead><tbody>'+
-      rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td style="color:var(--mute)">${r[2]}</td></tr>`).join('')+'</tbody>';
+      '<thead><tr><th>Test</th><th>What it asks</th><th class="num">p / stat</th><th>Reading</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><td><b>${r[0]}</b></td><td style="color:var(--mute)">${r[1]}</td><td class="num">${r[2]}</td><td style="color:var(--mute)">${r[3]}</td></tr>`).join('')+'</tbody>';
   })();
 
   // ---- model tournament tables ----
@@ -426,18 +483,33 @@
     Plotly.newPlot('osc',tr,lay,CFG);
   })();
 
-  // ---- mean reversion card ----
+  // ---- mean reversion: fitted OU card + current standing + inline spans ----
   (function(){
     const m=PL.mean_reversion||{};
-    document.getElementById('mrcard').innerHTML=
-      `<h3 style="margin-top:2px">Ornstein–Uhlenbeck fit</h3>
+    const hl=Math.round(m.half_life_days||0);
+    document.getElementById('oucard').innerHTML=
+      `<h3 style="margin-top:2px">Fitted Ornstein–Uhlenbeck process</h3>
+       <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#dbe4ee;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0 10px">
+         dr = ${(m.lambda_per_year||0).toFixed(2)}·(${(m.theta||0).toFixed(3)} − r)·dt + ${(m.sigma_annual||0).toFixed(2)}·dW
+       </div>
        <table>
-       <tr><td>Half-life of reversion</td><td class="num">${Math.round(m.half_life_days)} days (~${(m.half_life_days/30.4).toFixed(1)} mo)</td></tr>
-       <tr><td>AR(1) ρ</td><td class="num">${(m.ar1_rho||0).toFixed(3)}</td></tr>
-       <tr><td>Today’s z-score</td><td class="num">${(m.current_zscore||0).toFixed(2)}σ</td></tr>
+       <tr><td>Pull strength λ</td><td class="num">${(m.lambda_per_year||0).toFixed(2)} / yr</td></tr>
+       <tr><td>Half-life = ln2/λ</td><td class="num">${hl} d (~${(hl/30.4).toFixed(1)} mo)</td></tr>
+       <tr><td>Equilibrium θ</td><td class="num">${(m.theta||0).toFixed(3)} dex</td></tr>
+       <tr><td>Shock vol σ</td><td class="num">${(m.sigma_annual||0).toFixed(2)} dex/yr</td></tr>
+       <tr><td>AR(1) φ = e^(−λ·1d)</td><td class="num">${(m.ar1_phi||0).toFixed(3)}</td></tr>
+       </table>`;
+    document.getElementById('mrcard').innerHTML=
+      `<h3 style="margin-top:2px">Where Bitcoin stands today</h3>
+       <table>
+       <tr><td>Deviation from fair value</td><td class="num">${(m.current_zscore||0).toFixed(2)}σ</td></tr>
        <tr><td>Corridor percentile</td><td class="num">${Math.round(m.current_percentile)}%</td></tr>
+       <tr><td>Stationary 1σ dispersion</td><td class="num">±${(m.resid_sigma||0).toFixed(2)} dex (≈${Math.round((Math.pow(10,m.resid_sigma||0)-1)*100)}%)</td></tr>
        </table>
        <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${m.interpretation||''}</p>`;
+    const vr=document.getElementById('volrange'); if(vr) vr.textContent=`${(m.vol_low||0).toFixed(2)}–${(m.vol_high||0).toFixed(2)} dex/yr`;
+    const vt=document.getElementById('volratio'); if(vt) vt.textContent=`${(m.vol_ratio||0).toFixed(1)}×`;
+    const hm=document.getElementById('hlmonths'); if(hm) hm.textContent=(hl/30.4).toFixed(0);
   })();
 
   // ---- LPPLS ----
@@ -462,31 +534,33 @@
       ],
     });
     Plotly.newPlot('lppls',tr,lay,CFG);
-    document.getElementById('lpplscard').innerHTML=
-      `<table>
-       <tr><td>Fitted critical time t_c</td><td class="num">${lp.tc_date}</td></tr>
-       <tr><td>Actual cycle peak</td><td class="num">${lp.actual_peak_date}</td></tr>
-       <tr><td>Exponent m (bound 0–1)</td><td class="num">${lp.m.toFixed(2)} ${lp.valid_m?'<span class="pill ok">in range</span>':'<span class="pill no">out</span>'}</td></tr>
-       <tr><td>Angular freq ω</td><td class="num">${lp.omega.toFixed(1)} ${lp.passes_strict_filter?'<span class="pill ok">passes [6,13]</span>':'<span class="pill no">fails strict [6,13]</span>'}</td></tr>
-       <tr><td>Fit R²</td><td class="num">${lp.r2.toFixed(3)}</td></tr>
-       </table>`;
+    const cyc=PL.lppls_cycles||[];
+    document.getElementById('lpplstab').innerHTML=
+      '<thead><tr><th>Cycle run-up</th><th class="num">fitted t_c</th><th class="num">actual peak</th><th class="num">m</th><th class="num">ω</th><th class="num">R²</th><th>bubble verdict</th></tr></thead><tbody>'+
+      cyc.map(c=>`<tr><td><b>${c.label}</b></td><td class="num">${c.tc_date}</td><td class="num">${c.actual_peak_date}</td>`+
+        `<td class="num">${c.m.toFixed(2)}</td><td class="num">${c.omega.toFixed(1)}</td><td class="num">${c.r2.toFixed(3)}</td>`+
+        `<td>${c.passes_strict_filter?'<span class="pill ok">passes strict</span>':'<span class="pill no">ω at floor — fails</span>'}</td></tr>`).join('')+'</tbody>';
   })();
 
   // ---- rolling exponent ----
   (function(){
     const s=PL.stability; if(!s||!s.rolling_exponent) return;
     const re=s.rolling_exponent;
-    const ci=(PL.fit_coinbase||{}).n_ci_boot||[null,null];
     const tr=[
       {x:re.map(e=>e.date),y:re.map(e=>e.n),mode:'lines',line:{color:C.green,width:1.8},name:'rolling exponent (2y)',
         hovertemplate:'%{x}<br>n = %{y:.2f}<extra></extra>'},
     ];
+    const dmin=re[0].date, dmax=re[re.length-1].date;
+    const HALV=['2016-07-09','2020-05-11','2024-04-20'].filter(h=>h>=dmin&&h<=dmax);
+    const shapes=[{type:'line',xref:'paper',x0:0,x1:1,y0:(fc.n||5.4),y1:(fc.n||5.4),line:{color:C.orange,width:1.2,dash:'dash'}}]
+      .concat(HALV.map(h=>({type:'line',x0:h,x1:h,yref:'paper',y0:0,y1:1,line:{color:C.mute,width:1,dash:'dot'},opacity:0.65})));
+    const annos=[{xref:'paper',x:1,y:(fc.n||5.4),text:'full-sample n='+(fc.n||0).toFixed(2),showarrow:false,
+        font:{color:C.orange,size:11},xanchor:'right',yanchor:'bottom'}]
+      .concat(HALV.map(h=>({x:h,yref:'paper',y:1.0,text:'⛏ halving',showarrow:false,font:{color:C.mute,size:10},xanchor:'left',xshift:3})));
     const lay=baseLayout({
       xaxis:{gridcolor:C.line},
       yaxis:{gridcolor:C.line,title:{text:'exponent n (rolling)',font:{size:12}}},
-      shapes:[{type:'line',xref:'paper',x0:0,x1:1,y0:(fc.n||5.4),y1:(fc.n||5.4),line:{color:C.orange,width:1.2,dash:'dash'}}],
-      annotations:[{xref:'paper',x:1,y:(fc.n||5.4),text:'full-sample n='+(fc.n||0).toFixed(2),showarrow:false,
-        font:{color:C.orange,size:11},xanchor:'right',yanchor:'bottom'}],
+      shapes:shapes, annotations:annos,
     });
     Plotly.newPlot('roll',tr,lay,CFG);
     const chow=(s.chow_tests||[]);
@@ -496,9 +570,10 @@
         `<td>${c.break?'<span class="pill no">break</span>':'<span class="pill ok">stable</span>'}</td></tr>`).join('')+'</tbody>';
   })();
 
-  // ---- risk card ----
+  // ---- risk card + next-cycle prediction + inline spans ----
   (function(){
     const rk=PL.risk||{};
+    const pred=rk.prediction||{};
     const p2p=(rk.peak_to_peak||[]).map(p=>`${p.multiple.toFixed(1)}×`).join('  →  ');
     document.getElementById('riskcard').innerHTML=
       `<h3 style="margin-top:2px">Cycle mathematics</h3>
@@ -507,6 +582,17 @@
        <tr><td>Worst drawdown on record</td><td class="num">${Math.round(rk.max_drawdown_pct)}%</td></tr>
        </table>
        <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${rk.interpretation||''}</p>`;
+    const predEl=document.getElementById('predcard');
+    if(predEl) predEl.innerHTML=
+      `<h3 style="margin-top:2px">Estimating the 4th multiple</h3>
+       <table>
+       <tr><td>Gentle — excess-multiple decay toward 1×</td><td class="num">${(pred.pred_excess_geometric||0).toFixed(2)}×</td></tr>
+       <tr><td>Steep — log-linear in cycle number</td><td class="num">${(pred.pred_loglinear||0).toFixed(2)}×</td></tr>
+       <tr><td><b>Bracketed estimate</b></td><td class="num"><b>${(pred.range_low||0).toFixed(1)}×–${(pred.range_high||0).toFixed(1)}×</b></td></tr>
+       </table>
+       <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${pred.interpretation||''}</p>`;
+    const dd=document.getElementById('ddpct'); if(dd) dd.textContent=Math.round(rk.max_drawdown_pct)+'%';
+    const om=document.getElementById('obsmults'); if(om) om.textContent=(pred.observed_multiples||[]).map(x=>x.toFixed(1)+'×').join(', ');
   })();
 })();
 </script>
