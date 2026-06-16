@@ -99,9 +99,9 @@
     body.collapsed #panel { display: none; }
     body.collapsed .collapse-toggle { display: block; }
     #legend {
-      position: absolute; bottom: 12px; left: 14px; z-index: 9;
+      position: absolute; bottom: 30px; right: 8px; z-index: 9;
       background: var(--panel-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
-      border-radius: 8px; padding: 7px 11px; font-size: 11px; display: none; max-width: 60vw;
+      border-radius: 8px; padding: 7px 11px; font-size: 11px; display: none; max-width: min(64vw, 540px);
     }
     #legend.show { display: block; }
     #legend b { font-family: 'Montserrat', sans-serif; }
