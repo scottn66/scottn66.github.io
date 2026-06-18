@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="unit" content="ganba" />
+  <title>Ganba — the algorithm gacha (and the math of collecting them all)</title>
+  <meta name="description"
+        content="A gacha where the collectibles are algorithms and data structures, rarity is
+                 complexity, and fusion is composition. Pull, then watch the coupon-collector
+                 math, a live Monte Carlo lab, and loot-box pity economics underneath. By Scott Nelson." />
+  <meta name="author" content="Scott Nelson" />
+  <meta property="og:title" content="Ganba — the algorithm gacha" />
+  <meta property="og:description" content="Pull algorithms as gacha cards; then do the coupon-collector math, run a Monte Carlo lab, and model loot-box pity. By Scott Nelson." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://scottn66.github.io/ganba/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🎰</text></svg>" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --warn:#B83A2E; --code-bg:#F2F2F5;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+      --t1:#6F8A99; --t1s:#EAF0F2;   /* common  */
+      --t2:#2F7A4A; --t2s:#DEEFE0;   /* uncommon*/
+      --t3:#1F4E9E; --t3s:#DCE6F4;   /* rare    */
+      --t4:#8a4fbf; --t4s:#EDE3F7;   /* epic    */
+      --t5:#C9A227; --t5s:#F6EFD8;   /* legendary*/
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar a{color:#cfe0ff;border:none}
+    .topbar a:hover{color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    main{max-width:880px;margin:0 auto;padding:2rem 1.2rem 5rem}
+    h1{font-size:2rem;line-height:1.2;margin:.2rem 0 .4rem}
+    h2{font-size:1.35rem;margin:2.6rem 0 .6rem;padding-top:.4rem}
+    h3{font-size:1.05rem;margin:1.4rem 0 .4rem}
+    .sub{color:var(--muted);font-size:1.05rem;margin:.2rem 0 1.2rem}
+    .card{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem 1.2rem;box-shadow:var(--shadow);margin:1.1rem 0}
+    .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--radius);padding:.7rem 1rem;margin:1.1rem 0}
+    .badge{font-size:.72rem;background:var(--accent-soft);color:var(--accent);padding:.2rem .6rem;border-radius:99px;font-weight:600}
+    button{font:inherit;cursor:pointer;border:1px solid var(--rule);background:var(--card-bg);color:var(--text);border-radius:8px;padding:.5rem .9rem}
+    button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+    button.primary:hover{filter:brightness(1.08)}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+    .stat{display:inline-flex;flex-direction:column;min-width:92px;background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:.4rem .6rem}
+    .stat .n{font-size:1.4rem;font-weight:700;line-height:1}
+    .stat .l{font-size:.7rem;text-transform:uppercase;color:var(--muted);margin-top:3px}
+    /* reveal area */
+    #reveal{display:flex;gap:.5rem;flex-wrap:wrap;min-height:96px;margin:.8rem 0}
+    .pull-card{width:110px;border-radius:10px;padding:.5rem;color:#fff;opacity:0;transform:translateY(8px) scale(.96);
+      animation:pop .35s ease forwards;border:2px solid rgba(255,255,255,.5)}
+    @keyframes pop{to{opacity:1;transform:none}}
+    .pull-card .nm{font-weight:700;font-size:.82rem;line-height:1.15}
+    .pull-card .bo{font-size:.7rem;opacity:.9;margin-top:2px;font-family:SFMono-Regular,Menlo,monospace}
+    .pull-card .tg{font-size:.62rem;text-transform:uppercase;letter-spacing:.04em;margin-top:4px;opacity:.92}
+    .pull-card.t5{box-shadow:0 0 0 2px #fff, 0 0 14px 3px rgba(201,162,39,.7)}
+    /* dex */
+    .dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:.5rem;margin:.8rem 0}
+    .dx{border-radius:9px;padding:.5rem .55rem;border:1px solid var(--rule);background:var(--card-bg);font-size:.8rem}
+    .dx.locked{opacity:.42;filter:grayscale(.8)}
+    .dx .nm{font-weight:600;line-height:1.15}
+    .dx .bo{font-family:SFMono-Regular,Menlo,monospace;font-size:.72rem;color:var(--muted)}
+    .dx .rc{font-size:.68rem;color:var(--muted);margin-top:3px}
+    .dx .pip{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:2px}
+    .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+    label.ctl{display:block;margin:.5rem 0}
+    label.ctl .v{font-weight:600;color:var(--accent)}
+    input[type=range]{width:100%}
+    table{border-collapse:collapse;width:100%;margin:.6rem 0;font-size:.92rem}
+    th,td{border:1px solid var(--rule);padding:.4rem .55rem;text-align:left}
+    th{background:var(--accent-soft);color:var(--accent)}
+    canvas{max-width:100%;border:1px solid var(--rule);border-radius:8px;background:var(--card-bg)}
+    .tierdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+    .foot{color:var(--muted);font-size:.9rem;margin-top:.4rem}
+    .toggle{display:inline-flex;align-items:center;gap:.4rem;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="../index.html">Scott Nelson</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../dashboard.html">Dashboard</a>
+    <a href="../resume.html">Resume</a>
+  </nav>
+
+  <main>
+    <span class="badge">interactive · probability</span>
+    <h1>Ganba: the algorithm gacha</h1>
+    <p class="sub">A gacha where the cards are algorithms, rarity is complexity, and fusion is
+      composition — wrapped around the one question every loot box quietly poses:
+      <em>how many pulls to collect them all?</em></p>
+
+    <div class="callout">
+      This started as a Java data-structures homework (<code>Ganba Infusion</code>, CMSI) — a
+      gacha for collecting CS professors, built to exercise a from-scratch dynamic array. Here it
+      is repackaged: the collectibles are algorithms, and underneath the pulls is the
+      <strong>coupon-collector problem</strong>, a live Monte Carlo lab, and the economics of pity.
+      See <a href="#origin">origin &amp; provenance</a>.
+    </div>
+
+    <!-- 1. PULL -->
+    <h2 id="pull">1 · Pull</h2>
+    <p>Each pull draws one algorithm, weighted by rarity tier. Common algorithms drop often; the
+      legendary ones almost never. Pulls cost <strong>5 credits</strong> — the running tab is the
+      whole point of the economics section.</p>
+    <div class="card">
+      <div class="row" style="margin-bottom:.6rem">
+        <button class="primary" id="pull1">Pull ×1</button>
+        <button id="pull10">Pull ×10</button>
+        <button id="reset">Reset collection</button>
+        <span class="toggle" style="margin-left:auto">
+          <input type="checkbox" id="profSkin"><label for="profSkin">professor homage skin</label>
+        </span>
+      </div>
+      <div class="row">
+        <div class="stat"><span class="n" id="s-pulls">0</span><span class="l">pulls</span></div>
+        <div class="stat"><span class="n" id="s-distinct">0/0</span><span class="l">collected</span></div>
+        <div class="stat"><span class="n" id="s-credits">0</span><span class="l">credits spent</span></div>
+        <div class="stat"><span class="n" id="s-best">—</span><span class="l">best pull</span></div>
+      </div>
+      <div id="reveal"></div>
+      <p class="foot" id="completeMsg"></p>
+    </div>
+
+    <!-- 2. DEX -->
+    <h2 id="dex">2 · The dex</h2>
+    <p>The full set. Greyed until you pull one. Rarity tier = a rough proxy for algorithmic
+      sophistication; the fusion recipe is how you'd <em>compose</em> the card from simpler ones.</p>
+    <div class="dex" id="dex"></div>
+
+    <!-- 3. PROBABILITY -->
+    <h2 id="prob">3 · The math of collecting them all</h2>
+    <p>Collecting every distinct card is the <strong>coupon-collector problem</strong>. With equal
+      drop rates over $n$ cards the expected number of pulls is the clean
+      $n\,H_n=n\sum_{k=1}^{n}\tfrac1k$. With <em>unequal</em> rarities it generalizes to an integral
+      over the per-card probabilities $p_i$:</p>
+    <p>$$\mathbb{E}[\text{pulls to complete}]=\int_{0}^{\infty}\Big(1-\prod_{i=1}^{n}\big(1-e^{-p_i t}\big)\Big)\,dt$$</p>
+    <div class="card">
+      <p style="margin-top:0">Drag the tier drop-rates (they renormalize to 100%). Watch the expected
+        pulls — and the rarest card's odds — move.</p>
+      <div id="sliders"></div>
+      <div class="row" style="margin-top:.6rem">
+        <div class="stat"><span class="n" id="e-pulls">—</span><span class="l">E[pulls] to 100%</span></div>
+        <div class="stat"><span class="n" id="e-credits">—</span><span class="l">E[credits]</span></div>
+        <div class="stat"><span class="n" id="e-rarest">—</span><span class="l">rarest card odds</span></div>
+        <div class="stat"><span class="n" id="e-naive">—</span><span class="l">n·Hₙ (equal-rate)</span></div>
+      </div>
+      <p class="foot">The integral is evaluated numerically in your browser. Equal rates collapse it
+        back to $n\,H_n$ — the sanity check in the verification notes.</p>
+    </div>
+
+    <!-- 4. MONTE CARLO -->
+    <h2 id="mc">4 · Monte Carlo lab — simulation vs theory</h2>
+    <p>The closed form gives the <em>mean</em>. The full distribution is easier to <em>simulate</em>:
+      run thousands of collectors, each pulling until the set is complete, and histogram how long it
+      took. The empirical mean should converge to the integral above — theory and experiment shaking
+      hands.</p>
+    <div class="card">
+      <div class="row" style="margin-bottom:.6rem">
+        <button class="primary" id="runMC">Run 10,000 collectors</button>
+        <label class="toggle"><input type="checkbox" id="mcPity"> apply pity</label>
+        <span class="foot" id="mcStatus"></span>
+      </div>
+      <canvas id="hist" width="840" height="280"></canvas>
+      <div class="row" style="margin-top:.6rem">
+        <div class="stat"><span class="n" id="m-mean">—</span><span class="l">sim mean</span></div>
+        <div class="stat"><span class="n" id="m-theory">—</span><span class="l">theory (∫)</span></div>
+        <div class="stat"><span class="n" id="m-p50">—</span><span class="l">median</span></div>
+        <div class="stat"><span class="n" id="m-p90">—</span><span class="l">90th pct</span></div>
+      </div>
+    </div>
+
+    <!-- 5. PITY / ECONOMICS -->
+    <h2 id="econ">5 · Pity &amp; the economics of the box</h2>
+    <p>Real gacha systems don't leave the rarest cards to pure chance — they add <strong>pity</strong>:
+      a guaranteed rare-or-better at a hard streak limit, and often a <strong>soft pity</strong> ramp
+      where the odds climb as you go dry. Pity trades a fatter average cost for a much shorter tail —
+      it caps the catastrophe of the unlucky player. That tail is exactly what regulators and the
+      psychology literature focus on: the worst-case spend, not the average one.</p>
+    <div class="card">
+      <label class="ctl">hard pity — guarantee a rare+ every <span class="v" id="hpv">90</span> pulls
+        <input type="range" id="hp" min="0" max="200" value="90" step="5"></label>
+      <label class="ctl">soft pity — odds start climbing after <span class="v" id="spv">75</span> pulls
+        <input type="range" id="sp" min="0" max="200" value="75" step="5"></label>
+      <div class="row">
+        <button class="primary" id="runEcon">Compare with vs without pity</button>
+        <span class="foot" id="econStatus"></span>
+      </div>
+      <table id="econTbl" style="display:none">
+        <thead><tr><th>regime</th><th>mean spend</th><th>median</th><th>90th pct</th><th>99th pct (the tail)</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="foot">Pity makes the mean a little worse and the 99th percentile a lot better — the
+        whole point. Set both sliders to 0 to recover pure chance.</p>
+    </div>
+
+    <!-- 6. ORIGIN -->
+    <h2 id="origin">6 · Origin &amp; provenance</h2>
+    <p>The mechanic is a port of <strong>Ganba Infusion</strong>, my CMSI data-structures homework: a
+      gacha for collecting three CS professors — Edmiston (rarity 3), B.J. (4), and Forney (5, the
+      reinforcement-learning professor) — at 60/30/10 odds, built on a hand-written dynamic array
+      with <code>pull</code>, <code>fusion</code>, <code>sell</code>, and an <code>aidStudy</code>
+      loop. Flip the <em>professor homage skin</em> toggle in section 1 to collect the original cast.</p>
+    <p>What's new here is the lens. The pull loop is unchanged in spirit; the additions are the
+      <a href="https://en.wikipedia.org/wiki/Coupon_collector%27s_problem">coupon-collector</a>
+      analysis, the Monte Carlo convergence, and the pity economics. The algorithm roster and its
+      complexity tiers are my curation, drawn from coursework I've worked through
+      (Stanford CS 161, LMU data structures) — Karatsuba, Karger's randomized min-cut, union-find,
+      Dijkstra, the sorts. Monte-Carlo-vs-theory is the same move as my
+      <a href="../robot-arm-sim/">robot-arm crawler</a> writeup.</p>
+    <p class="foot">Built by Scott Nelson. All client-side: pulls persist in your browser's
+      localStorage; nothing is sent anywhere.</p>
+  </main>
+
+  <script>
+  // ============================================================
+  // ROSTER — algorithms/data structures as collectibles
+  // tier: 1 common … 5 legendary. rate = per-TIER drop %.
+  // ============================================================
+  const TIERS = [
+    { t:1, name:"common",    rate:55, color:"--t1" },
+    { t:2, name:"uncommon",  rate:27, color:"--t2" },
+    { t:3, name:"rare",      rate:12, color:"--t3" },
+    { t:4, name:"epic",      rate:5,  color:"--t4" },
+    { t:5, name:"legendary", rate:1,  color:"--t5" },
+  ];
+  const ALGO_ROSTER = [
+    {id:"array",      nm:"Dynamic array",   t:1, bo:"O(1) amortized", rc:"contiguous memory + doubling"},
+    {id:"linsearch",  nm:"Linear search",   t:1, bo:"O(n)",          rc:"array + a loop"},
+    {id:"bubble",     nm:"Bubble sort",     t:1, bo:"O(n²)",         rc:"array + adjacent swaps"},
+    {id:"insertion",  nm:"Insertion sort",  t:2, bo:"O(n²)",         rc:"array + shift-insert"},
+    {id:"binsearch",  nm:"Binary search",   t:2, bo:"O(log n)",      rc:"sorted array + halving"},
+    {id:"linkedlist", nm:"Linked list",     t:2, bo:"O(n) access",   rc:"nodes + pointers"},
+    {id:"stack",      nm:"Stack",           t:2, bo:"O(1)",          rc:"array/list + LIFO"},
+    {id:"queue",      nm:"Queue",           t:2, bo:"O(1)",          rc:"array/list + FIFO"},
+    {id:"merge",      nm:"Merge sort",      t:3, bo:"O(n log n)",    rc:"divide + merge"},
+    {id:"quick",      nm:"Quicksort",       t:3, bo:"O(n log n) avg",rc:"pivot + partition"},
+    {id:"hash",       nm:"Hash table",      t:3, bo:"O(1) avg",      rc:"hashing + chaining"},
+    {id:"bst",        nm:"Binary search tree",t:3,bo:"O(log n) avg", rc:"nodes + ordering invariant"},
+    {id:"heap",       nm:"Binary heap",     t:3, bo:"O(log n)",      rc:"array + sift up/down"},
+    {id:"dijkstra",   nm:"Dijkstra",        t:4, bo:"O(E log V)",    rc:"graph + heap + relax"},
+    {id:"dp",         nm:"Dynamic programming",t:4,bo:"varies",      rc:"recursion + memoization"},
+    {id:"rbtree",     nm:"Red-black tree",  t:4, bo:"O(log n)",      rc:"BST + rebalancing"},
+    {id:"astar",      nm:"A* search",       t:4, bo:"O(E)",          rc:"Dijkstra + heuristic"},
+    {id:"karatsuba",  nm:"Karatsuba mult.", t:5, bo:"O(n^1.585)",    rc:"divide & conquer + algebra"},
+    {id:"karger",     nm:"Karger min-cut",  t:5, bo:"randomized",    rc:"graph + random contraction"},
+    {id:"unionfind",  nm:"Union-find",      t:5, bo:"O(α(n))",       rc:"forest + path compression"},
+    {id:"btree",      nm:"B-tree",          t:5, bo:"O(log n)",      rc:"BST + high fan-out"},
+    {id:"fft",        nm:"FFT",             t:5, bo:"O(n log n)",    rc:"divide & conquer + roots of unity"},
+  ];
+  const PROF_ROSTER = [
+    {id:"edmiston", nm:"Edmiston", t:3, bo:"rarity 3", rc:"common pull"},
+    {id:"bj",       nm:"B.J.",     t:4, bo:"rarity 4", rc:"uncommon pull"},
+    {id:"forney",   nm:"Forney",   t:5, bo:"rarity 5", rc:"the RL professor"},
+  ];
+  const PROF_TIERS = [
+    { t:3, name:"rarity 3", rate:60, color:"--t3" },
+    { t:4, name:"rarity 4", rate:30, color:"--t4" },
+    { t:5, name:"rarity 5", rate:10, color:"--t5" },
+  ];
+  const COST = 5;
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // ---- live state ----
+  let usingProf = false;
+  let tierRates = {};                 // tier -> rate (editable via sliders, algorithm mode)
+  function roster(){ return usingProf ? PROF_ROSTER : ALGO_ROSTER; }
+  function tierDefs(){ return usingProf ? PROF_TIERS : TIERS; }
+
+  // per-card probability map from current tier rates (normalized)
+  function cardProbs(){
+    const defs = tierDefs(), r = roster();
+    const total = defs.reduce((s,d)=> s + (tierRates[d.t] ?? d.rate), 0) || 1;
+    const byTierCount = {};
+    r.forEach(c => byTierCount[c.t] = (byTierCount[c.t]||0)+1);
+    const probs = {};
+    r.forEach(c => {
+      const tr = (tierRates[c.t] ?? defs.find(d=>d.t===c.t).rate) / total;
+      probs[c.id] = tr / byTierCount[c.t];   // split tier mass evenly across its members
+    });
+    return probs;
+  }
+  function tierColorFor(t){ const d = tierDefs().find(x=>x.t===t); return css(d.color); }
+
+  // ---- collection persistence ----
+  const KEY = "ganba_collection_v1";
+  let store = { algo:{counts:{},pulls:0}, prof:{counts:{},pulls:0} };
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if(s) store = s; } catch(e){}
+  function bucket(){ return usingProf ? store.prof : store.algo; }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(store)); }
+
+  // ---- weighted random pull (with optional pity, used in sim) ----
+  function drawCard(){
+    const probs = cardProbs();
+    let x = Math.random(), acc = 0;
+    const ids = Object.keys(probs);
+    for (const id of ids){ acc += probs[id]; if (x <= acc) return id; }
+    return ids[ids.length-1];
+  }
+
+  // ============================================================
+  // PULL UI
+  // ============================================================
+  function rarityRank(t){ return t; }
+  function doPull(n){
+    const b = bucket(), reveal = document.getElementById("reveal");
+    reveal.innerHTML = "";
+    let bestT = 0;
+    for (let k=0;k<n;k++){
+      const id = drawCard();
+      b.counts[id] = (b.counts[id]||0)+1;
+      b.pulls++;
+      const c = roster().find(x=>x.id===id);
+      bestT = Math.max(bestT, c.t);
+      const el = document.createElement("div");
+      el.className = "pull-card t"+c.t;
+      el.style.background = tierColorFor(c.t);
+      el.style.animationDelay = (k*0.04)+"s";
+      el.innerHTML = `<div class="nm">${c.nm}</div><div class="bo">${c.bo}</div><div class="tg">${tierDefs().find(d=>d.t===c.t).name}</div>`;
+      reveal.appendChild(el);
+    }
+    save(); renderStats(); renderDex();
+    const bt = tierDefs().find(d=>d.t===bestT);
+    document.getElementById("s-best").textContent = bt ? bt.name : "—";
+  }
+  function renderStats(){
+    const b = bucket(), r = roster();
+    const distinct = r.filter(c => (b.counts[c.id]||0)>0).length;
+    document.getElementById("s-pulls").textContent = b.pulls;
+    document.getElementById("s-distinct").textContent = distinct+"/"+r.length;
+    document.getElementById("s-credits").textContent = b.pulls*COST;
+    const msg = document.getElementById("completeMsg");
+    if (distinct === r.length && r.length>0){
+      msg.textContent = `Complete set in ${b.pulls} pulls (${b.pulls*COST} credits). The math section says that's `+
+        `${Math.abs(b.pulls - lastTheory) < 0.35*lastTheory ? "right around" : "off from"} the expected `+
+        `${lastTheory ? Math.round(lastTheory) : "—"}.`;
+    } else msg.textContent = "";
+  }
+  function renderDex(){
+    const b = bucket(), host = document.getElementById("dex");
+    host.innerHTML = "";
+    roster().forEach(c=>{
+      const owned = (b.counts[c.id]||0)>0;
+      const el = document.createElement("div");
+      el.className = "dx"+(owned?"":" locked");
+      const col = tierColorFor(c.t);
+      el.innerHTML = `<div><span class="pip" style="background:${col}"></span><span class="nm">${c.nm}</span></div>`+
+        `<div class="bo">${c.bo}</div><div class="rc">${c.rc}${owned?` · ×${b.counts[c.id]}`:""}</div>`;
+      host.appendChild(el);
+    });
+  }
+
+  // ============================================================
+  // PROBABILITY — weighted coupon-collector (numeric integral)
+  // E = ∫₀^∞ (1 − Π(1 − e^{−p_i t})) dt
+  // ============================================================
+  let lastTheory = 0;
+  function expectedPulls(probs){
+    const ps = Object.values(probs).filter(p=>p>0);
+    if (ps.length < roster().length) return Infinity;     // some card unobtainable
+    const pmin = Math.min(...ps);
+    const T = 20/pmin;                                    // integrate well past the slow coupon
+    const steps = 6000, dt = T/steps;
+    let integral = 0;
+    for (let i=0;i<=steps;i++){
+      const t = i*dt;
+      let prod = 1;
+      for (const p of ps) prod *= (1 - Math.exp(-p*t));
+      const f = 1 - prod;
+      integral += (i===0||i===steps ? 0.5 : 1) * f * dt;  // trapezoid
+    }
+    return integral;
+  }
+  function harmonicN(n){ let h=0; for(let k=1;k<=n;k++) h+=1/k; return n*h; }
+
+  function buildSliders(){
+    const host = document.getElementById("sliders");
+    host.innerHTML = "";
+    if (usingProf){ host.innerHTML = `<p class="foot">Professor skin uses the original fixed 60/30/10 odds — switch off the homage skin to tune rates.</p>`; return; }
+    TIERS.forEach(d=>{
+      tierRates[d.t] = tierRates[d.t] ?? d.rate;
+      const lab = document.createElement("label");
+      lab.className = "ctl";
+      lab.innerHTML = `<span class="tierdot" style="background:${css(d.color)}"></span>${d.name} drop weight — `+
+        `<span class="v" id="tv-${d.t}">${tierRates[d.t]}</span>`+
+        `<input type="range" id="tr-${d.t}" min="0" max="80" step="1" value="${tierRates[d.t]}">`;
+      host.appendChild(lab);
+      lab.querySelector("input").addEventListener("input", e=>{
+        tierRates[d.t] = +e.target.value;
+        document.getElementById("tv-"+d.t).textContent = e.target.value;
+        renderProb();
+      });
+    });
+  }
+  function renderProb(){
+    const probs = cardProbs();
+    const E = expectedPulls(probs);
+    lastTheory = isFinite(E) ? E : 0;
+    document.getElementById("e-pulls").textContent   = isFinite(E)? Math.round(E) : "∞";
+    document.getElementById("e-credits").textContent = isFinite(E)? Math.round(E)*COST : "∞";
+    const rarest = Math.min(...Object.values(probs));
+    document.getElementById("e-rarest").textContent  = (rarest*100).toFixed(2)+"%";
+    document.getElementById("e-naive").textContent   = harmonicN(roster().length).toFixed(1);
+  }
+
+  // ============================================================
+  // MONTE CARLO — simulate collectors to completion
+  // ============================================================
+  function rarePlusTiers(){ return tierDefs().filter(d=>d.t>=3); }
+  function drawWithPity(state, hp, sp){
+    // soft pity: linearly ramp rare+ mass after sp; hard pity: force rare+ at hp
+    if (hp>0 && state.dry >= hp-1) return forceRarePlus();
+    const probs = cardProbs();
+    let boost = 0;
+    if (sp>0 && state.dry >= sp) boost = Math.min(0.06*(state.dry-sp+1), 0.9);
+    if (boost>0){
+      // move `boost` mass proportionally into rare+ cards
+      const ids = Object.keys(probs), rp = roster().filter(c=>c.t>=3).map(c=>c.id);
+      let base=0; ids.forEach(id=>base+=probs[id]);
+      const rpMass = rp.reduce((s,id)=>s+probs[id],0) || 1e-9;
+      ids.forEach(id=> probs[id] *= (1-boost));
+      rp.forEach(id=> probs[id] += boost*(probs0(id)/rpMass));
+    }
+    let x=Math.random(), acc=0;
+    for (const id of Object.keys(probs)){ acc+=probs[id]; if(x<=acc) return id; }
+    return Object.keys(probs).pop();
+  }
+  let _p0=null; function probs0(id){ if(!_p0)_p0=cardProbs(); return _p0[id]; }
+  function forceRarePlus(){
+    const rp = roster().filter(c=>c.t>=3); const probs=cardProbs();
+    let mass=rp.reduce((s,c)=>s+probs[c.id],0)||1e-9, x=Math.random()*mass, acc=0;
+    for(const c of rp){ acc+=probs[c.id]; if(x<=acc) return c.id; } return rp[rp.length-1].id;
+  }
+  function simulateOne(pity, hp, sp){
+    const need = roster().length; const got = new Set(); let pulls=0; const st={dry:0};
+    _p0=null;
+    while (got.size < need && pulls < 200000){
+      const id = pity ? drawWithPity(st, hp, sp) : drawCard();
+      pulls++;
+      const c = roster().find(x=>x.id===id);
+      if (c.t>=3) st.dry=0; else st.dry++;
+      got.add(id);
+    }
+    return pulls;
+  }
+  function runMonteCarlo(N, pity, hp, sp){
+    const out = new Array(N);
+    for (let i=0;i<N;i++) out[i] = simulateOne(pity, hp, sp);
+    return out;
+  }
+  function pct(sorted, p){ return sorted[Math.min(sorted.length-1, Math.floor(p*sorted.length))]; }
+  function drawHist(samples){
+    const cv = document.getElementById("hist"), ctx = cv.getContext("2d");
+    const W=cv.width, H=cv.height, pad=34;
+    ctx.clearRect(0,0,W,H);
+    const max = Math.max(...samples), bins=40, bw=max/bins;
+    const counts = new Array(bins).fill(0);
+    samples.forEach(v=>{ let b=Math.min(bins-1, Math.floor(v/bw)); counts[b]++; });
+    const cmax = Math.max(...counts);
+    // bars
+    for(let i=0;i<bins;i++){
+      const h=(counts[i]/cmax)*(H-2*pad), x=pad+i*((W-2*pad)/bins), y=H-pad-h;
+      ctx.fillStyle = css("--accent-soft");
+      ctx.fillRect(x, y, (W-2*pad)/bins-1, h);
+    }
+    // theory + empirical mean lines
+    const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+    const lineAt = (val,color,lab)=>{
+      const x = pad + (val/max)*(W-2*pad);
+      ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x,pad-6); ctx.lineTo(x,H-pad); ctx.stroke();
+      ctx.fillStyle=color; ctx.font="12px -apple-system,sans-serif"; ctx.fillText(lab, Math.min(x+4,W-90), pad+4);
+    };
+    ctx.strokeStyle=css("--rule"); ctx.beginPath(); ctx.moveTo(pad,H-pad); ctx.lineTo(W-pad,H-pad); ctx.stroke();
+    if (isFinite(lastTheory) && lastTheory>0) lineAt(lastTheory, css("--warn"), "theory "+Math.round(lastTheory));
+    lineAt(mean, css("--good"), "sim "+Math.round(mean));
+    ctx.fillStyle=css("--muted"); ctx.font="11px -apple-system,sans-serif";
+    ctx.fillText("0", pad-2, H-pad+14); ctx.fillText(Math.round(max)+" pulls", W-pad-54, H-pad+14);
+    return mean;
+  }
+  function renderMC(){
+    const pity = document.getElementById("mcPity").checked;
+    const hp = +document.getElementById("hp").value, sp = +document.getElementById("sp").value;
+    document.getElementById("mcStatus").textContent = "running…";
+    setTimeout(()=>{
+      const s = runMonteCarlo(10000, pity, hp, sp);
+      const mean = drawHist(s);
+      const sorted = [...s].sort((a,b)=>a-b);
+      document.getElementById("m-mean").textContent   = Math.round(mean);
+      document.getElementById("m-theory").textContent = isFinite(lastTheory)&&lastTheory? Math.round(lastTheory):"∞";
+      document.getElementById("m-p50").textContent    = pct(sorted,.5);
+      document.getElementById("m-p90").textContent    = pct(sorted,.9);
+      document.getElementById("mcStatus").textContent = pity? "10k collectors · pity on" : "10k collectors · pure chance";
+    }, 20);
+  }
+
+  // ============================================================
+  // ECONOMICS — with vs without pity
+  // ============================================================
+  function renderEcon(){
+    const hp=+document.getElementById("hp").value, sp=+document.getElementById("sp").value;
+    document.getElementById("econStatus").textContent="simulating…";
+    setTimeout(()=>{
+      const N=8000;
+      const rows = [
+        ["pure chance", runMonteCarlo(N,false,0,0)],
+        ["with pity", runMonteCarlo(N,true,hp,sp)],
+      ];
+      const tb = document.querySelector("#econTbl tbody"); tb.innerHTML="";
+      rows.forEach(([label,s])=>{
+        const sorted=[...s].sort((a,b)=>a-b), mean=s.reduce((a,b)=>a+b,0)/s.length;
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${label}</td><td>${Math.round(mean*COST)} cr</td><td>${pct(sorted,.5)*COST} cr</td>`+
+          `<td>${pct(sorted,.9)*COST} cr</td><td>${pct(sorted,.99)*COST} cr</td>`;
+        tb.appendChild(tr);
+      });
+      document.getElementById("econTbl").style.display="";
+      document.getElementById("econStatus").textContent="";
+    },20);
+  }
+
+  // ============================================================
+  // WIRING
+  // ============================================================
+  document.getElementById("pull1").onclick = ()=>doPull(1);
+  document.getElementById("pull10").onclick = ()=>doPull(10);
+  document.getElementById("reset").onclick = ()=>{
+    if(confirm("Reset the current collection?")){ const b=bucket(); b.counts={}; b.pulls=0; save(); renderStats(); renderDex(); document.getElementById("reveal").innerHTML=""; }
+  };
+  document.getElementById("profSkin").onchange = e=>{
+    usingProf = e.target.checked; tierRates={}; buildSliders(); renderProb(); renderStats(); renderDex();
+    document.getElementById("reveal").innerHTML="";
+  };
+  document.getElementById("runMC").onclick = renderMC;
+  document.getElementById("runEcon").onclick = renderEcon;
+  document.getElementById("hp").addEventListener("input", e=>document.getElementById("hpv").textContent=e.target.value);
+  document.getElementById("sp").addEventListener("input", e=>document.getElementById("spv").textContent=e.target.value);
+
+  buildSliders(); renderProb(); renderStats(); renderDex();
+  </script>
+</body>
+</html>

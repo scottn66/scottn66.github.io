@@ -316,6 +316,18 @@
         { id:"DT-5", title:"Build decision-theory.html (4 acts + 3 interactive widgets)", status:"backlog", size:"L", epic:"Build", urgency:"low", importance:"high", unit:"decision-theory", acceptance:"Single long-form page: BN inference + VPI calculator + counterfactual stepper; Scott-authored spine, AIMA / Forney cited.", deps:["DT-4"] },
         { id:"DT-6", title:"PR, publish, reconcile dashboard → publish_status done", status:"backlog", size:"S", epic:"Build", urgency:"low", importance:"medium", acceptance:"decision-theory.html live; MOC publish_status=done; manifest unit decision-theory PUBLISHED.", deps:["DT-5"] },
       ]
+    },
+    {
+      name: "Ganba Gacha", color: "#B83A2E",
+      link: "https://scottn66.github.io/ganba/", track: "efferent", origin: "born-publishable",
+      tasks: [
+        { id:"GB-1", title:"Repackage roster — algorithms as collectibles (rarity = complexity)", status:"done", size:"M", epic:"Build", urgency:"low", importance:"high", acceptance:"22-card roster across 5 tiers; fusion = composition; cross-links CS 161 + data-structures coursework. Repackages the CMSI hw2 Ganba Infusion professor gacha.", deps:[] },
+        { id:"GB-2", title:"Pull simulator + dex (localStorage)", status:"done", size:"M", epic:"Build", urgency:"low", importance:"high", acceptance:"Animated pull ×1/×10, persisted collection, greyed dex with tier / Big-O / fusion recipe; professor-homage easter-egg skin.", deps:["GB-1"] },
+        { id:"GB-3", title:"Probability explorer — weighted coupon-collector", status:"done", size:"M", epic:"Build", urgency:"low", importance:"high", acceptance:"Numeric integral E[pulls]; equal-rate check collapses to n·Hₙ (5-card = 11.42, verified exactly).", deps:["GB-1"] },
+        { id:"GB-4", title:"Monte Carlo lab — sim vs theory", status:"done", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"10k collectors, histogram + theory/sim mean lines; converges to the integral (1149 vs 1142, 0.6%).", deps:["GB-3"] },
+        { id:"GB-5", title:"Pity + loot-box economics", status:"done", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"Hard/soft pity; with-vs-without mean + tail (99th pct) comparison.", deps:["GB-4"] },
+        { id:"GB-6", title:"Publish /ganba/ + reconcile (MOC + manifest)", status:"in_progress", size:"S", epic:"Ship", urgency:"low", importance:"high", unit:"ganba", acceptance:"/ganba/ live; MOC-ganba-gacha publish_status = done; manifest unit ganba PUBLISHED (no FALSE-DONE).", deps:["GB-2","GB-5"] },
+      ]
     }
   ];
 

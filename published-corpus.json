@@ -35,6 +35,13 @@
     "kind": "page"
   },
   {
+    "unit": "ganba",
+    "url": "/ganba/",
+    "title": "Ganba \u2014 the algorithm gacha (and the math of collecting them all)",
+    "last_modified": "2026-06-17T19:55:18-07:00",
+    "kind": "project"
+  },
+  {
     "unit": "hmm",
     "url": "/HMM.html",
     "title": "Hidden Markov Models and Named Entity Recognition",
