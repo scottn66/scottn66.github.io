@@ -28,6 +28,13 @@
     "kind": "page"
   },
   {
+    "unit": "conscious-agents",
+    "url": "/conscious-agents.html",
+    "title": "From Markov Chains to Conscious Agents \u2014 Trace Logic & the Edge of Physics",
+    "last_modified": "2026-06-20T12:31:32-07:00",
+    "kind": "page"
+  },
+  {
     "unit": "decision-theory",
     "url": "/decision-theory.html",
     "title": "The Value of Knowing You \u00b7 Decision Theory \u2192 Causality",
@@ -38,7 +45,7 @@
     "unit": "hmm",
     "url": "/HMM.html",
     "title": "Hidden Markov Models and Named Entity Recognition",
-    "last_modified": "2025-03-29T22:22:52-07:00",
+    "last_modified": "2026-06-20T12:31:32-07:00",
     "kind": "page"
   },
   {
