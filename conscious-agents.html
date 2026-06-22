@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" data-level="complete">
+<html lang="en" data-theme="light" data-level="hs" class="no-js">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -211,24 +211,41 @@ h2[data-depth="4"]+.section-rule{background:linear-gradient(90deg,var(--depth-4)
 .gist p{margin:.3rem 0}.gist p:first-of-type{margin-top:0}.gist p:last-child{margin-bottom:0}
 .gist.lead{font-size:.98rem;border-left-width:4px;padding:.9rem 1.1rem}
 
-/* --- reader-level switcher pill --- */
+/* --- global reading-level switcher pill (sets every section's default level) --- */
 .levelbar{position:fixed;top:3.45rem;right:1rem;z-index:50;display:flex;align-items:center;gap:.1rem;
   font-family:"Inter",sans-serif;background:var(--card);border:1px solid var(--rule);border-radius:999px;
   box-shadow:var(--shadow);padding:.15rem .2rem}
 .levelbar .lv-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
   color:var(--ink-faint);padding:0 .35rem 0 .45rem}
-.levelbar button{border:0;background:transparent;color:var(--ink-soft);padding:.34rem .6rem;cursor:pointer;
+.levelbar button{border:0;background:transparent;color:var(--ink-soft);padding:.34rem .62rem;cursor:pointer;
   font-weight:600;font-family:inherit;font-size:.71rem;border-radius:999px;line-height:1}
 .levelbar button:hover{color:var(--ink)}
 .levelbar button[aria-pressed="true"]{background:var(--accent);color:#fff}
 
-/* --- reader-level gating: lower levels SUBTRACT optional depth (spine never gated) --- */
-html[data-level="hs"]   [data-min-level="ug"],
-html[data-level="hs"]   [data-min-level="grad"],
-html[data-level="hs"]   [data-min-level="complete"],
-html[data-level="ug"]   [data-min-level="grad"],
-html[data-level="ug"]   [data-min-level="complete"],
-html[data-level="grad"] [data-min-level="complete"]{display:none}
+/* ================= PER-SECTION TRIPTYCH (three renditions) ================= */
+.concept{scroll-margin-top:1rem}
+/* exactly one rendition shows; JS adds .on to the effective level */
+.rend{display:none}
+.rend.on{display:block}
+/* each rendition labels its level so the reader always knows the register */
+.rend::before{display:block;font-family:"Inter",sans-serif;font-size:.6rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;margin:.1rem 0 .7rem}
+.rend[data-lv="hs"]::before{content:"In plain words · high school";color:var(--ground)}
+.rend[data-lv="ug"]::before{content:"Undergraduate";color:var(--depth-2)}
+.rend[data-lv="phd"]::before{content:"Full rigor · graduate";color:var(--depth-4)}
+/* HS rendition carries the warm "grounding" tint — the gist throughline, now a full register */
+.rend[data-lv="hs"]{border-left:3px solid var(--ground);
+  background:color-mix(in srgb,var(--ground) 6%,transparent);padding:.5rem 1rem .7rem;border-radius:0 10px 10px 0}
+/* per-section level picker */
+.levelpick{display:inline-flex;gap:.1rem;margin:.2rem 0 1rem;padding:.12rem .16rem;
+  border:1px solid var(--rule);border-radius:999px;background:var(--card);vertical-align:middle}
+.levelpick button{border:0;background:transparent;color:var(--ink-faint);font-family:"Inter",sans-serif;
+  font-size:.64rem;font-weight:700;letter-spacing:.04em;padding:.2rem .56rem;border-radius:999px;cursor:pointer}
+.levelpick button:hover{color:var(--ink)}
+.levelpick button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.adv-note{font-family:"Inter",sans-serif;font-size:.8rem;color:var(--ink-faint);font-style:italic;margin:.2rem 0 1rem}
+/* without JS, show every rendition stacked (crawlers & no-JS readers get everything) */
+.no-js .rend{display:block}
 
 /* --- depth meter in the TOC rail --- */
 .depthmeter{margin:1.6rem 0 .5rem;padding:0 .55rem}
@@ -257,8 +274,14 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
   .hero-inner{padding:4rem 1.2rem 3rem}
   main h2{font-size:1.5rem}
 }
-@media print{.toc,.toggle,.hero .stars{display:none}.hero{color:#000;background:#fff}.wrap{display:block}}
+@media print{.toc,.toggle,.levelbar,.levelpick,.hero .stars{display:none}.hero{color:#000;background:#fff}.wrap{display:block}.rend{display:block!important}}
 </style>
+<script>
+/* set reading level + theme before first paint (no flash); JS present → drop no-js */
+(function(){var r=document.documentElement;r.classList.remove('no-js');
+  try{var L=localStorage.getItem('ca-level');if(L)r.setAttribute('data-level',L);
+      var T=localStorage.getItem('ca-theme');if(T)r.setAttribute('data-theme',T);}catch(e){}})();
+</script>
 </head>
 <body>
 
@@ -266,12 +289,11 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
   <span id="themeIcon">☾</span><span id="themeText">Dark</span>
 </button>
 
-<div class="levelbar" id="levelBar" role="group" aria-label="Reading level — lower levels hide derivations; the plain-words notes always stay">
-  <span class="lv-lbl">Level</span>
-  <button data-lv="hs"       title="High-school — gist + intuition only">HS</button>
-  <button data-lv="ug"       title="Undergraduate — worked examples & equations">UG</button>
-  <button data-lv="grad"     title="Graduate — proofs & derivations">Grad</button>
-  <button data-lv="complete" aria-pressed="true" title="Complete — everything, including code & conjecture">Full</button>
+<div class="levelbar" id="levelBar" role="group" aria-label="Reading level — sets the default register for every section; each section can also be changed on its own">
+  <span class="lv-lbl">Read as</span>
+  <button data-lv="hs"  title="High school — plain words & intuition">HS</button>
+  <button data-lv="ug"  title="Undergraduate — the real notation & key equations">UG</button>
+  <button data-lv="phd" title="Graduate — full rigor, proofs, code, caveats">PhD</button>
 </div>
 
 <!-- ======================= HERO ======================= -->
@@ -335,16 +357,15 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ======================= MAIN ======================= -->
 <main>
 
-<p class="lede">Hoffman and Prakash do not use Markov chains as a metaphor for consciousness. They use them as the <em>literal load‑bearing formalism</em>: a conscious agent <strong>is</strong> a small bundle of row‑stochastic matrices, and the act of observation <strong>is</strong> a precise, classical operation on them called the <em>trace</em>. This page builds that claim from the ground up — starting at the same transition matrix on the <a href="HMM.html">HMM page</a>, and ending at a non‑Boolean logic of observers and a conjectural projection down to the physics of spacetime.</p>
+<p class="lede">Hoffman and Prakash do not use Markov chains as a metaphor for consciousness. They use them as the <em>literal load‑bearing formalism</em>: a conscious agent <strong>is</strong> a small bundle of row‑stochastic matrices, and the act of observation <strong>is</strong> a precise, classical operation on them called the <em>trace</em>. This page builds that claim from the ground up — from the same transition matrix on the <a href="HMM.html">HMM page</a> to a non‑Boolean logic of observers and a conjectural projection down to the physics of spacetime.</p>
 
-<p>The material spans three very different epistemic worlds: rock‑solid textbook mathematics, genuinely new theorems proven in a 2024 preprint, and speculative lecture‑hall framings that have never been written down. Conflating them is how this subject earns its reputation for crankery. So every rung below is tagged.</p>
+<p>The material spans three epistemic worlds: rock‑solid textbook mathematics, genuinely new theorems proven in a 2024 preprint, and speculative lecture‑hall framings never written down. Conflating them is how this subject earns its reputation for crankery — so every claim is tagged, and every section can be read at three depths.</p>
 
 <div class="gist lead">
   <p>Here is the bold claim in plain words: the world you see — space, time, solid objects — might not be the real thing. It may work more like a headset, a screen that hides what is actually out there. Hoffman's bet is that what's really there is <em>conscious agents</em>, and that the whole show can be built from one humble object you already know — a grid of numbers that says how likely each next step is.</p>
-  <p>This page climbs from that grid all the way to the edge of physics. You do not need the math to follow the story: notes like this one give the gist the whole way down, and they never disappear. If you want more or less detail, pick a reading level in the top‑right — <strong>HS</strong>, <strong>UG</strong>, <strong>Grad</strong>, or <strong>Full</strong>.</p>
+  <p>You do not need the math to follow the story. Every section comes in three versions — plain‑words <strong>HS</strong>, undergraduate <strong>UG</strong>, and full‑rigor <strong>PhD</strong> — and you switch between them per section or for the whole page. Start at HS; climb when you're curious.</p>
 </div>
 
-<!-- ===== HOW TO READ ===== -->
 <h2 id="how-to-read">How to read this page</h2>
 <div class="section-rule"></div>
 <p>Four labels appear throughout. They are the most important thing on the page — they let you take the rigorous spine seriously without being asked to swallow the speculative payload on the same terms.</p>
@@ -358,9 +379,9 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 
 <h4 style="margin-top:1.8rem">Three ways the page meets you where you are</h4>
 <ul>
-  <li><strong>Reading level</strong> (top‑right: <span class="sans" style="font-weight:600">HS · UG · Grad · Full</span>). A single switch. <em>Full</em> is the default and shows everything. Drop to <em>Grad</em> to hide code, <em>UG</em> to also hide proofs, or <em>HS</em> for intuition only. It only ever <em>subtracts</em> optional depth — the core spine and the plain‑words notes are always shown.</li>
-  <li><strong>The plain‑words rail</strong> (warm amber, like the box above the legend). Every section opens with one. It is the throughline: read only these top to bottom and you still get the whole arc, no math required. It never hides at any level.</li>
-  <li><strong>The depth gradient</strong> (the coloured bar beside each Part, and the meter in the sidebar). Cool teal → blue → indigo → violet as the material gets more precise. It is a <em>signpost</em> for how deep you are, kept deliberately separate from the four certainty tiers above.</li>
+  <li><strong>Three renditions per section</strong> — each section is written three times, like three translations of the same idea: <span class="sans" style="font-weight:600">HS</span> (plain words and intuition, no equations), <span class="sans" style="font-weight:600">UG</span> (the real notation and the key equation, explained), and <span class="sans" style="font-weight:600">PhD</span> (full rigor — theorems, proofs, code, caveats). A warm amber tint marks the HS register. The intended use is to read a section at HS, then climb it to UG, then PhD — the same ground three times — which is exactly how the sharpest questions surface.</li>
+  <li><strong>Two ways to switch.</strong> The pill <span class="sans" style="font-weight:600">top‑right</span> sets the default register for the <em>whole</em> page; the little <span class="sans" style="font-weight:600">HS · UG · PhD</span> control under each heading changes <em>that section alone</em>, so you can hold one section at PhD while the rest stays plain. Your global choice is remembered. (Some aids appear at only one level — a homely analogy at HS, the formal diagram at UG and above.)</li>
+  <li><strong>The depth gradient</strong> (the coloured bar beside each Part, and the meter in the sidebar). Cool teal → blue → indigo → violet as the material gets more precise. It is a <em>signpost</em> for how deep into the subject you are — kept deliberately separate from the four certainty tiers above, which mark how well‑established each claim is.</li>
 </ul>
 
 <div class="box note">
@@ -371,35 +392,107 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ============================================================= -->
 <!-- PART I -->
 <!-- ============================================================= -->
-<h2 id="part1" data-depth="1"><span class="num">PART I · foundations</span>Formal foundations</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Before anything strange, we need four plain tools from ordinary math. A <strong>Markov chain</strong> is just a rule for hopping between states where only "where you are now" decides "where you go next." The one to hold onto is the <strong>trace</strong>: if you can only watch some of the states, the trace is the exact, honest rule for the part you <em>can</em> see. That idea is the hinge for everything that follows.</p>
-</div>
-<p>We fix notation that the rest of the page never abandons. A reader fluent in HMMs can skim — but the trace construction in §I.5 is the hinge on which everything else turns, and it is usually <em>not</em> taught alongside HMMs.</p>
 
-<h3 id="mc">I.1 · Markov chains and stochastic matrices <span class="tier t">T</span></h3>
+
+<h2 id="part1" data-depth="1" class="part-divider"><span class="num">PART I · foundations</span>Formal foundations</h2>
+<div class="section-rule"></div>
+<p class="lede">Four plain tools from ordinary mathematics. Skim if you know HMMs — but the trace in §I.5 is the hinge the whole page turns on, and it is rarely taught beside them.</p>
+
+<section class="concept" data-concept="mc">
+<h3 id="mc">I.1 · Markov chains &amp; stochastic matrices</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Picture a frog hopping between lily pads. Where it jumps next depends only on the pad it's sitting on right now — not on the winding path it took to get here. That "only the present matters" rule is what makes something a <strong>Markov chain</strong>: a system that drifts between a fixed set of situations (call them <em>states</em>), where your current state alone sets the odds for the next one.</p>
+<p>All those odds live in a single bookkeeping device: a square grid of numbers. Read across any one row and you get the chances of going from "I'm here now" to each possible "here next." Because something <em>must</em> happen on the next hop, every row has to add up to 1 (that's just "the probabilities of all the options sum to a whole"), and no number can be negative. A grid like that — non-negative, every row summing to 1 — is the entire object. People call it a <strong>transition matrix</strong>, and it's the one piece of machinery the rest of the page keeps reusing.</p>
+<p>One handy move: if you're unsure where you are and only know the odds of being in each state, you can multiply that list of odds through the grid to get the odds one tick later — and you can keep doing it to peek further into the future. (Heads up: "kernel" will show up later as a fancier word for this same grid. Worth filing away.)</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Fix a finite state space \(S=\{1,\dots,n\}\). A sequence of random variables \(X_0,X_1,X_2,\dots\) valued in \(S\) is a <strong>(time-homogeneous) Markov chain</strong> when it obeys the <strong>Markov property</strong> — the future is conditionally independent of the past given the present:</p>
+\[ \Pr(X_{t+1}=j \mid X_t=i,\,X_{t-1},\dots,X_0)=\Pr(X_{t+1}=j\mid X_t=i)=P_{ij}. \]
+<p>Here \(i\) is the current state, \(j\) the next, and the entire history before time \(t\) drops out of the conditioning — knowing where you are right now is as good as knowing the whole trajectory. "Time-homogeneous" means the number \(P_{ij}\) does not depend on \(t\); the rule is the same on every tick.</p>
+<p>Collect those numbers into the <strong>transition matrix</strong> \(P\in\mathbb{R}^{n\times n}\). It is <strong>row-stochastic</strong>: \(P_{ij}\ge 0\) for all \(i,j\), and \(\sum_{j=1}^{n}P_{ij}=1\) for every row \(i\). Read each constraint plainly — probabilities can't be negative, and from any state \(i\) the chain must land <em>somewhere</em> on the next step, so the \(i\)-th row is a probability distribution over destinations. That makes \(P_{ij}\) literally the \(P(s'\mid s)\) you'd write for a transition.</p>
+<p>The matrix isn't just notation; it computes. Encode your current belief about location as a <em>row</em> vector \(\mu\) (a distribution over states), and one step of the dynamics is right-multiplication, \(\mu\mapsto\mu P\) — each new coordinate is a weighted average of the old ones, which is exactly the law of total probability. Iterating, the \(k\)-step transition law is the \(k\)-th matrix power, governed by the <strong>Chapman–Kolmogorov identity</strong> \(P^{(m+k)}=P^{(m)}P^{(k)}\): to hop \(m+k\) steps, hop \(m\) then \(k\). In the measure-theoretic generalization the matrix becomes a <strong>Markov kernel</strong> \(K(x,B)\) — a map that is a probability measure in its second slot — but on a finite state space "kernel" and "row-stochastic matrix" are the same thing. (Worth holding onto: <em>kernel</em> is the word Hoffman builds everything on.) Everything in this paragraph is standard, settled mathematics — no conjecture anywhere yet.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Let \(S=\{1,\dots,n\}\) be a finite state space. A sequence of random variables \(X_0,X_1,X_2,\dots\) taking values in \(S\) is a <strong>(time‑homogeneous) Markov chain</strong> if it satisfies the <strong>Markov property</strong> — the future is conditionally independent of the past given the present:</p>
 \[ \Pr(X_{t+1}=j \mid X_t=i,\,X_{t-1},\dots,X_0)\;=\;\Pr(X_{t+1}=j\mid X_t=i)\;=\;P_{ij}. \]
 <p>The numbers \(P_{ij}\) assemble into the <strong>transition matrix</strong> \(P\in\mathbb{R}^{n\times n}\). It is <strong>row‑stochastic</strong>:</p>
 \[ P_{ij}\ge 0 \quad\text{for all } i,j, \qquad \sum_{j=1}^{n} P_{ij}=1 \quad\text{for every row } i. \]
 <p>Each row is a probability distribution over "where you go next." This is exactly the object \(P(s'\mid s)\) on the <a href="HMM.html">HMM page</a>. A distribution over states is a row vector \(\mu\); one step of dynamics is right‑multiplication, \(\mu \mapsto \mu P\); the \(k\)-step law is governed by the <strong>Chapman–Kolmogorov</strong> identity \(P^{(m+k)}=P^{(m)}P^{(k)}\). A measure‑theoretic generalisation replaces the matrix with a <strong>Markov kernel</strong> \(K(x,B)\) — a function that is a probability measure in its second argument; in the finite case "kernel" and "row‑stochastic matrix" are synonyms. Hold onto that word: it is Hoffman's.</p>
+</div>
+</section>
 
-<h3 id="stat">I.2 · Stationarity, ergodicity, reversibility <span class="tier t">T</span></h3>
+<section class="concept" data-concept="stat">
+<h3 id="stat">I.2 · Stationarity, ergodicity &amp; reversibility</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Run a random hopping process long enough and it often settles into a steady habit: the <em>chance</em> of finding it in each state stops changing, even though it keeps moving. That long-run habit is the <strong>stationary distribution</strong> — a list of probabilities that the dynamics leave untouched. Start it anywhere, wait, and a well-behaved chain forgets where it began and drifts into the same habit.</p>
+<p>One special chain is <strong>reversible</strong>: play a long recording of it backward and it looks statistically identical to playing it forward. The plain test is a balance condition — between any two states, traffic one way exactly matches traffic the other way, once you weight by how often you visit each. That symmetry sounds like a small bonus, but hold onto it: it is exactly what later lets the chain carry a notion of <em>distance</em> and shape (the geometry comes up further down the page). All of this is standard textbook mathematics, true no matter what the states stand for.</p>
+<p>One more knob: how fast the chain settles. There is a number, the <strong>spectral gap</strong>, and the bigger it is, the quicker the chain forgets its start and reaches the habit.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Fix a finite chain with transition matrix \(P\). A probability row vector \(\pi\) is <strong>stationary</strong> when it is unmoved by one step of the dynamics:</p>
+\[ \pi = \pi P, \qquad \sum_i \pi_i = 1,\ \pi_i \ge 0. \]
+<p>Reading the matrix product out, this says \(\pi_j = \sum_i \pi_i P_{ij}\) for every state \(j\): the probability flowing <em>into</em> \(j\) from everywhere exactly replaces what flows out, so the distribution is in equilibrium. Equivalently, \(\pi\) is a left eigenvector of \(P\) with eigenvalue \(1\). For an <strong>irreducible</strong> (every state reachable from every other) and <strong>aperiodic</strong> chain, this \(\pi\) is unique and is also the limit: \(\mu P^k \to \pi\) as \(k\to\infty\) for <em>every</em> starting distribution \(\mu\). The chain forgets its initial condition.</p>
+<p>A stronger property is <strong>reversibility</strong> with respect to \(\pi\), defined by <em>detailed balance</em>:</p>
+\[ \pi_i P_{ij} = \pi_j P_{ji} \quad\text{for all } i,j. \]
+<p>Both sides are the long-run rate of the transition \(i\to j\): the left is "be at \(i\), then jump to \(j\)," the right is the reverse. Equality means the equilibrium flow is symmetric edge by edge — the time-reversed chain has the same law. (Detailed balance implies stationarity by summing over \(i\), but it is genuinely stronger; plenty of stationary chains are not reversible.) Its real payoff is algebraic: reversibility makes \(P\) <strong>self-adjoint</strong> on the weighted space \(\ell^2(\pi)\), so its eigenvalues \(1=\lambda_0 > \lambda_1 \ge \cdots\) are real and its eigenvectors orthogonal. That spectral structure is what later supports a genuine geometry — diffusion distance and Dirichlet forms — so reversibility is the quiet hinge to keep in view. The <strong>spectral gap</strong> \(1-\lambda_1\) sets the mixing rate: how fast \(\mu P^k\) collapses onto \(\pi\). This is all classical Markov-chain theory (tagged Textbook), independent of any interpretation of the states.</p>
+</div>
+<div class="rend" data-lv="phd">
 <div class="box def">
   <p class="lbl">Definition · Stationary distribution</p>
   <p>A probability row vector \(\pi\) is <strong>stationary</strong> for \(P\) if \(\pi = \pi P\), i.e. \(\pi\) is a left eigenvector with eigenvalue \(1\). For an irreducible, aperiodic chain it is unique and \(\mu P^{k}\to\pi\) for every initial \(\mu\).</p>
 </div>
 <p>A chain is <strong>reversible</strong> with respect to \(\pi\) when it obeys <em>detailed balance</em>, \(\pi_i P_{ij}=\pi_j P_{ji}\). Reversibility is what later lets a chain carry a <em>geometry</em>: it makes \(P\) self‑adjoint on \(\ell^2(\pi)\), so its eigenvalues are real and its eigenvectors orthogonal — the doorway to diffusion distance and Dirichlet forms (§VII). The eigenvalues \(1=\lambda_0>\lambda_1\ge\cdots\) control mixing; the <strong>spectral gap</strong> \(1-\lambda_1\) is the rate.</p>
+</div>
+</section>
 
-<h3 id="hmm">I.3 · Hidden Markov Models <span class="tier t">T</span></h3>
+<section class="concept" data-concept="hmm">
+<h3 id="hmm">I.3 · Hidden Markov Models</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Picture a puppet show. Behind the curtain, a puppeteer moves from pose to pose — that is the <strong>hidden</strong> part, and you never see it directly. All you get is the shadow each pose throws on the screen — that is the <strong>observed</strong> part. A <em>hidden Markov model</em> is just this setup written down as numbers: a backstage process you can't watch, and a visible signal it gives off.</p>
+<p>Two rules run the show. First, the puppeteer's next pose depends only on the pose right now, not on the whole history — that's the "Markov" part. Second, each pose throws its shadow with certain odds (one pose might usually look dark, occasionally light). From a stream of shadows, clever recipes can guess the most likely backstage path, or learn the odds from scratch. This is solved, standard math — the on-ramp, not the controversial part.</p>
+<p>Here is the one detail to carry forward, because the whole rest of the page turns on it: in an HMM the causation runs <strong>one way only</strong>. The hidden poses push the visible shadows around; the shadows never reach back and nudge the poses. Watching changes nothing backstage. Hoffman calls that one-way street "the fiction of objective observation" — the comfortable assumption that you can look at the world without being part of it. The HMM is where that assumption lives, so it's exactly the thing the later "trace" idea will tear down.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>A <strong>hidden Markov model (HMM)</strong> is an ordinary Markov chain with a curtain dropped in front of it. The chain still hops between hidden states <code>S</code> under a transition matrix, but you never see those states; instead each hidden state <em>emits</em> a visible symbol drawn from an alphabet <code>V</code>. Following Rabiner's canonical tutorial, the whole object is the five-tuple</p>
+<p>\[ \lambda = (S,\; V,\; A,\; B,\; \pi). \]</p>
+<p>Reading the symbols: <code>S</code> is the set of hidden states and <code>V</code> the set of observable symbols; \(A=(a_{ij})\) is the row-stochastic transition matrix on the hidden states (\(a_{ij}=\Pr(\text{next state }j\mid\text{current state }i)\), exactly the Markov chain from the previous section); \(\pi\) is the initial distribution over hidden states; and the new piece is the <strong>emission matrix</strong> \(B=(b_j(v))\), where \(b_j(v)=\Pr(\text{symbol }v\mid\text{hidden state }j)\) — the odds that state \(j\) shows you symbol \(v\). Each row of both \(A\) and \(B\) is a probability distribution, so each sums to 1.</p>
+<p>Three classical questions come with the model, all standard and solved: the <em>likelihood</em> of an observed sequence (forward algorithm), the most probable hidden path behind it (<em>decoding</em>, via Viterbi), and fitting the matrices to data (<em>training</em>, via Baum–Welch). The Viterbi recursion, for the record, is</p>
+<p>\[ \delta_t(j)=\Big(\max_{i}\,\delta_{t-1}(i)\,a_{ij}\Big)\,b_j(o_t), \]</p>
+<p>where \(\delta_t(j)\) is the probability of the single best hidden path that ends in state \(j\) at time \(t\) and has produced the observations seen so far. The \(\max_i\) picks the best predecessor state \(i\), the \(a_{ij}\) charges the cost of the transition into \(j\), and \(b_j(o_t)\) charges the cost of state \(j\) emitting the symbol \(o_t\) you actually observed at time \(t\).</p>
+<p>Keep the architecture in view, because it is the whole reason this section exists. In an HMM the factorization \(A\) (state→state) and \(B\) (state→symbol) is strictly <strong>one-way</strong>: hidden states drive the symbols, and the symbols never feed back into the transition dynamics. That built-in asymmetry is what Hoffman names "the fiction of objective observation" — the assumption that an observer can register the world without perturbing it. Everything later on the page comes from a single move: deleting that one-way restriction. So treat the HMM not as the destination but as the baseline whose one constraint is about to be removed.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>An HMM adds a curtain. The chain \(X_t\) on hidden states is no longer observed directly; instead each hidden state <em>emits</em> a visible symbol. Following Rabiner's canonical tutorial <a href="#refs">[Rabiner 1989]</a>, an HMM is the five‑tuple</p>
 \[ \lambda = (S,\; V,\; A,\; B,\; \pi), \]
 <p>with hidden states \(S\), observation alphabet \(V\), transition matrix \(A=(a_{ij})\), <strong>emission</strong> matrix \(B=(b_j(v))\) giving \(\Pr(\text{symbol }v\mid\text{state }j)\), and initial distribution \(\pi\). The three classical problems — <em>likelihood</em> (forward algorithm), <em>decoding</em> (Viterbi), and <em>training</em> (Baum–Welch / forward–backward) — are all on your HMM page. The Viterbi recursion, for the record,</p>
 \[ \delta_t(j)=\Big(\max_{i}\,\delta_{t-1}(i)\,a_{ij}\Big)\,b_j(o_t), \]
 <p>finds the single most probable hidden path. <strong>Keep the architecture in view:</strong> in an HMM, causation is one‑way — hidden states drive symbols, never the reverse. That asymmetry is precisely what Hoffman calls "the fiction of objective observation," and precisely what the trace chain dissolves.</p>
+</div>
+</section>
 
-<h3 id="mdp">I.4 · Markov Decision Processes and policies <span class="tier t">T</span></h3>
+<section class="concept" data-concept="mdp">
+<h3 id="mdp">I.4 · Markov Decision Processes &amp; policies</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>So far the states have just <em>happened</em> to you, like weather. A <strong>Markov Decision Process</strong> adds a chooser: at each state you pick an <strong>action</strong>, and the action tilts the odds for where you land next. Think of a board game where the square you sit on isn't fixed by fate alone — you also get to roll, or play a card, and that changes the next square. The extra ingredients are a menu of actions, a rule for how each action bends the dice, a <strong>reward</strong> you collect along the way, and a knob that says how much you care about the future versus right now.</p>
+<p>A <strong>policy</strong> is just your standing rule for what to do in each state — possibly a coin-flip rule, like "when I'm here, go left 70% of the time, right 30%." Here's the one idea to keep: <em>the moment you lock in a policy, the chooser disappears.</em> Average over your own choices and you're back to a plain hopping-between-states machine, the kind from before — same math, no agency left visible. A policy is a recipe for turning a thing-you-steer into a thing-that-just-runs.</p>
+<p>That much is rock-solid textbook math. There's a more ambitious version — that bolting reward onto the states gives you exactly the object Hoffman needs for his "policies over observer-windows" story — but when the authors of this page stress-tested it, <em>that stronger claim did not hold up</em>. The plain collapse-to-a-chain fact survives; the fancier elaboration was the over-reach, so don't lean on it.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>A <strong>Markov Decision Process (MDP)</strong> is the tuple \((S,A,T,r,\gamma)\): a state space \(S\), a set of <strong>actions</strong> \(A\), a <em>controlled</em> transition kernel \(T(s'\mid s,a)\) giving the probability of moving to \(s'\) when you take action \(a\) in state \(s\), a reward \(r\), and a discount factor \(\gamma\in[0,1)\) that down-weights future reward. The new object versus a plain Markov chain is the dependence on \(a\): you no longer have one transition matrix, you have one for <em>each</em> action.</p>
+<p>A <strong>stationary stochastic policy</strong> \(\pi(a\mid s)\) is a map from states to probability distributions over actions — for each fixed \(s\), the row \(\pi(\cdot\mid s)\) sums to 1. The structural fact to carry forward: fixing a policy <strong>collapses the MDP back into an ordinary Markov chain on \(S\)</strong>, with transition matrix</p>
+<p>\[ P_\pi(s,s') \;=\; \sum_{a\in A}\pi(a\mid s)\,T(s'\mid s,a). \]</p>
+<p>Read the right side as a weighted average: for each candidate next state \(s'\), you sum the action-conditioned transition probabilities \(T(s'\mid s,a)\), each weighted by how likely your policy is to take that action, \(\pi(a\mid s)\). It is row-stochastic by construction — it's a convex combination of the row-stochastic matrices \(T(\cdot\mid s,a)\), and a convex mix of probability rows is again a probability row. So a policy <em>is</em> precisely the recipe that turns a controlled process into an autonomous one. This is the genuine, undisputed bridge to the language of "policy formation," and it's textbook-grade (tag <strong>T</strong>).</p>
+<p>One honest caveat, kept from the source. There is a stronger claim — that the joint <em>state–reward</em> process is itself the "Markov reward process" that would formalize Hoffman's notion of a policy operating over observer-windows. That elaboration was <strong>adversarially refuted</strong> during the page's research pass: it is the authors' over-reach, <em>not</em> an established result (tag <strong>X</strong>). The induced-chain identity above is solid; the reward-process upgrade is not, so treat it as a failed bet rather than a theorem.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>An MDP adds <em>agency</em>: \((S,A,T,r,\gamma)\) with actions \(A\), a controlled kernel \(T(s'\mid s,a)\), reward \(r\), and discount \(\gamma\). A <strong>stationary stochastic policy</strong> \(\pi(a\mid s)\) maps states to distributions over actions. The key structural fact we will reuse:</p>
 <div class="box def">
   <p class="lbl">Definition · Policy‑induced chain</p>
@@ -407,12 +500,28 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
   \[ P_\pi(s,s') \;=\; \sum_{a\in A}\pi(a\mid s)\,T(s'\mid s,a). \]
   <p>A policy <em>is</em> a recipe for turning a controlled process into an autonomous one. This is the genuine, undisputed bridge to "policy formation."</p>
 </div>
-<p class="code-cap" style="margin-top:.4rem" data-min-level="grad">Caveat <span class="tier x">X</span>: the stronger claim — that the joint <em>state–reward</em> process is itself the "Markov reward process" that formalises Hoffman's policy‑over‑windows — was adversarially <strong>refuted</strong> (1–2) in the research pass. The basic induced‑chain fact above is solid; the elaboration is the over‑reach.</p>
-
-<h3 id="trace-math">I.5 · The trace: watching a sub‑window of states <span class="tier t">T</span> <span class="tier p">P</span></h3>
-<div class="gist">
-  <p>This is the single most important idea on the page, so here it is in plain words — and it stays visible at every level. Imagine a clock ticking behind a wall; you only see it when the pendulum swings into a gap. The <strong>trace</strong> is the exact rule for what you see. It quietly folds in every hidden swing, correctly, so the visible part never surprises you. An observer is not guessing — an observer is <em>exactly right</em> about their slice of the world, and blind to the rest. Everything later is built on this one move.</p>
+<p class="code-cap" style="margin-top:.4rem">Caveat <span class="tier x">X</span>: the stronger claim — that the joint <em>state–reward</em> process is itself the "Markov reward process" that formalises Hoffman's policy‑over‑windows — was adversarially <strong>refuted</strong> (1–2) in the research pass. The basic induced‑chain fact above is solid; the elaboration is the over‑reach.</p>
 </div>
+</section>
+
+<section class="concept" data-concept="trace">
+<h3 id="trace-math">I.5 · The trace — watching a sub‑window of states</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Picture a long hallway where things keep happening, but you can only see into two or three rooms through open doorways. The rest of the hallway is dark. Whenever the action wanders off into the dark, you lose sight of it — until it strolls back into a lit room. The question is: can you write down an honest rule for just the rooms you <em>can</em> see, one that's never caught off guard by what happened in the dark?</p>
+<p>You can, and it's called the <strong>trace</strong>. It works by quietly accounting for <em>every</em> possible detour through the dark — every path the action might take while you can't see it, long or short, each weighted by how likely it is — and folding all of that back into the odds of where it pops out next. The result is a fresh rule for your visible rooms alone: still a clean "grid of odds whose rows each add up to 1," just like the original. The remarkable part is that it isn't a guess or a rough estimate. For the slice of the world you can watch, the trace is <strong>exactly right</strong> — zero surprise — even though you're completely blind to the rest. This isn't anyone's bold conjecture; it's settled mathematics.</p>
+<p>Why care? This one move is the hinge for everything that follows. An observer who sees only part of the world isn't a broken, error-prone version of someone who sees all of it. The observer is <em>perfectly</em> accurate about their own slice and simply blind beyond it — and that precise blindness, it turns out, is the whole story.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Here is the construction an HMM course usually skips, and the technical heart of the program. Suppose the full chain runs on a state space \(S\) with transition matrix \(P\), but you can only attend to a subset \(A \subseteq S\); the complement \(A' = S \setminus A\) is invisible. We want the <em>exactly correct</em> dynamics on \(A\) alone. Split \(P\) into blocks according to the partition \(A, A'\):</p>
+\[ P=\begin{bmatrix} P_{AA} & P_{AA'}\\ P_{A'A} & P_{A'A'} \end{bmatrix}, \]
+<p>where \(P_{AA}\) holds transitions that stay within the visible set, \(P_{AA'}\) sends you off into the dark, \(P_{A'A'}\) shuffles you around inside the dark, and \(P_{A'A}\) brings you back. Now watch the chain only when it sits in \(A\), marginalising over every excursion into \(A'\). The induced transition matrix on \(A\) — the <strong>trace</strong> (also "censored" or "watched") chain — is the <em>Schur complement</em></p>
+\[ p_A \;=\; P_{AA} \;+\; P_{AA'}\,(I-P_{A'A'})^{-1}\,P_{A'A}. \]
+<p>Read the correction term right to left: \(P_{A'A}\) is the step that re-enters \(A\); the factor \((I-P_{A'A'})^{-1} = \sum_{k\ge 0} P_{A'A'}^{\,k}\) is a geometric series that sums over <em>all</em> hidden excursions of every length \(k\) — every invisible path from where you left \(A\) to where you come back, each weighted by its probability; and \(P_{AA'}\) is the original departure. So the trace adds, to the direct visible transitions \(P_{AA}\), the entire accounted-for cost of every round trip through the dark. The series converges because the hidden part is transient — you always eventually return — so \(I - P_{A'A'}\) is invertible.</p>
+<p>The payoff (Trace Chain Theorem, Traces 2024 Thm 3.4): \(p_A\) is again row-stochastic, a bona-fide Markov chain on \(A\), and it is the <em>unique</em> "no-surprise" reduction — it reproduces the visible statistics with <strong>zero</strong> residual error, not as an approximation. This is the "zero-surprise correct answer." It is classical Markov theory (Revuz 1984) restated and deployed in the preprint, so the core fact is solid, not speculative. Censoring is also <strong>transitive</strong> (Thm 2.4): the trace of a trace is itself a trace, which is what later lets observers stack into a hierarchy. The figure contrasts this with the HMM: in an HMM causation flows one way, hidden states drive visible symbols and never the reverse — the "fiction of objective observation." Remove that restriction and you get the trace chain, where observed and unobserved interact symmetrically and the observer is part of the observed. That last sentence is the authors' <em>framing</em> (Traces 2024, p.10), not an extra theorem; the matrix identity above is what is actually proven.
+</div>
+<div class="rend" data-lv="phd">
 <p>Here is the construction usually missing from an HMM course, and the technical heart of Hoffman's program. Suppose you can only attend to a subset \(A\subseteq S\) of states; the rest, \(A'=S\setminus A\), are invisible to you. What are the <em>exactly correct</em> dynamics on the part you can see?</p>
 <p>Partition \(P\) into blocks indexed by \(A\) and \(A'\):</p>
 \[ P=\begin{bmatrix} P_{AA} & P_{AA'}\\[2pt] P_{A'A} & P_{A'A'} \end{bmatrix}. \]
@@ -469,11 +578,28 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ============================================================= -->
 <!-- PART II -->
 <!-- ============================================================= -->
-<h2 id="part2" data-depth="2"><span class="num">PART II · construction</span>The conscious agent</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Here is the leap. Keep the exact same math, but say the states are <strong>experiences</strong> — what it feels like to see red, to taste salt — instead of weather or dice. A "conscious agent" is then just three of these grids wired in a loop (perceive, decide, act) plus a counter that ticks once per experience. Nothing in the math changes; only what the numbers are <em>about</em> changes.</p>
 </div>
+</section>
+
+<section class="concept" data-concept="agent">
+<h2 id="part2" data-depth="2"><span class="num">PART II</span>The conscious agent</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Here is the leap. Take the exact same machinery from before — grids of numbers where each row adds up to 1, telling you the odds of moving from one situation to the next — and just change what the situations <em>are</em>. Instead of "sunny tomorrow given rainy today," let each one be a moment of <strong>experience</strong>: what it feels like to see red, to taste salt. Nothing in the math moves; only the meaning of the labels changes. <strong>That swap — calling the states conscious experiences — is the authors' big philosophical bet, not something they proved.</strong></p>
+<p>With that swap made, a <strong>conscious agent</strong> is a small wiring diagram with three of these grids in a loop. One grid turns the world into an experience (<em>perceive</em>), one turns an experience into an action (<em>decide</em>), and one turns an action back into a change in the world (<em>act</em>). Add a plain <strong>counter</strong> that clicks up by one every time a new experience arrives — that is the agent's only clock. Run the loop once and you get this experience; run it again and you get the next.</p>
+<p>The tidy payoff: chain the three grids together and the whole perceive–decide–act cycle collapses into a single grid that takes "my experience now" straight to "my experience next." Because rows that each add to 1 still add to 1 when you multiply them, this combined object is automatically a well-behaved chain — no extra assumptions needed. The authors treat that as a falsifiable promise: show them one conscious process that no such grid can capture, and the theory breaks.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Keep Part I's mathematics intact and reinterpret only the meaning of the states: they are now <strong>conscious experiences</strong> (qualia) rather than positions or weather. <em>This relabeling is the metaphysical move, flagged by the authors as conjecture — the matrices are unchanged, but the claim that they are <strong>about experience</strong> is a bet, not a theorem.</em> Formally, a <strong>conscious agent</strong> is the seven-tuple</p>
+<p>\[ \mathbf{C}=\big((X,\mathcal{X}),\,(G,\mathcal{G}),\,(W,\mathcal{W}),\,P,\,D,\,A,\,N\big), \]</p>
+<p>where \(X\) is a measurable space of <strong>experiences</strong>, \(G\) of <strong>actions</strong>, and \(W\) of <strong>world</strong> states. The three middle objects are Markov kernels — the measure-theoretic version of a row-stochastic matrix, each a probability distribution in its second argument: <strong>perception</strong> \(P:W\times X\to[0,1]\) (world \(\to\) experience), <strong>decision</strong> \(D:X\times G\to[0,1]\) (experience \(\to\) action — read this as a stochastic policy, though that word is an interpretive bridge, not the authors' own), and <strong>action</strong> \(A:G\times W\to[0,1]\) (action \(\to\) world). The final entry \(N\in\mathbb{N}\) is an integer <strong>experience counter</strong> that increments by one each time a message crosses the perception channel — the agent's intrinsic clock.</p>
+<p>Compose the three kernels around the loop and the entire perceive–decide–act cycle becomes a single Markov chain on experiences, the <strong>qualia kernel</strong></p>
+<p>\[ Q \;=\; D\,A\,P \;:\; X\times X\to[0,1], \qquad Q(e,e')=\sum_{g\in G}\sum_{w\in W} D(e,g)\,A(g,w)\,P(w,e'), \]</p>
+<p>read as "how my experience at this tick becomes my experience at the next." The inner sums marginalize over which action \(g\) was taken and which world state \(w\) resulted, so only experience-to-experience odds remain. Its dual, the <strong>strategy kernel</strong> \(S=APD\) on actions, governs how actions beget actions.</p>
+<p>The reason \(Q\) is automatically a legitimate chain is just linear algebra: a product of row-stochastic matrices is again row-stochastic (each row's entries stay nonnegative and still sum to 1), so the loop is Markov <em>by construction</em>, with no extra hypothesis. Hoffman frames this as a Church–Turing-style falsifiable thesis — the theory fails the moment someone exhibits a conscious process that no Markov kernel can represent.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Now the reinterpretation. Hoffman keeps the mathematics of Part I almost untouched and changes only what the states <em>mean</em>: states are <strong>conscious experiences</strong> (qualia), not positions or weather. <span class="tier c">C</span> The reframing is the metaphysical move; the matrices are unchanged.</p>
 
 <div class="box def">
@@ -501,30 +627,82 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ============================================================= -->
 <!-- PART III -->
 <!-- ============================================================= -->
-<h2 id="part3" data-depth="3"><span class="num">PART III · peak rigor</span>The trace order &amp; trace logic</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>This is the payoff, and it is real math, not hand‑waving. Line up every possible chain and ask "is this one just a partial view of that one?" That single question sorts them into a clean pecking order (a <em>partial order</em>). The order behaves like ordinary true/false logic when you stay inside one observer's view — but <em>not</em> across views: there is no god's‑eye "everything." That "true locally, strange globally" pattern is the same shape that shows up in quantum theory.</p>
 </div>
-<p>This is the crux — the part that was unverifiable until a full read of the 46‑page 2024 preprint. Every claim here is now grounded in a numbered theorem.</p>
+</section>
 
-<h3>III.1 · The trace order is a partial order <span class="tier p">P</span></h3>
+<h2 id="part3" data-depth="3" class="part-divider"><span class="num">PART III · peak rigor</span>The trace order &amp; trace logic</h2>
+<div class="section-rule"></div>
+<p class="lede">The payoff, and it is real mathematics. A single relation — "is a partial view of" — sorts every Markov chain into a logic that is Boolean inside any one observer, yet has no global "everything."</p>
+
+<section class="concept" data-concept="order">
+<h3 id="trace-order">III.1 · The trace order is a partial order</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Think of every possible "watching rule" for a system — the full clockwork, and also every partial view you'd get by only watching some of the parts. Now ask one blunt question about any two of them: <strong>is this one just a partial view of that one?</strong> When the answer is yes, draw an arrow from the smaller view to the bigger one. Those arrows sort all the rules into a clean pecking order, the way "is a smaller number than" sorts numbers on a line.</p>
+<p>This pecking order is what mathematicians call a <em>partial order</em> — "partial" because not every two views can be compared. Two observers watching totally different corners of the same world are like apples and oranges: neither is a partial view of the other, so there's simply no arrow between them. That's allowed, and it's the whole point. But the order does obey three honest rules: every view is a view of itself; if two views are each a partial view of the other, they're really the same view wearing different name-tags; and a partial-view-of-a-partial-view is still just a partial view. The middle rule is the slippery one, and the authors actually proved all three — this is settled math, not a guess.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Recall the <strong>trace</strong> from earlier: given a Markov kernel \(Q\) (a row-stochastic matrix, the dynamics of the full system) and a sub-window of states \(A\), the trace \(q_A\) is the exactly-correct dynamics an observer sees if they can only watch \(A\) and marginalize over everything hidden. Now define a relation on the class of <em>all</em> Markov kernels:</p>
+<p>\[ P \preceq_t Q \quad\Longleftrightarrow\quad P = q_A \text{ for some sub-window } A \text{ of } Q. \]</p>
+<p>Read \(P \preceq_t Q\) as "\(P\) is a partial view of \(Q\)" — \(P\) is what you'd see if you watched only the \(A\)-states of the bigger chain \(Q\) and let all excursions into the hidden states fold themselves correctly into the visible statistics. Both \(P\) and \(Q\) are honest Markov kernels in their own right; the relation just records that one is a censored shadow of the other.</p>
+<p>The result (<em>Traces 2024, Thm 4.2</em>, with proofs in Appendix A — this is the partial order attributed to Chetan Prakash, and it is genuinely proven) is that \(\preceq_t\) is a <strong>partial order</strong>: reflexive, antisymmetric, and transitive. <em>Reflexive</em>: take \(A\) to be all of the states, hide nothing, and \(q_A = Q\), so every kernel is a partial view of itself. <em>Transitive</em>: a trace of a trace is again a trace (the censoring lemma, Thm 2.4) — so if \(P \preceq_t Q\) and \(Q \preceq_t R\), then \(P \preceq_t R\), and nesting sub-windows never escapes the order. <em>Antisymmetry</em> is the subtle one: if \(P \preceq_t Q\) and \(Q \preceq_t P\) — each chain a sub-view of the other — then they must be the same chain up to relabelling the states. (Intuitively, mutual partial-views can't both strictly shrink each other, so neither hid anything.)</p>
+<p>The upshot is that observers don't form a flat list but a lattice-like hierarchy of "sees less than / sees more than," with genuinely incomparable observers sitting side by side. That ordering is the scaffold the next sections build their logic on — and unlike much of what follows, the order itself is settled mathematics, not a conjecture.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Define a relation on the set of <em>all</em> Markov kernels: \(P\preceq_t Q\) iff \(P\) is a trace of \(Q\) (i.e. \(P=q_A\) for some sub‑window \(A\) of \(Q\)). "Being a partial view of."</p>
 <div class="box thm">
   <p class="lbl">Theorem · Trace Order (Traces 2024, Thm 4.2)</p>
   <p>\(\preceq_t\) is a <strong>partial order</strong> on the class of Markovian kernels: reflexive, antisymmetric, and transitive (proofs in the paper's Appendix A). This is the result you heard attributed to Chetan Prakash — and it is genuinely proven.</p>
 </div>
 <p>Antisymmetry is the subtle one: if each of two chains is a sub‑view of the other, they are the same chain (up to relabelling). Transitivity is exactly the trace‑of‑a‑trace lemma (Thm 2.4). So observers sit in a lattice‑like hierarchy of "sees less than / sees more than."</p>
+</div>
+</section>
 
-<h3>III.2 · Locally Boolean, globally non‑Boolean <span class="tier p">P</span></h3>
+<section class="concept" data-concept="logic">
+<h3 id="trace-logic">III.2 · Locally Boolean, globally non‑Boolean</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Think of every observer as having a window onto the world: the slice of reality they can actually see. Earlier we learned these windows fall into a "sees-less-than / sees-more-than" pecking order. Now read that order as a kind of <strong>logic</strong> — a way of asking "if this is true, does that follow?"</p>
+<p>Here's the punchline. <strong>Pick one observer and look only at the smaller windows nested inside theirs, and the logic behaves completely normally</strong> — like ordinary true/false, where every statement has a clean opposite and any two statements can be combined ("this AND that," "this OR that"). That's the "locally Boolean" part; "Boolean" just means everyday yes/no logic. But <strong>step back and try to combine windows that belong to different observers, and the niceness breaks</strong>. There's no single biggest window that contains everything — no god's-eye view. Many windows simply can't be compared at all, and you can only combine two of them when they could, in principle, be seen at the same time.</p>
+<p>This exact pattern — tidy inside any one viewpoint, but impossible to stitch all viewpoints into one consistent whole — is the same strange signature that shows up in quantum physics. That resemblance is a real, proven feature of the math here. What's <em>not</em> settled is which named mathematical box this logic belongs in, and even the general rule for combining two windows is still missing. The authors flag those as open questions — this is a promising lead they're chasing, not a finished result.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Take the trace order <code>⪯_t</code> from the previous section ("<em>P</em> is a partial view of <em>Q</em>") and read it as logical entailment: a smaller kernel "follows from" the larger one it is a trace of. The set of all Markov kernels, ordered this way, becomes a <strong>logic</strong>, and its character is the headline result.</p>
+<p><strong>Theorem (Local Booleanity, Traces 2024, Thm 4.12).</strong> Fix a single kernel <code>N</code> and restrict attention to its <em>downset</em> — the set of all traces of <code>N</code> (every sub-window view derivable from that one chain). On that downset the trace logic is a <strong>Boolean algebra</strong>: it carries a well-defined meet \(\wedge\), join \(\vee\), and complement \(\neg\), obeying the usual laws of ordinary propositional logic. Concretely, sub-windows of one fixed chain combine and negate as cleanly as subsets of a set do.</p>
+<p>The contrast is the whole point. <strong>Globally</strong> — across the class of <em>all</em> kernels, not just the traces of one — the structure is <em>not</em> Boolean. There is no greatest element \(\mathbf{1}\) (no universal "everything" that all observers are partial views of), no global complement, and many pairs of kernels are simply <em>incomparable</em> — neither is a trace of the other. Meets and joins are only guaranteed to exist between <strong>compatible</strong> kernels, i.e. ones that are simultaneously verifiable (both views of some common chain). You get a family of Boolean "frames," one per fixed kernel, that cannot be glued into a single global Boolean algebra.</p>
+<p>That "Boolean frame by frame, non-Boolean overall" shape is the algebraic signature of <strong>quantum-style logic</strong>: it is exactly what distinguishes the logic of quantum propositions from classical logic. The natural mathematical home looks like a <strong>partial Boolean algebra</strong> in the sense of Kochen–Specker (a patchwork of Boolean algebras agreeing on overlaps) rather than an orthomodular lattice — but be careful: <em>this identification is the authors' suggestion, not a proven classification</em>. The paper deliberately stops short of pinning down the lattice-theoretic identity, and it leaves the <strong>general form of the join</strong> (how to combine two compatible kernels in closed form) as an explicit open problem (Remark 4.10). So: the locally-Boolean / globally-non-Boolean theorem is proven; naming the exact structure and writing down the general join are not.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Read \(\preceq_t\) as logical entailment and the set of kernels becomes a <strong>logic</strong>. Its character is the headline:</p>
 <div class="box thm">
   <p class="lbl">Theorem · Local Booleanity (Traces 2024, Thm 4.12)</p>
   <p>Restricted to all traces of a <em>single fixed</em> kernel \(N\), the trace logic is a <strong>Boolean algebra</strong> (with an explicit meet, join, and complement on that downset). But <strong>globally</strong> it is <em>not</em> Boolean: there is no greatest element \(\mathbf{1}\), no global complement, and many incomparable kernels. Meets and joins exist only between "compatible" (simultaneously verifiable) kernels.</p>
 </div>
 <p>This is your transcript's "globally non‑Boolean, but locally Boolean" — verbatim, and now with a citation. The structure is the signature of <strong>quantum‑style logic</strong>: a family of Boolean "frames" that cannot be glued into one global Boolean algebra. The natural mathematical home is a <strong>partial Boolean algebra</strong> in the sense of Kochen–Specker, rather than an orthomodular lattice. <span class="tier x">X</span> The paper itself stops short of naming the lattice‑theoretic identity — leaving it, and the <strong>general form of the join</strong>, as explicit open problems (Remark 4.10). Your transcript's "no general notation for the join yet" is exactly right.</p>
+</div>
+</section>
 
-<h3>III.3 · The bridge to belief: Lebesgue logic <span class="tier p">P</span></h3>
+<section class="concept" data-concept="belief">
+<h3 id="lebesgue">III.3 · The bridge to belief — Lebesgue logic</h3>
+
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>So far we've been talking about <strong>seeing</strong>: an observer watches only part of a system, and the <em>trace</em> is the exact rule for that partial view. There's a second, older idea here about <strong>believing</strong>: how a rational mind should hold and update its hunches about the world. That belief-side bookkeeping has its own little logic, called <strong>Lebesgue logic</strong>, with operations that act like AND, OR, NOT, and "implies" (its AND is basically a souped-up version of Bayes' rule, the standard recipe for updating a belief when new evidence comes in). It was invented back in 1993 to model perception, long before any of the trace stuff.</p>
+<p>The surprising claim of this section: these two logics are <strong>secretly the same shape</strong>. Take any chain and read off its long-run "where does it settle" pattern (its steady-state spread over states). Doing that turns a fact about <em>what you can see</em> into a fact about <em>what you should believe</em> — and it does so without scrambling the structure: views that fit together as observations still fit together as beliefs. The vivid version: shrink your window down to a smaller view, and the belief you'd land on is just your original belief <em>cropped and rescaled</em> to that smaller window. Nothing weird sneaks in.</p>
+<p>The authors call this the most genuinely surprising solid result in their whole program — and it is a real, proven theorem, not a slogan. The bold metaphysics ("reality is conscious agents") still sits elsewhere as the authors' bet; <em>this</em> particular bridge between seeing and believing is the part that actually holds up.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Recall the <strong>trace logic</strong> from §III.1–III.2: order all Markov kernels by \(P \preceq_t Q\) ("\(P\) is a partial view of \(Q\)"), and reading that order as logical entailment makes the kernels into a logic — locally Boolean, globally not. This section connects that <em>logic of observation</em> to an independent, older <em>logic of belief</em>: <strong>Lebesgue logic</strong> [Bennett–Hoffman–Murthy 1993], a logic defined over collections of probability measures with connectives ENTAILS / AND / OR / NOT, whose AND generalises Bayes' rule. Notably, Lebesgue logic has the same "not Boolean in general, but locally Boolean" character — and it predates the trace program by three decades.</p>
+<p>The bridge is a <strong>logic homomorphism</strong> — a map between two logics that preserves their structure (entailment goes to entailment, the meets/joins that exist are respected). Here the map is the assignment that sends each kernel to its <strong>stationary measure</strong> \(\pi\), the distribution fixed by the chain:</p>
+<p>\[ P \;\longmapsto\; \pi, \qquad \pi = \pi P, \qquad \sum_i \pi_i = 1. \]</p>
+<p>In words: \(\pi\) is the row vector that the dynamics leaves unchanged (\(\pi = \pi P\)) — the left eigenvector of \(P\) for eigenvalue \(1\), normalised to sum to one. It is "where the chain settles in the long run." The theorem (<strong>Traces 2024, Cor. 4.4</strong>, resting on <strong>Thm 3.9</strong>) states that \(P \mapsto \pi\) carries the trace logic <em>onto</em> the Lebesgue logic structure-preservingly. The plain reading: <em>the logic of what you can see maps faithfully onto the logic of what you can rationally believe.</em></p>
+<p>Why it's true is one clean computation, the content of Thm 3.9: the stationary measure of a <em>trace</em> is just the original stationary measure <strong>restricted to the visible window and renormalised</strong>. If \(p_A\) is the trace of \(P\) onto a sub-window \(A\) (the Schur-complement chain from §I.5), then its stationary measure is</p>
+<p>\[ \pi_A(i) \;=\; \frac{\pi(i)}{\sum_{j\in A}\pi(j)}, \qquad i \in A. \]</p>
+<p>That is, take \(\pi\), keep only the entries on the states you can see, and divide by their total so they sum to \(1\) again. Because "take a partial view" on the kernel side (the trace) corresponds to "crop-and-renormalise" on the measure side, the order is preserved and the map is a homomorphism. The authors flag this as the most genuinely surprising rigorous result in the corpus — and it is marked <strong>[P] proven</strong>, a real theorem with a citation, not a conjecture. What stays speculative is the surrounding metaphysics (the conscious-agents reading); this structural correspondence between observation-logic and belief-logic is the part that is actually established.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>There is a second, older logic in play. <strong>Lebesgue logic</strong> <a href="#refs">[Bennett–Hoffman–Murthy 1993]</a> is a logic over <em>collections of probability measures</em>, with connectives ENTAILS / AND / OR / NOT (its AND generalises Bayes' rule). It too is "not Boolean in general, but locally Boolean," and it was built decades ago to model perception.</p>
 <div class="box thm">
   <p class="lbl">Theorem · Homomorphism (Traces 2024, Cor. 4.4, via Thm 3.9)</p>
@@ -535,11 +713,27 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ============================================================= -->
 <!-- PART IV -->
 <!-- ============================================================= -->
-<h2 id="part4" data-depth="4"><span class="num">PART IV · frontier</span>Agency, policy, and the meta‑policy recursion</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Now the most speculative twist. Observers don't just sit in the pecking order — they can <em>move</em> through it, choosing which view to take next. That choosing is a "policy." And since a policy is itself one of these grids, you can make a policy <em>about</em> policies — a meta‑policy — and keep going up. The paper gives the pieces; the full tower is partly the user's idea and partly Hoffman's newest, not‑yet‑published 2026 work. Treat it as a frontier, not a finished result.</p>
 </div>
+</section>
+
+<section class="concept" data-concept="agency">
+<h2 id="part4" data-depth="4"><span class="num">PART IV</span>Agency, policy &amp; the meta‑policy recursion</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>So far the observers have been sitting still, each stuck looking at its own slice of the world. Here is the bold next step: let them <em>move</em>. An observer can choose which slice to look at next — and that habit of choosing, "from this view, lean toward that view," is what we'll call a <strong>policy</strong>.</p>
+<p>The neat part is that a policy is built from the very same kind of object as everything else on this page: a grid whose rows add up to 1, a rule for "given where I am, here's how likely I am to go each place next." Because a policy is just another such grid, you can write a policy <em>about</em> policies — a rule for how your way of choosing changes over time. That's a <strong>meta-policy</strong>. And you can stack another rule on top of that, and another. Picture a hall of mirrors where each mirror is itself reflected in a higher one: experiences, then the windows you view them through, then the policies for switching windows, then policies over those policies.</p>
+<p>One honest warning. The bottom rungs of this ladder are things the authors actually proved: a policy really is the same type of object as an observer, and nesting views inside views is well-behaved. But the <em>full tower</em> — a chain whose states are entire observer-windows, climbing forever — is partly the reader's own construction and partly Hoffman's newest, not-yet-published work. It is a promising bet about where the math goes, not a finished result. Read it as the frontier, with the paint still wet.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Recall two facts already in hand. First, fixing a decision rule turns a controlled process into a plain Markov chain: a <strong>policy</strong> is a recipe for collapsing choice into autonomous dynamics, \(P_\pi(s,s')=\sum_a \pi(a\mid s)\,T(s'\mid s,a)\). Second, on the conscious-agent side the decision kernel \(D\) <em>is</em> that policy, and the <strong>strategy kernel</strong> \(S=APD\) — the loop run in action-space — is itself a row-stochastic matrix. So a policy is not a different species of thing from an observer; it is another kernel, and it lives inside the same <strong>trace order</strong> \(\preceq_t\) as the observers do. That is the load-bearing move: "a policy of policies" is at least <em>well-typed</em>, because the object you would take a policy <em>over</em> is the same kind of object as the policy itself.</p>
+<p>Two proven facts make the stacking coherent. The strategy kernel \(S=APD\) inherits the trace order and trace logic (so policies sit in the same lattice as observers), and <strong>trace-of-a-trace-is-a-trace</strong> (the transitivity lemma) means nesting sub-windows is closed: a coarsened view of a coarsened view is still an honest view. <em>Dissociation</em> is then just one large kernel traced onto many different subsets at once, splitting it into many smaller observer "islands" — scale is simply how much you have traced away. The authors pitch this explicitly as a non-Boolean extension of Nested Observer Windows.</p>
+<p>The proposed extrapolation typesets as a ladder, each level a Markov chain on the objects of the level below, each level carrying its own trace order:</p>
+\[ \underbrace{X \xrightarrow{\;Q\;} X}_{\text{experiences}} \;\cdot\; \underbrace{\mathcal{W} \xrightarrow{\;\Pi\;} \mathcal{W}}_{\text{windows}} \;\cdot\; \underbrace{\mathcal{P} \xrightarrow{\;M\;} \mathcal{P}}_{\text{policies}} \;\cdot\; \cdots \]
+<p>Here \(Q=DAP\) is the qualia kernel on experiences; \(\Pi\) is a kernel whose <em>states are entire observer-windows</em> (kernels), so it "walks" among views; \(M\) is a kernel whose states are policies; and the dots say you may keep climbing. Read each arrow as "given the current object at this level, here is the distribution over the next one," and the claim is that the logic of all such walks is, by recursion, again a trace logic.</p>
+<p><strong>Keep the hedge explicit.</strong> The bottom of the ladder is proven — \(S=APD\) in the order, transitivity, dissociation, the NOW framing. The <em>meta-policy chain itself</em> — \(\Pi\), \(M\), and the recursion past them — is not in the published papers. It is the reader's construction, seeded by the proven pieces and aligned with Hoffman's not-yet-published 2026 work, and should be carried as the authors' (and the reader's) bet, not as a theorem.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Your transcript's most ambitious idea: observers don't just sit in the order — they <em>move</em> through it. You can walk among observer‑windows; the walk is a policy; the logic of all policies is again a trace logic; iterate to get meta‑policies. Here is exactly how much of that is established.</p>
 
 <h4>What the paper gives you <span class="tier p">P</span></h4>
@@ -550,7 +744,7 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
   <li>The authors explicitly frame this as a <em>non‑Boolean extension of the Nested Observer Windows (NOW)</em> theory of hierarchical consciousness <a href="#refs">[Riddle &amp; Schooler 2024]</a> — the direct citation for "logic recurses across scales."</li>
 </ul>
 
-<div class="box ext" data-min-level="grad">
+<div class="box ext">
   <p class="lbl">⚑ Your extrapolation — clearly not in the paper</p>
   <p>The explicit <strong>meta‑policy recursion</strong> — a Markov chain whose <em>states are observer‑windows</em>, walked by a higher kernel, with the logic of all such walks being a trace logic by recursion — is <em>your</em> construction, seeded by Thm 2.4 + the strategy‑kernel result + the NOW citation, but never written down by the authors. That is not a strike against it; it makes it the single best candidate for an <strong>original contribution</strong>. The recursion ladder is:</p>
   <p style="text-align:center">
@@ -564,9 +758,14 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <!-- ============================================================= -->
 <!-- PART V -->
 <!-- ============================================================= -->
-<section data-min-level="ug">
-<h2 id="part5"><span class="num">PART V · recap</span>The lecture, formalised</h2>
+</div>
+</section>
+
+<section class="concept single" data-concept="recap">
+<h2 id="part5"><span class="num">PART V</span>The lecture, formalised</h2>
 <div class="section-rule"></div>
+<p class="adv-note">An appendix that re-derives the transcript segment by segment. Shown at the PhD level.</p>
+<div class="rend" data-lv="phd">
 <p>Your transcript, translated segment by segment into the notation above. Each translation carries the tag for what it actually rests on. <span class="sans" style="font-size:.82rem;color:var(--ink-faint)">(A recap section — shown from the Undergraduate level up.)</span></p>
 
 <h4>"States of the matrix as observer‑outcomes or conscious experiences." <span class="tier c">C</span></h4>
@@ -598,14 +797,19 @@ html[data-level="grad"] [data-min-level="complete"]{display:none}
 <h4>"Distance comes from how far two states are under a diffused transition — Dirichlet forms come out of this." <span class="tier c">C</span> <span class="tier x">X</span></h4>
 <p>The paper does define <em>distance = commute time</em> of the recurrent class, and commute time <em>is</em> effective resistance / Dirichlet energy (Doyle–Steiner) — so the bridge is real and rigorous <em>outside</em> Hoffman. But the explicit "Dirichlet form" machinery is absent from the corpus; building it is original territory. §VI and §VII make it concrete.</p>
 
-</section>
+
 
 <!-- ============================================================= -->
 <!-- PART VI -->
 <!-- ============================================================= -->
-<section data-min-level="ug">
-<h2 id="part6"><span class="num">PART VI · code</span>Python data structures</h2>
+</div>
+</section>
+
+<section class="concept single" data-concept="code">
+<h2 id="part6"><span class="num">PART VI</span>Python data structures</h2>
 <div class="section-rule"></div>
+<p class="adv-note">Runnable <code>numpy</code> sketches. Shown from the UG level up.</p>
+<div class="rend" data-lv="ug">
 <p>Illustrative, not production code — the point is to make each abstract object touchable. <code>numpy</code> only. <span class="sans" style="font-size:.82rem;color:var(--ink-faint)">(Shown from the Undergraduate level up.)</span></p>
 
 <h4>VI.1 · A Markov kernel as a row‑stochastic matrix <span class="tier t">T</span></h4>
@@ -733,18 +937,34 @@ def dirichlet_energy(P, pi, f):
     return 0.5 * np.sum(pi[:, None] * P * diff2)
 </code></pre>
 
-</section>
+
 
 <!-- ============================================================= -->
 <!-- PART VII -->
-<!-- SPINOUT-CANDIDATE: extract to conscious-agents-physics.html when this part exceeds ~3 screens OR the Trace Institute recursive-trace-logic paper publishes. Inline + gated until then. -->
+
 <!-- ============================================================= -->
-<section data-min-level="ug">
-<h2 id="part7" data-depth="4"><span class="num">PART VII · frontier</span>Physics as projection — the speculative payload</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Everything past here is Hoffman's <em>bet</em>, not proven physics — so it sits behind the rigorous spine on purpose. The idea: read the familiar quantities of physics off the long‑run pattern of the chain. <strong>Mass</strong> is how busy the pattern is; <strong>spin</strong> is a single number squeezed from the matrix; <strong>distance</strong> is how long a round trip between two states takes. Bold and surprisingly tidy — and entirely conjecture.</p>
 </div>
+</section>
+
+<!-- SPINOUT-CANDIDATE: extract Part VII to conscious-agents-physics.html when >3 screens OR Trace Institute paper publishes -->
+<section class="concept" data-concept="physics">
+<h2 id="part7" data-depth="4"><span class="num">PART VII</span>Physics as projection</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p><strong>Heads up: everything in this section is the authors' bet, not proven physics.</strong> Parts I through III tried to build something rigorous; this part is the wild guess that hangs off the end of it. So read it as "wouldn't it be cool if," not "here is how the universe works."</p>
+<p>The big idea is that <em>spacetime is not the bottom layer of reality</em>. In this picture, what is really fundamental is a network of interacting "conscious agents" that hop between states over and over, like a board game where the next square depends only on the one you're on. Hoffman calls spacetime a <em>headset</em> — a convenient screen that summarizes the long-run habits of all that hopping, the way a desktop icon summarizes a messy file you never see directly.</p>
+<p>The fun (and unproven) part is the <em>dictionary</em>: each familiar quantity in physics is supposed to be just a feature of that hopping pattern. <strong>Mass</strong> is how disorderly and "busy" the pattern is — a perfectly regular, repeating loop has zero mass. <strong>Distance</strong> is how many steps a round trip between two states takes. <strong>Spin</strong> is a single number squeezed out of the network's grid. <strong>Speed</strong> is tied to the fastest possible round trip, and the tidiest, most regular loops travel at light speed. It is a bold, surprisingly neat translation table. But to be clear, the authors freely admit it is a proposal: they do <em>not</em> derive real physics from it, and in particular nothing here reaches Einstein's gravity — at best it gestures toward the geometry of <em>special</em> relativity and hopes to grow from there.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p><strong>Epistemic flag, kept loud:</strong> this entire section is conjecture — marked [C] in the source. It is the authors' proposed dictionary, not a derivation of established physics. Its appeal is internal consistency and nerve, not any link to measured results. The earlier parts stand on their own; this part deliberately sits behind them so a wrong guess here doesn't poison the rigorous spine.</p>
+<p>The conceptual move: take spacetime to be <em>emergent</em> rather than fundamental. Underneath is a Markov chain of conscious-agent dynamics — a stochastic process whose transition rule is a row-stochastic matrix \(Q\) (each row of nonnegative entries sums to 1, giving the probabilities of where the system goes next from a given state). The proposal is to read physical quantities off the chain's <em>recurrent communicating class</em> (RCC) — the set of states the chain keeps returning to in the long run — rather than off any pre-existing geometry. Spacetime, in this telling, is just a compact code for the RCC's asymptotic behavior.</p>
+<p>The one equation worth pinning down is the mass identification (eq. 47): mass is the <em>entropy rate</em> of the RCC,</p>
+<p>\[ h(Q) \;=\; -\sum_{i} \pi_i \sum_{j} Q_{ij}\,\log Q_{ij}, \]</p>
+<p>where \(Q_{ij}\) is the probability of stepping from state \(i\) to state \(j\), and \(\pi_i\) is the stationary distribution — the long-run fraction of time the chain spends in state \(i\) (the weights satisfying \(\pi Q = \pi\)). The inner sum is the unpredictability of the next step given you're at \(i\); averaging it against \(\pi\) gives the chain's average bits-of-surprise per step. The intuition: a chain that just marches around a fixed periodic loop is perfectly predictable, so \(h(Q)=0\) — and that is exactly the proposed condition for a <em>massless</em> particle. Disorderly, high-entropy dynamics read as massive. Sibling entries in the dictionary follow the same spirit: distance is a commute time \(T_{ab}=\lVert a-b\rVert^2\) (a resistance-like, Dirichlet-energy quantity on the state graph), spin is the determinant of \(Q\) collapsed to \(S(d)\in\{0,\tfrac12,1\}\), and energy/momentum scale as \(1/d\) with \(d\) the number of asymptotic states (\(p=h/d\), \(E=hc/d\), eq. 44).</p>
+<p>Two caveats the source insists on, and you should carry them. First, the claim that the enhanced chain's harmonic functions are <em>identical in form</em> to a free-particle wavefunction is contested even among the authors' own verifiers — "identical" versus "merely analogous" is unsettled, so don't bank on it. Second, and more important: what this machinery actually touches is <em>special-relativistic / conformal / twistor</em> geometry — a Grassmannian \(G(2,4)\) isomorphic to the Minkowski algebra with rotor group \(SU(2,2)\) — plus an aspirational hierarchy of spacetime patches. There is <strong>no worked connection to the Einstein field equations or curved general relativity.</strong> The honest phrasing is "special-relativistic geometry, aspiring to GR," never "derives GR."</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Everything in this section is the authors' <em>proposal</em> <span class="tier c">C</span>. None of it is established physics; the value is in the audacity and internal consistency of the dictionary, not in any derivation of the Standard Model. Present it as conjecture and the credibility of Parts I–III is preserved.</p>
 
 <p>The governing idea: <em>spacetime is not fundamental</em>. It is a data structure — a "headset," in Hoffman's word — that compactly encodes the asymptotic behaviour of conscious‑agent Markov dynamics. Physical quantities are read off the recurrent communicating class (RCC) of the qualia kernel:</p>
@@ -770,17 +990,32 @@ def dirichlet_energy(P, pi, f):
 
 <p>Two honest caveats from the verification pass. First, the claim that the enhanced chain's harmonic functions are <em>identical in form</em> to the free‑particle wavefunction is <strong>contested</strong> — verifiers split on "identical" vs. "merely analogous." Second, what the corpus actually reaches is <em>special‑relativistic / conformal / twistor</em> geometry (a \(G(2,4)\cong\) Minkowski algebra, rotor group \(SU(2,2)\)) plus an aspirational hierarchy of spacetime patches — there is <strong>no worked link to the Einstein field equations or curved‑spacetime general relativity</strong>. Say "special‑relativistic geometry, aspiring to GR," never "derives GR."</p>
 
-</section>
+
 
 <!-- ============================================================= -->
 <!-- PART VIII -->
 <!-- ============================================================= -->
-<h2 id="part8" data-depth="4"><span class="num">PART VIII · frontier</span>Ontology &amp; intellectual lineage</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Why believe any of this? Because evolution gives a reason to distrust your own senses. A real theorem here — <strong>Fitness‑Beats‑Truth</strong> — shows that creatures tuned to survive, not to see truly, win out. So perception is a handy <em>interface</em>, like the icons on a desktop, not a clear window onto reality. That is the doorway to the bigger claim: spacetime itself is the interface, not the bedrock.</p>
 </div>
+</section>
 
+<section class="concept" data-concept="ontology">
+<h2 id="part8" data-depth="4"><span class="num">PART VIII</span>Ontology &amp; intellectual lineage</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>So far the math has been neutral. This section answers the obvious question: <em>why should you believe any of the wild stuff about spacetime being a kind of screen, not the real bedrock?</em> The honest starting point is a worry about your own eyes.</p>
+<p>Here evolution does the heavy lifting, and one piece of it is a real proved result, not a guess. It's nicknamed <strong>Fitness-Beats-Truth</strong>. The idea: animals that survive aren't rewarded for seeing the world <em>accurately</em> — they're rewarded for doing whatever keeps them alive. When the theorem pits a creature whose senses track plain usefulness against one whose senses track literal truth, the truth-tracker almost always goes extinct, and the bigger your range of possible perceptions, the more lopsided that gets. So your senses are best thought of as a <strong>handy interface, like the icons on a phone</strong> — a trash-can icon helps you delete a file without showing you the wires inside the chip, and that's the point. The icon is useful precisely <em>because</em> it hides the truth.</p>
+<p>From there the authors take a much bolder swing, and it's important to mark it as a swing. Their bet — <em>not</em> something they proved — is called <strong>conscious realism</strong>: that consciousness is the bedrock and the "world" is really a web of other conscious agents, with spacetime and physical objects being the interface, not the furniture of reality. They line up some famous thinkers (Leibniz, William James, and others) as ancestors of the idea. Treat that as company they're keeping and a bet they're placing, not as proof they're right.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>The section motivates dropping fundamental spacetime, and it does so in three pieces of very different strength: a theorem, a conjecture, and a lineage. Keep them separate.</p>
+<p><strong>The theorem [P].</strong> Model perception itself as a Markov kernel \( p:W\times X\to[0,1] \), where \(W\) is the set of world states, \(X\) is the set of an organism's possible perceptions, and \(p(w,\cdot)\) is the probability distribution over perceptions given world state \(w\) — exactly the perception kernel \(P\) from the conscious-agent definition. The <strong>Fitness-Beats-Truth theorem</strong> [Prakash et al. 2020] compares a <em>truth</em> strategy (perceptions that track world states faithfully) against a <em>fitness</em> strategy (perceptions tuned only to a payoff/fitness function), and shows the truth strategy is generically driven to extinction. The headline bound is</p>
+<p>\[ \Pr(\text{fitness strictly dominates truth}) \;\ge\; \frac{|X|-3}{|X|-1} \xrightarrow[\;|X|\to\infty\;]{} 1. \]</p>
+<p>Read it plainly: \(|X|\) is how many distinct perceptions the organism can have, and as that repertoire grows, the probability that a fitness-only perceiver out-competes a truth-tracking one tends to \(1\). The intuition is that fitness is a <em>many-to-one</em> recoding of the world — many genuinely different world states collapse to the same payoff, so a perceptual system optimized for payoff throws away the world's actual structure and is cheaper and faster for it. The conclusion the authors draw is that veridical perception is not selected for: perception is a species-specific <strong>interface</strong> (the "desktop of icons"), not a window onto reality. <em>(One honest caveat from the source: critics dispute the uniform-prior assumption behind the bound — not the theorem's internal correctness.)</em></p>
+<p><strong>The conjecture [C].</strong> Built on top of that is <strong>conscious realism</strong>: the positive ontological bet that consciousness is fundamental and the world \(W\) is itself a network of conscious agents, so every agent–world interaction is really agent–agent. Spacetime and objects become interface, not substrate. This is where the framework's two technical operations get a metaphysical job: the <strong>combination and dissociation problems</strong> (how observers fuse into a larger one, and split into smaller ones) are meant to be handled by <em>joins</em> and <em>traces</em> on kernels, and the "hard problem" is reframed as building a theory <em>from</em> consciousness rather than <em>of</em> it. None of this is proven — it is the authors' research program, and the page marks it as such.</p>
+<p><strong>The lineage [X].</strong> Finally, the section names intellectual ancestors and cousins — Leibniz's windowless monads coordinated by pre-established harmony, James and Whitehead on process/pan-experientialism, Kastrup's analytic idealism, QBism's observer-centric reading of quantum probability, Wolfram's "Observer Theory," and Varadarajan on the geometry of quantum logic. These are pointers, not claims of mathematical equivalence; the page is explicit that citing an ancestor is not endorsing identity.</p>
+</div>
+<div class="rend" data-lv="phd">
 <h3>VIII.1 · The evolutionary engine: Fitness‑Beats‑Truth <span class="tier p">P</span></h3>
 <p>Why abandon a fundamental spacetime at all? Because evolution gives a reason to distrust perception. Modelling perception as a Markov kernel \(p:W\times X\to[0,1]\), the <strong>Fitness‑Beats‑Truth theorem</strong> <a href="#refs">[Prakash et al. 2020]</a> shows that a strategy tuned only to <em>fitness</em> generically drives a strategy tuned to <em>truth</em> to extinction: the probability that fitness strictly dominates truth is at least \((|X|-3)/(|X|-1)\to 1\) as the perceptual repertoire grows. Veridical perception is not selected for. Perception is a species‑specific <em>interface</em> — a desktop of icons — not a window onto reality. <em>(Critics — Martinez, Allan — dispute the uniform‑prior assumption, not the theorem's correctness.)</em></p>
 
@@ -793,12 +1028,26 @@ def dirichlet_energy(P, pi, f):
 <!-- ============================================================= -->
 <!-- PART IX -->
 <!-- ============================================================= -->
-<section data-min-level="ug">
-<h2 id="part9" data-depth="4"><span class="num">PART IX · frontier</span>Positive geometries &amp; the cast of characters</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>Meet the physics "cast." Hoffman hopes his chains connect to <strong>positive geometries</strong> — shapes that modern physicists use to compute particle collisions <em>without</em> assuming space and time first. The headline names: Arkani‑Hamed (the amplituhedron), Gross ("spacetime is doomed"), and Levin (intelligence at every scale of life). Whether these deep ideas are secretly the <em>same</em> structure is wide open — that is the frontier the lecture was pointing at.</p>
 </div>
+</section>
+
+<section class="concept" data-concept="cast">
+<h2 id="part9" data-depth="4"><span class="num">PART IX</span>Positive geometries &amp; the cast</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Modern physicists have a surprising trick. To predict what happens when two particles smash together, they used to draw out every way the collision could unfold in space and time, then add it all up — slow and messy. Lately some of them found you can skip all that. You build a single geometric shape, and the answer is just a property of the shape. Space and time don't go in as assumptions; they fall out at the end. The most famous of these shapes is called the <strong>amplituhedron</strong>. This part is solid, mainstream physics.</p>
+<p>Hoffman's hope is that <em>his</em> shapes are secretly the same shapes. Recall his picture: reality is a swarm of tiny experience-machines (his "conscious agents"), and what we call a particle might be a shadow these machines cast onto one of those geometric forms. It is a clean, almost tidy idea — and it is a <strong>bet, not a proven fact</strong>. He has set it up so it could be shown wrong: if no particle-collision pattern can ever be found hiding inside his agents' math, the idea fails. So far nobody has confirmed it either way.</p>
+<p>That's why this section is mostly a <em>cast list</em> rather than a result. <strong>Nima Arkani-Hamed</strong> built the amplituhedron and likes to say "spacetime is doomed" — meaning space and time are not the ground floor of reality. <strong>David Gross</strong>, a Nobel physicist, has argued the same for years. <strong>Michael Levin</strong>, a biologist, studies how cells, tissues, and whole organisms each behave like nested little agents with their own goals. All four thinkers share one hunch: the ordinary world of objects in space is a projection of something deeper and more combinatorial. Whether it's the <em>same</em> deeper thing for all of them is wide open — that's the frontier this part is pointing at, not a place it arrives.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>Start with the established physics, because that part is real and the linkage is not. A <strong>positive geometry</strong> is a region — think of a generalized polytope living inside the <em>positive Grassmannian</em> \(\mathrm{Gr}_{\ge 0}(k,n)\), the space of \(k\)-planes in \(n\)-space with all coordinates non-negative — that comes equipped with a single distinguished <strong>canonical differential form</strong>, fixed entirely by the region's boundary structure. The headline example is the <strong>amplituhedron</strong> of Arkani-Hamed and Trnka (2013): the residues of its canonical form reproduce scattering amplitudes in planar \(\mathcal{N}=4\) super-Yang-Mills, with <em>locality and unitarity emerging</em> from the geometry rather than being assumed up front. Sibling constructions exist — the ABHY associahedron for \(\phi^3\) amplitudes, the cosmological polytope for cosmological correlators. <strong>This is textbook-grade [T] modern physics</strong>, independent of any theory of mind.</p>
+<p>The bridge Hoffman reaches for runs through one genuine construction and one conjecture. The genuine piece (from <em>Fusions of Consciousness</em>, 2023) is a map from a Markov chain to a <strong>decorated permutation</strong>, built via the chain's communicating classes — and decorated permutations are exactly the combinatorial labels for cells of the positive Grassmannian. Concretely, a communicating class of size \(\ell\) is made to code an \((\ell-1)\)-dimensional cell:</p>
+<p>\[ \text{communicating class of size } \ell \;\longmapsto\; \text{a cell of dimension } \ell-1 \text{ in } \mathrm{Gr}_{\ge 0}. \]</p>
+<p>Here \(\ell\) is the number of states that all mutually reach one another in the qualia kernel, and the right-hand side is a face of the positive Grassmannian — the same combinatorial atoms the amplituhedron is assembled from. That map is a real result. What sits on top of it is the <strong>conjecture [C]</strong>: that <em>a particle is the physical projection of the dynamics of one such communicating class onto a face of an amplituhedron</em>. Read the equation as a typing statement — both sides are cells of the same object, so the comparison is at least well-posed — not as a derivation that the projection is physically correct.</p>
+<p>Keep the hedge sharp, because the source does. The positive-geometry program is established; the identification of conscious-agent dynamics <em>with</em> that geometry is Hoffman's aspiration, explicitly framed as <strong>falsifiable</strong> (find a gluon-scattering decorated permutation inside no conscious agent's Markov dynamics, and the theory dies) but <em>not</em> yet a result inside the physics program. The "cast" — Arkani-Hamed and his "spacetime is doomed," David Gross's post-spacetime stance, Michael Levin's multi-scale competency architecture — are listed because all four programs share the single bet that the object-filled spatiotemporal world is a derived projection of a deeper combinatorial or agentive structure. Whether those projections are the <em>same</em> structure is entirely unestablished. This section names a frontier; it does not cross it.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>The "deeper truths" digression you flagged names a specific constellation of thinkers. Here is each, what they actually did, and how (or whether) it touches Hoffman's program.</p>
 
 <h3>IX.1 · The bridge Hoffman is reaching for <span class="tier c">C</span></h3>
@@ -829,16 +1078,37 @@ def dirichlet_energy(P, pi, f):
   <p>All four programs — Hoffman's trace logic, Arkani‑Hamed's amplituhedron, Gross's post‑spacetime physics, Levin's multi‑scale agency — share one bet: <em>the spatiotemporal, object‑filled world is a derived projection of a deeper, more combinatorial / agentive structure.</em> Whether the projections are the <em>same</em> structure is entirely unestablished. That is the open frontier the lecture was gesturing at.</p>
 </div>
 
-</section>
+
 
 <!-- ============================================================= -->
 <!-- PART X -->
 <!-- ============================================================= -->
-<h2 id="part10"><span class="num">PART X · honesty</span>Skeptics &amp; open problems</h2>
-<div class="section-rule"></div>
-<div class="gist">
-  <p>An honesty check, shown to everyone at every level. Critics say the evolution theorem leans on a loaded assumption, and that the jump to particle‑physics shapes is suggestive pattern‑matching, not proof. The authors leave real gaps too: no general recipe for joining observers, no settled name for the logic, no worked path from this toy relativity to real gravity. Knowing the open problems is part of taking the idea seriously.</p>
 </div>
+</section>
+
+<section class="concept" data-concept="skeptics">
+<h2 id="part10"><span class="num">PART X</span>Skeptics &amp; open problems</h2>
+<div class="section-rule"></div>
+<div class="levelpick" role="group" aria-label="Reading level for this section"><button type="button" data-lv="hs">HS</button><button type="button" data-lv="ug">UG</button><button type="button" data-lv="phd">PHD</button></div>
+<div class="rend" data-lv="hs">
+<p>Taking an idea seriously means knowing where it is weak, so here is the honest list of complaints and unfinished business. The complaints come in two flavors. First, the evolution result (the one saying creatures who chase usefulness beat creatures who chase truth) quietly assumes that every possible world is equally likely to begin with. Critics say that assumption is rigged: change which worlds you bet on, and "seeing truly" can win after all. Second, the leap from these grids of numbers to the exotic shapes physicists use for particle collisions looks, to skeptics, like spotting a face in the clouds — a suggestive resemblance, not a proof.</p>
+<p>The authors also admit real holes in their own house. There is no general recipe (and not even agreed‑upon shorthand) for <em>combining</em> two observers into one. Nobody has pinned down exactly which kind of logic this is — it resembles the strange logic of quantum theory, but the precise name is still open. The "policy about policies" tower and the idea that distance comes from round‑trip travel time are plausible bridges that nobody has actually built yet. And the bridge from this toy version of relativity to real gravity simply does not exist yet.</p>
+<p>One more piece of honesty: the central 46‑page paper is a preprint — it has <em>not</em> been peer‑reviewed. And the whole physics half of the program is the authors' own bet, which they label as conjecture. None of that makes it wrong; it just marks where the solid ground ends and the wager begins.</p>
+</div>
+<div class="rend" data-lv="ug">
+<p>This section is the program's self‑audit, and it splits cleanly into <strong>external critiques</strong> and <strong>internal open problems</strong>. Both deserve to be stated as sharply as the positive results.</p>
+<p><strong>The critiques.</strong> The Fitness‑Beats‑Truth theorem models perception as a Markov kernel \( p:W\times X\to[0,1] \) — a grid whose rows give \( \Pr(\text{experience}\mid\text{world state}) \), with each row summing to 1 — and concludes that a fitness‑tuned strategy generically drives a truth‑tuned one extinct. The theorem itself is not disputed; what critics (Martinez, Allan) attack is one premise: a <em>uniform a‑priori measure over world states</em> \( W \). That is the assumption that, before any data, every world configuration is equally probable. Swap that flat prior for one where useful structure correlates with truth, and the extinction result can reverse. So the contested object is the prior on \( W \), not the algebra. A second critique targets §VII: the map from the qualia kernel to amplituhedron‑style "positive geometries" is, to its philosophical critics (Murphy; QRI), form‑matching in search of a physical interpretation — a dictionary, not a derivation. Keep this firmly in mind: the entire physics payload is the authors' own conjecture, and the preprint anchoring the trace‑logic results is <em>not peer‑reviewed</em>.</p>
+<p><strong>The open problems</strong> — several flagged by the authors themselves — are best read against the trace order \( \preceq_t \). Recall that on the downset of a single fixed kernel the trace logic is a Boolean algebra, with a well‑defined meet, join, and complement. The gaps live where you try to leave that local frame:</p>
+<ul>
+  <li><strong>The general join.</strong> There is no general form, and not even a settled notation, for the join \( \vee \) between incomparable kernels (Remark 4.10). Locally the join exists; globally it is undefined.</li>
+  <li><strong>The lattice identity.</strong> Is the global logic exactly a <em>partial Boolean algebra</em> in the Kochen–Specker sense, or something weaker? The paper stops short of naming it. <em>(This is an extrapolation, not the authors' claim.)</em></li>
+  <li><strong>Meta‑policy recursion.</strong> Does a chain whose states are observer‑windows follow formally from trace transitivity (Thm 2.4) plus the strategy‑kernel result, or does it need new axioms? Unbuilt. <em>(Extrapolation.)</em></li>
+  <li><strong>The Dirichlet connection.</strong> Does the commute‑time "distance" genuinely give a Dirichlet‑form / diffusion metric on observers? Rigorous outside Hoffman, but plausible‑and‑unproven inside the corpus, where the machinery is absent. <em>(Extrapolation.)</em></li>
+  <li><strong>From SR to GR.</strong> The corpus reaches special‑relativistic geometry only; no worked passage to curved spacetime exists. <em>(The authors' own conjecture.)</em></li>
+</ul>
+<p>The discipline here is to hold two things at once: the trace‑order and local‑Booleanity theorems are proven and survive these objections untouched, while everything downstream — the physics dictionary, the join, the meta‑recursion, the metric — is explicitly unfinished. The honest reader treats the first list as settled and the second as the actual research frontier.</p>
+</div>
+<div class="rend" data-lv="phd">
 <p>Epistemic honesty requires the counter‑voices and the genuinely unfinished business.</p>
 <h4>What critics say</h4>
 <ul>
@@ -858,6 +1128,9 @@ def dirichlet_energy(P, pi, f):
 <!-- ============================================================= -->
 <!-- MASTER OUTLINE -->
 <!-- ============================================================= -->
+</div>
+</section>
+
 <h2 id="outline"><span class="num">SYNOPSIS</span>The master outline</h2>
 <div class="section-rule"></div>
 <p>The whole argument as a single nested ladder — the teaching order, each rung tagged. This is the spine to read, lecture, or build from.</p>
@@ -889,6 +1162,8 @@ def dirichlet_energy(P, pi, f):
 <!-- ============================================================= -->
 <!-- REFERENCES -->
 <!-- ============================================================= -->
+
+
 <h2 id="refs"><span class="num">SOURCES</span>References</h2>
 <div class="section-rule"></div>
 <div class="refs">
@@ -920,6 +1195,7 @@ def dirichlet_energy(P, pi, f):
 </ol>
 <p style="color:var(--ink-faint);margin-top:1.4rem">Companion research logs in this repository: <code>HMM-hoffman-research.md</code> (breadth), <code>HMM-hoffman-research-2-trace-logic.md</code> (threads), <code>HMM-hoffman-research-3-traces-paper.md</code> (full‑PDF ground truth).</p>
 </div>
+
 
 </main>
 </div>
@@ -978,26 +1254,46 @@ document.addEventListener('DOMContentLoaded',function(){
   targets.forEach(function(t){obs.observe(t);});
 })();
 
-// ---- reader-level switcher (subtractive gating; defaults to Complete) ----
+// ---- per-section triptych engine (HS/UG/PhD renditions; global + per-section) ----
 (function(){
-  var root=document.documentElement, bar=document.getElementById('levelBar');
-  if(!bar) return;
-  var btns=[].slice.call(bar.querySelectorAll('button'));
-  var saved=localStorage.getItem('ca-level');
-  if(saved){root.setAttribute('data-level',saved);}
-  function sync(){
-    var lv=root.getAttribute('data-level')||'complete';
-    btns.forEach(function(b){b.setAttribute('aria-pressed', b.getAttribute('data-lv')===lv?'true':'false');});
+  var root=document.documentElement;
+  var ORDER={hs:0,ug:1,phd:2};
+  var concepts=[].slice.call(document.querySelectorAll('.concept'));
+
+  function rendsOf(c){return [].slice.call(c.children).filter(function(x){return x.classList&&x.classList.contains('rend');});}
+  function applyConcept(c){
+    var eff=c.getAttribute('data-lock')||root.getAttribute('data-level')||'hs';
+    var rends=rendsOf(c), best=null, bi=-1;
+    rends.forEach(function(r){var i=ORDER[r.getAttribute('data-lv')];
+      if(i!==undefined && i<=ORDER[eff] && i>bi){bi=i;best=r;}});
+    rends.forEach(function(r){r.classList.toggle('on', r===best);});
+    var pick=c.querySelector(':scope > .levelpick');
+    if(pick){[].slice.call(pick.querySelectorAll('button')).forEach(function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-lv')===eff?'true':'false');});}
   }
-  sync();
-  btns.forEach(function(b){
+  function applyAll(){concepts.forEach(applyConcept);}
+
+  var bar=document.getElementById('levelBar');
+  function syncGlobal(){var lv=root.getAttribute('data-level')||'hs';
+    if(bar)[].slice.call(bar.querySelectorAll('button')).forEach(function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-lv')===lv?'true':'false');});}
+  if(bar){[].slice.call(bar.querySelectorAll('button')).forEach(function(b){
     b.addEventListener('click',function(){
-      var lv=b.getAttribute('data-lv');
-      root.setAttribute('data-level',lv);
-      localStorage.setItem('ca-level',lv);
-      sync();
-    });
+      root.setAttribute('data-level', b.getAttribute('data-lv'));
+      try{localStorage.setItem('ca-level', b.getAttribute('data-lv'));}catch(e){}
+      concepts.forEach(function(c){c.removeAttribute('data-lock');}); // global resets per-section choices
+      syncGlobal(); applyAll();
+    });});}
+
+  concepts.forEach(function(c){
+    var pick=c.querySelector(':scope > .levelpick'); if(!pick) return;
+    [].slice.call(pick.querySelectorAll('button')).forEach(function(b){
+      b.addEventListener('click',function(){
+        c.setAttribute('data-lock', b.getAttribute('data-lv')); applyConcept(c);
+      });});
   });
+
+  syncGlobal(); applyAll();
 })();
 
 // ---- depth meter (active band follows the Part in view) ----
