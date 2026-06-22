@@ -49,6 +49,14 @@
       font-size: 1.1rem;
       margin-top: 10px;
     }
+    /* Headline title under the name */
+    .tagline {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-top: 6px;
+    }
     /* Section titles */
     .section-title {
       font-family: 'Montserrat', sans-serif;
@@ -111,16 +119,18 @@
   <!-- Header: Name, Professional Summary & Contact -->
   <header>
     <h1>Scott Nelson</h1>
+    <p class="tagline">Data Scientist</p>
     <p>
-      Data Scientist with robust proficiency in Python and hands‑on experience in managing large-scale datasets,
-      statistical analysis, and building automated data pipelines. Adept at translating complex data into actionable
-      insights to drive product innovation and operational excellence. Passionate about leveraging advanced ML techniques
-      to support secure, scalable, and transparent AI solutions.
+      Data scientist with strong Python skills and hands-on experience across the machine learning lifecycle, from
+      building automated data pipelines to LLM fine-tuning, red-teaming, and model evaluation for Meta's Llama 2 and
+      Llama 3 models. Currently pursuing an MS in Applied Data Intelligence at San José State University, with a strong
+      foundation in statistical analysis and a focus on turning complex data into clear, actionable insights.
     </p>
     <p>
       San Francisco Bay Area •
-      <a href="mailto:scottjnelson5@gmail.com" style="color: var(--primary-color);">scottjnelson5@gmail.com</a> •
-      <a href="https://scottn66.github.io" style="color: var(--primary-color);">scottn66.github.io</a>
+      scottjnelson5[at]gmail.com •
+      <a href="https://scottn66.github.io" style="color: var(--primary-color);">scottn66.github.io</a> •
+      <a href="https://github.com/scottn66" style="color: var(--primary-color);">github.com/scottn66</a>
     </p>
   </header>
 
@@ -128,32 +138,42 @@
   <section id="experience" class="section-bg">
     <h2 class="section-title">Experience</h2>
     <article>
-      <h3>Meta, Remote — Linguistic Data Analyst</h3>
+      <h3>N Star Holdings, Remote - Independent Technical Consultant</h3>
+      <p>AUGUST 2024 - JANUARY 2026</p>
+      <ul>
+        <li>Served as the sole engineer and technical lead, a one-person team with full ownership of the technology, for a debt-collection business managing a $480K charged-off loan portfolio of roughly 370 debtors, working directly with a non-technical business owner through a legally complex Texas-to-California ownership transfer.</li>
+        <li>Cleaned, consolidated, and standardized debtor records from 19 separate sources into a single, analysis-ready dataset, including a normalized data dictionary and code key.</li>
+        <li>Designed and built prototype versions of a debtor self-service web portal using several full-stack approaches, including Firebase (Firestore and Cloud Functions), Supabase with a Postgres database on Vercel, and a Python Flask API, and used AI-assisted development tools to iterate quickly on design and usability.</li>
+        <li>Built the core functionality: secure debtor onboarding and login with Firebase Authentication, SMS two-factor authentication and one-time passwords (OTP), server-side identity verification, account dashboards, and a PayPal checkout flow for online payments.</li>
+        <li>Managed legally compliant debtor outreach across multiple channels, including required mailed legal notices, phone calls, and a prototype automated voice (IVR) system, to reach a difficult and often uncooperative population.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Meta, Remote - Linguistic Data Analyst</h3>
       <p>AUGUST 2023 - AUGUST 2024</p>
       <ul>
-        <li>Collaborated with cross-functional teams (Engineering, Subject Experts, Product, Policy, and Research) to fine‑tune LLM training datasets, ensuring safety and bias alignment in Meta AI’s Llama 2 & Llama 3 projects before deployment.</li>
-        <li>Conducted thorough research into state of the art techniques and methods for LLM development, red-teaming, machine learning optimization of prompting, and natural language processing metrics.</li>
-        <li>Participated in daily, collaborative meetings for brainstorming experimentation, communicating insights, and troubleshooting.</li>
-        <li>Stress test LLM to determine areas of weakness in model safety and analyze language generation. Achieving a 65% reduction in violations—with up to 100% reduction in critical hazard categories—ensuring rigorous safety and bias alignment pre—deployment.</li>
-        <li>Compile training datasets tailored to fine tuning needs</li>
-        <li>Develop across the board metrics and standards for model training.</li>
-        <li>Communicate linguistic insights accessibly and succinctly, while considering technical and computational constraints.</li>
+        <li>Collaborated with cross-functional teams (Engineering, Subject Experts, Product, Policy, and Research) to fine-tune LLM training datasets, ensuring safety and bias alignment in Meta AI’s Llama 2 &amp; Llama 3 projects before deployment.</li>
+        <li>Designed and executed 20,000+ adversarial prompts across dozens of harm categories and multiple model versions to stress-test model safety and surface weaknesses in language generation.</li>
+        <li>Contributed to a 65% average reduction in policy violations across categories, with the largest gains in critical-hazard categories.</li>
+        <li>Researched state-of-the-art techniques for LLM development, red-teaming, prompt optimization, and NLP evaluation metrics, and developed cross-cutting metrics and standards for model training.</li>
+        <li>Communicated linguistic insights clearly to technical and non-technical stakeholders while accounting for computational constraints.</li>
       </ul>
     </article>
     <article>
-      <h3>Loyola Marymount University, Los Angeles — Research Assistant</h3>
+      <h3>Loyola Marymount University, Los Angeles - Research Assistant</h3>
       <p>NOVEMBER 2021 - SEPTEMBER 2023</p>
       <ul>
-        <li>Conducted advanced statistical analyses from electroencephalogram (EEG) data collection and to support neuroscience research, transforming raw time series data into meaningful comparisons with abnormal neuropsychological research.</li>
-        <li>Collaborated with interdisciplinary teams to review literature and implement novel testing designs that bridged cognitive science with emerging AI theory. Conducted critical reviews of research methods for cognitive science.</li>
-        <li>Assisted in the development and validation of ensemble transformer architecture. Combining decision-tree and long context transformer architectures creating an ensemble pipeline to predict readers’ subjective perceptions of bias. </li>
+        <li>Transformed raw EEG time-series into power spectral density (PSD) analyses supporting the neural efficiency hypothesis.</li>
+        <li>Designed and crowdsourced a 290-article, ~2,200-annotation subjective-news-bias corpus (CNN/FOX/BBC), tagging each judgment with the reader’s political leaning and demographics to operationalize bias as reader-dependent.</li>
+        <li>Built an ensemble pipeline (Longformer long-context transformer + decision tree) to predict readers’ subjective perceptions of article bias.</li>
+        <li>Re-engineered an abandoned modeling pipeline into a leakage-free, CPU-only reproduction (&lt;10s), catching a data-leakage bug affecting ~97% of validation and showing reader demographics outpredict article text (AUC 0.62 vs 0.53).</li>
       </ul>
     </article>
     <article>
-      <h3>Tenant’s Law Firm, Los Angeles — Internship</h3>
+      <h3>Tenant’s Law Firm, Los Angeles - Internship</h3>
       <p>MAY 2022 - DECEMBER 2022</p>
       <ul>
-        <li>Automated data‐intelligence reporting by integrating APIs and JSON data pipelines with the Customer Relationship Management (CRM) system, using a scheduled workflow automation tool (n8n) to prioritize workload for attorneys</li>
+        <li>Automated data-intelligence reporting by integrating APIs and JSON data pipelines with the Customer Relationship Management (CRM) system, using a scheduled workflow automation tool (n8n) to prioritize workload for attorneys.</li>
         <li>Integrated a document drafting software to cut routine legal drafting time by 80% via digitization and automation.</li>
         <li>Ordered public records requests from the Los Angeles Metro area’s multiple municipal bodies; client/customer service.</li>
       </ul>
@@ -165,14 +185,14 @@
   <section id="education" class="section-bg">
     <h2 class="section-title">Education</h2>
     <article>
-      <h3>San Jose State University, San Jose, CA — Master of Science in Applied Data Intelligence</h3>
+      <h3>San Jose State University, San Jose, CA - Master of Science in Applied Data Intelligence</h3>
       <p>JAN 2026 - (present)</p>
       <p>
-        Intended Grad Coursework: Mathematics for Data Intelligence • Data Visualization • Database Technologies • Deep Learning • Machine Learning • Data Engineering &amp Pipeline Development • Data Science • Optimization
+        Intended Grad Coursework: Mathematics for Data Intelligence • Data Visualization • Database Technologies • Deep Learning • Machine Learning • Data Engineering &amp; Pipeline Development • Data Science • Optimization
       </p>
     </article>
     <article>
-      <h3>Loyola Marymount University, Los Angeles, CA — Bachelor of Arts in Psychology</h3>
+      <h3>Loyola Marymount University, Los Angeles, CA - Bachelor of Arts in Psychology</h3>
       <p>AUGUST 2019 - MAY 2023</p>
       <p>Minors: Computer Science; Statistics &amp; Data Science</p>
       <p>
@@ -188,10 +208,10 @@
   <section id="certifications" class="section-bg">
     <h2 class="section-title">Certifications</h2>
     <ul>
-      <li>Machine Learning Specialization – Dr. Andrew Ng, Stanford Coursera (2024)</li>
-      <li>Relational Databases and SQL Specialization – Stanford Coursera (2024)</li>
-      <li>Google Professional Data Analytics Certificate – Google Coursera (2022)</li>
-      <li>How Software Ate Finance (Financial Services) – Stanford Coursera (2023)</li>
+      <li>Machine Learning Specialization - Dr. Andrew Ng, Stanford Coursera (2024)</li>
+      <li>Relational Databases and SQL Specialization - Stanford Coursera (2024)</li>
+      <li>Google Professional Data Analytics Certificate - Google Coursera (2022)</li>
+      <li>How Software Ate Finance (Financial Services) - Stanford Coursera (2023)</li>
     </ul>
   </section>
 
@@ -199,11 +219,12 @@
   <section id="skills" class="section-bg">
     <h2 class="section-title">Skills</h2>
     <ul>
-      <li>Machine Learning, Deep Learning &amp; Optimization</li>
-      <li>Statistical &amp; Quantitative Analysis</li>
-      <li>Data Engineering &amp; Pipeline Development</li>
-      <li>Programming: Python (advanced)</li>
-      <li>Agile Methodologies</li>
+      <li><strong>Languages:</strong> Python (advanced), JavaScript, SQL, C++, Bash, R, Java</li>
+      <li><strong>ML / DL:</strong> PyTorch, TensorFlow, Hugging Face Transformers, scikit-learn; transformers &amp; attention, LLM fine-tuning, RAG, prompt engineering, adversarial testing / red-teaming, model evaluation &amp; benchmarking, AI safety &amp; alignment / bias mitigation</li>
+      <li><strong>Data &amp; pipelines:</strong> pandas, NumPy, DuckDB, MySQL, vector databases &amp; embeddings, ETL / pipeline development</li>
+      <li><strong>Visualization:</strong> Plotly, matplotlib, seaborn</li>
+      <li><strong>Tools &amp; infra:</strong> Git, Linux, MLOps, GCP, Firebase/Firestore, Supabase, Vercel</li>
+      <li><strong>Methods:</strong> Agile, statistical &amp; quantitative analysis</li>
     </ul>
   </section>
 
@@ -211,8 +232,8 @@
   <section id="awards" class="section-bg">
     <h2 class="section-title">Awards</h2>
     <ul>
-      <li>Hack-a-thon: 1st overall for full-stack news aggregation and summarizer</li>
-      <li>Data-thon: 1st in 24‑hour competition for cleaning, analysis, and inference on a large, econometric dataset</li>
+      <li>Hackathon: 1st overall for full-stack news aggregation and summarizer</li>
+      <li>Data-thon: 1st in 24-hour competition for cleaning, analysis, and inference on a large, econometric dataset</li>
       <li>Data Challenge: 1st place winner of ASA’s federal dataset analysis competition for successful educational insights</li>
     </ul>
   </section>
@@ -220,12 +241,12 @@
   <!-- Languages Section -->
   <section id="languages" class="section-bg">
     <h2 class="section-title">Languages</h2>
-    <p>Python (preferred), Java, SQL, C++, R, Git</p>
+    <p>Python (advanced), JavaScript, SQL, C++, Bash, R, Java</p>
   </section>
 
   <!-- Footer -->
   <footer>
-    <p>&copy; 2023 Scott Nelson. All Rights Reserved.</p>
+    <p>&copy; 2026 Scott Nelson. All Rights Reserved.</p>
   </footer>
 </body>
 </html>
