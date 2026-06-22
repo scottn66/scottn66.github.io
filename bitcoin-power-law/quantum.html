@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Could a Quantum Computer Break Bitcoin? — An autopsy of a threat that isn't what you think</title>
+<meta name="description" content="Quantum doesn't break Bitcoin — it threatens the ownership of a countable set of coins whose public keys are already exposed. The math is solved; the hard part is coordination. An honest, anti-hype autopsy."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script>
+  window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<style>
+  :root{
+    --bg:#0a0d12; --bg2:#0e131a; --card:#121821; --card2:#0f141c; --line:#1f2731;
+    --ink:#e8eef5; --mute:#93a1b2; --dim:#8a97a8;
+    --orange:#f7931a; --blue:#4c93f7; --green:#3fb950; --red:#f85149; --purple:#a371f7; --teal:#39c5cf;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box}
+  @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+  body{margin:0;background:
+      radial-gradient(1100px 520px at 82% -8%, rgba(247,147,26,.10), transparent 60%),
+      radial-gradient(900px 480px at -5% 4%, rgba(76,147,247,.08), transparent 55%),
+      var(--bg);
+    color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.65;
+    -webkit-font-smoothing:antialiased;overflow-x:clip;}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+  a:focus-visible,nav a:focus-visible,.skip:focus{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
+  .skip{position:absolute;left:-9999px;top:0;background:var(--orange);color:#0a0d12;padding:8px 14px;font-weight:600;z-index:100}
+  .skip:focus{left:0}
+  code,.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+    background:rgba(10,13,18,.82);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;gap:6px;align-items:center;height:52px;overflow-x:auto;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav .brand{font-weight:700;margin-right:14px;white-space:nowrap;color:var(--ink)}
+  nav .brand b{color:var(--orange)}
+  nav a{color:var(--mute);font-size:13px;padding:6px 11px;border-radius:7px;white-space:nowrap;font-weight:500;min-height:44px;display:inline-flex;align-items:center}
+  nav a:hover{background:var(--card);color:var(--ink);text-decoration:none}
+  /* hero */
+  header.hero{padding:56px 0 26px;border-bottom:1px solid var(--line)}
+  .eyebrow{color:var(--orange);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12.5px}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.05;margin:14px 0 14px;font-weight:800;letter-spacing:-1.2px}
+  h1 .g{color:var(--orange)}
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){h1 .g{background:linear-gradient(95deg,var(--orange),#ffb454);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}}
+  .lede{font-size:18px;color:var(--mute);max-width:760px}
+  .byline{margin-top:18px;color:var(--dim);font-size:13.5px}
+  .byline a{color:var(--mute)}
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;min-width:120px}
+  .chip .k{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+  .chip .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+  /* sections */
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  .lenstag{display:inline-flex;align-items:center;gap:8px;color:var(--mute);font-size:12.5px;font-weight:600;
+    letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .lensnum{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;
+    background:rgba(247,147,26,.14);color:var(--orange);font-weight:700;font-size:12px}
+  h2{font-size:26px;font-weight:700;letter-spacing:-.5px;margin:6px 0 8px}
+  h3{font-size:17px;font-weight:600;margin:22px 0 8px}
+  p{color:#cdd6e1}
+  .q{color:var(--mute);font-style:italic;font-size:16.5px;margin:0 0 14px;border-left:2px solid var(--line);padding-left:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+  .plot{width:100%;min-height:300px}
+  figure{margin:16px 0}
+  figure img{width:100%;border:1px solid var(--line);border-radius:12px;display:block;background:var(--card2)}
+  figcaption{color:var(--dim);font-size:12.5px;margin-top:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .verdict{border-radius:12px;padding:14px 16px;margin-top:16px;font-size:14.5px;border:1px solid}
+  .v-real{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.32)}
+  .v-warn{background:rgba(247,147,26,.08);border-color:rgba(247,147,26,.32)}
+  .v-bad{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.30)}
+  .verdict b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:"JetBrains Mono",monospace;white-space:nowrap}
+  .card>table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .win{color:var(--green);font-weight:600}
+  .eq{overflow-x:auto;padding:6px 2px;color:#dbe4ee}
+  .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mute)}
+  .pill.ok{color:var(--green);border-color:rgba(63,185,80,.4)}
+  .pill.no{color:var(--red);border-color:rgba(248,81,73,.4)}
+  .scorecard{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .scorecard ul{margin:8px 0 0;padding-left:18px}
+  .scorecard li{margin:7px 0;font-size:14px;color:#cdd6e1}
+  footer{padding:34px 0 70px;color:var(--dim);font-size:13px}
+  footer code{color:var(--mute)}
+  @media(max-width:820px){.grid2,.scorecard{grid-template-columns:1fr}}
+  @media(max-width:700px){
+    .heroCard{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-radius:0;border-left:none;border-right:none;padding-left:8px;padding-right:8px}
+    .heroCard #hero{min-height:460px}
+  }
+
+  /* ============ QUANTUM PAGE ADDITIONS ============ */
+  details{border:1px solid var(--line);border-radius:10px;padding:0 14px;margin:14px 0;background:var(--card2)}
+  details[open]{padding-bottom:12px}
+  summary{cursor:pointer;color:var(--mute);font-weight:600;font-size:13.5px;padding:12px 0;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  details p:first-of-type{margin-top:4px}
+  details table{margin:8px 0}
+  /* quadrilemma grid */
+  .quadgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+  .quadgrid .card{margin:0}
+  .quadgrid h4{margin:0 0 6px;font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .quadgrid .stake{font-size:13.5px;color:#cdd6e1;margin:0 0 8px}
+  .quadgrid .breaks{font-size:12.5px;color:var(--red);margin:0;font-weight:600}
+  @media(max-width:640px){.quadgrid{grid-template-columns:1fr}}
+  /* back link */
+  .backlink{display:inline-flex;align-items:center;gap:8px;margin-top:8px;padding:11px 16px;border:1px solid var(--line);
+    border-radius:10px;background:var(--card);color:var(--ink);font-weight:600;font-size:14px}
+  .backlink:hover{border-color:rgba(247,147,26,.4);text-decoration:none;color:var(--orange)}
+  /* inline svg figures */
+  figure.svgfig{margin:16px 0}
+  figure.svgfig svg{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:12px;background:var(--card2)}
+  .svgcap-take{color:var(--ink);font-weight:600}
+  /* svg helper classes (used inside <svg> via class attrs) */
+  .sv-label{font-family:Inter,system-ui,sans-serif;font-weight:600}
+  .sv-mono{font-family:"JetBrains Mono",monospace}
+  .legendrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px;font-size:12px;color:var(--mute)}
+  .legendrow .pill{font-size:11px}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+<nav><div class="wrap">
+  <span class="brand"><b aria-hidden="true">₿</b> Power Law · Quantum</span>
+  <a href="#exposed">Exposed leaf</a>
+  <a href="#coins">Which coins</a>
+  <a href="#math">The math</a>
+  <a href="#machine">The machine</a>
+  <a href="#fixes">Fixes &amp; choice</a>
+  <a href="#promise">Which promise</a>
+  <a href="#verdict">Verdict</a>
+  <a href="#sidebars">Sidebars</a>
+  <a href="index.html">← back</a>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">Appendix · Quantum</div>
+  <h1>Could a quantum computer <span class="g">break</span> Bitcoin?<br/>An autopsy of a threat that isn't what you think.</h1>
+  <p class="lede"><b>Bottom line first:</b> quantum computing does not "break Bitcoin." It threatens the <i>ownership</i> of a specific, countable set of coins whose public keys are already exposed on-chain — not the ledger, not mining, not your never-reused cold storage. The cryptography to fix it already exists and is standardized; what's hard is coordination, not math. No code-breaking quantum machine exists today, and the honest read of every timeline is a wide band, not a date.</p>
+  <p class="q">If you arrived from the power-law page: this is its other through-line — <i>"don't trust, verify"</i> — followed all the way down to the math problem that trust ultimately rests on. §1–3 are the mechanism (what breaks, what merely bends, which coins are exposed); §4–5 are the engineering and the governance fight; §6–7 are the philosophical crux and the verdict. Heavy machinery lives in clearly-marked <i>for-the-curious</i> blocks — skip them and the main path still holds. A short coda ties the same question back to AI.</p>
+
+  <div class="card">
+    <div class="lenstag" style="margin-bottom:10px"><span class="lensnum" aria-hidden="true">⚑</span> On sourcing — three tiers, kept separate on purpose</div>
+    <p style="margin-top:0">This topic goes wrong when facts about built hardware get conflated with projections about hardware nobody has built and with round numbers from press coverage. So each load-bearing claim is tagged:</p>
+    <p><b style="color:var(--green)">(a) Measured facts</b> — demonstrated results and on-chain counts: Google's <i>Willow</i> below-threshold error-correction milestone (<i>Nature</i>, Dec 2024); Gidney's 2025 RSA resource reduction (arXiv:2505.15917); the exposure estimates (Deloitte, River, Chaincode Labs); the finalized post-quantum standards (FIPS 203/204/205). Cited normally.</p>
+    <p><b style="color:var(--orange)">(b) Projected estimates</b> — what a <i>future</i>, un-built machine would require. The headline <b>Google Quantum AI cluster — fewer than ~500,000 physical qubits, executable "in minutes," ~41% live-race success</b> — comes from a <b>real, high-credibility primary preprint</b> (Babbush, Gidney, Boneh, Drake et al., <i>"Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities,"</i> arXiv:2603.28846, v2 15 Apr 2026). It travels with exactly <b>three standing hedges</b>: (i) it is a preprint, peer review pending; (ii) any attacker-favorable number is the paper's <i>own</i> deliberately idealized, attacker-favorable, Bitcoin-specific upper bound, not an expected outcome; (iii) Google sells quantum computers, so weight the source's interest.</p>
+    <p style="margin-bottom:0"><b style="color:var(--mute)">(c) Media-derived figures</b> — round numbers that circulate in coverage but are not in the underlying specs. The dramatic "170,000 vulnerable P2PK outputs" and "1.1 million Satoshi-era coins" attached to the BIP debate are <b>reporting</b>, not spec text; cited as such.</p>
+  </div>
+
+  <div class="chips">
+    <div class="chip"><div class="k">Exposed surface</div><div class="v" style="color:var(--red)">4–10M ₿</div></div>
+    <div class="chip"><div class="k">Live-race upper bound</div><div class="v" style="color:var(--orange)">~41%</div></div>
+    <div class="chip"><div class="k">CRQC within 10 yr</div><div class="v" style="color:var(--blue)">28–49%</div></div>
+    <div class="chip"><div class="k">Grover vs SHA-256</div><div class="v" style="color:var(--green)">~10²² yr</div></div>
+    <div class="chip"><div class="k">Code-breaking machine</div><div class="v" style="color:var(--mute)">none yet</div></div>
+  </div>
+</div></header>
+
+<main id="main">
+
+<!-- ===================== §1 ===================== -->
+<section id="exposed"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q1</span> The exposed leaf</div>
+  <h2>Trust isn't abolished — it's relocated onto one math problem</h2>
+  <p>The parent page has two through-lines. One is the power law. The other is older and quieter: <b>"don't trust, verify."</b> That slogan is usually read as a triumph over trust — you no longer have to believe a bank or a custodian. But that is not what it does. <i>It does not abolish trust; it relocates it.</i> You stop trusting an institution and start trusting a math problem: that one particular calculation is easy to run forwards and effectively impossible to run backwards.</p>
+  <p>That calculation is the <b>elliptic-curve discrete logarithm problem</b>, or ECDLP, and everything in this article hangs off it.</p>
+  <p class="q"><b>The one-way street.</b> Your wallet takes a secret number — your private key — and multiplies it by a fixed, publicly known point on a curve to produce your public key. Going forward is cheap: any phone can do it. Going backward — recovering the secret from the public result — is, on a classical computer, hopeless. That asymmetry is the whole trick. It is <i>why</i> you can shout your public key from the rooftops, etch it onto the blockchain forever, and lose nothing: nobody can divide their way back to your private key.</p>
+  <p>Nobody has <i>proven</i> ECDLP is hard — it is an <b>unproven hardness conjecture</b>, exactly the kind of foundational assumption this page interrogates rather than swallows. It is the <b>binding</b> security assumption of Bitcoin ownership, and the one quantum computing actually threatens.</p>
+  <p>A second cryptographic layer plays a different role, and conflating the two is the source of most confusion here. <b>SHA-256 and RIPEMD-160</b> — the hash functions — wrap your public key inside an address. Think of this layer not as a second co-equal lock but as a <b>curtain</b>: it keeps your public key out of sight until the moment you spend, so an attacker has nothing to point an algorithm <i>at</i>. The address is a fingerprint of the key, not the key itself; an unspent, never-reused coin is safe because its public key <b>simply hasn't been published yet</b> — not because the hash is eternally un-reversible. So: the deepest <i>threatened</i> layer is <b>ECDLP</b> (binding, and it breaks); the hash layer is a <b>temporary curtain</b> (hiding, and it merely softens). That distinction is the spine of the whole piece, and it produces the one sentence that makes both "Bitcoin is doomed" and "Bitcoin is quantum-proof" wrong:</p>
+  <div class="verdict v-warn" style="font-size:16px;text-align:center"><b>Shor breaks the keys; Grover only bends the hashes.</b></div>
+  <p>We earn that in §3. But first, the genuinely reassuring part, which deserves to come <i>before</i> the heavy math: which coins are actually exposed. The answer is not "Bitcoin." It is a specific, countable subset.</p>
+</div></section>
+
+<!-- ===================== §2 ===================== -->
+<section id="coins"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q2</span> Which coins are actually exposed</div>
+  <h2>A countable subset — not "Bitcoin"</h2>
+  <p>Settle the single most common misconception first, because nearly everyone arrives carrying it. There are two completely different things people mean by "quantum breaks Bitcoin," and only one is real.</p>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:2px">Box A — Key recovery <span class="pill no">real</span></h3>
+      <p style="font-size:14px;margin:6px 0 0">A quantum computer running Shor's algorithm could take a <i>visible public key</i> and recover the matching private key, then forge a signature and spend coins that aren't its own. This is theft of specific, identifiable coins. It does <b>not</b> rewrite history, reverse confirmed transactions, or break consensus rules. The forged signature is, mathematically, a <i>valid</i> signature.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:2px">Box B — Consensus attack <span class="pill ok">non-event</span></h3>
+      <p style="font-size:14px;margin:6px 0 0">Rewriting the blockchain or double-spending confirmed transactions requires raw mining power, governed by hashing — and hashing is only mildly softened by quantum attack and is re-absorbed by Bitcoin's difficulty adjustment. Quantum does <b>not</b> meaningfully enable this.</p>
+    </div>
+  </div>
+  <p>The punchline most coverage misses: <b>quantum threatens the ownership of exposed coins, not the integrity of the ledger.</b> Box A is the story; Box B is largely a non-event. Shor needs a <i>public key</i> to act on. Where the chain shows only the curtain — a hash — Shor has no target. That single fact partitions every coin into exposed and safe.</p>
+
+  <div class="card"><table>
+    <thead><tr><th>Output type</th><th>What the public key is doing</th><th>Quantum status</th></tr></thead>
+    <tbody>
+      <tr><td><b>P2PK</b> (earliest coinbase coins)</td><td>Public key sits in the open, by the format's design</td><td><span class="pill no">Exposed</span> — key visible at rest</td></tr>
+      <tr><td><b>Reused address</b> (any type, spent from at least once)</td><td>Public key was revealed the first time you spent</td><td><span class="pill no">Exposed</span> — key visible at rest</td></tr>
+      <tr><td><b>Taproot key-path</b> (P2TR)</td><td>Tweaked public key sits directly in the output</td><td><span class="pill no">Exposed</span> — key visible at rest</td></tr>
+      <tr><td><b>Unspent, never-reused</b> (P2PKH / P2WPKH)</td><td>Only a <i>160-bit fingerprint</i> of the key is shown</td><td><span class="pill ok">Hidden</span> — safe until spent</td></tr>
+    </tbody>
+  </table></div>
+
+  <!-- ===== SVG 2: Exposure stacked bar ===== -->
+  <figure class="svgfig">
+    <svg viewBox="0 0 880 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A stacked horizontal bar across roughly 20 million BTC supply: an exposed slice of about 4 to 10 million BTC (P2PK, reused, Taproot key-path) shown in red on the left, and the much larger hashed-and-safe remainder shown in green.">
+      <text x="24" y="34" class="sv-label" fill="#e8eef5" font-size="16">The exposed surface, against total supply</text>
+      <text x="24" y="56" class="sv-label" fill="#93a1b2" font-size="12.5" font-weight="400">~20M BTC in circulation · exposed = public key already published on-chain</text>
+      <!-- bar track -->
+      <rect x="24" y="86" width="832" height="64" rx="8" fill="#0a0d12" stroke="#1f2731"/>
+      <!-- exposed slice: 4-10M of ~20M -> use ~7M midpoint => ~35% width; draw band 20%-50% -->
+      <!-- safe remainder (green) full, then exposed (red) overlaid on left -->
+      <rect x="26" y="88" width="828" height="60" rx="7" fill="#3fb950" fill-opacity="0.22"/>
+      <rect x="26" y="88" width="290" height="60" rx="7" fill="#f85149" fill-opacity="0.30"/>
+      <!-- uncertainty band edges for the exposed slice (20%-50%) -->
+      <line x1="191" y1="84" x2="191" y2="152" stroke="#f85149" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>
+      <line x1="440" y1="84" x2="440" y2="152" stroke="#f85149" stroke-width="1" stroke-dasharray="3 3" opacity="0.7"/>
+      <!-- labels in slices -->
+      <text x="44" y="114" class="sv-label" fill="#f85149" font-size="13">Exposed · ~4–10M BTC</text>
+      <text x="44" y="133" class="sv-mono" fill="#f85149" font-size="11.5" opacity="0.9">P2PK / reused / Taproot key-path</text>
+      <text x="560" y="114" class="sv-label" fill="#3fb950" font-size="13">Hashed &amp; safe — the remainder</text>
+      <text x="560" y="133" class="sv-mono" fill="#3fb950" font-size="11.5" opacity="0.9">unspent, never-reused (P2PKH / P2WPKH)</text>
+      <!-- scale ticks -->
+      <text x="26" y="176" class="sv-mono" fill="#8a97a8" font-size="10.5">0</text>
+      <text x="186" y="176" class="sv-mono" fill="#8a97a8" font-size="10.5">~20%</text>
+      <text x="430" y="176" class="sv-mono" fill="#8a97a8" font-size="10.5">~50%</text>
+      <text x="828" y="176" class="sv-mono" fill="#8a97a8" font-size="10.5" text-anchor="end">~20M (supply)</text>
+      <text x="24" y="212" class="sv-label" fill="#93a1b2" font-size="12.5" font-weight="400">Estimates: Deloitte &gt;4M (~25%) · River ~6.8M · Chaincode 4–10M (midpoint ~6.26M). The dashed band marks the ~20–50% range.</text>
+    </svg>
+    <figcaption><span class="svgcap-take">The exposed slice is a minority of supply you can literally count on-chain</span> — the green remainder is safe because its public key has never been published. <span class="pill">projection-free</span> on-chain counts (tier a), with the well-known estimate spread.</figcaption>
+  </figure>
+
+  <p>The safe case is <i>structural</i>, not luck: a well-kept coin's public key first appears at the instant of spending, and not before. This is why the oldest piece of wallet hygiene — <b>one address, one use</b> — is also the best free quantum defense available today.</p>
+  <p>The exposed coins split by <i>time pressure</i>. The <b>long-range attack</b> targets coins whose public key is <i>already permanently public</i> (P2PK, reused addresses, Taproot key-path): the key sits on-chain forever, so a future machine takes all the time it needs — the larger standing risk, and why the governance dilemma later exists. The <b>live-race attack</b> targets an otherwise-safe hashed coin only at the instant of spending, when the curtain briefly lifts — a sprint against the next block that, crucially, the attacker is unlikely to win.</p>
+
+  <details><summary>▸ For the curious: how each output type exposes its key, the live-race mechanics, and why "harvest now, decrypt later" doesn't apply</summary>
+    <p><b>The output types.</b> <b>P2PK</b> coins — the oldest on the chain, much of what Satoshi mined — put the public key in the open; the curtain was never drawn. A <b>reused address</b> drew it back the first time it was spent. <b>Taproot</b> key-path outputs place the key directly in the output with no hash wrapper — a partial regression to the P2PK era, precisely why the hardening proposals target it. A <b>never-reused</b> P2PKH/P2WPKH output shows only a 160-bit fingerprint (<code>HASH160 = RIPEMD160(SHA256(pubkey))</code>): you can check that a key matches it, but you cannot rebuild the key from it. (One caveat, since this page disowns bad arguments even when they point the right way: you'll read that "Taproot usage is declining <i>because</i> of quantum fears." Treat that as unproven — fee optimization, batching, and exchange behavior explain the fall at least as well, with no direct evidence of a quantum cause.)</p>
+    <p><b>The live race.</b> When you spend a hashed coin, your transaction lands in the <b>mempool</b> — the public waiting room every node can see — and the curtain lifts. The attacker must now (1) feed your public key to Shor and recover your private key, then (2) broadcast a competing transaction paying the same coins to <i>themselves</i> with a higher fee — a <b>replace-by-fee race</b> — and (3) get it confirmed <b>before the next block buries your legitimate spend</b>. That window averages ~ten minutes, but blocks arrive on a Poisson schedule, so sometimes two, sometimes thirty. And ten minutes is the attacker's <i>best</i> case: your legitimate spend is <i>already</i> in the mempool, possibly already paying a competitive fee, so the attacker is overtaking a transaction with a head start. <b>Miners pick the winner</b> — they can prefer the first-seen spend from a key, or refuse a replacement that spends the same input under a different signature. So any single headline number for live-race success is an <b>attacker-favorable upper bound</b>, not an expected outcome.</p>
+    <p><b>Why HNDL doesn't apply.</b> The standard quantum worry for the rest of the internet — <b>harvest now, decrypt later (HNDL)</b> — is serious for ordinary traffic: an adversary records your <i>encrypted</i> data today and stores it for a future machine to decrypt, presupposing a hidden secret inside. Bitcoin is different: <b>its signatures authorize transactions; they do not hide a payload.</b> A signature proves <i>I am allowed to move these coins</i> — no encrypted message waits to be cracked. As a16z's analysis puts it (correcting a Federal Reserve note that, in their reading, <i>"exaggerates the urgency"</i> by mis-applying HNDL), there is no confidentiality to retroactively attack. What <i>does</i> carry over is a cousin: for exposed coins, the target is already public and already permanent — you don't "harvest" a P2PK key, it has sat in the open since 2009. So the defense isn't curative; it's <b>preventive</b>: migrate vulnerable coins <i>before</i> a capable machine exists. Real and pressing — just not HNDL, and calling it HNDL borrows an urgency that doesn't belong to it.</p>
+  </details>
+</div></section>
+
+<!-- ===================== §3 ===================== -->
+<section id="math"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q3</span> What actually breaks — the math</div>
+  <h2>Structure-finding versus haystack-searching</h2>
+  <p>We've claimed an asymmetry — <i>Shor breaks the keys, Grover only bends the hashes</i> — and asserted it sinks both the doom and the complacency narratives. Here's why, intuition first.</p>
+  <p class="q"><b>Structure-finding vs. haystack-searching.</b> An elliptic-curve key has a hidden mathematical <i>regularity</i> — a periodic structure baked into how the curve works. Shor's algorithm is a <b>structure-finding machine</b>: hand it something with a hidden period and it locates that period with brutal efficiency. Because ECDLP <i>has</i> that structure, Shor cuts straight through it — a <b>true break</b>, where security doesn't degrade, it collapses. A cryptographic hash is the opposite — engineered to be <i>structureless</i>, with no period to find. The best a quantum computer can do against it is <b>Grover's algorithm</b>, a cleverer haystack search that finds the needle in roughly the <i>square root</i> of the tries a classical search would need. A real speedup, but searching an astronomically large haystack twice as efficiently. A <b>soften, not a break.</b></p>
+  <p>That contrast — surgical structure-finding versus merely-faster searching — is the entire asymmetry.</p>
+
+  <!-- ===== SVG 1: Shor-breaks / Grover-bends asymmetry ===== -->
+  <figure class="svgfig">
+    <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Two side-by-side panels. Left, in red: a cut wire labeled Shor against ECC, a true break that is exponential. Right, in green: a vast haystack merely halved, labeled Grover against SHA-256, a quadratic soften.">
+      <!-- divider -->
+      <line x1="440" y1="24" x2="440" y2="248" stroke="#1f2731" stroke-width="1"/>
+      <!-- LEFT PANEL: Shor / ECC / true break -->
+      <text x="28" y="40" class="sv-label" fill="#f85149" font-size="15">Shor → ECDLP (secp256k1)</text>
+      <text x="28" y="60" class="sv-label" fill="#93a1b2" font-size="12" font-weight="400">a true break — security collapses</text>
+      <!-- a wire being cut -->
+      <line x1="40" y1="150" x2="190" y2="150" stroke="#f85149" stroke-width="5" stroke-linecap="round"/>
+      <line x1="250" y1="150" x2="400" y2="150" stroke="#f85149" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+      <!-- cut spark -->
+      <path d="M210 132 L222 150 L210 168 M230 132 L218 150 L230 168" stroke="#ffb454" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <text x="190" y="120" class="sv-mono" fill="#ffb454" font-size="11" text-anchor="middle">CUT</text>
+      <!-- exponential curve sketch -->
+      <path d="M40 230 Q140 228 210 200 T400 110" stroke="#f85149" stroke-width="2" fill="none" opacity="0.8"/>
+      <text x="44" y="222" class="sv-mono" fill="#f85149" font-size="11">classical $\sqrt N=2^{128}$</text>
+      <text x="232" y="120" class="sv-mono" fill="#f85149" font-size="11">Shor: poly-time</text>
+      <text x="28" y="270" class="sv-label" fill="#cdd6e1" font-size="12" font-weight="400">Exponential gap. Once the key is visible, the private key is derivable.</text>
+      <!-- RIGHT PANEL: Grover / SHA / haystack -->
+      <text x="468" y="40" class="sv-label" fill="#3fb950" font-size="15">Grover → SHA-256</text>
+      <text x="468" y="60" class="sv-label" fill="#93a1b2" font-size="12" font-weight="400">a soften — the haystack is merely halved</text>
+      <!-- haystack: many dots, one needle -->
+      <g fill="#3fb950" fill-opacity="0.30">
+        <circle cx="490" cy="150" r="3"/><circle cx="508" cy="138" r="3"/><circle cx="526" cy="160" r="3"/><circle cx="544" cy="144" r="3"/><circle cx="562" cy="156" r="3"/><circle cx="580" cy="138" r="3"/><circle cx="598" cy="162" r="3"/><circle cx="616" cy="146" r="3"/><circle cx="634" cy="158" r="3"/><circle cx="652" cy="140" r="3"/><circle cx="670" cy="154" r="3"/><circle cx="688" cy="148" r="3"/><circle cx="706" cy="160" r="3"/><circle cx="724" cy="142" r="3"/><circle cx="742" cy="156" r="3"/><circle cx="760" cy="148" r="3"/><circle cx="778" cy="160" r="3"/><circle cx="796" cy="144" r="3"/><circle cx="814" cy="156" r="3"/>
+        <circle cx="490" cy="172" r="3"/><circle cx="512" cy="180" r="3"/><circle cx="534" cy="174" r="3"/><circle cx="556" cy="184" r="3"/><circle cx="578" cy="176" r="3"/><circle cx="600" cy="186" r="3"/><circle cx="622" cy="174" r="3"/><circle cx="644" cy="184" r="3"/><circle cx="666" cy="176" r="3"/><circle cx="688" cy="186" r="3"/><circle cx="710" cy="174" r="3"/><circle cx="732" cy="184" r="3"/><circle cx="754" cy="176" r="3"/><circle cx="776" cy="186" r="3"/><circle cx="798" cy="174" r="3"/><circle cx="814" cy="184" r="3"/>
+      </g>
+      <!-- the needle -->
+      <circle cx="652" cy="172" r="5" fill="#ffb454"/>
+      <text x="664" y="176" class="sv-mono" fill="#ffb454" font-size="10">needle</text>
+      <text x="468" y="118" class="sv-mono" fill="#3fb950" font-size="11">$2^{256}\to 2^{128}$ tries (≈ √)</text>
+      <text x="468" y="270" class="sv-label" fill="#cdd6e1" font-size="12" font-weight="400">≈10²² years to crack one hash — softened, nowhere near broken.</text>
+      <!-- takeaway bar -->
+      <rect x="0" y="252" width="880" height="48" fill="none"/>
+      <text x="440" y="296" class="sv-label" fill="#e8eef5" font-size="14" text-anchor="middle">ECC falls hard; hashing only bends.</text>
+    </svg>
+    <figcaption><span class="svgcap-take">ECC falls hard (exponential, a true break); hashing only bends (quadratic, a soften).</span> This is why "all of Bitcoin is doomed" and "Bitcoin is quantum-proof" are <i>both</i> wrong.</figcaption>
+  </figure>
+
+  <p>But — the strongest anti-alarmist point in the article — <i>having the algorithm is not the same as being able to run it.</i> Shor against secp256k1 is a single, unbroken chain of <b>tens of millions of Toffoli gates</b> (the for-the-curious estimate is ~70–90 million; §4's subject), and that chain has to execute <i>coherently</i>, start to finish, faster than the machine falls apart.</p>
+  <p class="q"><b>The orchestra that can't drop a note.</b> A qubit is like a soap bubble holding a number: every operation risks popping it. So the challenge isn't owning a large quantum computer, any more than a symphony's challenge is owning enough musicians. It's getting every musician to play a seventy-million-note piece flawlessly, end to end — because a single decoherence event anywhere ruins the result. No machine ever built has sustained anything close to this.</p>
+  <p>The binding constraint isn't how many qubits you have; it's whether you can hold a multi-million-gate computation together long enough to finish. That gap — the subject of §4 — is enormous.</p>
+
+  <details><summary>▸ For the curious: the receipts on Shor (exponential; breaks outright) and Grover (quadratic; only softens)</summary>
+    <p><b>Shor.</b> Bitcoin signatures (ECDSA, and Schnorr since Taproot) rest on recovering a private key $d$ from the public key $Q = dG$ on the secp256k1 group, whose order is $N \approx 2^{256}$. The best <i>classical</i> attack is Pollard's rho, costing about $\sqrt{N} \approx 2^{128}$ group operations — comfortably infeasible forever on classical hardware. <b>Shor's algorithm solves the same problem in polynomial time</b> — on the order of $(\log N)^3$ work — by translating discrete-log into quantum period-finding. (Two different exponents on the <i>same</i> group order: $\sqrt{N} = 2^{128}$ is the <i>classical</i> cost; $(\log N)^3$ is <i>Shor's</i>. Not to be conflated.) That gap is effectively exponential. Once a public key is visible and a cryptographically-relevant quantum computer exists, the matching private key is derivable and the signature scheme is broken outright (Proos &amp; Zalka 2003, arXiv:quant-ph/0301141; Roetteler, Naehrig, Svore &amp; Lauter, ASIACRYPT 2017, arXiv:1706.06752).</p>
+    <p><b>Grover.</b> Against SHA-256, Grover cuts brute-force cost from $2^{256}$ to about $2^{128}$ operations. That <i>sounds</i> alarming — until you count:</p>
+    <div class="card eq">
+      $$ 2^{128} \approx 3.4\times10^{38}\ \text{operations} \;\Longrightarrow\; \text{at } 10^{9}\ \text{ops/s},\ \sim 3.4\times10^{29}\ \text{s} \;\approx\; 10^{22}\ \text{years.} $$
+    </div>
+    <p>Cracking a single SHA-256 hash with Grover would take ~10²² years — roughly 800 billion times the age of the universe. SHA-256 is softened, nowhere near broken. <i>(In the page's self-correcting habit: an earlier draft put this at ~10¹⁹ seconds, wrong by ten orders of magnitude; the correct figure is ~10²⁹ s ≈ 10²² years — and the error happened to understate Bitcoin's margin.)</i></p>
+    <p>Three facts make the hash layer even safer:</p>
+    <ul style="color:#cdd6e1;font-size:14px">
+      <li><b>Grover barely parallelizes.</b> Splitting the search across $k$ machines buys only $\sqrt{k}$ (Zalka 1997), forcing one long <i>serial</i> run. NIST encodes this ceiling as <code>MAXDEPTH</code>; realistic fault-tolerant Grover attacks need depth ~$2^{144}$, making SHA-256 effectively <i>harder</i> than the $2^{128}$ headline.</li>
+      <li><b>Difficulty adjustment absorbs the speedup.</b> A Grover miner's edge is a square-root gain, and Bitcoin's roughly-two-week retargeting competes it back toward parity. Honest hedge: retargeting restores <i>difficulty</i>, not necessarily <i>relative hashrate share</i> — a quantum miner with both a genuine √-speedup <i>and</i> ASIC-competitive per-operation throughput could grab disproportionate share before the retarget catches up. But today's quantum hardware is nowhere near ASIC per-hash speed, which is what makes mining safe in practice now.</li>
+      <li><b>RIPEMD-160's outer layer</b> sits at ~$2^{80}$ under Grover — small by cryptographic standards but still infeasible, and irrelevant unless SHA-256 falls first.</li>
+    </ul>
+  </details>
+
+  <p>So mining survives, structurally: proof-of-work rests on hashing, hashing only bends, and difficulty re-absorbs the bend. The thing quantum genuinely threatens is the <i>ownership of coins whose public key is already showing</i>.</p>
+  <div class="verdict v-warn"><b>The asymmetry, one last time:</b> ECC falls hard (Shor, exponential, a true break); hashing only bends (Grover, quadratic, a soften). This is why "all of Bitcoin is doomed" and "Bitcoin is quantum-proof" are <i>both</i> wrong.</div>
+</div></section>
+
+<!-- ===================== §4 ===================== -->
+<section id="machine"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q4</span> How far is the machine?</div>
+  <h2>Physical qubits, logical qubits, and the factory tax</h2>
+  <p>First, a vocabulary problem that almost every scary qubit headline trades on. When a company announces "1,000 qubits," it counts <b>physical qubits</b> — real, noisy hardware that holds a quantum bit for a fraction of a second before errors creep in. The number that matters for breaking Bitcoin is <b>logical qubits</b> — the perfect, error-free qubits the algorithm assumes, each one built by ganging hundreds to thousands of physical qubits together to check each other's work and vote out errors. A machine with "a thousand qubits today" is closer to having the raw material for one or two reliable ones. And the operations Shor leans on most heavily are the <i>expensive</i> ones to manufacture inside the error-correcting scaffold — so the real cost is a "factory tax" that balloons a design needing ~1,200 logical qubits into hundreds of thousands of physical ones, which is why progress on the number that matters has been <i>slower</i> than the press releases suggest.</p>
+  <p>With that, the resource estimates stop being a single scary number and become a story about how the target has moved. <b>Every figure that follows is a projection about hardware that does not yet exist.</b> Treat each one the way this page treats the power-law exponent: an estimate with a band, not a fact.</p>
+
+  <!-- ===== SVG 5: The qubit gap ===== -->
+  <figure class="svgfig">
+    <svg viewBox="0 0 880 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three labeled horizontal bars on a log scale. Logical estimate roughly 1200 to 2330 qubits, drawn dashed as a projection. Physical estimate under 500000 qubits, drawn dashed and translucent as a projection. Built hardware about 1100 qubits today, drawn solid.">
+      <text x="24" y="34" class="sv-label" fill="#e8eef5" font-size="16">The qubit gap — built vs. projected</text>
+      <text x="24" y="54" class="sv-label" fill="#93a1b2" font-size="12" font-weight="400">log scale · note the two estimates measure different things (logical vs. physical)</text>
+      <!-- log axis 10^3 .. 10^6 mapped across x:[150,840] -->
+      <!-- ticks: 10^3 at 150, 10^4 at 380, 10^5 at 610, 10^6 at 840 -->
+      <line x1="150" y1="248" x2="840" y2="248" stroke="#1f2731"/>
+      <g class="sv-mono" fill="#8a97a8" font-size="10.5" text-anchor="middle">
+        <text x="150" y="266">10³</text><text x="380" y="266">10⁴</text><text x="610" y="266">10⁵</text><text x="840" y="266">10⁶</text>
+      </g>
+      <line x1="380" y1="80" x2="380" y2="248" stroke="#1f2731" stroke-dasharray="2 4"/>
+      <line x1="610" y1="80" x2="610" y2="248" stroke="#1f2731" stroke-dasharray="2 4"/>
+      <!-- BUILT bar: ~1,100 physical -> log10(1100)=3.041 -> x = 150 + (3.041-3)*230 = ~159, width to ~1200 negligible; draw solid bar from 150 to ~163 (tiny). Make it a marker block. -->
+      <rect x="150" y="90" width="18" height="26" rx="4" fill="#4c93f7"/>
+      <text x="176" y="108" class="sv-label" fill="#4c93f7" font-size="13">Built hardware today · ~1,100 physical <tspan class="sv-mono" fill="#8a97a8" font-size="10.5">(Condor 1,121 · neutral-atom ~1,180)</tspan></text>
+      <!-- LOGICAL estimate: 1,200 (log 3.079 -> x≈168) to 2,330 (log 3.367 -> x≈234), dashed -->
+      <rect x="168" y="136" width="66" height="26" rx="4" fill="none" stroke="#f7931a" stroke-width="1.6" stroke-dasharray="5 4"/>
+      <text x="244" y="154" class="sv-label" fill="#f7931a" font-size="13">Logical estimate · ~1,200–2,330 <tspan class="sv-mono" fill="#8a97a8" font-size="10.5">(projection)</tspan></text>
+      <!-- PHYSICAL estimate: < 500,000 -> log10(5e5)=5.699 -> x = 150 + (5.699-3)*230 = ~771; bar from 10^3 region up to 771, dashed translucent -->
+      <rect x="150" y="182" width="621" height="26" rx="4" fill="#f7931a" fill-opacity="0.10" stroke="#f7931a" stroke-width="1.4" stroke-dasharray="5 4"/>
+      <text x="158" y="200" class="sv-label" fill="#f7931a" font-size="13">Physical estimate · &lt;500,000 <tspan class="sv-mono" fill="#8a97a8" font-size="10.5">(projection · the factory tax)</tspan></text>
+      <!-- gap arrow from built to physical -->
+      <path d="M168 224 L765 224" stroke="#f85149" stroke-width="1.2" stroke-dasharray="3 3" marker-end="url(#arrR)"/>
+      <defs><marker id="arrR" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f85149"/></marker></defs>
+      <text x="466" y="220" class="sv-mono" fill="#f85149" font-size="10.5" text-anchor="middle">hundreds-fold gap, and unbuilt</text>
+      <!-- legend -->
+      <g font-size="11.5">
+        <rect x="610" y="90" width="14" height="12" rx="2" fill="#4c93f7"/><text x="630" y="100" class="sv-label" fill="#93a1b2" font-weight="400">built</text>
+        <rect x="678" y="90" width="14" height="12" rx="2" fill="none" stroke="#f7931a" stroke-dasharray="3 3"/><text x="698" y="100" class="sv-label" fill="#93a1b2" font-weight="400">projection</text>
+      </g>
+    </svg>
+    <figcaption><span class="svgcap-take">Built hardware (~1,100, solid) sits orders of magnitude below even the lowest projected physical estimate (&lt;500K, dashed).</span> The logical figure (~1,200–2,330) is what the algorithm assumes; the factory tax inflates it into the hundreds of thousands. <span class="pill ok">built</span> = measured (tier a) · <span class="pill no">projection</span> = unbuilt hardware (tier b).</figcaption>
+  </figure>
+
+  <details><summary>▸ For the curious: how the resource estimates have moved (Roetteler · Proos–Zalka · Gidney · Google)</summary>
+    <p>The error-correcting scaffold has a name worth knowing: the <b>surface code</b>. The operations Shor leans on most heavily (Toffoli and T-gates) cannot be done cheaply inside it; to manufacture them, a real machine runs <b>magic-state factories</b> — large, slow subsystems that produce these expensive gates one batch at a time. That factory tax, not the raw qubit headline, is the binding cost.</p>
+    <p>The canonical academic baseline is <b>Roetteler, Naehrig, Svore and Lauter (ASIACRYPT 2017, arXiv:1706.06752)</b>: breaking secp256k1's 256-bit curve takes roughly <b>2,330 logical qubits and ~1.26 × 10¹¹ Toffoli gates</b>. The deeper anchor is <b>Proos and Zalka (2003, arXiv:quant-ph/0301141)</b>, who first established the scaling — qubits growing linearly with key bit-length, gate count with its cube — and pegged a concrete low end of <b>~1,000 logical qubits for a smaller 160-bit curve</b>. One reassuring fact falls out: elliptic-curve crypto is <i>cheaper</i> to break than RSA, so Bitcoin's curve is a softer quantum target than the RSA securing most of the web — a warning about everything else, not a comfort about Bitcoin.</p>
+    <p>"The estimates are huge, so we have decades" is fragile because the estimates keep shrinking — from <i>math</i>, not hardware. In May 2025, <b>Gidney (arXiv:2505.15917)</b> cut the headline cost of breaking RSA-2048 from a 2019 figure of ~20 million noisy qubits to <b>under 1 million</b> — a ~<b>20× reduction</b> — purely from algorithmic cleverness, hardware assumptions untouched. Any "we are safe because the numbers are astronomical" position is one good paper away from revision.</p>
+    <p>That brings us to the most consequential and most recent estimate. In March 2026, <b>Google Quantum AI with collaborators at Stanford and the Ethereum Foundation (Babbush, Gidney, Boneh, Drake and others)</b> posted <i>"Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities"</i> (arXiv:2603.28846; v2, 15 Apr 2026). It is the lowest published estimate to date: <b>fewer than 1,200 logical qubits and ~90 million Toffoli gates</b> (or, in an alternate trade-off, fewer than 1,450 logical qubits and ~70 million Toffoli gates), <b>fewer than half a million physical qubits</b>, executable <b>"in minutes"</b> at a 0.1% error rate. The <b>three sourcing hedges travel with it</b>: preprint, peer review pending; any attacker-favorable figure is the paper's <i>own</i> idealized upper bound; and Google sells quantum computers. None of this makes the paper wrong — it makes it a projection from an interested party.</p>
+    <p>Notice what the two big reductions are and are not. There are <b>two ~20× drops on record, but on different problems</b> — Gidney's is RSA (20M → under 1M qubits); the Google result is the separate ECC estimate. They are not one continuous halving line, and drawing them as a single trajectory would manufacture false inevitability. What they jointly show is narrower but real: resource estimates <i>can</i> fall sharply on theory alone.</p>
+  </details>
+
+  <p>The shrinking-estimates story matters because it makes "decades away" a bet, not a fact — two separate ~20× reductions have come from theory alone, without anyone building a new qubit.</p>
+  <p>Against all of these projections sits built hardware. The frontier is around <b>1,000–1,200 physical qubits</b> (IBM's Condor at 1,121; Atom Computing's neutral-atom array near 1,180), and <i>none</i> does the fault-tolerant computation an attack requires. Google's <b>Willow</b> result (<i>Nature</i>, Dec 2024) was a genuine milestone — error correction working <i>below threshold</i>, so adding physical qubits made the logical qubit <i>better</i> — but Willow held a single logical qubit as <i>memory</i>, not a computer running tens of millions of gates in sequence. As §3 laid out with the orchestra that can't drop a note, Shor against secp256k1 demands an unbroken coherent computation of <b>tens of millions of Toffoli gates</b> (the 70–90M figure), end to end, and no device has come within many orders of magnitude. <b>This sustained-coherence requirement, not the qubit count, is the strongest reason the calibrated read is not alarmist.</b></p>
+  <p class="q"><b>A caveat about the word "qubit."</b> As a16z has noted, "logical qubit" has been "stretched beyond recognition" in marketing — sometimes applied to error-<i>detecting</i> codes that can't fix anything. When you read a qubit number, ask: physical or logical, built or projected? Most headlines blur all four.</p>
+
+  <h3>The tension peak: Mosca's inequality</h3>
+  <p>Here the question stops being about physics and becomes a decision under uncertainty — the article's climax. The rule, named for cryptographer Michele Mosca, is common sense about deadlines: <b>X</b> is how long your secret must <i>stay</i> secret, <b>Y</b> is how long migration to quantum-proof cryptography takes, and if <b>X + Y > Z</b> — the time until the attacker's machine arrives — <b>you are already too late.</b> You act when X + Y threatens to exceed Z, not when Z is proven.</p>
+
+  <!-- ===== SVG 3: Mosca's inequality X+Y>Z ===== -->
+  <figure class="svgfig">
+    <svg viewBox="0 0 880 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A horizontal timeline. X, the secret lifetime, is infinite for already-exposed coins, shown running off the left edge. Y, the migration window, is a band of 5 to 10-plus years. Together X plus Y is compared against Z, the time to a code-breaking quantum computer, itself a wide band. The X-plus-Y span overruns Z, annotated already behind for exposed coins.">
+      <text x="24" y="34" class="sv-label" fill="#e8eef5" font-size="16">Mosca's inequality: $X + Y > Z$ ⟹ already too late</text>
+      <!-- baseline timeline -->
+      <line x1="24" y1="120" x2="856" y2="120" stroke="#1f2731"/>
+      <text x="852" y="112" class="sv-mono" fill="#8a97a8" font-size="10.5" text-anchor="end">time →</text>
+      <!-- X bar: secret lifetime, infinite for exposed coins -> runs off left -->
+      <rect x="0" y="70" width="430" height="22" rx="4" fill="#f85149" fill-opacity="0.22" stroke="#f85149" stroke-dasharray="4 3"/>
+      <text x="40" y="86" class="sv-label" fill="#f85149" font-size="12.5">X · secret lifetime = ∞ for already-exposed coins (maxed, irreversible)</text>
+      <text x="8" y="62" class="sv-mono" fill="#f85149" font-size="11">←∞</text>
+      <!-- Y bar: migration band, starts where X ends -->
+      <rect x="430" y="70" width="190" height="22" rx="4" fill="#f7931a" fill-opacity="0.22" stroke="#f7931a"/>
+      <text x="436" y="86" class="sv-label" fill="#f7931a" font-size="12">Y · migration (5–10+ yr, projection)</text>
+      <!-- Y uncertainty whisker -->
+      <line x1="620" y1="81" x2="690" y2="81" stroke="#f7931a" stroke-dasharray="3 3"/>
+      <line x1="690" y1="75" x2="690" y2="87" stroke="#f7931a"/>
+      <!-- Z band: time to CRQC, a band lower track -->
+      <rect x="470" y="150" width="170" height="22" rx="4" fill="#4c93f7" fill-opacity="0.20" stroke="#4c93f7"/>
+      <text x="476" y="166" class="sv-label" fill="#4c93f7" font-size="12">Z · time-to-CRQC (wide band)</text>
+      <!-- Z whisker -->
+      <line x1="640" y1="161" x2="740" y2="161" stroke="#4c93f7" stroke-dasharray="3 3"/>
+      <line x1="740" y1="155" x2="740" y2="167" stroke="#4c93f7"/>
+      <!-- overlap region: X+Y end (620, extending to whisker ~690) overruns Z start where it matters -->
+      <rect x="470" y="64" width="220" height="116" fill="#f85149" fill-opacity="0.06"/>
+      <line x1="470" y1="60" x2="470" y2="184" stroke="#f85149" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>
+      <line x1="690" y1="60" x2="690" y2="184" stroke="#f85149" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>
+      <text x="580" y="208" class="sv-label" fill="#f85149" font-size="13" text-anchor="middle">overlap → already behind, for exposed coins</text>
+      <!-- now marker -->
+      <line x1="430" y1="56" x2="430" y2="190" stroke="#93a1b2" stroke-width="1"/>
+      <text x="430" y="50" class="sv-mono" fill="#93a1b2" font-size="10.5" text-anchor="middle">now</text>
+      <text x="24" y="250" class="sv-label" fill="#cdd6e1" font-size="12" font-weight="400">Because X is already infinite for exposed coins, even a generous Z is overrun the moment Y is long — the rational move is to begin migration <i>before</i> a machine is demonstrated.</text>
+    </svg>
+    <figcaption><span class="svgcap-take">For already-exposed coins X is maxed out, so X + Y overruns even a generous Z today.</span> Y (migration, 5–10+ yr) and Z (time-to-CRQC) are both <span class="pill no">projections</span>; X is a measured, irreversible fact for published keys.</figcaption>
+  </figure>
+
+  <p>Feed Bitcoin in, and one term behaves unlike anything in normal cryptography. <b>X is effectively infinite and solid:</b> a store of value must stay secure forever, and for coins whose public key is <i>already</i> exposed, X is <i>maxed out and irreversible</i> — no future moment un-publishes a published key. <b>Z is genuinely uncertain</b>, a wide band (below). And <b>Y is the load-bearing uncertain term:</b> soft-forking post-quantum cryptography into Bitcoin <i>and</i> persuading users to move millions of coins plausibly takes <b>5 to 10 or more years</b> given Bitcoin's ossification — a <i>projection</i>, not a measurement, and the soft point the whole conclusion leans on.</p>
+  <p>So <i>if</i> you accept a long Y, then because X is already infinite for exposed coins, <b>X + Y exceeds even a generous Z today</b>, and the rational move is to <b>begin migration work before a code-breaking machine is demonstrated</b> — not because Q-Day is imminent, but because Bitcoin's Y is unusually long. Not a prophecy that the machine is near; an argument that, for this system, you cannot afford to find out the hard way.</p>
+
+  <details><summary>▸ For the curious: how long are Y and Z, really? (migration precedents · expert bands · the standards clock)</summary>
+    <p><b>How long is Y?</b> The only evidence is the historical record of retiring a broken primitive, and it is not encouraging. <b>MD5</b> was shown weak from 2004, with practical collisions by 2008 — and took well over a decade to purge, with stragglers for years after. <b>SHA-1</b>: theoretical death announced 2011, browsers hard-failing its certificates by 2017 — yet <b>Git still uses SHA-1 at its core in 2026</b>, fifteen years on, mid-migration. <b>DNSSEC</b> has been rolling out <i>partially</i> for roughly twenty years and is still incomplete.</p>
+    <p>The alarming part: every one of those migrations had a <b>central forcing authority</b> — a standards body, a browser cartel, a vendor — that could set a deadline and make it stick. Bitcoin has none; its changes happen by rough consensus among developers, miners, and users who routinely decline to upgrade. If a primitive with a CA/Browser Forum behind it takes a decade-plus, Bitcoin's Y is plausibly <i>longer</i>. The disanalogy sharpens the Mosca conclusion, it doesn't soften it.</p>
+    <p><b>How long is Z?</b> The most credible signal is structured expert elicitation. The <b>Global Risk Institute / Mosca <i>Quantum Threat Timeline</i></b> reports a <i>band</i>, not a point. The <b>2025 edition</b> (Mosca and Piani, evolutionQ; 26 experts) puts the chance of a cryptographically-relevant machine — one breaking RSA-2048 within a day — at <b>28%–49% within ten years</b>, the highest ten-year reading in the survey's seven-year history, up sharply from the 2024 band (which was <b>19%–34%</b>; the optimistic end jumped to 49%, the pessimistic floor from 14% to 28%). Further out, ~69% of experts put it above even odds within fifteen years, 92% within twenty. A commonly-cited <i>5-year</i> band of ~5–14% comes from the <b>2024</b> edition, not 2025 — treat it as a year-stamped artifact.</p>
+    <p>The other clock is a deadline, valuable precisely because it comes from a party with no stake in Bitcoin. The <b>NSA's CNSA 2.0</b> suite and supporting <b>NIST</b> guidance direct federal systems to deprecate the classical public-key crypto Bitcoin relies on (ECC P-256, RSA-2048): software- and firmware-signing quantum-safe by <b>2030</b>, broad removal targeted for <b>2035</b>. The standards are finished — <b>FIPS 203, 204 and 205</b> (ML-KEM, ML-DSA, SLH-DSA) were finalized in August 2024. A fourth, <b>FIPS 206</b> (the Falcon-based FN-DSA), is <i>forthcoming, not published</i> — submitted for approval in August 2025, but the public draft had still not appeared by mid-2026, with a final standard expected late 2026 or early 2027. These bind <i>federal</i> systems, not Bitcoin — but they set an external, incentive-neutral pace for the whole cryptographic-library ecosystem Bitcoin floats in.</p>
+  </details>
+
+  <div class="verdict v-warn"><b>Verdict — the machine.</b> No code-breaking quantum computer exists. The physical-qubit gap to even the lowest <i>projected</i> estimate (under 500,000 qubits, from a peer-review-pending Google preprint) is hundreds-fold against today's ~1,100, and the <b>sustained-coherence gap — running tens of millions of gates fault-tolerantly — is larger still and untouched by any demonstration.</b> Yet the gap is closing on two fronts, hardware and algorithms, and two separate ~20× reductions show estimates can fall on theory alone. The expert band for a CRQC within a decade has risen to <b>28–49% (GRI 2025, up from 19–34% in 2024)</b>, and an external 2030/2035 deprecation clock is already running. Treat "decades away" as one plausible projection, not a fact — and "imminent" as hype. This is exactly the regime in which Mosca's inequality says: start now.</div>
+</div></section>
+
+<!-- ===================== §5 ===================== -->
+<section id="fixes"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q5</span> The fixes and the forced choice</div>
+  <h2>The cryptography is the easy part</h2>
+  <p>The good news is real: the cryptography is the <i>easy</i> part. Quantum-proof signature schemes already exist, standardized and ready; the migration paths are drafted. What makes Bitcoin's problem hard is three things no algorithm can fix: a <b>bloat tax</b> on every transaction, the <b>coordination</b> to deploy anything, and <b>one dilemma about other people's coins that cryptography cannot resolve.</b></p>
+
+  <h3>The bloat tax, and where quantum-safe coins would live</h3>
+  <p>The post-quantum schemes are on the shelf: <b>ML-DSA (Dilithium)</b> and the lattice-based <b>FN-DSA (Falcon)</b>, compact but resting on newer, less battle-tested assumptions; and <b>SLH-DSA (SPHINCS+)</b>, hash-based and therefore the conservative choice — its security leans only on the SHA-256-class assumptions Bitcoin already trusts. The catch is <i>size</i>. A Bitcoin signature-plus-public-key today is ~64–96 bytes; post-quantum signatures are <b>kilobytes</b> (SPHINCS+ into the tens). On a chain whose scarcest resource is block space, that is a direct hit to throughput and permanent upward pressure on fees, and the trade-off runs one way: the most conservative assumptions cost the most bytes, and the smallest signatures rest on the least-tested math.</p>
+  <p>Two drafted proposals stage the response, and both are <b>Draft</b> status, pre-activation. <b>BIP-360</b> defines <i>where</i> quantum-safe coins would live: a new output type now called <b>P2MR (Pay-to-Merkle-Root)</b> — essentially <b>Taproot with the quantum-vulnerable key-spend path removed</b>, script-spend-only, so no bare public key sits exposed. <b>BIP-361</b> (Jameson Lopp and six co-authors, April 2026) stages the contested step the press calls a "freeze": not a flat lockout but a phased sunset of the legacy signatures, with <b>two formal phases and an experimental recovery mechanism</b>. The honest read is that a <i>non-controversial</i> new address type "achieves nothing" for the standing long-range threat by itself — offering a safer mailbox doesn't protect the mail already lying in the open. That protection requires the freeze BIP-361 stages and the values choice below.</p>
+
+  <details><summary>▸ For the curious: the PQC signature sizes, and the exact status of BIP-360 and BIP-361</summary>
+    <p><b>The signature-size trade-off.</b></p>
+    <table>
+      <thead><tr><th>Scheme</th><th>Basis</th><th>Relative size</th><th>Security posture</th></tr></thead>
+      <tbody>
+        <tr><td>Current (ECDSA/Schnorr)</td><td>Elliptic curve</td><td class="num">~64–96 B (sig + pubkey)</td><td>Quantum-vulnerable</td></tr>
+        <tr><td><b>FN-DSA / Falcon</b></td><td>Lattice</td><td class="num">~1–2 KB</td><td>Compact; newer assumptions</td></tr>
+        <tr><td><b>ML-DSA / Dilithium</b></td><td>Lattice</td><td class="num">~2–4 KB</td><td>Standardized (FIPS 204); newer assumptions</td></tr>
+        <tr><td><b>SLH-DSA / SPHINCS+</b></td><td>Hash-based</td><td class="num">tens of KB</td><td>Most conservative (FIPS 205); SHA-256-class only</td></tr>
+      </tbody>
+    </table>
+    <p>The most conservative assumptions cost the most bytes; the smallest signatures rest on the least-tested math. No free lunch — only a choice about which price to pay.</p>
+    <p><b>BIP-360</b> (championed by the developer known as Hunter Beast). The name has churned: first <b>Pay-to-Quantum-Resistant-Hash</b>, briefly <b>P2TSH</b>, now <b>P2MR (Pay-to-Merkle-Root)</b> as of v0.11.0, February 2026. It was <b>merged into the bitcoin/bips repository on 11 February 2026</b> — but "merged into the repo" is not "activated on the network." Its status field still reads <b>Draft</b>; merging is bookkeeping, not a soft fork. The proposal also deliberately <i>narrowed</i>: the specific post-quantum signature algorithm was moved <i>out</i> into a separate future BIP, so the output type can be debated on its own merits.</p>
+    <p><b>BIP-361's phases.</b> <b>Phase A</b> (~3 years): the network stops accepting <i>new</i> sends <i>to</i> quantum-vulnerable address types, so the exposed pile stops growing. <b>Phase B</b> (~5 years, after A): the network stops honoring <i>spends</i> signed with legacy ECDSA/Schnorr — sunsetting the vulnerable signatures. <b>Plus a recovery path:</b> a sketched <i>quantum-safe rescue mechanism</i> using zero-knowledge proofs to let holders who still possess their original wallet seed reclaim funds after the sunset — but the <b>canonical BIP text describes this as experimental and under development, not a formalized, numbered phase.</b> Secondary press frames the whole thing as a tidy "three-phase plan with a Phase C rescue"; the spec does not number it.</p>
+    <p><b>One sourcing distinction.</b> The dramatic figures attached to this debate — "170,000 vulnerable P2PK outputs," "1.1 million Satoshi-era coins" — come from <i>media coverage</i>, not the BIP (tier (c)). The spec's own load-bearing claim is more measured: <b>more than 34% of all bitcoin sat at addresses with a revealed public key as of 1 March 2026.</b> Cite the scary round numbers as reporting; cite the structural fact as spec.</p>
+  </details>
+
+  <h3>The forced choice: a quadrilemma, not a trilemma</h3>
+  <p>Here cryptography runs out of room. Some exposed coins <b>cannot be migrated by anyone</b>, because no one holds the keys: Satoshi's own stash — Chaincode Labs puts the directly-exposed P2PK portion at <b>600,000 to 1.1 million BTC</b> — plus an unknown mass of coins whose owners died or vanished. There is no cryptographic answer to what the network does about coins it knows a future machine can steal but their owners can no longer rescue. Only a values choice, with <b>four</b> options, not the tidy three usually framed:</p>
+
+  <!-- ===== SVG 4: Freeze / Steal / Burn / Reclaim quadrilemma (quadgrid of cards) ===== -->
+  <div class="quadgrid">
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h4 style="color:var(--red)">1 · STEAL — do nothing</h4>
+      <p class="stake">Leave the coins exposed and let a future machine drain them — in practice, wealth redistribution to whoever wins the hardware race (a nation-state, a large company), then a fire-sale that shatters confidence.</p>
+      <p class="breaks">Breaks "your keys, your coins" — an attacker walks off with the coins while the protocol's letter survives.</p>
+    </div>
+    <div class="card" style="border-color:rgba(247,147,26,.3)">
+      <h4 style="color:var(--orange)">2 · FREEZE — sunset the vulnerable spends</h4>
+      <p class="stake">Soft-fork a deadline after which legacy ECDSA spends are invalid, locking unmigrated coins in place. Prevents theft by having the <i>protocol</i> confiscate the coins instead of an attacker.</p>
+      <p class="breaks">Breaks "your keys, your coins" the other way — it trades a thief for a committee.</p>
+    </div>
+    <div class="card" style="border-color:rgba(248,81,73,.3)">
+      <h4 style="color:var(--red)">3 · BURN — provably destroy them</h4>
+      <p class="stake">Render unmigrated vulnerable coins permanently unspendable. Lopp's stated preference, on the logic that quantum-recovered coins "only make everyone else's coins worth less… a theft from everyone." Even Lopp says he does <i>not like</i> it — only that inaction is worse.</p>
+      <p class="breaks">Breaks "your keys, your coins" — the protocol destroys property to protect the whole.</p>
+    </div>
+    <div class="card" style="border-color:rgba(63,185,80,.3)">
+      <h4 style="color:var(--green)">4 · TIME-LOCKED RECLAIM — a long migration window</h4>
+      <p class="stake">Rather than a hard cutoff, give original owners an extended, protocol-enforced window to prove ownership and move funds to a quantum-safe output before any freeze or burn. Rescues owners who are merely slow or asleep.</p>
+      <p class="breaks">Reduces but does <i>not</i> eliminate the problem — a key that's truly gone still can't be reclaimed by a holder who no longer exists.</p>
+    </div>
+  </div>
+
+  <ol style="color:#cdd6e1;font-size:14.5px">
+    <li><b>STEAL — do nothing.</b> Leave the coins exposed and let a future machine drain them. In practice this is <b>wealth redistribution to whoever wins the hardware race</b> — a nation-state, a large company — followed by a fire-sale that shatters confidence. "Your keys, your coins" survives the letter of the protocol while an attacker walks off with the coins.</li>
+    <li><b>FREEZE — sunset the vulnerable spends.</b> Soft-fork a deadline after which legacy ECDSA spends are invalid, locking unmigrated coins in place. This prevents theft by having the <i>protocol</i> confiscate the coins instead of an attacker. It trades a thief for a committee.</li>
+    <li><b>BURN — provably destroy them.</b> Render unmigrated vulnerable coins permanently unspendable. This is Jameson Lopp's stated preference, on the logic that quantum-recovered coins "only make everyone else's coins worth less… a theft from everyone." Even Lopp says he does <i>not like</i> it — only that inaction is worse.</li>
+    <li><b>TIME-LOCKED RECLAIM — a long migration window.</b> Rather than a hard cutoff, give original owners an extended, protocol-enforced window to prove ownership and move funds to a quantum-safe output before any freeze or burn takes effect. It <i>reduces</i> the confiscation problem — rescuing owners who are merely slow or asleep — but does <b>not eliminate</b> it, because genuinely lost keys and Satoshi-era coins still cannot be reclaimed by a holder who no longer exists.</li>
+  </ol>
+  <div class="verdict v-bad"><b>Every one of the four breaks a Bitcoin promise for some coins.</b> STEAL breaks "your keys, your coins" by letting an attacker seize them; FREEZE and BURN break it the other way, as the protocol takes them; even RECLAIM cannot save a key that's truly gone. There is no choice that keeps every promise. That is the genuine crux of Bitcoin's quantum resilience: not mathematics, which is solved, but <i>which value to sacrifice</i> — and to whom the network is willing to say no.</div>
+
+  <details><summary>▸ For the curious: how other chains are answering the same question</summary>
+    <p>Bitcoin is not facing this alone, and the comparison sharpens the diagnosis. <b>QRL (the Quantum Resistant Ledger)</b> was built from genesis on hash-based XMSS signatures — quantum-safe by design, at the cost of building a whole new chain. <b>Ethereum</b> has a structural advantage: account abstraction lets accounts change their own signature logic, and Vitalik Buterin has publicly sketched a recovery-fork approach leaning on that flexibility. <b>Algorand</b> already uses Falcon-based state proofs in parts of its design.</p>
+    <p>The pattern is consistent and unflattering to Bitcoin in exactly one respect: chains with <b>upgrade-friendly account models can swap signature schemes far more easily.</b> Bitcoin's signature ossification — the very rigidity that makes it credibly neutral — is what makes its migration slower and its Y term longer. That is not a knock on the thesis; it <i>is</i> the thesis. Bitcoin's quantum problem was never that the cryptography is unsolvable. It is that Bitcoin, more than almost any other system, is built to be hard to change — and the one time that property becomes a liability is precisely when it is asked to change to save itself.</p>
+  </details>
+</div></section>
+
+<!-- ===================== §6 ===================== -->
+<section id="promise"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q6</span> Which promise is real?</div>
+  <h2>The immutability trolley problem</h2>
+  <p>Everything so far has been physics and engineering. This is where cryptography runs out and the question becomes one no amount of qubits can answer.</p>
+  <p>A quantum thief who derives your private key and spends your coins <b>breaks no rule of the Bitcoin protocol.</b> Their signature is valid; the math checks out; every node accepts it because, by the only definition the network has ever enforced, it <i>is</i> a legitimate spend. "Code is law" says the coins are theirs now. And yet every instinct says a theft just happened.</p>
+  <p>To stop it, the network would have to do the one thing it has spent fifteen years promising never to do: reach into the ledger and <b>invalidate an otherwise-valid signature</b> — freeze, burn, or sunset the old scheme. That protects the victim. It also breaks Bitcoin's deepest invariant: that no one, not even the developers, not even a supermajority, can reach in and alter who controls a coin.</p>
+  <p>So the choice is a trolley problem. On one track, "code is law" stands and a quantum attacker drains millions through valid signatures. On the other, you pull the lever — you confiscate, by protocol, to honor a shared human sense of ownership the code does not encode. <b>Bitcoin cannot keep both "code is law" and "theft is illegitimate" at the same time.</b> A sufficiently powerful machine forces the network to confess which of its two foundational promises was the real one. (The four governance responses are §5's subject; this is about <i>why the choice is forced at all</i>.)</p>
+
+  <details><summary>▸ For the curious: the calibrated middle — two spectra, stated fairly</summary>
+    <p>This is a polarized topic, with vendor incentives pulling one way and ideological commitments the other. The honest move is to lay out both spectra, then stand in the calibrated middle.</p>
+    <p><b>The Bitcoiner spectrum</b> runs from "do nothing" to "freeze now," each position with a real steelman:</p>
+    <ul style="color:#cdd6e1;font-size:14px">
+      <li><b>Complacency / ossification</b> (segments of maximalists; the implicit position of slow BIP review): <i>SHA-256 isn't broken, Grover is only quadratic, mining is safe, a code-breaking machine is decades off — and a soft fork is itself an attack surface.</i> <b>Right</b> that mining and hashing are safe and Z is uncertain, and that contentious forks are genuinely dangerous. But it conflates the durable <i>hashing</i> layer with the vulnerable <i>signature</i> layer, waves away the already-exposed millions, and treats slowness as a feature precisely where slowness is the binding risk.</li>
+      <li><b>Property-rights absolutism</b> (Charles Hoskinson, many vocal holders): <i>freezing or burning anyone's coins — even lost ones, even Satoshi's — violates "your keys, your coins."</i> <b>Coherent on principle</b> (the DAO/Ethereum-Classic split is the cautionary precedent), but it collides with the fact that <i>doing nothing is not neutral</i> — inaction is a decision to let an attacker seize those exact coins.</li>
+      <li><b>Activist migration</b> (Hunter Beast / BIP-360; Lopp et al. / BIP-361; Casa): <i>commit now to a phased soft fork.</i> <b>Rational, arguably the safest path</b> — but politically explosive and assumes coordination Bitcoin has historically struggled to muster (the reaction on X to BIP-361 was reportedly overwhelmingly negative).</li>
+      <li><b>Conservative soft-fork skeptics</b> (Adam Back; some Core developers): wary of fast-tracked, contentious activation, preferring minimal, opt-in, non-confiscatory mechanisms. A reasonable procedural brake — though every month of caution lengthens Y.</li>
+    </ul>
+    <p><b>The quantum spectrum</b> runs from "tomorrow" to "never":</p>
+    <ul style="color:#cdd6e1;font-size:14px">
+      <li><b>Vendor / supremacy hype</b> (some IBM / Google / IonQ / PsiQuantum marketing, amplified by media FUD): <i>quantum breaks Bitcoin imminently.</i> <b>Misrepresents resource estimates as capabilities</b>, ignores sustained fault-tolerance entirely, and conflates random-circuit-sampling "advantage" and raw physical-qubit counts with an actual break.</li>
+      <li><b>The calibrated middle</b> (Mosca / GRI; a16z's Justin Thaler; the standards bodies behind CNSA 2.0 and NIST IR 8547): <i>the probability within ten years is real and rising — but not near-certain. Act on Mosca's inequality. Separate facts from projections from debunked claims.</i> This is the position this piece centers; the 2030/2035 deadlines supply an external, incentive-neutral clock.</li>
+      <li><b>The principled hard skeptic</b> (Gil Kalai, with Alicki, Dyakonov, Levin): <i>scalable fault-tolerant quantum computing may be physically impossible.</i> A <b>serious minority view that bounds the doom narrative</b> — but its strong form is in real tension with Willow's below-threshold error suppression, and is rejected by the Preskill / Harrow / Aaronson mainstream. Kalai himself floats ~2030 as a fair checkpoint. Present it honestly — and never as a license for inaction, because Mosca binds under <i>uncertainty</i>, not certainty.</li>
+    </ul>
+  </details>
+
+  <details><summary>▸ For the curious: the false-alarm ledger — why "quantum broke crypto" headlines never survive review</summary>
+    <p>Before panicking at the next "quantum just broke encryption" headline, install the right prior: that headline recurs every couple of years, and <b>none of the instances has survived review.</b></p>
+    <table>
+      <thead><tr><th>Year</th><th>The claim</th><th>What actually happened</th></tr></thead>
+      <tbody>
+        <tr><td><b>2019</b></td><td>Google's <b>Sycamore</b> achieves "quantum supremacy."</td><td>Real and important — but <b>random-circuit sampling</b>, a benchmark with no cryptographic content. It could not factor a number or break a key. Not cryptanalysis.</td></tr>
+        <tr><td><b>recurring</b></td><td>"<b>Shor's algorithm factored 15</b> (and 21, and 35)."</td><td>True and a milestone each time — but these <b>do not scale.</b> They rely on hand-tuned circuits and prior knowledge of the answer; resource cost explodes long before practical numbers. A breakable 15 says nothing about a 256-bit key.</td></tr>
+        <tr><td><b>2022–23</b></td><td>A Chinese group claims a <b>lattice / "RSA broken"</b> method on near-term hardware.</td><td>The paper grafted a quantum optimizer onto <b>Schnorr's (unvalidated) classical factoring claim</b>; Bruce Schneier and Scott Aaronson noted the classical step doesn't work at scale. <b>Debunked.</b></td></tr>
+        <tr><td><b>2024–25</b></td><td><b>D-Wave</b> "breaks RSA."</td><td>Factored trivially small or specially structured numbers using a quantum <i>annealer</i> — not a gate-model machine running Shor. One factorization was <b>reproduced on a Commodore VIC-20</b>, a 1981 home computer.</td></tr>
+      </tbody>
+    </table>
+    <p>The pattern is the point: every time, the fine print reveals a benchmark with no cryptographic stakes, a toy-sized demonstration that doesn't scale, or an outright error. The genuinely credible primary source pointing the other way is not any of these — it is the Google Quantum AI ECC preprint (arXiv:2603.28846), and <i>that</i> paper does not claim a break has happened. It is a careful <b>resource estimate</b> of what a future, un-built machine would require. That is the difference between hype and the calibrated middle.</p>
+  </details>
+</div></section>
+
+<!-- ===================== §7 ===================== -->
+<section id="verdict"><div class="wrap">
+  <div class="lenstag"><span class="lensnum">Q7</span> Verdict</div>
+  <h2>Resilient in math, gated by coordination</h2>
+
+  <h3>Bitcoin is not the fragile one</h3>
+  <p>One fact this debate routinely omits inverts the whole framing. A quantum computer powerful enough to run Shor against secp256k1 would, by the same capability, <b>break essentially all classical public-key cryptography in production at once</b> — the RSA and ECC securing TLS and the web's padlock, code-signing, online banking, government systems, secure messaging. So "quantum breaks Bitcoin," said in isolation, badly overstates anything Bitcoin-specific: <b>the same machine breaks the global financial and PKI systems Bitcoin lives inside</b>, and that world has far larger problems than some exposed Bitcoin UTXOs.</p>
+  <p>And here's what should lower the temperature: <b>Bitcoin is arguably <i>more</i> migratable than the global PKI, not less.</b> It has a known, enumerable set of vulnerable outputs — you can literally count the exposed public keys on-chain — active soft-fork proposals already drafted, standardized replacements ready to drop in, and a community visibly fighting about migration today. The world's TLS and PKI are a vastly larger, more fragmented surface with no single forcing authority and no clean inventory of what is exposed.</p>
+  <p class="q"><i>(The honest counter to the counter: relative fragility is not relative attractiveness. Bitcoin is permissionless to attack, irreversible once a theft settles, and instantly liquid to monetize — properties the rest of the PKI mostly lacks. So Bitcoin may be more <b>defensible</b> and yet more <b>tempting</b> at once. Same fact, flipped.)</i></p>
+
+  <h3>The threat is real but neither imminent nor uniform</h3>
+  <p><b>Bitcoin's quantum resilience is not gated by a missing algorithm — the algorithm exists.</b> Post-quantum signatures are standardized; a soft-fork path is drafted; the cryptography is genuinely the easy part. What gates Bitcoin is <b>social and governance latency</b> — its long, uncertain migration time — and the <b>irreducible exposed-coin dilemma</b>, the freeze/steal/burn/reclaim values choice over Satoshi-era and permanently lost coins that no cryptography can resolve.</p>
+
+  <!-- scorecard: survives / does not survive quantum -->
+  <div class="scorecard">
+    <div class="card v-real" style="border-color:rgba(63,185,80,.3)">
+      <h3 style="margin-top:2px;color:var(--green)">✓ Survives quantum</h3>
+      <ul>
+        <li><b>Mining &amp; proof-of-work.</b> Hashing only bends (Grover, quadratic) and difficulty adjustment re-absorbs the bend.</li>
+        <li><b>Never-reused, properly-hashed coins</b> (P2PKH / P2WPKH) — the public key is hidden until spend.</li>
+        <li><b>The ledger's integrity.</b> No rewrite, no double-spend of confirmed history (Box B is a non-event).</li>
+        <li><b>The cryptographic fix itself</b> — FIPS 203/204/205 are standardized; replacements are ready to drop in.</li>
+        <li><b>The live-spend race, marginally</b> — even granting a working machine, the primed attacker's upper bound is <b>under 41%</b>, and that is the paper's own idealized worst case.</li>
+      </ul>
+    </div>
+    <div class="card v-bad" style="border-color:rgba(248,81,73,.3)">
+      <h3 style="margin-top:2px;color:var(--red)">✗ Does not survive</h3>
+      <ul>
+        <li><b>The standing, already-exposed surface</b> — <b>4–10M BTC (~20–50% of supply)</b> whose public key sits on-chain forever, facing no clock.</li>
+        <li><b>P2PK, reused addresses, Taproot key-path</b> outputs — the key is visible at rest.</li>
+        <li><b>The truly unrecoverable coins</b> — Satoshi-era P2PK at <b>600K–1.1M BTC</b>, plus an unknown mass of lost keys, which no migration can rescue.</li>
+        <li><b>"Code is law" <i>and</i> "theft is illegitimate" together</b> — a powerful machine forces the network to give up one.</li>
+        <li><b>Any comfort from a precise timeline.</b> "Decades," "this decade," "never" are all projections with wide bands.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>The threat is <b>real but neither imminent nor uniform.</b> Mining and never-reused, properly-hashed coins are safe. The live-spend race is marginal even granting a working machine — the Google Quantum AI preprint puts a <i>primed</i> attacker's chance of stealing a coin inside Bitcoin's ~ten-minute confirmation window at <b>slightly under 41%</b> <i>(arXiv:2603.28846, Fig. 6)</i>. But that is the paper's <b>own idealized, attacker-favorable, Bitcoin-specific upper bound</b>: it assumes instant public-key syndication, a winning fee-replacement, and zero mempool congestion, and ignores miner-mediated defensive policy. A worst-case snapshot, not an expected outcome, and a projection about hardware no one has built <i>(the three standing hedges apply: peer-review-pending preprint; the authors' deliberate idealization; Google's vendor interest)</i>. Faster-block chains fare far worse on the same analysis — Litecoin under 3%, Zcash under 0.08% — which underscores that Bitcoin's slower cadence is here protective.</p>
+  <p>What genuinely does not survive is the large, <b>standing</b> surface of already-exposed public keys — somewhere in the range of <b>4–10 million BTC, roughly 20–50% of supply</b> (Deloitte estimates more than 4M, ~25%; River about 6.8M; Chaincode Labs 4–10M with a working midpoint near 6.26M). That surface faces no clock: an exposed key sits on-chain forever. Within it sit the truly unrecoverable coins — the Satoshi-era P2PK holdings Chaincode puts at <b>600,000 to 1.1 million BTC</b>, plus an unknown mass of lost keys — which no migration can rescue, because no one holds the keys to move them.</p>
+  <div class="verdict v-warn">So the rational posture is <b>risk-managed urgency, not panic and not complacency.</b> Begin migration work now — Mosca's inequality says to, granting its load-bearing assumption that Bitcoin's migration time is long. Ship opt-in post-quantum output types. Hold the freeze/burn/reclaim debate <i>before</i> it becomes an emergency. And treat every timeline — "decades," "this decade," "never" — as a projection with a wide band, never a fact. Bitcoin is resilient <i>if</i> its social layer moves ahead of the machine; it is fragile precisely where it has always been fragile — in coordination, not in cryptography. This is "don't trust, verify" followed honestly all the way down: the root of trust turns out to be an unproven mathematical conjecture, quantum threatens that conjecture specifically, and the system's survival rests, in the end, on the one thing cryptography was supposed to let us avoid — coordinated human trust.</div>
+
+  <h3>What a holder can do today</h3>
+  <p>None of this requires waiting for a soft fork, taking a side in the freeze debate, or trusting any timeline. There are concrete, free, uncontroversial steps available now:</p>
+  <ul style="color:#cdd6e1;font-size:14.5px">
+    <li><b>Never reuse an address.</b> The first time you spend from an address, you publish its public key forever. One address, one use — modern wallets do this by default; let them.</li>
+    <li><b>Keep funds in unspent, never-reused hashed outputs</b> (P2WPKH / P2PKH), not in P2PK, reused addresses, or Taproot key-path outputs — those expose the public key directly.</li>
+    <li><b>Treat <i>spending</i> as the moment of exposure.</b> Plan large spends with that in mind, and guard any extended public key (xpub), since leaking one exposes an entire branch of derived keys at once.</li>
+    <li><b>Ignore "Q-Day is here" headlines.</b> No code-breaking quantum computer exists. When one is genuinely near, the signal will be unambiguous and the standardized fixes are already on the shelf.</li>
+  </ul>
+  <p>These cost nothing, change no protocol, and are correct regardless of which timeline turns out right.</p>
+</div></section>
+
+<!-- ===================== SIDEBARS ===================== -->
+<section id="sidebars"><div class="wrap">
+  <div class="lenstag">★ For the curious — six sidebars</div>
+  <h2>The arguments that don't fit the main path</h2>
+
+  <details><summary>▸ For the curious: the attacker's dilemma — why the rational play is <i>not</i> to steal</summary>
+    <p>Suppose the machine exists and you control it. The naïve assumption is that you drain every exposed coin. But the instant a quantum theft becomes visible on-chain, the market understands Bitcoin's signatures are broken — and the price collapses. <b>The act of stealing destroys the value of what you stole.</b> A profit-seeking attacker would do far better to quietly <b>short Bitcoin</b> and <i>then</i> reveal the break than to grab coins that crater in their hands. The only actor for whom draining coins is rational is one <b>indifferent to Bitcoin's price</b> — a hostile nation-state seeking to discredit the system, not enrich itself. So the threat model bifurcates by <i>motive</i>, not capability: the financially-rational attacker is deterred by the damage they'd cause, and the dangerous adversary is the one who wants the damage. A narrower, more identifiable threat than "anyone with a quantum computer."</p>
+  </details>
+
+  <details><summary>▸ For the curious: the canary that cries three things</summary>
+    <p>The most-watched early-warning signal for Q-Day is simple: <i>do Satoshi's coins move?</i> Those long-dormant, fully-exposed P2PK outputs are the perfect quantum target, so a sudden spend would be the alarm bell. But the alarm is <b>fundamentally ambiguous.</b> If those coins move, it could mean (1) a quantum computer derived the key, (2) Satoshi is alive and spending, or (3) someone found the key by ordinary means — a recovered backup, a leaked seed. <b>You cannot tell which from the transaction.</b> The signature is valid in all three; the chain records <i>that</i> the coins moved, never <i>why</i>. A sharp koan for a "don't trust, verify" system: the single most important event the network could witness is one you can observe perfectly yet cannot verify the cause of.</p>
+  </details>
+
+  <details><summary>▸ For the curious: the ossification paradox</summary>
+    <p>Bitcoin's great virtue is that it is hard to change. The rigidity is the product: no one can inflate the supply or confiscate a coin <i>because</i> the system resists change so stubbornly. But quantum turns the virtue into a liability: <b>the same rigidity that makes Bitcoin credibly neutral is what makes it slow to defend itself.</b> A system nimble enough to soft-fork in post-quantum signatures overnight would, by that nimbleness, be one someone could change in less benign ways. So the unsettling general question: <i>can a system be too trustless to save itself?</i> Quantum is the first existential test of whether credible neutrality survives a hard deadline — and the answer matters for every institution built to be deliberately hard to change.</p>
+  </details>
+
+  <details><summary>▸ For the curious: the announcement paradox</summary>
+    <p>A pre-committed freeze date is supposed to be responsible: tell everyone in advance that legacy signatures stop working on a certain block, so honest holders can migrate. But the announcement does two things its proponents would rather it didn't. First, it <b>broadcasts that the developers think Q-Day is near enough to act on</b> — a bearish signal the market may read as one. Second, it <b>hands a quantum attacker the one thing a long-range attack never had: a deadline.</b> The at-rest attack has always been leisurely — the exposed key sits there forever. Announce a freeze, and you convert that open-ended threat into a <i>race</i>: any attacker with a nearly-ready machine now knows exactly how long they have to sweep the exposed coins. Defending early may be the very thing that <i>starts</i> the race it was meant to prevent — a genuine cost of acting in the open, to be weighed against the larger cost of not acting at all.</p>
+  </details>
+
+  <details><summary>▸ For the curious: the priced-out</summary>
+    <p>Beyond lost keys and Satoshi's untouchable coins, there is a third class of un-migratable holdings the freeze/burn debate forgets: <b>the coins that aren't worth migrating.</b> Moving a UTXO to a quantum-safe output costs a fee, and post-quantum signatures are <i>kilobytes</i> where today's are tens of bytes — so a migration transaction is large and expensive. For small "dust" outputs, <b>the fee to protect the coin exceeds the coin's own value</b>, and a rational holder leaves it exposed. Worse, the problem compounds when it matters most: a migration rush would spike fees precisely in the window when protection is most urgent, pricing out even mid-sized holders. So the permanently-exposed set is larger than "lost keys plus Satoshi" — it includes a long tail that is economically irrational to save. Even a perfect technical migration leaves residue, not because the cryptography failed but because the economics did.</p>
+  </details>
+
+  <details><summary>▸ For the curious: Coda — the AI-side Q-Day</summary>
+    <p>This piece began from the parent page's through-line: <i>"don't trust, verify" does not abolish trust, it relocates it.</i> Every such system bottoms out on a hardness conjecture. Bitcoin's is the elliptic-curve discrete log, and quantum invalidates it. The natural next question: <b>what is the equivalent conjecture for AI — and what invalidates <i>it</i>?</b></p>
+    <p>As we move toward wanting <i>proof</i> that a model ran as claimed — that the weights weren't swapped, the computation wasn't faked — the tool of choice is <b>zero-knowledge machine learning (zkML)</b>: cryptographic proofs that a specific model produced a specific output. And here is the convergence: <b>zkML rests on the same family of cryptography that Shor breaks.</b> The elliptic-curve and pairing-based assumptions under today's succinct proofs are quantum-vulnerable in the same stroke. So a single sufficiently powerful machine could both drain exposed coins <i>and</i> forge the very "the model really ran" proofs we'd build to trust AI systems. The two verify-don't-trust regimes — money and machine intelligence — share a foundation, and a code-breaking quantum computer tests both at once. (The honest hedge: post-quantum proof systems — hash-based STARKs and lattice constructions — already exist and don't share the weakness, just as post-quantum signatures do for Bitcoin. The point is not that AI's trust layer is doomed; it is that it inherits the <i>same</i> migration problem, and the <i>same</i> race.)</p>
+  </details>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <p><b>Method &amp; sourcing.</b> Tier (a) measured facts: Willow (<i>Nature</i>, Dec 2024); Gidney RSA reduction (arXiv:2505.15917); exposure estimates (Deloitte, River, Chaincode Labs); FIPS 203/204/205 (finalized Aug 2024). Tier (b) projected estimates about un-built hardware, peer-review-pending: Google Quantum AI et al., <i>"Securing Elliptic Curve Cryptocurrencies against Quantum Vulnerabilities"</i> (arXiv:2603.28846, v2 15 Apr 2026) — the ~500K-physical-qubit / "in minutes" / ~41%-live-race cluster, carrying the three standing hedges (preprint; idealized attacker-favorable Bitcoin-specific upper bound; Google vendor interest). Foundational scaling: Proos &amp; Zalka (arXiv:quant-ph/0301141); Roetteler, Naehrig, Svore &amp; Lauter (arXiv:1706.06752). Timeline elicitation: Global Risk Institute / Mosca <i>Quantum Threat Timeline</i> 2025 (10-year band 28–49%, up from 19–34% in 2024). Standards/deadlines: NSA CNSA 2.0; NIST IR 8547 (2030 / 2035); FIPS 206 (FN-DSA) forthcoming. Proposals: BIP-360 (P2MR, Draft, merged 11 Feb 2026), BIP-361 (Draft, two formal phases plus an experimental recovery mechanism). Tier (c) media-derived: the "170,000 P2PK" / "1.1M Satoshi-era" round numbers are reporting, not spec text.</p>
+  <p style="color:var(--dim)">A research appendage to "Does Bitcoin Follow a Power Law? — An Econometric Autopsy"; it does not touch the power-law econometrics. Educational analysis — not investment advice.</p>
+  <p style="margin-top:18px"><a class="backlink" href="index.html">← Return to the power-law autopsy</a></p>
+</div></footer>
+
+</body>
+</html>
