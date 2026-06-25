@@ -1,5 +1,12 @@
 [
   {
+    "unit": "applied-decision-theory",
+    "url": "/applied-decision-theory.html",
+    "title": "Applied Decision Theory \u00b7 A Word-Problem Playground",
+    "last_modified": "2026-06-24T23:48:35-07:00",
+    "kind": "page"
+  },
+  {
     "unit": "arxiv_scraper",
     "url": "/arxiv_scraper.html",
     "title": "arXiv Scraper &mdash; Knowledge Source Pipeline",
@@ -17,7 +24,7 @@
     "unit": "cartography",
     "url": "/cartography.html",
     "title": "City Cartography \u2014 Roads + Topography",
-    "last_modified": "2026-06-15T21:18:52-07:00",
+    "last_modified": "2026-06-24T23:48:35-07:00",
     "kind": "page"
   },
   {
@@ -38,7 +45,7 @@
     "unit": "decision-theory",
     "url": "/decision-theory.html",
     "title": "The Value of Knowing You \u00b7 Decision Theory \u2192 Causality",
-    "last_modified": "2026-06-11T13:59:47-07:00",
+    "last_modified": "2026-06-24T23:48:35-07:00",
     "kind": "page"
   },
   {
@@ -67,6 +74,13 @@
     "url": "/mandelbrot_landing.html",
     "title": "Mandelbrot Explorer - Tutorial &amp; Background",
     "last_modified": "2026-06-10T21:47:56-07:00",
+    "kind": "page"
+  },
+  {
+    "unit": "ner-taggers",
+    "url": "/ner-taggers.html",
+    "title": "From Counts to Context: HMM \u2192 LSTM \u2192 BERT for NER",
+    "last_modified": "2026-06-24T23:48:35-07:00",
     "kind": "page"
   },
   {
