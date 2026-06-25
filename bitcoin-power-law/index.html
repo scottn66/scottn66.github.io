@@ -368,7 +368,7 @@
     const yTick=[0.1,1,10,100,1e3,1e4,1e5,1e6,1e7];
     const yText=yTick.map(fmtUSD);
     const xVals=[],xYears=[];
-    for(let y=2011;y<=2034;y+=2){const dd=(y-2009)*365.2425; xVals.push(dd); xYears.push(String(y));}
+    [2011,2014,2017,2020,2024,2030,2040,2055].forEach(y=>{const dd=(y-2009)*365.2425; xVals.push(dd); xYears.push(String(y));});
     const NIL='rgba(0,0,0,0)';
     const tr=[];
     // ---- Gaussian density corridor: nested shells whose opacity follows exp(-k^2/2) ----
