@@ -71,6 +71,7 @@
   .q{color:var(--mute);font-style:italic;font-size:16.5px;margin:0 0 14px;border-left:2px solid var(--line);padding-left:14px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
   .plot{width:100%;min-height:300px}
+  .chartlabel{color:var(--mute);font-size:12.5px;font-weight:600;letter-spacing:.01em;margin:2px 2px 6px}
   figure{margin:16px 0}
   figure img{width:100%;border:1px solid var(--line);border-radius:12px;display:block;background:var(--card2)}
   figcaption{color:var(--dim);font-size:12.5px;margin-top:8px}
@@ -136,11 +137,14 @@
   <p>The Bitcoin power-law model (Santostasi; Burger) says price grows as a fixed power of Bitcoin's <em>age</em>, not exponentially:</p>
   <div class="card eq">
     $$ P(t) \;=\; A\,\bigl(t\bigr)^{\,n}, \qquad\Longleftrightarrow\qquad \log_{10} P \;=\; a \;+\; n\,\log_{10} t $$
-    <p style="margin:8px 0 0;color:var(--mute);font-size:14px">where $t$ = days since the genesis block (2009-01-03). On <b>log–log axes</b> a power law is a <b>straight line</b> — the slope is the exponent $n$. Switch the chart to <b>calendar time with log price</b> and the same law becomes a gentle <b>log curve</b> that flattens as growth decelerates — the clearest view of the modern price-vs-age relationship. (A pure exponential would instead be a <i>straight</i> line on that semi-log view, implying a constant doubling time Bitcoin has never had — which is why it loses in Lens 3.)</p>
+    <p style="margin:8px 0 0;color:var(--mute);font-size:14px">where $t$ = days since the genesis block (2009-01-03). On <b>log–log axes</b> a power law is a <b>straight line</b> — the slope is the exponent $n$. Shown on <b>calendar time with log price</b> (the lower panel), the same law becomes a gentle <b>log curve</b> that flattens as growth decelerates — the clearest view of the modern price-vs-age relationship. (A pure exponential would instead be a <i>straight</i> line on that semi-log view, implying a constant doubling time Bitcoin has never had — which is why it loses in Lens 3.)</p>
   </div>
   <div class="card heroCard">
-    <div id="hero" class="plot" role="img" aria-label="Bitcoin price versus the power-law fit on log-log axes: price tracks a straight trend line from about five cents in 2010 to six figures in 2025, inside a plus-or-minus 2-sigma corridor; today's price sits below the fitted line." style="min-height:540px"></div>
-    <figcaption>Interactive: hover for fair value vs. actual, drag to zoom, double-click to reset. Use the buttons to switch between <b>log–log</b> (power law = straight line) and <b>calendar time · log price</b> (the same law as a log curve). The orange line is the fitted trend; the shaded <b>corridor is the Gaussian dispersion drawn along the fit</b> — densest on the μ line and fading out to the <b>±1σ and ±2σ</b> boundaries (labeled at the right). Bitcoin spends ≈68% of its days within ±1σ of fair value and ≈95% within ±2σ. Blue = BTC (Coinbase, weekly); green = independent 2010–2015 reference prices.</figcaption>
+    <div class="chartlabel"><b>Log–log (age)</b> · the power law is a straight line</div>
+    <div id="hero_ll" class="plot" role="img" aria-label="Bitcoin price versus the power-law fit on log-log axes: on log price and log age the fit is a straight line that the price tracks within a Gaussian corridor; today sits just below the line." style="min-height:420px"></div>
+    <div class="chartlabel" style="border-top:1px solid var(--line);margin-top:18px;padding-top:14px"><b>Calendar time · log price</b> · the same law as a gentle curve that flattens</div>
+    <div id="hero_cal" class="plot" role="img" aria-label="The same fit on calendar time with log price: the power law becomes a curve that rises fast then flattens, tracked within the same corridor; an exponential would instead be a straight line here." style="min-height:360px"></div>
+    <figcaption>Two views of the same fit, stacked: <b>log–log (top)</b> — the power law is a straight line — and <b>calendar time · log price (bottom)</b> — the same law as a gentle curve that flattens. The orange line is the fitted trend; the shaded <b>corridor is the Gaussian dispersion drawn along the fit</b> — densest on the μ line and fading to the <b>±1σ and ±2σ</b> boundaries (labeled at the right). Bitcoin spends ≈68% of its days within ±1σ of fair value and ≈95% within ±2σ. Blue = BTC (Coinbase, weekly); green = independent 2010–2015 reference prices. Hover for fair value vs. actual; drag to zoom.</figcaption>
   </div>
   <div class="verdict v-real">The visual case is strong: a single straight line spans from $0.05 (2010) to six figures (2025), and independent early-era prices land on it. The corridor says deviations behave roughly like a Gaussian in σ. <b>But a straight-looking line on log–log axes is where the real work begins, not ends.</b></div>
 </div></section>
@@ -358,68 +362,56 @@
   document.getElementById('genfoot').textContent = PL.generated_at||'';
   document.getElementById('datanote').textContent = 'Charts are downsampled (weekly price, 5-day residuals) for legibility; all formal tests use the full daily series.';
 
-  // ---- HERO: log-log with a Gaussian density corridor along the fit ----
+  // ---- HERO: two stacked views of the same fit (log-log + calendar) with a Gaussian density corridor ----
   (function(){
     const ml=PL.model_line; if(!ml) return;
     const mlDays=ml.dates.map(dayOf);
     const ser=PL.series, anch=PL.anchors;
     const sigma=(PL.fit_full||{}).resid_sigma||0.276;     // dex (log10 units)
-    const up=(m,k)=>m*Math.pow(10,k*sigma), dn=(m,k)=>m/Math.pow(10,k*sigma);
-    const yTick=[0.1,1,10,100,1e3,1e4,1e5,1e6,1e7];
-    const yText=yTick.map(fmtUSD);
-    const xVals=[],xYears=[];
-    for(let y=2011;y<=2034;y+=2){const dd=(y-2009)*365.2425; xVals.push(dd); xYears.push(String(y));}
-    const NIL='rgba(0,0,0,0)';
-    const tr=[];
-    // ---- Gaussian density corridor: nested shells whose opacity follows exp(-k^2/2) ----
-    // Symmetric in log10 price (dex) -> log-normal (right-skewed) in raw price. Densest on μ, fading to ±2σ.
+    const up=(m,k)=>m*Math.pow(10,k*sigma);
     const lvl=k=>ml.mid.map(m=>up(m,k));   // up(m,k)=m*10^(k*sigma); any sign of k
-    const KMAX=2.2, NSH=10, DK=KMAX/NSH, BASEA=0.20;
-    const shell=(k0,k1,a)=>{
-      tr.push({x:mlDays,y:lvl(k0),mode:'lines',line:{width:0,color:NIL},hoverinfo:'skip',showlegend:false});
-      tr.push({x:mlDays,y:lvl(k1),mode:'lines',line:{width:0,color:NIL},fill:'tonexty',fillcolor:'rgba(247,147,26,'+a.toFixed(3)+')',hoverinfo:'skip',showlegend:false});
-    };
-    for(let i=1;i<=NSH;i++){const km=(i-0.5)*DK, a=BASEA*Math.exp(-km*km/2);
-      shell((i-1)*DK,i*DK,a); shell(-(i-1)*DK,-i*DK,a);}
-    // ±1σ / ±2σ boundary envelopes, drawn along the whole line
-    const sigLine=(k,col,nm,show)=>tr.push({x:mlDays,y:lvl(k),mode:'lines',line:{color:col,width:1,dash:'dot'},opacity:0.7,name:nm,showlegend:show,hoverinfo:'skip'});
-    sigLine(2,C.mute,'±2σ',true); sigLine(-2,C.mute,'',false);
-    sigLine(1,C.orange,'±1σ',true); sigLine(-1,C.orange,'',false);
-    // fit
-    tr.push({x:mlDays,y:ml.mid,mode:'lines',line:{color:C.orange,width:2.6},name:'power-law fit (μ)',
-      hovertemplate:'fair value %{y:$,.0f}<extra></extra>'});
-    // series
-    tr.push({x:ser.map(s=>dayOf(s.date)),y:ser.map(s=>s.price),customdata:ser.map(s=>s.date),
-      mode:'lines',line:{color:C.blue,width:1.5},name:'BTC price',
-      hovertemplate:'%{customdata}<br>%{y:$,.0f}<extra></extra>'});
-    // anchors
-    tr.push({x:anch.map(a=>dayOf(a.date)),y:anch.map(a=>a.price),customdata:anch.map(a=>a.note),
-      mode:'markers',marker:{color:C.green,size:7,line:{color:'#0a0d12',width:1}},name:'2010–15 reference',
-      hovertemplate:'%{customdata}<br>%{y:$,.2f}<extra></extra>'});
-    // current
-    tr.push({x:[cur.day],y:[cur.price],mode:'markers',marker:{color:C.blue,size:11,line:{color:'#fff',width:2}},
-      name:'today',hovertemplate:'today '+fmtUSD(cur.price)+'<extra></extra>'});
-
-    // σ labels at the right edge, each sitting on its boundary line
-    const midLast=ml.mid[ml.mid.length-1], lastDay=mlDays[mlDays.length-1];
-    const sigAnno=[[2,'+2σ',C.mute],[1,'+1σ',C.orange],[0,'μ',C.orange],[-1,'−1σ',C.orange],[-2,'−2σ',C.mute]]
-      .map(([k,lab,col])=>({x:lastDay,y:up(midLast,k),text:lab,showarrow:false,font:{color:col,size:10.5},xanchor:'left',xshift:4}));
-
-    const lay=baseLayout({
-      margin:{l:58,r:30,t:18,b:50},
-      xaxis:{domain:[0,1],type:'log',tickvals:xVals,ticktext:xYears,gridcolor:C.line,
-        title:{text:'year — log scale (days since genesis)',font:{size:12}}},
-      yaxis:{type:'log',tickvals:yTick,ticktext:yText,gridcolor:C.line,title:{text:'BTC price (USD)',font:{size:12}}},
-      shapes:[{type:'rect',xref:'x',yref:'paper',x0:cur.day,x1:lastDay,y0:0,y1:1,
-        fillcolor:'rgba(247,147,26,0.04)',line:{width:0}}],
-      annotations:sigAnno,
-      updatemenus:[{type:'buttons',direction:'right',x:0,y:1.14,bgcolor:'#121821',bordercolor:C.line,
-        font:{size:11,color:'#cdd6e1'},buttons:[
-        {label:'log–log (age)',method:'relayout',args:[{'xaxis.type':'log','xaxis.title.text':'year — log scale (days since genesis)'}]},
-        {label:'calendar time · log price',method:'relayout',args:[{'xaxis.type':'linear','xaxis.title.text':'year · calendar time (days since genesis)'}]},
-      ]}],
-    });
-    Plotly.newPlot('hero',tr,lay,CFG);
+    const yTick=[0.1,1,10,100,1e3,1e4,1e5,1e6,1e7], yText=yTick.map(fmtUSD);
+    const midLast=ml.mid[ml.mid.length-1], lastDay=mlDays[mlDays.length-1], NIL='rgba(0,0,0,0)';
+    // Identical trace set for both panels (only the x-axis scale differs); built fresh per panel.
+    function buildTraces(){
+      const tr=[], KMAX=2.2, NSH=10, DK=KMAX/NSH, BASEA=0.20;
+      // Gaussian density corridor: nested shells, opacity ~ exp(-k^2/2); symmetric in log10 price -> log-normal in raw price.
+      const shell=(k0,k1,a)=>{
+        tr.push({x:mlDays,y:lvl(k0),mode:'lines',line:{width:0,color:NIL},hoverinfo:'skip',showlegend:false});
+        tr.push({x:mlDays,y:lvl(k1),mode:'lines',line:{width:0,color:NIL},fill:'tonexty',fillcolor:'rgba(247,147,26,'+a.toFixed(3)+')',hoverinfo:'skip',showlegend:false});
+      };
+      for(let i=1;i<=NSH;i++){const km=(i-0.5)*DK, a=BASEA*Math.exp(-km*km/2); shell((i-1)*DK,i*DK,a); shell(-(i-1)*DK,-i*DK,a);}
+      const sigLine=(k,col,nm,show)=>tr.push({x:mlDays,y:lvl(k),mode:'lines',line:{color:col,width:1,dash:'dot'},opacity:0.7,name:nm,showlegend:show,hoverinfo:'skip'});
+      sigLine(2,C.mute,'±2σ',true); sigLine(-2,C.mute,'',false); sigLine(1,C.orange,'±1σ',true); sigLine(-1,C.orange,'',false);
+      tr.push({x:mlDays,y:ml.mid,mode:'lines',line:{color:C.orange,width:2.6},name:'power-law fit (μ)',hovertemplate:'fair value %{y:$,.0f}<extra></extra>'});
+      tr.push({x:ser.map(s=>dayOf(s.date)),y:ser.map(s=>s.price),customdata:ser.map(s=>s.date),mode:'lines',line:{color:C.blue,width:1.5},name:'BTC price',hovertemplate:'%{customdata}<br>%{y:$,.0f}<extra></extra>'});
+      tr.push({x:anch.map(a=>dayOf(a.date)),y:anch.map(a=>a.price),customdata:anch.map(a=>a.note),mode:'markers',marker:{color:C.green,size:7,line:{color:'#0a0d12',width:1}},name:'2010–15 reference',hovertemplate:'%{customdata}<br>%{y:$,.2f}<extra></extra>'});
+      tr.push({x:[cur.day],y:[cur.price],mode:'markers',marker:{color:C.blue,size:11,line:{color:'#fff',width:2}},name:'today',hovertemplate:'today '+fmtUSD(cur.price)+'<extra></extra>'});
+      return tr;
+    }
+    const mkShade=()=>({type:'rect',xref:'x',yref:'paper',x0:cur.day,x1:lastDay,y0:0,y1:1,fillcolor:'rgba(247,147,26,0.04)',line:{width:0}});
+    const mkAnno=()=>[[2,'+2σ',C.mute],[1,'+1σ',C.orange],[0,'μ',C.orange],[-1,'−1σ',C.orange],[-2,'−2σ',C.mute]]
+      .map(([k,lab,col])=>({x:lastDay,y:up(midLast,k),text:lab,showarrow:false,font:{color:col,size:10.5},xanchor:'left',xshift:3}));
+    const xv=ys=>{const v=[],t=[];ys.forEach(y=>{v.push((y-2009)*365.2425);t.push(String(y));});return {v,t};};
+    const lx=xv([2011,2014,2017,2020,2024,2030,2040,2055]);   // log axis: spaced to read cleanly on a log scale
+    const cx=xv([2012,2018,2024,2030,2036,2042,2048,2054,2060]); // linear axis: even years
+    const yax=()=>({type:'log',tickvals:yTick,ticktext:yText,gridcolor:C.line,title:{text:'BTC price (USD)',font:{size:11}}});
+    // top panel: log-log (age) — the power law is a straight line
+    Plotly.newPlot('hero_ll', buildTraces(), baseLayout({
+      margin:{l:56,r:26,t:8,b:38},
+      legend:{orientation:'h',y:1.07,x:0,font:{size:11},bgcolor:'rgba(0,0,0,0)'},
+      xaxis:{type:'log',tickvals:lx.v,ticktext:lx.t,gridcolor:C.line,title:{text:'days since genesis (log scale)',font:{size:11}}},
+      yaxis:yax(), shapes:[mkShade()], annotations:mkAnno(),
+    }), CFG);
+    // bottom panel: calendar time, log price — the same law as a gentle curve
+    Plotly.newPlot('hero_cal', buildTraces(), baseLayout({
+      margin:{l:56,r:26,t:8,b:38}, showlegend:false,
+      xaxis:{type:'linear',tickvals:cx.v,ticktext:cx.t,gridcolor:C.line,title:{text:'calendar year',font:{size:11}}},
+      yaxis:yax(), shapes:[mkShade()], annotations:mkAnno(),
+    }), CFG);
+    // ensure both panels fill the full container width once layout (and fonts) have settled
+    const fit=()=>['hero_ll','hero_cal'].forEach(id=>{const d=document.getElementById(id); if(d&&d.clientWidth){try{Plotly.Plots.resize(d);}catch(e){}}});
+    setTimeout(fit,80); setTimeout(fit,500); window.addEventListener('resize',fit);
   })();
 
   // ---- fit inference table ----
