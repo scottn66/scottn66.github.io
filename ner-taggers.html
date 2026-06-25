@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="unit" content="ner-taggers">
+    <meta name="description" content="One NER task, three taggers: a from-scratch HMM, an LSTM, and a fine-tuned DistilBERT (0.888 entity-F1 on CoNLL-2003), with a final comparison.">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>From Counts to Context: HMM → LSTM → BERT for NER</title>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding-top: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto 0;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: #0056b3;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        .header .subtitle {
+            margin-top: 0.4rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        .concept-box {
+            background-color: #eef4ff;
+            border-left: 5px solid #0056b3;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .caveat-box {
+            background-color: #fff8e6;
+            border-left: 5px solid #e0a800;
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 5px;
+        }
+        .caveat-box h4 { color: #946c00; }
+        .roadmap-box {
+            background: linear-gradient(135deg,#eef9f0 0%,#e3f3ea 100%);
+            border-left: 5px solid #2e8b57;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .roadmap-box h3, .roadmap-box h4 { color: #2e8b57; }
+        h2, h3 {
+            color: #0056b3;
+            margin-bottom: 0.75rem;
+        }
+        a { color: #007bff; }
+        code {
+            background: #f0f2f5;
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+            color: #c7254e;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #1e1e2e;
+            color: #e6e6e6;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+        figure { text-align: center; margin: 1.5rem 0; }
+        figcaption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        table.compare {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.92rem;
+            background: #fff;
+        }
+        table.compare th, table.compare td {
+            border: 1px solid #dde3ec;
+            padding: 10px 12px;
+            vertical-align: top;
+            text-align: left;
+        }
+        table.compare thead th {
+            background: #0056b3;
+            color: #fff;
+            font-weight: 600;
+        }
+        table.compare tbody th {
+            background: #eef4ff;
+            color: #0056b3;
+            white-space: nowrap;
+        }
+        table.compare tbody tr:nth-child(even) td { background: #fafbfd; }
+        .pill {
+            display: inline-block; padding: 0.1rem 0.55rem; border-radius: 12px;
+            font-size: 0.72rem; font-weight: 600; color: #fff; vertical-align: middle;
+        }
+        .pill-hmm  { background: #0056b3; }
+        .pill-lstm { background: #8a4bd6; }
+        .pill-bert { background: #d6534b; }
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 20px;
+        }
+        ul { padding-left: 20px; }
+        ul li { margin-bottom: 0.3rem; }
+        .mt-5 { margin-top: 3rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .text-center { text-align: center; }
+        h5 { font-weight: 400; }
+        /* self-contained button styles (no Bootstrap dependency) */
+        .btn { display: inline-block; padding: 0.45rem 1rem; border-radius: 0.25rem; font-size: 0.95rem; font-weight: 600; text-decoration: none; border: 1px solid transparent; }
+        .btn-primary { background: #0056b3; color: #fff; border-color: #0056b3; }
+        .btn-primary:hover { background: #004494; color: #fff; }
+        .btn-light { background: #f4f4f4; color: #0056b3; border-color: #cfd6e0; }
+        .btn-light:hover { background: #e9ecf1; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="text-center mb-3">
+            <a href="index.html" class="btn btn-primary">Home</a>
+            <a href="HMM.html" class="btn btn-light">&larr; Back to the HMM page</a>
+        </div>
+        <h1>From Counts to Context</h1>
+        <p class="subtitle">One NER task, three generations of taggers: HMM &rarr; LSTM &rarr; BERT</p>
+    </header>
+
+    <!-- Intro -->
+    <div class="container mt-5">
+        <section class="mb-4">
+            <h2>The same task, climbing the model ladder</h2>
+            <p>The <a href="HMM.html">companion page</a> builds a <strong>Hidden Markov Model</strong> from scratch to tag named entities. This page picks up where that one ends and walks up two more rungs of the modelling ladder - a recurrent <strong>LSTM</strong> tagger, and a fine-tuned <strong>BERT/DistilBERT</strong> tagger - all three solving the <em>same</em> problem so they can be compared apples-to-apples.</p>
+            <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">named entity recognition (NER)</a> over the <a href="https://www.clips.uantwerpen.be/conll2003/ner/" target="_blank">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
+            <p>The arc is a single idea: <strong>we keep widening the window of context a tagging decision can see, and we keep enriching how a word is represented</strong> - from atomic word-IDs (HMM), to learned dense vectors read left-to-right (LSTM), to pretrained <em>contextual</em> subword vectors that see the whole sentence at once (BERT).</p>
+
+            <figure>
+                <svg viewBox="0 0 760 250" width="100%" style="max-width:760px;height:auto;" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Progression from HMM to LSTM to BERT">
+                    <!-- HMM -->
+                    <rect x="20" y="40" width="220" height="170" rx="10" fill="#eef4ff" stroke="#0056b3" stroke-width="2"/>
+                    <text x="130" y="68" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="16" font-weight="700" fill="#0056b3">HMM</text>
+                    <text x="130" y="90" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#444">count-based generative</text>
+                    <text x="130" y="120" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">word = atomic ID</text>
+                    <text x="130" y="140" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">context = prev tag</text>
+                    <text x="130" y="160" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">decode = Viterbi</text>
+                    <text x="130" y="188" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" font-style="italic" fill="#0056b3">Markov assumption</text>
+                    <!-- LSTM -->
+                    <rect x="270" y="40" width="220" height="170" rx="10" fill="#f3edfb" stroke="#8a4bd6" stroke-width="2"/>
+                    <text x="380" y="68" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="16" font-weight="700" fill="#8a4bd6">LSTM</text>
+                    <text x="380" y="90" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#444">recurrent discriminative</text>
+                    <text x="380" y="120" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">word = learned vector</text>
+                    <text x="380" y="140" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">context = all left words</text>
+                    <text x="380" y="160" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">decode = per-token argmax</text>
+                    <text x="380" y="188" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" font-style="italic" fill="#8a4bd6">memory cell</text>
+                    <!-- BERT -->
+                    <rect x="520" y="40" width="220" height="170" rx="10" fill="#fbeceb" stroke="#d6534b" stroke-width="2"/>
+                    <text x="630" y="68" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="16" font-weight="700" fill="#d6534b">BERT</text>
+                    <text x="630" y="90" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#444">pretrained + fine-tuned</text>
+                    <text x="630" y="120" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">word = contextual subword</text>
+                    <text x="630" y="140" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">context = whole sentence</text>
+                    <text x="630" y="160" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" fill="#333">decode = per-token argmax</text>
+                    <text x="630" y="188" text-anchor="middle" font-family="Open Sans, sans-serif" font-size="11" font-style="italic" fill="#d6534b">self-attention</text>
+                    <!-- arrows -->
+                    <text x="255" y="130" text-anchor="middle" font-family="Open Sans" font-size="22" fill="#888">&rarr;</text>
+                    <text x="505" y="130" text-anchor="middle" font-family="Open Sans" font-size="22" fill="#888">&rarr;</text>
+                </svg>
+                <figcaption>Three taggers, one task. Each rung widens the context window and enriches the word representation.</figcaption>
+            </figure>
+            <p style="margin-bottom:0;"><em>Provenance:</em> all three live in the CMSI 5370 (NLP) problem-set-2 archive. The HMM and LSTM were the submitted assignment; the BERT tagger is the post-submission &ldquo;kept going&rdquo; branch (<code>copy_ps2-scottn66/</code>) that adds HuggingFace fine-tuning.</p>
+        </section>
+    </div>
+
+    <!-- METHOD 1: HMM -->
+    <section class="container mt-5">
+        <h2><span class="pill pill-hmm">1</span>&nbsp; Hidden Markov Model - the count-based baseline</h2>
+        <p>Full treatment lives on the <a href="HMM.html">HMM page</a>; here is the one-paragraph recap so the comparison stands on its own.</p>
+        <p>The HMM is a <strong>generative</strong>, count-based model. Training is a single pass of maximum-likelihood counting over the labelled corpus that fills three tables:</p>
+        <ul>
+            <li><strong>Initial</strong> <code>P(tag&#8321;)</code> - how often each tag starts a sentence.</li>
+            <li><strong>Transition</strong> <code>P(tag&#8348; | tag&#8348;&#8331;&#8321;)</code> - the order-1 <a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank">Markov</a> assumption: a tag depends only on the tag immediately before it.</li>
+            <li><strong>Emission</strong> <code>P(word | tag)</code> - how likely each word is, given a tag.</li>
+        </ul>
+        <p>All three tables are initialised to ones rather than zeros, which folds <a href="https://en.wikipedia.org/wiki/Additive_smoothing" target="_blank">add-one (Laplace) smoothing</a> straight into the model so no unseen event gets zero probability. Decoding finds the best tag sequence two ways: <strong>greedy</strong> (pick the locally best tag at each step) or <strong>Viterbi</strong> (a dynamic program in log-space that recovers the single most-likely <em>whole-sequence</em> tagging via a trellis + backpointers).</p>
+        <div class="concept-box">
+            <h4>What it gets right - and where it caps out</h4>
+            <p><strong>Right:</strong> trains in seconds on a CPU, is fully interpretable (every number is a count), and Viterbi gives a provably optimal decode under the model. The in-code benchmark hint targets <strong>~90% token accuracy with greedy and ~91% with Viterbi</strong>.</p>
+            <p style="margin-bottom:0;"><strong>Caps out because:</strong> a word is an <em>atomic ID</em> - &ldquo;Paris&rdquo; and &ldquo;London&rdquo; share nothing, and any word unseen in training collapses to <code>&lt;UNK&gt;</code>. The Markov-1 assumption means a tag sees only the <em>single</em> previous tag, never the words around it. Those two limits are exactly what the next two models attack.</p>
+        </div>
+    </section>
+
+    <!-- METHOD 2: LSTM -->
+    <section class="container mt-5">
+        <h2><span class="pill pill-lstm">2</span>&nbsp; LSTM tagger - learned representations + memory</h2>
+        <p>The <a href="https://en.wikipedia.org/wiki/Long_short-term_memory" target="_blank">LSTM</a> tagger (<code>nn.py</code> / <code>lstm.py</code>, PyTorch) swaps counting for <strong>learning</strong>. It is a small <strong>discriminative</strong> network with three layers:</p>
+        <pre><code>word IDs ─▶ nn.Embedding(vocab, embed_dim=32)      # learn a dense vector per word
+         ─▶ nn.LSTM(embed_dim=32, hidden_dim=12)   # carry a memory cell across the sentence
+         ─▶ nn.Linear(hidden_dim=12, num_tags)      # project each step's state to tag scores</code></pre>
+        <p>Two things change versus the HMM. First, words become <strong>learned dense vectors</strong> instead of atomic IDs, so the model can discover that &ldquo;Paris&rdquo; and &ldquo;London&rdquo; behave alike. Second, the recurrent cell means the tag for word <em>i</em> is informed by a hidden state that has absorbed <em>every word to its left</em> - far more context than the HMM's single previous tag. Training is gradient descent (Adam, <code>lr=0.001</code>, 10 epochs), one sentence per backward pass.</p>
+        <div class="caveat-box">
+            <h4>&#9888; Honest notes from the code</h4>
+            <ul style="margin-bottom:0;">
+                <li>The LSTM is <strong>unidirectional</strong> (left context only) and intentionally tiny (<code>hidden_dim=12</code>) - an instructional baseline, not a tuned model.</li>
+                <li><code>forward()</code> returns <strong>raw logits</strong>, but the loss is <code>nn.NLLLoss()</code>, which expects log-probabilities (the <code>log_softmax</code> line is commented out). The network still trains and converges, but the printed loss is not interpretable as cross-entropy.</li>
+                <li>No held-out accuracy was recorded in the source, so this page does <strong>not</strong> quote an LSTM number - the honest comparison is structural, not a leaderboard.</li>
+            </ul>
+        </div>
+        <p>The LSTM fixes the HMM's representation and left-context limits, but it still reads strictly left-to-right and learns its embeddings from scratch on a small corpus. The next model removes both of those constraints at once.</p>
+    </section>
+
+    <!-- METHOD 3: BERT -->
+    <section class="container mt-5">
+        <h2><span class="pill pill-bert">3</span>&nbsp; BERT / DistilBERT tagger - pretrained, bidirectional context</h2>
+        <p>The transformer tagger (<code>bert.py</code>) fine-tunes <a href="https://huggingface.co/distilbert-base-cased" target="_blank">DistilBERT</a> - a distilled, ~66M-parameter <a href="https://en.wikipedia.org/wiki/BERT_(language_model)" target="_blank">BERT</a> - for token classification through the HuggingFace <code>Trainer</code> API:</p>
+        <pre><code>datasets   = load_dataset('conll2003')                       # gold NER data
+tokenizer  = AutoTokenizer.from_pretrained('distilbert-base-cased')
+model      = AutoModelForTokenClassification.from_pretrained(
+                 'distilbert-base-cased', num_labels=len(label_list))
+args       = TrainingArguments(lr=2e-5, batch=16, epochs=3, weight_decay=0.01)
+trainer    = Trainer(model, args, train_dataset=..., data_collator=...)
+trainer.train()</code></pre>
+        <p>Two qualitative leaps over the LSTM:</p>
+        <ul>
+            <li><strong>Transfer learning.</strong> DistilBERT arrives already knowing English from massive pretraining; fine-tuning on CoNLL only nudges those weights. The LSTM started from random vectors on a tiny corpus.</li>
+            <li><strong>Bidirectional, whole-sentence context via <a href="https://en.wikipedia.org/wiki/Attention_(machine_learning)" target="_blank">self-attention</a>.</strong> Every token attends to <em>every other token</em> in the sentence - left and right at once - instead of the LSTM's left-only stream. Subword (WordPiece) tokenization also means out-of-vocabulary words degrade gracefully into pieces rather than collapsing to <code>&lt;UNK&gt;</code>.</li>
+        </ul>
+        <p>This branch isn't just code: a fine-tuned model was pushed to the HuggingFace Hub as <a href="https://huggingface.co/scottn66/distilbert-base-uncased-finetuned-ner" target="_blank"><code>scottn66/distilbert-base-uncased-finetuned-ner</code></a>, and <code>trans4mers.py</code> wires it into live POS / NER / question-answering pipelines on sample text.</p>
+
+        <div class="concept-box">
+            <h4>The result, measured</h4>
+            <p>The original archived <code>bert.py</code> couldn't be trusted to report a number: it had a <strong>train/eval leak</strong> (<code>train_dataset == eval_dataset</code>) and fed word-level labels to the Trainer without aligning them to DistilBERT's <em>subword</em> tokens. A hardened rewrite (proper subword label alignment, a held-out split, and seqeval scoring - see the roadmap below) fixes all of that and produces real, reproducible numbers.</p>
+            <p>Fine-tuned <strong>DistilBERT-cased, 3 epochs</strong> on CoNLL-2003 (HF 9-label BIO version) scores, on the held-out <strong>test</strong> set: <strong>entity-level F1 = 0.888</strong> (precision 0.880, recall 0.896) and <strong>token accuracy = 0.978</strong>. On the validation set the best epoch reaches <strong>0.934 entity-F1</strong> / 0.989 token accuracy. The ~88.8% test entity-F1 is right in the expected band for DistilBERT on CoNLL-2003.</p>
+            <p style="margin-bottom:0;">For a <strong>strict apples-to-apples</strong> check against the HMM and LSTM - the same local 5-class data, the same preprocessing - the fine-tuned model reaches <strong>98.5% token accuracy</strong> (macro token-F1 0.933) versus the HMM's ~91% Viterbi token accuracy. Same task, same labels: <strong>+7 points</strong> from contextual pretraining.</p>
+        </div>
+    </section>
+
+    <!-- BERT IMPROVEMENT ROADMAP -->
+    <section class="container mt-5">
+        <div class="roadmap-box">
+            <h3>&#9989; Improving the BERT tagger - done</h3>
+            <p>The leaky baseline was rewritten into a properly evaluated DistilBERT NER model. Each fix below is now implemented:</p>
+            <ol>
+                <li><strong>&#10003; Subword label alignment.</strong> Tokenize with <code>is_split_into_words=True</code> and use <code>word_ids()</code> to spread each word's gold tag onto its first subword while masking continuation pieces and specials with <code>-100</code> (ignored by the loss). This is the single change that makes the model correct. Verified against the live tokenizer: <code>Kubernetes</code> splits to <code>Ku</code>/<code>##ber</code>/<code>##net</code>/<code>##es</code>, and only the first piece keeps the word's tag (the rest become <code>-100</code>).</li>
+                <li><strong>&#10003; Real held-out evaluation.</strong> Train on the train split, evaluate on validation, report on the held-out test split - the train/eval leak is gone.</li>
+                <li><strong>&#10003; Entity-level metrics.</strong> A <code>compute_metrics</code> runs <a href="https://github.com/chakki-works/seqeval" target="_blank">seqeval</a> for entity-level precision / recall / F1 (the standard CoNLL score) on the BIO data, and falls back to token-level scoring for the bare 5-class data.</li>
+                <li><strong>&#10003; Use the loaded data &amp; drop dead code.</strong> Trains on the actual <code>datasets</code> object; the unused <code>BERTPoSTagger</code>, <code>CustomDataset</code>, and precomputed-then-discarded <code>encoded_inputs</code> are gone.</li>
+                <li><strong>&#10003; Modernize the API.</strong> Real <code>transformers</code> import (no <code>trans4mers</code> shim) and a complete <code>requirements.txt</code>. Going further than planned: the rewrite runs on <strong>transformers 5.x</strong> (<code>processing_class</code> replaces the removed <code>tokenizer=</code> arg) and <strong>datasets 5.x</strong> (script loading was removed, so it pulls a parquet CoNLL-2003 mirror).</li>
+                <li><strong>Remaining stretch goals.</strong> Try <code>bert-base-cased</code> vs DistilBERT; reconcile the cased/uncased split with the published uncased Hub model; optionally add a CRF decode head so the transformer, like the HMM, optimizes the whole tag sequence rather than each token independently.</li>
+            </ol>
+            <p style="margin-bottom:0;">Result: <strong>0.888 test entity-F1</strong> (0.934 on validation) - squarely in the expected band, and now trustworthy because the evaluation is honest.</p>
+        </div>
+    </section>
+
+    <!-- FINAL COMPARISON -->
+    <section class="container mt-5">
+        <h2>Final comparison</h2>
+        <p>The same task seen through three lenses. Where a cell would require a number the source never trustworthily produced, it says so rather than inventing one.</p>
+        <table class="compare">
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th><span class="pill pill-hmm">HMM</span></th>
+                    <th><span class="pill pill-lstm">LSTM</span></th>
+                    <th><span class="pill pill-bert">BERT / DistilBERT</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Paradigm</th>
+                    <td>Generative, count-based</td>
+                    <td>Discriminative, trained from scratch</td>
+                    <td>Pretrained + fine-tuned (transfer learning)</td>
+                </tr>
+                <tr>
+                    <th>Word representation</th>
+                    <td>Atomic ID; <code>&lt;UNK&gt;</code> for unseen</td>
+                    <td>Learned dense vector (32-dim)</td>
+                    <td>Pretrained <em>contextual</em> subword vectors (768-dim)</td>
+                </tr>
+                <tr>
+                    <th>Context per decision</th>
+                    <td>Previous tag only (Markov-1)</td>
+                    <td>All words to the left (unidirectional)</td>
+                    <td>Entire sentence, both directions (self-attention)</td>
+                </tr>
+                <tr>
+                    <th>Out-of-vocabulary words</th>
+                    <td>Brittle (smoothed <code>&lt;UNK&gt;</code>)</td>
+                    <td>Single <code>&lt;UNK&gt;</code> embedding</td>
+                    <td>Graceful (WordPiece subwords)</td>
+                </tr>
+                <tr>
+                    <th>Training</th>
+                    <td>One MLE counting pass; seconds, CPU</td>
+                    <td>Backprop, Adam, 10 epochs, 1 sentence/step</td>
+                    <td>Fine-tune 3 epochs from pretrained; GPU-friendly</td>
+                </tr>
+                <tr>
+                    <th>Parameters</th>
+                    <td>Count tables, O(tags² + tags·|V|)</td>
+                    <td>Tiny (embed 32, hidden 12)</td>
+                    <td>~66M (DistilBERT)</td>
+                </tr>
+                <tr>
+                    <th>Sequence decoding</th>
+                    <td>Viterbi (global optimum) or greedy</td>
+                    <td>Per-token argmax</td>
+                    <td>Per-token argmax (CRF head = stretch goal)</td>
+                </tr>
+                <tr>
+                    <th>Interpretability</th>
+                    <td>High - every value is a count</td>
+                    <td>Low</td>
+                    <td>Low</td>
+                </tr>
+                <tr>
+                    <th>Documented result</th>
+                    <td>~90% greedy / ~91% Viterbi token acc. (in-code hint)</td>
+                    <td>Not recorded (+ NLLLoss/logits caveat)</td>
+                    <td><strong>0.888 entity-F1</strong> (CoNLL test) &middot; <strong>98.5% token-acc</strong> on local 5-class (vs HMM ~91%)</td>
+                </tr>
+                <tr>
+                    <th>Main limitation</th>
+                    <td>Markov-1 + atomic words</td>
+                    <td>Left-only, tiny, no pretraining</td>
+                    <td>Per-token decode (no CRF); cased/uncased to reconcile</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="concept-box">
+            <h4>The takeaway</h4>
+            <p style="margin-bottom:0;">Read top to bottom, the three models tell one story: <strong>each generation buys richer context and richer word representations at the cost of interpretability and compute.</strong> The HMM is transparent and instant but myopic; the LSTM learns representations and remembers its left context; BERT brings world knowledge from pretraining and sees the whole sentence at once. The HMM still wins on transparency and on <em>globally</em> optimal decoding - which is why a CRF head on top of BERT (giving it Viterbi-style sequence optimization) is the natural place these two ends of the ladder meet.</p>
+        </div>
+    </section>
+
+    <!-- Cross-link back -->
+    <section class="container mt-5">
+        <div class="concept-box" style="background:linear-gradient(135deg,#eef4ff 0%,#e7e6ff 100%);border-left-color:#5b4bd6;">
+            <h4 style="color:#5b4bd6;">Where this fits</h4>
+            <p>The HMM at the base of this ladder is the same row-stochastic transition matrix that the <a href="conscious-agents.html">conscious-agents page</a> repurposes as the substrate of a perception theory. This page climbs the other direction - from that Markov baseline toward modern neural taggers.</p>
+            <p style="margin-bottom:0;">
+                <a href="HMM.html" class="btn btn-primary">&larr; The HMM, in full</a>
+                <a href="conscious-agents.html" class="btn btn-primary" style="background:#5b4bd6;border-color:#5b4bd6;">From Markov Chains to Conscious Agents &rarr;</a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>CMSI 5370 - Natural Language Processing &middot; Loyola Marymount University</p>
+        <p>HMM &amp; LSTM: submitted assignment &middot; BERT: post-submission extension (HuggingFace)</p>
+        <p>&copy; 2026 Scott Nelson</p>
+    </footer>
+</body>
+</html>

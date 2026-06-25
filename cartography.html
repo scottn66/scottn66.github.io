@@ -82,11 +82,23 @@
       border-top: 1px solid var(--field-border); padding-top: 10px;
     }
     #status.err { color: var(--warn); }
-    #status .bar { height: 3px; background: var(--field-border); border-radius: 2px; margin-top: 6px; overflow: hidden; display: none; }
+    #status .bar { position: relative; height: 4px; background: var(--field-border); border-radius: 2px; margin-top: 7px; overflow: hidden; display: none; }
     #status.loading .bar { display: block; }
-    #status .bar i { display: block; height: 100%; width: 40%; background: var(--accent-2);
-      animation: slide 1.1s ease-in-out infinite; }
-    @keyframes slide { 0% { margin-left: -40%; } 100% { margin-left: 100%; } }
+    #status .bar .fill { display: block; height: 100%; width: 0; background: var(--accent-2); border-radius: 2px; transition: width 0.25s ease; }
+    #status .bar .shimmer { position: absolute; top: 0; left: -40%; height: 100%; width: 40%; border-radius: 2px;
+      background: var(--accent-2); opacity: 0.85; display: none; animation: slide 1.15s ease-in-out infinite; }
+    #status .bar.indet .fill { display: none; }
+    #status .bar.indet .shimmer { display: block; }
+    @keyframes slide { 0% { left: -40%; } 100% { left: 100%; } }
+    #hud {
+      position: absolute; top: 14px; right: 14px; z-index: 11; display: none;
+      background: var(--panel-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
+      border-radius: 8px; padding: 8px 11px; min-width: 134px;
+      font: 11px/1.55 ui-monospace, Menlo, Consolas, monospace; box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    }
+    #hud.show { display: block; }
+    #hud .big { font-size: 15px; font-weight: 700; }
+    #hud .dim { color: var(--panel-muted); }
     .foot { margin-top: 12px; font-size: 10.5px; color: var(--panel-muted); line-height: 1.5; }
     .foot a { color: var(--accent-2); text-decoration: none; }
     details { margin-top: 6px; }
@@ -173,6 +185,12 @@
         <option value="paths">Streets + paths</option>
       </select>
     </div>
+    <div class="ctrl-row">
+      <span class="lbl">Performance HUD</span>
+      <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:12px;">
+        <input type="checkbox" id="ly-stats"> <span>FPS &amp; render ms</span>
+      </label>
+    </div>
 
     <div class="row" style="margin-top:14px;">
       <button class="btn-primary" id="render" style="flex:2;">Render map</button>
@@ -183,7 +201,7 @@
       <button class="btn-ghost" id="fit" style="flex:1;" disabled>Re-fit</button>
     </div>
 
-    <div id="status">Enter a place and press <b>Render map</b>.<div class="bar"><i></i></div></div>
+    <div id="status"><span id="status-msg">Enter a place and press <b>Render map</b>.</span><div class="bar"><span class="fill"></span><i class="shimmer"></i></div></div>
 
     <details>
       <summary>About &amp; tips</summary>
@@ -202,6 +220,7 @@
   </div>
 
   <div class="hint-zoom" id="zoomHint">scroll to zoom · drag to pan</div>
+  <div id="hud"></div>
   <div id="legend"></div>
   <div id="attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Terrain: AWS / Mapzen</div>
 
@@ -317,11 +336,32 @@
   // ---------------------------------------------------------------------------
   // Status helpers
   // ---------------------------------------------------------------------------
-  var statusEl = $("status");
+  var statusEl = $("status"), statusMsg = $("status-msg");
+  var progBar = statusEl.querySelector(".bar"), progFill = progBar.querySelector(".fill");
   function status(msg, opts) {
     opts = opts || {};
-    statusEl.innerHTML = msg + '<div class="bar"><i></i></div>';
+    statusMsg.innerHTML = msg;
     statusEl.className = (opts.loading ? "loading " : "") + (opts.err ? "err" : "");
+    if (!opts.loading) progBar.classList.remove("indet");
+  }
+  // Determinate / indeterminate progress. pct === null => indeterminate shimmer (for network
+  // waits of unknown length, where the main thread is free so the CSS animation still runs);
+  // a number sets the fill width.
+  function progress(pct, label) {
+    statusEl.className = "loading";
+    if (label != null) statusMsg.textContent = label;
+    if (pct == null) progBar.classList.add("indet");
+    else { progBar.classList.remove("indet"); progFill.style.width = Math.max(0, Math.min(100, pct)) + "%"; }
+  }
+  // Resolve only after the browser has actually painted (double rAF), so a progress update is
+  // visible BEFORE the next blocking synchronous step runs — otherwise the bar would freeze
+  // exactly when heavy work starts.
+  function nextPaint() {
+    return new Promise(function (r) {
+      var done = false, go = function () { if (done) return; done = true; r(); };
+      requestAnimationFrame(function () { requestAnimationFrame(go); });  // resolves after a real paint
+      setTimeout(go, 60);  // fallback so the pipeline never hangs if rAF is throttled/paused
+    });
   }
   function setStats(s) { $("stats").textContent = s || ""; }
 
@@ -540,7 +580,9 @@
       });
     });
 
-    return Promise.all(proms).then(function (results) {
+    return Promise.all(proms).then(async function (results) {
+      progress(74, "Processing elevation data …");
+      await nextPaint();  // paint the label before the synchronous decode + NoData repair blocks
       // mosaic of nx*256 x ny*256 pixels
       var TS = 256, mW = nx * TS, mH = ny * TS;
       var off = document.createElement("canvas"); off.width = TS; off.height = TS;
@@ -849,7 +891,8 @@
     };
   }
 
-  function render() {
+  var lastRenderMs = 0;   // cost of the most recent frame, surfaced by the HUD
+  function drawScene() {
     var th = THEMES[$("theme").value];
     var bw = parseFloat($("weight").value);
     var L = currentLayers();
@@ -910,6 +953,8 @@
     }
     ctx.restore();
   }
+  // timed wrapper so the HUD can report per-frame render cost
+  function render() { var t0 = performance.now(); drawScene(); lastRenderMs = performance.now() - t0; }
 
   function strokeWeightedGlow(list, color, bw) {
     ctx.strokeStyle = color; ctx.lineJoin = "round"; ctx.lineCap = "round";
@@ -1006,15 +1051,18 @@
     var detail = $("detail").value;
     var bb;
 
-    status("Locating “" + q + "” …", { loading: true });
+    progFill.style.width = "0%";
+    progress(4, "Locating “" + q + "” …");
     geocode(q).then(function (g) {
       bb = clampBbox(g);
       scene.bbox = bb;
-      status("Fetching map data from OpenStreetMap …", { loading: true });
+      progress(null, "Fetching roads & features from OpenStreetMap … (large areas can take 30s+)");
       return overpass(buildQuery(bb, layers, detail), function (i, ep) {
-        if (i > 0) status("Retrying via mirror " + (i + 1) + " …", { loading: true });
+        if (i > 0) progress(null, "Overpass busy — retrying via mirror " + (i + 1) + " …");
       });
-    }).then(function (osm) {
+    }).then(async function (osm) {
+      progress(32, "Parsing map features …");
+      await nextPaint();  // categorize() over tens of thousands of elements blocks; show label first
       var cat = categorize(osm.elements || []);
       scene.roads = cat.roads; scene.water = cat.water; scene.waterLines = cat.waterLines;
       scene.green = cat.green; scene.rail = cat.rail; scene.buildings = cat.buildings;
@@ -1022,21 +1070,23 @@
 
       var needTopo = layers.contours || layers.hillshade || layers.bathy;
       if (!needTopo) return null;
-      status("Fetching elevation tiles …", { loading: true });
+      progress(38, "Fetching elevation tiles …");
       return loadTerrain(bb, function (d, t) {
-        status("Fetching elevation tiles … " + d + "/" + t, { loading: true });
+        progress(38 + 34 * (d / t), "Fetching elevation tiles … " + d + "/" + t);
       });
-    }).then(function (terr) {
+    }).then(async function (terr) {
       scene.contours = { index: [], normal: [] }; scene.hill = null; scene.bathy = null;
       scene._terr = terr || null;  // cache the raw grid so toggles/interval recompute without refetch
       scene._terrStats = null;
       if (terr) {
         var th = THEMES[$("theme").value];
-        status("Computing terrain — contours, relief, depth …", { loading: true });
-        if (layers.contours) scene.contours = computeContours(terr, $("cinterval").value);
-        if (layers.hillshade) scene.hill = computeHillshade(terr);
-        if (layers.bathy) scene.bathy = computeBathymetry(terr, th);
+        // each step yields first so the % + label paint before that step's synchronous block
+        if (layers.contours)  { progress(80, "Tracing contour lines …");       await nextPaint(); scene.contours = computeContours(terr, $("cinterval").value); }
+        if (layers.hillshade) { progress(86, "Computing hillshade relief …");  await nextPaint(); scene.hill = computeHillshade(terr); }
+        if (layers.bathy)     { progress(91, "Computing water depth …");       await nextPaint(); scene.bathy = computeBathymetry(terr, th); }
       }
+      progress(96, "Drawing map …");
+      await nextPaint();
       scene.loaded = true;
       fitTo(scene.worldBounds);
       // if the viewport wasn't measurable yet, re-fit on the next frame
@@ -1044,6 +1094,7 @@
         requestAnimationFrame(function () { resize(); fitTo(scene.worldBounds); render(); });
       }
       render();
+      progress(100, "Drawing map …");
       finishRender(layers);
     }).catch(function (err) {
       console.error(err);
@@ -1125,6 +1176,46 @@
     var sb = $("sw-bathy"); if (sb) sb.style.background = "linear-gradient(135deg," + th.bathyShallow + "," + th.bathyDeep + ")";
   }
 
+  // ---- Performance HUD: a live heartbeat + FPS + per-frame render cost ----
+  // FPS = frames counted by a rAF loop over each interval; the DOM is repainted by a timer so
+  // it still works where rAF is throttled. Both freeze during a true main-thread block (a heavy
+  // render), so the heartbeat stalling and FPS cratering is exactly how you watch the limit.
+  var hudEl = $("hud"), hudOn = false, hudInt = 0, hudRAFc = 0;
+  var hudFrames = 0, hudPrevFrames = 0, hudPrevT = 0, hudTick = 0;
+  var HEART = ["◴", "◷", "◶", "◵"];
+  function fpsColor(f) { return f >= 50 ? "var(--ok)" : f >= 24 ? "var(--warn)" : "var(--accent)"; }
+  function hudCount() { if (hudOn) { hudFrames++; hudRAFc = requestAnimationFrame(hudCount); } }
+  function hudPaint() {
+    if (!hudOn) return;
+    var now = performance.now(), dt = (now - hudPrevT) / 1000;
+    var fps = dt > 0 ? (hudFrames - hudPrevFrames) / dt : 0;
+    hudPrevFrames = hudFrames; hudPrevT = now; hudTick++;
+    var sc = scene, info = sc.loaded
+      ? sc.roads.length.toLocaleString() + " roads<br>" +
+        (sc.green.length + sc.water.length).toLocaleString() + " fills · " +
+        (((sc.contours.normal.length + sc.contours.index.length) / 4) | 0).toLocaleString() + " contour segs"
+      : '<span class="dim">no map yet</span>';
+    hudEl.innerHTML =
+      HEART[hudTick % 4] + ' <span class="big" style="color:' + fpsColor(fps) + '">' + Math.round(fps) + '</span> <span class="dim">fps</span>' +
+      '<br>render <b>' + lastRenderMs.toFixed(1) + '</b> ms' +
+      '<br><span class="dim">' + info + '</span>';
+  }
+  $("ly-stats").addEventListener("change", function () {
+    hudOn = this.checked;
+    if (hudOn) {
+      hudEl.classList.add("show");
+      var zh = $("zoomHint"); if (zh) zh.style.display = "none";
+      hudFrames = 0; hudPrevFrames = 0; hudPrevT = performance.now();
+      hudRAFc = requestAnimationFrame(hudCount);
+      hudInt = setInterval(hudPaint, 200);
+      hudPaint();  // populate immediately
+    } else {
+      hudEl.classList.remove("show");
+      clearInterval(hudInt);
+      if (hudRAFc) cancelAnimationFrame(hudRAFc);
+    }
+  });
+
   $("render").onclick = runRender;
   $("download").onclick = download;
   $("fit").onclick = function () { if (scene.worldBounds) { fitTo(scene.worldBounds); render(); } };
@@ -1180,8 +1271,14 @@
     canvas.addEventListener(ev, function () { var h = $("zoomHint"); if (h) h.style.display = "none"; }, { once: true });
   });
 
-  // expose for console debugging
-  window.cartography = { scene: scene, view: view, render: render, run: runRender };
+  // expose for console debugging / measuring limits
+  window.cartography = {
+    scene: scene, view: view, render: render, run: runRender,
+    // average ms/frame over n synchronous redraws of the current view — a quick way to
+    // measure the render limit from the console, e.g. cartography.benchmark(30)
+    benchmark: function (n) { n = n || 20; var t0 = performance.now(); for (var i = 0; i < n; i++) drawScene(); return +(((performance.now() - t0)) / n).toFixed(2); },
+    lastFrameMs: function () { return lastRenderMs; }
+  };
 })();
 </script>
 </body>
