@@ -1,0 +1,48 @@
+name: Update BTC price
+
+# Refreshes the live "current" BTC price snapshot in the power-law page's
+# bitcoin-power-law/assets/data.js once a day. It recomputes only the `current`
+# block (today's point + the Price/model and Corridor chips) from the stored,
+# stable power-law fit -- it does NOT regenerate the full econometric payload
+# (that needs the out-of-repo pl_econometrics.py). See scripts/update_btc_price.py.
+#
+# Commits carry [skip ci] so the published-corpus manifest workflow does not
+# re-run on these minor daily updates.
+
+on:
+  schedule:
+    - cron: '23 7 * * *'      # ~07:23 UTC daily (off the hour; scheduled runs can be delayed)
+  workflow_dispatch: {}        # allow manual runs from the Actions tab
+
+permissions:
+  contents: write              # to commit the refreshed data.js
+
+concurrency:
+  group: update-btc-price
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Refresh current BTC price
+        run: python3 scripts/update_btc_price.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- bitcoin-power-law/assets/data.js; then
+            echo "data.js unchanged -- nothing to commit."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add bitcoin-power-law/assets/data.js
+            git commit -m "chore: refresh live BTC price snapshot [skip ci]"
+            git push
+          fi
