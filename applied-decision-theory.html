@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Applied Decision Theory · A Word-Problem Playground</title>
+  <meta name="description"
+        content="A companion playground to the causal-ladder curriculum: worked
+                 word-problems in insurance, markets, medicine, and law, each solved
+                 with expected utility, MEU, and the value of information, plus a
+                 live break-even calculator. By Scott Nelson." />
+  <meta name="author" content="Scott Nelson" />
+  <meta property="og:title" content="Applied Decision Theory: A Word-Problem Playground" />
+  <meta property="og:description" content="Break-even probability, implied probability, and VPI applied to insurance, markets, medicine, and law — with a live calculator. Companion to the causal-ladder page, by Scott Nelson." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://scottn66.github.io/applied-decision-theory.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon"
+        href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🎲</text></svg>" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --gold-soft:#F6EFD8; --code-bg:#F2F2F5;
+      --see:#2F7A4A; --do:#1F4E9E; --imagine:#8a4fbf; --imagine-soft:#EDE3F7;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    pre{background:#1f2430;color:#e6e6e6;padding:1rem 1.1rem;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.55}
+    pre code{background:none;color:inherit;padding:0}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar a{color:#cfe0ff;border:none}
+    .topbar a:hover{color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    .page{display:grid;grid-template-columns:230px minmax(0,760px);gap:2.4rem;max-width:1080px;margin:0 auto;padding:2rem 1.2rem 5rem}
+    .toc{position:sticky;top:3.4rem;align-self:start;font-size:.85rem;max-height:90vh;overflow:auto}
+    .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+    .toc li{counter-increment:t;margin:.15rem 0}
+    .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
+    .toc a{color:var(--muted);border:none}
+    .toc a:hover{color:var(--accent)}
+    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none;counter-increment:none}
+    .toc .act::before{content:""}
+    .toc .digress a{font-style:italic}
+    main{min-width:0}
+    h1{font-size:2.5rem;line-height:1.1;margin:.2rem 0 .6rem;letter-spacing:-.5px}
+    h2{font-size:1.5rem;margin:2.6rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
+    h3{font-size:1.12rem;margin:1.6rem 0 .3rem}
+    .lead{font-size:1.18rem;color:#333}
+    .badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .badge{font-size:.72rem;background:var(--accent-soft);color:var(--accent);padding:.2rem .6rem;border-radius:99px;border:none;font-weight:600}
+    .act-tag{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.18rem .55rem;border-radius:99px;color:#fff}
+    .act-see{background:var(--see)} .act-do{background:var(--do)} .act-imagine{background:var(--imagine)} .act-econ{background:var(--gold);color:#3a2e00}
+    .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--radius);padding:.8rem 1rem;margin:1.1rem 0;box-shadow:var(--shadow)}
+    .callout.good{border-left-color:var(--good)} .callout.warn{border-left-color:var(--warn)} .callout.gold{border-left-color:var(--gold)}
+    .callout.landmark{border-left-color:var(--imagine);background:var(--imagine-soft)}
+    .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .aside-box{border:1px dashed var(--rule);border-radius:var(--radius);padding:.75rem 1rem;margin:1.1rem 0;background:#FCFCFD;font-size:.93rem}
+    .aside-box .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+    .aside-box.prereq .k{color:var(--good)}
+    .aside-box.digress .k{color:var(--gold)}
+    details.aside-box summary{cursor:pointer;font-weight:700;font-size:.8rem}
+    .toc-toggle{display:none}
+    mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+    figure{margin:1.2rem 0;text-align:center}
+    figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
+    table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
+    th,td{border:1px solid var(--rule);padding:.4rem .6rem;text-align:left;vertical-align:top}
+    th{background:var(--accent-soft);color:var(--accent)}
+    ol.outline{counter-reset:o;list-style:none;padding-left:0}
+    ol.outline>li{counter-increment:o;margin:.5rem 0;padding-left:2.1rem;position:relative}
+    ol.outline>li::before{content:counter(o);position:absolute;left:0;top:.1rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--accent);color:#fff;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .widget{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem 1.2rem;margin:1.3rem 0;box-shadow:var(--shadow)}
+    .widget h4{margin:.1rem 0 .2rem;font-size:1rem}
+    .widget .hint{font-size:.8rem;color:var(--muted);margin:0 0 .8rem}
+    .seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:.15rem .4rem .15rem 0}
+    .seg button{border:none;background:#fff;padding:.28rem .6rem;font-size:.82rem;cursor:pointer;color:var(--muted)}
+    .seg button.on{background:var(--accent);color:#fff}
+    .row{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:flex-start}
+    .col{flex:1;min-width:240px}
+    .bar{height:18px;background:var(--accent-soft);border-radius:4px;position:relative;margin:.25rem 0}
+    .bar>span{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px;transition:width .25s}
+    .barlabel{display:flex;justify-content:space-between;font-size:.8rem;margin-top:.5rem}
+    .slider{width:100%}
+    .readout{font-variant-numeric:tabular-nums}
+    .big{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .pill{display:inline-block;padding:.1rem .5rem;border-radius:99px;font-size:.78rem;font-weight:700}
+    .pill.a{background:var(--good-soft);color:var(--good)} .pill.b{background:var(--accent-soft);color:var(--accent)}
+    .twin{display:flex;gap:1.2rem;flex-wrap:wrap}
+    .twin .net{flex:1;min-width:220px;border:1px dashed var(--rule);border-radius:10px;padding:.6rem;text-align:center}
+    .steps{counter-reset:s;margin:.6rem 0}
+    .step{counter-increment:s;border-left:3px solid var(--rule);padding:.2rem 0 .2rem .9rem;margin:.4rem 0;opacity:.45;transition:opacity .2s}
+    .step.active{opacity:1;border-left-color:var(--imagine)}
+    .step .label::before{content:"Step " counter(s) " · "}
+    .step .label{font-weight:700;font-size:.82rem;text-transform:uppercase;color:var(--muted)}
+    .worked .step{opacity:1;border-left-color:var(--accent)}
+    button.go{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.4rem .9rem;font-size:.86rem;cursor:pointer}
+    button.go:hover{filter:brightness(1.08)}
+    .inputline{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;font-size:.85rem;margin:.3rem 0}
+    .inputline input{width:54px;padding:.2rem .3rem;border:1px solid var(--rule);border-radius:6px;font-family:inherit}
+    .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}
+    @media(max-width:880px){
+      .page{grid-template-columns:1fr}
+      h1{font-size:2rem}
+      .toc{display:block;position:static;max-height:none}
+      .toc>nav{display:none}
+      .toc.open>nav{display:block}
+      .toc-toggle{display:block;width:100%;text-align:left;background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .8rem;font-size:.9rem;cursor:pointer}
+      table{display:block;overflow-x:auto;white-space:normal}
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="index.html">Scott Nelson</a>
+    <a href="decision-theory.html">← Decision theory</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="resume.html">Resume</a>
+  </nav>
+
+  <div class="page">
+    <aside class="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
+      <nav><ol>
+        <li><a href="#insurance">Insurance · break-even</a></li>
+        <li><a href="#widget-be">▶ Break-even calculator</a></li>
+        <li><a href="#finance">Finance · implied probability</a></li>
+        <li><a href="#medicine">Medicine · VPI of a test</a></li>
+        <li><a href="#law">Law · settle vs. trial</a></li>
+        <li class="digress"><a href="decision-theory.html">← back to the ladder</a></li>
+      </ol></nav>
+    </aside>
+
+    <main>
+      <header id="hero">
+        <div class="badges">
+          <span class="badge">Applied · word-problem playground</span>
+          <span class="badge">break-even · implied probability · VPI</span>
+          <span class="badge">live calculator</span>
+          <a href="decision-theory.html" style="border:none"><span class="badge">companion to the causal ladder</span></a>
+        </div>
+        <h1>Applied decision theory</h1>
+        <p class="lead">
+          A breakaway from the <a href="decision-theory.html">causal-ladder
+          curriculum</a>: same engine — expected utility, maximum expected
+          utility, the <a href="decision-theory.html#vpi">value of
+          information</a> — but here it is pure practice. Four word-problems from
+          high-stakes fields, each solved step by step, plus a calculator you can
+          drag. The recurring trick: a price or a payoff secretly encodes a
+          <em>probability</em>, and the work is reading it back out.
+        </p>
+        <p>
+          Every problem below is the same move in disguise: read a
+          <em>price</em> backwards to recover the <em>probability</em> it implies.
+          The cleanest version — the one the calculator runs on, and the one the
+          diagram sketches — is the break-even of a <strong>risk transfer</strong>.
+          It needs only the expected-value reasoning from the
+          <a href="decision-theory.html#utility">causal-ladder page</a> (utility
+          and maximum expected utility); that is the one prerequisite.
+        </p>
+        <div class="callout gold">
+          <span class="k">The shared equation</span>
+          <p style="margin:.3rem 0 0">
+            You break even between paying a certain cost up front and carrying the
+            risk yourself exactly when
+            $$p^\ast \;=\; \frac{C}{\,L - D\,}.$$
+            In words: the break-even probability is the up-front cost divided by
+            the slice of the loss that the cost actually removes.
+          </p>
+        </div>
+        <p>
+          What each symbol means — abstractly, and what it can stand for once you
+          point the equation at a real decision:
+        </p>
+        <table>
+          <tr><th>Symbol</th><th>Abstractly</th><th>Applied, it can be…</th></tr>
+          <tr><td>$p^\ast$</td><td>the <strong>break-even probability</strong> of the bad event — transfer the risk if your true chance is higher, self-bear if it is lower</td><td>a screen-crack rate · the claim rate an insurer assumes · how likely you are to actually use the cover</td></tr>
+          <tr><td>$C$</td><td>the <strong>certain cost paid up front</strong> to hand off the risk, per period</td><td>an insurance premium · an extended-warranty price · a maintenance plan · the cost of a hedge</td></tr>
+          <tr><td>$L$</td><td>the <strong>full loss</strong> you eat if the event happens and you did <em>not</em> pay $C$</td><td>an out-of-warranty repair · a replacement device · the bill for an uncovered failure</td></tr>
+          <tr><td>$D$</td><td>the <strong>residual cost</strong> you still pay even when covered, so $C$ buys only $L-D$ of real protection</td><td>a deductible · a service fee · a copay · $D=0$ when the cover is total</td></tr>
+        </table>
+        <p>
+          The other three problems are the same inversion through sibling
+          formulas: in <a href="#finance">finance</a> the price <em>is</em> the
+          probability; in <a href="#medicine">medicine</a> the "price" is a test
+          and the payoff is the <a href="decision-theory.html#vpi">value of the
+          information</a> it buys; in <a href="#law">law</a> the break-even is the
+          win-probability that makes a settlement fair. The diagram is that whole
+          family at a glance:
+        </p>
+        <figure>
+          <svg viewBox="0 0 700 240" width="100%" style="max-width:700px" role="img" aria-label="One engine: a quoted price, read backwards through p-star equals C over L minus D, becomes an implied probability — the same move across insurance, options, betting, and prediction markets">
+            <defs><marker id="ad-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#555" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="30" y="38" width="210" height="72" rx="10" fill="#DCE6F4" stroke="#1F4E9E"/>
+            <text x="135" y="68" font-size="15" font-weight="700" fill="#0C447C" text-anchor="middle">A quoted price</text>
+            <text x="135" y="90" font-size="11" fill="#185FA5" text-anchor="middle">premium · odds · option · stake</text>
+            <line x1="244" y1="74" x2="452" y2="74" stroke="#555" stroke-width="2" marker-end="url(#ad-arrow)"/>
+            <text x="348" y="60" font-size="11" fill="#555" text-anchor="middle">read it backwards</text>
+            <text x="318" y="100" font-size="13" fill="#1E1E1E" text-anchor="end">p* =</text>
+            <text x="353" y="93" font-size="12.5" fill="#1E1E1E" text-anchor="middle">C</text>
+            <line x1="334" y1="97" x2="372" y2="97" stroke="#1E1E1E" stroke-width="1"/>
+            <text x="353" y="110" font-size="12.5" fill="#1E1E1E" text-anchor="middle">L − D</text>
+            <rect x="458" y="38" width="212" height="72" rx="10" fill="#DEEFE0" stroke="#2F7A4A"/>
+            <text x="564" y="68" font-size="15" font-weight="700" fill="#085041" text-anchor="middle">An implied probability</text>
+            <text x="564" y="90" font-size="11" fill="#0F6E56" text-anchor="middle">break-even · risk-neutral</text>
+            <line x1="350" y1="118" x2="350" y2="150" stroke="#E5E5EA" stroke-width="1"/>
+            <text x="350" y="146" font-size="11.5" fill="#555" text-anchor="middle">the same move, four markets</text>
+            <g font-size="13" font-weight="700" text-anchor="middle">
+              <rect x="22" y="162" width="150" height="56" rx="9" fill="#F6EFD8" stroke="#C9A227"/><text x="97" y="187" fill="#633806">Insurance</text>
+              <rect x="190" y="162" width="150" height="56" rx="9" fill="#F6EFD8" stroke="#C9A227"/><text x="265" y="187" fill="#633806">Options</text>
+              <rect x="358" y="162" width="150" height="56" rx="9" fill="#F6EFD8" stroke="#C9A227"/><text x="433" y="187" fill="#633806">Betting</text>
+              <rect x="526" y="162" width="150" height="56" rx="9" fill="#F6EFD8" stroke="#C9A227"/><text x="601" y="187" fill="#633806">Prediction</text>
+            </g>
+            <g font-size="10.5" text-anchor="middle" fill="#854F0B">
+              <text x="97" y="205">premium ⇄ claim</text>
+              <text x="265" y="205">price ⇒ RN prob</text>
+              <text x="433" y="205">odds ⇒ 1/d</text>
+              <text x="601" y="205">price = prob</text>
+            </g>
+          </svg>
+          <figcaption>One engine behind all four problems: invert a price to recover the probability it implies.</figcaption>
+        </figure>
+        <div class="callout landmark">
+          <span class="k">The problem schema</span>
+          <p style="margin:.3rem 0 0">
+            This is a problem set, not an essay, so every entry follows the same
+            five beats — <strong>Setup</strong> (the scenario and what to find),
+            <strong>Principle</strong> (the lens, written as a formula),
+            <strong>Work</strong> (numbered arithmetic), <strong>Answer</strong>
+            (the boxed result), and <strong>Takeaway</strong> (the transferable
+            lesson). The tag beside each title names the tool it drills, and new
+            problems slot into the same beats. The theory behind every move lives
+            on the <a href="decision-theory.html">ladder page</a> (Bayes nets →
+            utility → MEU → VPI → counterfactuals); every number is checked by
+            hand.
+          </p>
+        </div>
+      </header>
+
+      <h2 id="insurance">1 · Insurance — what AppleCare's price believes <span class="act-tag act-econ">break-even probability</span></h2>
+      <p>
+        Apple sells AppleCare+ on the iPhone 17 Pro Max for $C=\$139.99$ a year.
+        Out of warranty, a screen repair is $L=\$379$; with coverage you pay a
+        $D=\$29$ deductible. Below what one-year break rate should you decline the
+        plan?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · break-even probability</span>
+        <p style="margin:.3rem 0 0">
+          Self-insuring costs $p\,L$ in expectation; insuring costs $C+pD$. Set
+          them equal and the indifference point is
+          $$p^\ast=\frac{C}{L-D}.$$
+          Buy coverage iff your true $p$ exceeds $p^\ast$; equivalently, the
+          premium <em>reveals</em> the probability the seller is pricing in.
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">Set up</div>
+          $C=\$139.99,\ L=\$379,\ D=\$29.$</div>
+        <div class="step"><div class="label">Net loss the premium covers</div>
+          $L-D = 379-29 = \$350.$ Coverage doesn't make repair free; it turns a
+          $\$379$ loss into a $\$29$ one, so the premium only buys $L-D$ of risk
+          transfer.</div>
+        <div class="step"><div class="label">Break-even</div>
+          $p^\ast = \dfrac{139.99}{350} = 0.39997 \approx 40\%.$</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          Decline if you crack a screen less than $\approx\!40\%$ of years; buy if
+          more. The rest of the lineup prices the same way: the base iPhone 17
+          ($\$119.99$ against a $\$329$ repair) also lands at
+          $119.99/300\approx 40\%$, while the iPhone 17 Pro ($\$139.99$ against
+          $\$329$) needs $139.99/300\approx 46.7\%$ — the worst screen-only value
+          of the three. A risk-averse buyer's threshold sits a hair
+          <em>below</em> these, by a risk premium
+          $\approx\tfrac12 A(W)\,\mathrm{Var}(\text{loss})$ that is negligible when
+          the loss is tiny against your wealth — which is exactly why cheap-item
+          insurance rarely pays.
+        </p>
+      </div>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">A posted price is a probability in disguise. Read it back out, remember the deductible shrinks your cover to $L-D$ (not $L$), and buy only when your own break rate beats the rate the premium implies.</p>
+      </div>
+
+      <!-- WIDGET · break-even calculator -->
+      <div class="widget" id="widget-be">
+        <h4>▶ Break-even calculator <span class="act-tag act-econ">decide</span></h4>
+        <p class="hint">Any risk-transfer is this one trade: pay a certain premium $C$, or self-insure and risk a loss $L$ (paying a deductible $D$ if covered). Drag the numbers and your own one-period break rate $p$; the widget returns the break-even $p^\ast=C/(L-D)$ — the probability the <em>price</em> implies — and tells you which side wins. The defaults are Example 1's AppleCare numbers.</p>
+        <div style="margin:.2rem 0 .7rem;display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="go" id="be-preset-ac" style="font-size:.78rem;padding:.3rem .7rem">AppleCare Pro Max</button>
+          <button class="go" id="be-preset-reset" style="font-size:.78rem;padding:.3rem .7rem;background:var(--muted)">Reset</button>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="inputline"><span style="width:200px">premium $C$ per period</span>$<input type="number" id="be-c" value="139.99" step="1" min="0" style="width:72px" aria-label="premium C"></div>
+            <div class="inputline"><span style="width:200px">full loss $L$ (no coverage)</span>$<input type="number" id="be-l" value="379" step="1" min="0" style="width:72px" aria-label="full loss L"></div>
+            <div class="inputline"><span style="width:200px">deductible $D$ (with coverage)</span>$<input type="number" id="be-d" value="29" step="1" min="0" style="width:72px" aria-label="deductible D"></div>
+            <div class="inputline"><span style="width:200px">your break probability $p$</span><input class="slider" type="range" id="be-p" min="0" max="1" step="0.01" value="0.15" aria-label="your break probability p"><span class="readout" id="be-p-v">0.15</span></div>
+          </div>
+          <div class="col" id="be-out"></div>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.74rem;color:var(--muted);margin:.8rem 0 .2rem">
+          <span><span style="display:inline-block;width:14px;height:3px;background:#1F4E9E;vertical-align:middle"></span> self-insure = p·L</span>
+          <span><span style="display:inline-block;width:14px;border-top:3px dashed #B83A2E;vertical-align:middle"></span> insure = C + p·D</span>
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#8a4fbf;vertical-align:middle"></span> break-even p*</span>
+        </div>
+        <svg id="be-chart" viewBox="0 0 480 244" width="100%" style="max-width:480px;display:block" role="img" aria-label="Expected annual cost versus break probability: the self-insure and insure lines cross at the break-even probability, with a marker at your chosen p"></svg>
+      </div>
+
+      <h2 id="finance">2 · Finance — implied probability, and how the vig lies <span class="act-tag act-econ">implied probability</span></h2>
+      <p>
+        Two quick reads. <strong>(i)</strong> A prediction-market contract pays
+        $\$1$ if a candidate wins and trades at $\$0.62$. What probability does the
+        market imply? <strong>(ii)</strong> A sportsbook offers decimal odds of
+        $1.90$ on <em>each</em> side of a two-outcome game. What does each price
+        imply, and what is the book keeping for itself?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · a price is a probability</span>
+        <p style="margin:.3rem 0 0">
+          A $\$1$ binary claim is priced at its risk-neutral probability, so
+          $\text{price}=p$ outright; buy iff your $p>\text{price}$. For decimal
+          odds $d$ the implied probability is $1/d$ — but that is <em>gross of the
+          margin</em>: across outcomes the implied probabilities sum to more than
+          $1$ by the <strong>overround</strong>, and dividing each by that sum
+          removes the bias.
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">Market contract</div>
+          Price is the probability: $p = 0.62 = 62\%$. Buy only if you believe the
+          candidate wins more than $62\%$ of the time.</div>
+        <div class="step"><div class="label">Each side's naive read</div>
+          $1/1.90 = 0.5263 = 52.63\%$ for each side.</div>
+        <div class="step"><div class="label">The overround</div>
+          $0.5263 + 0.5263 = 1.0526$, so the book has baked in $5.26\%$ (exactly
+          $1/19$) of margin.</div>
+        <div class="step"><div class="label">De-vig</div>
+          Normalize: $0.5263 / 1.0526 = 0.5$ each — the honest line is
+          $50\%/50\%$.</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          The market says $62\%$ (buy above that); the two $1.90$ prices
+          <em>look</em> like $52.63\%$ but really encode $50\%/50\%$ plus a
+          $5.26\%$ house edge. The naive implied probability overstates every
+          outcome by the half-vig, so normalize before you trust it — the same
+          price-to-probability inversion as insurance, with the seller's margin
+          folded in.
+        </p>
+      </div>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">Inverting a price into a probability is the same move everywhere — options, betting lines, prediction markets. But a <em>quoted</em> price hides the seller's margin, so strip the overround before you trust the number.</p>
+      </div>
+
+      <h2 id="medicine">3 · Medicine — the value of a diagnostic test <span class="act-tag act-econ">value of information</span></h2>
+      <p>
+        A patient may have disease $D$; your prior is $P(D)=0.40$. Two actions,
+        with payoffs in net-benefit units (read them as thousands of dollars of
+        quality-adjusted value):
+      </p>
+      <table style="max-width:520px">
+        <tr><th>&nbsp;</th><th>Disease (0.40)</th><th>Healthy (0.60)</th></tr>
+        <tr><td><strong>Treat</strong></td><td>90</td><td>70</td></tr>
+        <tr><td><strong>Withhold</strong></td><td>30</td><td>100</td></tr>
+      </table>
+      <p>
+        A <em>perfect</em> test reveals the true state and costs $2$ units. Is it
+        worth ordering before you choose?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · value of perfect information</span>
+        <p style="margin:.3rem 0 0">
+          With $\mathrm{EU}(a)=\sum_s P(s)\,U(a,s)$ and
+          $\mathrm{MEU}=\max_a \mathrm{EU}(a)$, the
+          <a href="decision-theory.html#eq-vpi">VPI</a> of observing the true state
+          is
+          $$\mathrm{VPI}=\Big[\textstyle\sum_v P(v)\,\mathrm{MEU}(v)\Big]-\mathrm{MEU},$$
+          and you test iff $\mathrm{VPI}$ beats the test's cost.
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">Decide blind</div>
+          $\mathrm{EU}(\text{Treat})=0.4(90)+0.6(70)=78$ and
+          $\mathrm{EU}(\text{Withhold})=0.4(30)+0.6(100)=72$, so $\mathrm{MEU}=78$
+          — treat without testing.</div>
+        <div class="step"><div class="label">Decide per result</div>
+          A "Disease" result $\to \max(90,30)=90$ (treat); a "Healthy" result
+          $\to \max(70,100)=100$ (withhold).</div>
+        <div class="step"><div class="label">Expected best, informed</div>
+          $0.4(90)+0.6(100)=36+60=96.$</div>
+        <div class="step"><div class="label">VPI</div>
+          $96-78 = 18$ units — far above the cost of $2$, so <strong>test</strong>
+          (worth it for any cost under $18$).</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          $\mathrm{VPI}=18$. The test earns its keep only because a "Healthy"
+          result <em>flips</em> the action — blind you would have treated, but the
+          result tells you to withhold. Information is worth exactly what it
+          changes: had both states led to the same choice, $\mathrm{VPI}$ would be
+          $0$, the clinical version of the ladder's $\mathrm{VPI}(F)=0$ result.
+        </p>
+      </div>
+      <figure>
+        <svg viewBox="0 0 700 262" width="100%" style="max-width:700px" role="img" aria-label="Two strategies compared column by column: treating blind scores MEU 78, testing first scores 96; the gain comes entirely from the Healthy column, where the test flips the action from treat (70) to withhold (100), worth 18">
+          <rect x="20" y="52" width="128" height="46" rx="8" fill="#DCE6F4" stroke="#1F4E9E"/>
+          <text x="84" y="73" font-size="13" font-weight="700" fill="#0C447C" text-anchor="middle">Treat blind</text>
+          <text x="84" y="89" font-size="10.5" fill="#185FA5" text-anchor="middle">no information</text>
+          <rect x="176" y="52" width="150" height="46" rx="6" fill="#fff" stroke="#E5E5EA"/>
+          <text x="251" y="72" font-size="11.5" fill="#1E1E1E" text-anchor="middle">Disease · 0.4</text>
+          <text x="251" y="89" font-size="11.5" fill="#555" text-anchor="middle">treat → 90</text>
+          <rect x="334" y="52" width="150" height="46" rx="6" fill="#fff" stroke="#E5E5EA"/>
+          <text x="409" y="72" font-size="11.5" fill="#1E1E1E" text-anchor="middle">Healthy · 0.6</text>
+          <text x="409" y="89" font-size="11.5" fill="#555" text-anchor="middle">treat → 70</text>
+          <rect x="520" y="52" width="158" height="46" rx="8" fill="#DCE6F4" stroke="#1F4E9E"/>
+          <text x="599" y="80" font-size="14" font-weight="700" fill="#0C447C" text-anchor="middle">MEU = 78</text>
+          <rect x="20" y="200" width="128" height="46" rx="8" fill="#DEEFE0" stroke="#2F7A4A"/>
+          <text x="84" y="221" font-size="13" font-weight="700" fill="#085041" text-anchor="middle">Test, then act</text>
+          <text x="84" y="237" font-size="10.5" fill="#0F6E56" text-anchor="middle">perfect info (−2)</text>
+          <rect x="176" y="200" width="150" height="46" rx="6" fill="#fff" stroke="#E5E5EA"/>
+          <text x="251" y="220" font-size="11.5" fill="#1E1E1E" text-anchor="middle">Disease · 0.4</text>
+          <text x="251" y="237" font-size="11.5" fill="#555" text-anchor="middle">treat → 90</text>
+          <rect x="334" y="200" width="150" height="46" rx="6" fill="#DEEFE0" stroke="#2F7A4A"/>
+          <text x="409" y="220" font-size="11.5" fill="#085041" text-anchor="middle">Healthy · 0.6</text>
+          <text x="409" y="237" font-size="11.5" font-weight="700" fill="#085041" text-anchor="middle">withhold → 100</text>
+          <rect x="520" y="200" width="158" height="46" rx="8" fill="#DEEFE0" stroke="#2F7A4A"/>
+          <text x="599" y="228" font-size="14" font-weight="700" fill="#085041" text-anchor="middle">E[MEU] = 96</text>
+          <line x1="409" y1="98" x2="409" y2="200" stroke="#8a4fbf" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <rect x="300" y="128" width="215" height="44" rx="8" fill="#EDE3F7" stroke="#8a4fbf"/>
+          <text x="407" y="148" font-size="11.5" font-weight="700" fill="#3C3489" text-anchor="middle">the test flips this column</text>
+          <text x="407" y="164" font-size="11" fill="#26215C" text-anchor="middle">70 → 100, weighted 0.6 ⇒ +18</text>
+          <text x="84" y="150" font-size="12.5" font-weight="700" fill="#1E1E1E" text-anchor="middle">VPI = 96 − 78</text>
+          <text x="84" y="170" font-size="16" font-weight="700" fill="#8a4fbf" text-anchor="middle">= 18</text>
+        </svg>
+        <figcaption>The two strategies, column by column. Both treat when disease is likely; the test earns its value only in the Healthy column, where it flips the action from <em>treat</em> (70) to <em>withhold</em> (100). That single flip, weighted by P(Healthy)=0.6, is the entire VPI of 18.</figcaption>
+      </figure>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">Information is worth only what it changes. VPI prices decision-relevance, not how much you learn — a test whose result never flips the action is worth exactly nothing, however informative it feels.</p>
+      </div>
+
+      <h2 id="law">4 · Law — settle or go to trial <span class="act-tag act-econ">expected utility</span></h2>
+      <p>
+        A plaintiff wins an award of $X=\$100{,}000$ with probability $p$, and
+        nothing otherwise. Trial costs $K=\$20{,}000$ in fees either way, and the
+        defendant offers a certain settlement of $S=\$30{,}000$. When should the
+        plaintiff settle — and why might they settle for less than the case is
+        "worth"?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · expected value, then expected utility</span>
+        <p style="margin:.3rem 0 0">
+          Trial is worth $pX-K$ in expectation, so settle iff $S\ge pX-K$, i.e.
+          below the break-even
+          $$p^\ast=\frac{S+K}{X}.$$
+          Under risk aversion you compare <em>utilities</em>, not dollars: the
+          gamble's <strong>certainty equivalent</strong> sits below its expected
+          value by a risk premium, so offers between the two get accepted even when
+          the dollar math "says sue."
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">Break-even win-rate</div>
+          $p^\ast = \dfrac{30{,}000+20{,}000}{100{,}000}=0.5.$ Go to trial only if
+          you'd win more than half the time — exactly the
+          <a href="decision-theory.html#domains">preponderance</a> line.</div>
+        <div class="step"><div class="label">Expected value at $p=0.6$</div>
+          $\mathbb{E}[\text{trial}]=0.6(100{,}000)-20{,}000=\$40{,}000 > \$30{,}000$,
+          so a risk-<em>neutral</em> plaintiff litigates.</div>
+        <div class="step"><div class="label">Add risk aversion</div>
+          With $u(w)=\sqrt{w}$ and wealth $W=\$100{,}000$, trial gives
+          $\$180{,}000$ (win) or $\$80{,}000$ (lose):
+          $\mathrm{EU}=0.6\sqrt{180000}+0.4\sqrt{80000}=367.7.$</div>
+        <div class="step"><div class="label">Certainty equivalent</div>
+          $\mathrm{CE}=367.7^{2}-100{,}000=\$35{,}200$, a risk premium of
+          $40{,}000-35{,}200=\$4{,}800$ below the expected value.</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          The break-even is $p^\ast=50\%$. At $p=0.6$ the EV of trial is
+          $\$40{,}000$, but its certainty equivalent is only $\$35{,}200$ — so a
+          risk-averse plaintiff accepts any offer in $[\$35{,}200,\ \$40{,}000]$,
+          <em>below</em> the expected-value line. (The $\$30{,}000$ on the table is
+          under even the CE, so it is still rejected; nudge it to $\$36{,}000$ and
+          EV says "sue" while caution says "settle.") Expected utility subsumes
+          naive expected value: concavity prices in risk, which is why litigants,
+          insurers, and patients all routinely accept less than a gamble's
+          mathematical expectation.
+        </p>
+      </div>
+      <figure>
+        <svg viewBox="0 0 560 300" width="100%" style="max-width:560px" role="img" aria-label="A concave utility curve: the trial's certainty equivalent of 35200 dollars sits left of its expected value of 40000 dollars, and the gap between them is the 4800 dollar risk premium">
+          <defs><marker id="rp-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 2L8 5L2 8" fill="#B83A2E"/></marker></defs>
+          <line x1="55" y1="255" x2="540" y2="255" stroke="#bbb"/>
+          <line x1="55" y1="255" x2="55" y2="35" stroke="#bbb"/>
+          <text x="533" y="273" font-size="10.5" fill="#555" text-anchor="end">wealth →</text>
+          <text x="50" y="44" font-size="10.5" fill="#555" text-anchor="end">utility</text>
+          <polyline points="55,235 123,197 191,164 259,136 326,112 394,90 462,68 530,50" fill="none" stroke="#1F4E9E" stroke-width="2.5"/>
+          <text x="250" y="126" font-size="11" fill="#1F4E9E" text-anchor="end">u(w) = √w</text>
+          <line x1="123" y1="197" x2="462" y2="68" stroke="#999" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <circle cx="123" cy="197" r="4.5" fill="#1F4E9E"/>
+          <text x="123" y="214" font-size="10" fill="#555" text-anchor="middle">lose · $80k</text>
+          <circle cx="462" cy="68" r="4.5" fill="#1F4E9E"/>
+          <text x="462" y="58" font-size="10" fill="#555" text-anchor="middle">win · $180k</text>
+          <line x1="303" y1="120" x2="326" y2="120" stroke="#C9A227" stroke-width="1.4"/>
+          <circle cx="326" cy="120" r="4.5" fill="#C9A227"/>
+          <text x="335" y="116" font-size="10" fill="#854F0B" text-anchor="start">E[u] of trial = 367.7</text>
+          <circle cx="303" cy="120" r="4.5" fill="#B83A2E"/>
+          <line x1="303" y1="120" x2="303" y2="255" stroke="#B83A2E" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="326" y1="120" x2="326" y2="255" stroke="#555" stroke-width="1" stroke-dasharray="3 3"/>
+          <line x1="303" y1="243" x2="326" y2="243" stroke="#B83A2E" stroke-width="1.4" marker-start="url(#rp-arrow)" marker-end="url(#rp-arrow)"/>
+          <text x="314" y="237" font-size="9.5" fill="#B83A2E" text-anchor="middle">$4.8k</text>
+          <text x="303" y="284" font-size="9.5" fill="#B83A2E" text-anchor="middle">CE 135.2</text>
+          <text x="326" y="270" font-size="9.5" fill="#555" text-anchor="middle">EV 140</text>
+        </svg>
+        <figcaption>Schematic (curvature exaggerated). Because utility is concave, the trial's certainty equivalent (\$35,200) lies left of its expected value (\$40,000); the \$4,800 gap is the risk premium — the most a risk-averse plaintiff will give up to avoid the gamble, which is why they settle below the dollar expectation.</figcaption>
+      </figure>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">Expected utility subsumes expected value. Concavity prices in risk, so the rational deal sits below the gamble's dollar expectation by the risk premium — the gap that keeps settlement, insurance, and hedging in business.</p>
+      </div>
+
+      <footer class="colophon" id="colophon">
+        <p>
+          A companion playground to
+          <a href="decision-theory.html">The Value of Knowing You</a>, the
+          causal-ladder curriculum. The theory — Bayesian networks, expected
+          utility, maximum expected utility, and the value of perfect information —
+          is developed there; this page just applies it. Every figure is recomputed
+          by hand, and the calculator's arithmetic mirrors the worked steps.
+          — Scott Nelson
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+  /* =================== break-even / implied-probability calculator =================== */
+  (function(){
+    const $=id=>document.getElementById(id);
+    function num(id){ const v=parseFloat($(id).value); return isNaN(v)?0:v; }
+    function compute(){
+      const C=Math.max(0,num("be-c")), L=Math.max(0,num("be-l")), D=Math.max(0,num("be-d")), p=num("be-p");
+      $("be-p-v").textContent=p.toFixed(2);
+      const cover=L-D;
+      if(cover<=0){
+        $("be-out").innerHTML=`<div class="big readout">—</div>
+          <div style="font-size:.82rem;color:var(--warn)">Deductible ≥ loss: coverage removes no risk, so it is never worth buying on this peril.</div>`;
+        $("be-chart").innerHTML='<text x="240" y="122" font-size="12" fill="#B83A2E" text-anchor="middle">no risk transfer — deductible ≥ loss</text>';
+        return;
+      }
+      const pStar=C/cover, euSelf=p*L, euIns=C+p*D, insure=p>pStar, diff=Math.abs(euSelf-euIns), pct=pStar*100;
+      $("be-out").innerHTML=`
+        <div style="font-size:.8rem;color:var(--muted)">Break-even probability</div>
+        <div class="big readout">${pStar>1?'&gt;100%':pct.toFixed(1)+'%'}</div>
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:.5rem">p* = C/(L−D) = ${C.toFixed(2)} / ${cover.toFixed(2)}</div>
+        <div style="font-size:.85rem">Self-insure E[cost] = <span class="readout">$${euSelf.toFixed(2)}</span></div>
+        <div style="font-size:.85rem">Insure E[cost] = <span class="readout">$${euIns.toFixed(2)}</span></div>
+        <div style="margin-top:.7rem">At your p = ${p.toFixed(2)}: <span class="pill ${insure?'a':'b'}">${insure?'Insure':'Self-insure'}</span></div>
+        <div style="font-size:.82rem;color:var(--muted);margin-top:.3rem">${pStar>1
+          ? 'The premium exceeds the loss it can avoid, so insuring loses at any probability on this peril alone.'
+          : (insure
+            ? `Your break risk beats the ${pct.toFixed(1)}% the price implies — coverage pays off, by $${diff.toFixed(2)} in expectation.`
+            : `Your break risk is below the ${pct.toFixed(1)}% the price implies — self-insuring wins, by $${diff.toFixed(2)} in expectation.`)}</div>`;
+      drawChart(C,L,D,p,pStar);
+    }
+    function drawChart(C,L,D,p,pStar){
+      const x0=46,x1=466,y0=206,y1=16, ymax=Math.max(L,C+D,1)*1.10;
+      const X=t=>x0+(x1-x0)*t, Y=v=>y0-(v/ymax)*(y0-y1);
+      const inR=pStar<=1&&pStar>=0, cx=X(Math.min(pStar,1)), cy=Y(Math.min(pStar,1)*L);
+      const upx=X(p), cheaper=p*L<=C+p*D, uy=cheaper?Y(p*L):Y(C+p*D);
+      let ticks='';
+      [0,0.25,0.5,0.75,1].forEach(t=>{ticks+=`<line x1="${X(t)}" y1="${y0}" x2="${X(t)}" y2="${y0+4}" stroke="#bbb"/><text x="${X(t)}" y="${y0+16}" font-size="10" fill="#888" text-anchor="middle">${t}</text>`;});
+      $("be-chart").innerHTML=`
+        <line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="#ccc"/>
+        <line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="#ccc"/>
+        ${ticks}
+        <text x="${(x0+x1)/2}" y="${y0+30}" font-size="10.5" fill="#666" text-anchor="middle">probability the loss happens, p</text>
+        <polyline points="${X(0)},${Y(0)} ${X(1)},${Y(L)}" fill="none" stroke="#1F4E9E" stroke-width="2.5"/>
+        <polyline points="${X(0)},${Y(C)} ${X(1)},${Y(C+D)}" fill="none" stroke="#B83A2E" stroke-width="2.5" stroke-dasharray="6 4"/>
+        ${inR?`<line x1="${cx}" y1="${y0}" x2="${cx}" y2="${cy}" stroke="#8a4fbf" stroke-dasharray="2 3"/><circle cx="${cx}" cy="${cy}" r="4" fill="#8a4fbf"/><text x="${cx}" y="${cy-7}" font-size="10.5" fill="#8a4fbf" text-anchor="middle">p* = ${(pStar*100).toFixed(0)}%</text>`:''}
+        <line x1="${upx}" y1="${y0}" x2="${upx}" y2="${y1}" stroke="#999" stroke-dasharray="3 3"/>
+        <circle cx="${upx}" cy="${uy}" r="4.5" fill="${cheaper?'#1F4E9E':'#B83A2E'}" stroke="#fff" stroke-width="1.5"/>
+        <text x="${upx}" y="12" font-size="10" fill="#555" text-anchor="middle">your p</text>`;
+    }
+    ["be-c","be-l","be-d","be-p"].forEach(id=>$(id).addEventListener("input",compute));
+    $("be-preset-ac").onclick=()=>{$("be-c").value=139.99;$("be-l").value=379;$("be-d").value=29;$("be-p").value=0.15;compute();};
+    $("be-preset-reset").onclick=()=>{$("be-c").value=100;$("be-l").value=500;$("be-d").value=0;$("be-p").value=0.25;compute();};
+    compute();
+  })();
+
+  /* =================== mobile TOC disclosure =================== */
+  document.getElementById("toc-toggle").addEventListener("click",function(){
+    const t=document.querySelector(".toc");
+    t.classList.toggle("open");
+    this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
+  });
+  </script>
+</body>
+</html>
