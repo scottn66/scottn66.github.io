@@ -128,6 +128,7 @@
   <nav class="topbar">
     <a class="brand" href="index.html">Scott Nelson</a>
     <a href="decision-theory.html">← Decision theory</a>
+    <a href="actuarial-pricing.html">Actuarial track →</a>
     <a href="index.html#projects">Projects</a>
     <a href="dashboard.html">Dashboard</a>
     <a href="resume.html">Resume</a>
@@ -142,6 +143,11 @@
         <li><a href="#finance">Finance · implied probability</a></li>
         <li><a href="#medicine">Medicine · VPI of a test</a></li>
         <li><a href="#law">Law · settle vs. trial</a></li>
+        <li><a href="#test">Medicine · base-rate trap</a></li>
+        <li><a href="#newsvendor">Operations · how many to stock</a></li>
+        <li><a href="#kelly">Investing · bet sizing</a></li>
+        <li><a href="#stopping">Search · when to stop</a></li>
+        <li><a href="#potodds">Poker · pot odds</a></li>
         <li class="digress"><a href="decision-theory.html">← back to the ladder</a></li>
       </ol></nav>
     </aside>
@@ -159,13 +165,13 @@
           A breakaway from the <a href="decision-theory.html">causal-ladder
           curriculum</a>: same engine — expected utility, maximum expected
           utility, the <a href="decision-theory.html#vpi">value of
-          information</a> — but here it is pure practice. Four word-problems from
+          information</a> — but here it is pure practice. A growing set of word-problems from
           high-stakes fields, each solved step by step, plus a calculator you can
           drag. The recurring trick: a price or a payoff secretly encodes a
           <em>probability</em>, and the work is reading it back out.
         </p>
         <p>
-          Every problem below is the same move in disguise: read a
+          Several of the problems below are the same move in disguise: read a
           <em>price</em> backwards to recover the <em>probability</em> it implies.
           The cleanest version — the one the calculator runs on, and the one the
           diagram sketches — is the break-even of a <strong>risk transfer</strong>.
@@ -537,6 +543,252 @@
       <div class="aside-box"><span class="k">Takeaway</span>
         <p style="margin:.25rem 0 0">Expected utility subsumes expected value. Concavity prices in risk, so the rational deal sits below the gamble's dollar expectation by the risk premium — the gap that keeps settlement, insurance, and hedging in business.</p>
       </div>
+
+      <h2 id="more">More from the anthology <span class="act-tag act-econ">new facets</span></h2>
+      <p>
+        The first four problems all reduce to the same move: read a price into a
+        probability. The next five keep the expected-value and utility engine but
+        push it into genuinely new shapes — a noisy signal updated by
+        <a href="#test">Bayes' rule</a>, an optimal <a href="#newsvendor">quantity</a>
+        rather than a yes/no, <a href="#kelly">growth-optimal</a> sizing over
+        repeated bets, a <a href="#stopping">sequential</a> search with no second
+        chances, and a strategic <a href="#potodds">equilibrium</a> against an
+        opponent who is also optimizing. For the actuary's professional take on
+        pricing the risk itself, see the
+        <a href="actuarial-pricing.html">actuarial track</a>.
+      </p>
+      <h2 id="test">5 · Medicine &amp; screening — the base-rate trap of a positive test <span class="act-tag act-econ">Bayes + value of information</span></h2>
+      <p>
+        A disease has prevalence (prior) $P(D)=1\%$ in the screened population. A
+        screening test has sensitivity $P(+\mid D)=95\%$ and specificity
+        $P(-\mid H)=90\%$ — so it falsely flags a healthy person
+        $P(+\mid H)=10\%$ of the time. A patient walks in, gets screened, and
+        tests <strong>positive</strong>. How likely is it that they actually have
+        the disease?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · Bayes' rule (posterior from a positive)</span>
+        <p style="margin:.3rem 0 0">
+          The post-test probability of disease weights the true-positive mass
+          against all positive mass — true and false:
+          $$P(D\mid +)=\frac{P(+\mid D)\,P(D)}{P(+\mid D)\,P(D)+P(+\mid H)\,P(H)}.$$
+          A rare disease ($P(D)$ tiny) lets the false-positive term
+          $P(+\mid H)\,P(H)$ dominate, no matter how good the test sounds.
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">True-positive mass</div>
+          $P(+\mid D)\,P(D)=0.95\times 0.01 = 0.0095.$</div>
+        <div class="step"><div class="label">False-positive mass</div>
+          $P(+\mid H)\,P(H)=(1-0.90)\times(1-0.01)=0.10\times 0.99 = 0.099.$</div>
+        <div class="step"><div class="label">Total positive mass</div>
+          $0.0095 + 0.099 = 0.1085.$ Already telling: the false alarms
+          ($0.099$) outweigh the real cases ($0.0095$) more than tenfold.</div>
+        <div class="step"><div class="label">Posterior</div>
+          $P(D\mid +)=\dfrac{0.0095}{0.1085}=0.0876 \approx 8.8\%.$</div>
+        <div class="step"><div class="label">Same thing, 10,000 people</div>
+          Of $10{,}000$ screened: $100$ are sick, of whom $0.95\times 100 = 95$
+          test positive; $9{,}900$ are well, of whom $0.10\times 9{,}900 = 990$
+          test positive. That is $95+990 = 1{,}085$ positives, only $95$ truly
+          sick: $\dfrac{95}{1{,}085}=8.8\%.$</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          $P(D\mid +)\approx 8.8\%$. Despite a "$95\%$ accurate" test and a scary
+          positive, the patient is still over $91\%$ likely to be healthy — the
+          <em>base-rate fallacy</em>. With disease this rare, a single positive
+          barely moves the needle; the $990$ false positives drown out the $95$
+          real ones.
+        </p>
+      </div>
+      <div class="aside-box"><span class="k">Connecting to value of information</span>
+        <p style="margin:.25rem 0 0">
+          A real test is noisy, so its value of information can never exceed the
+          <em>perfect</em>-test ceiling — the $\mathrm{VPI}=18$ units from
+          <a href="#medicine">problem 3</a>: $0\le \mathrm{VEI}\le\mathrm{VPI}$.
+          And like any information, the screen is worth ordering only if its
+          result could <em>flip</em> the treat/withhold choice. At an $8.8\%$
+          posterior, if you would not treat at that probability, a lone positive
+          buys nothing but anxiety — confirm with a second, independent test
+          before acting.
+        </p>
+      </div>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">
+          When the prior is small, even an excellent test produces mostly false
+          positives: sensitivity acts on a tiny slice while the false-positive
+          rate acts on the vast healthy majority. Always ask "out of how many?"
+          before trusting a positive — and remember that a test is worth running
+          only when its answer could change what you do.
+        </p>
+      </div>
+      <figure>
+<svg viewBox="0 0 700 312" width="100%" style="max-width:700px;display:block;margin:0 auto" role="img" aria-label="A 10,000-person frequency tree: 100 sick split into 95 true positives and 5 missed; 9,900 well split into 990 false positives and 8,910 true negatives; among 1,085 positives only 95 are truly sick, a positive predictive value of 8.8 percent.">
+<line x1="355" y1="52" x2="180" y2="92" stroke="#777" stroke-width="1"/>
+<line x1="355" y1="52" x2="525" y2="92" stroke="#777" stroke-width="1"/>
+<rect x="300" y="18" width="110" height="34" rx="6" fill="#DCE6F4" stroke="#1F4E9E"/><text x="355.0" y="39.0" font-size="12" font-weight="700" fill="#0C447C" text-anchor="middle">10,000 screened</text>
+<rect x="120" y="92" width="120" height="40" rx="6" fill="#DCE6F4" stroke="#1F4E9E"/><text x="180.0" y="110" font-size="12" font-weight="700" fill="#0C447C" text-anchor="middle">100 sick</text><text x="180.0" y="125" font-size="10.5" fill="#0C447C" text-anchor="middle">prevalence 1%</text>
+<rect x="460" y="92" width="130" height="40" rx="6" fill="#fff" stroke="#E5E5EA"/><text x="525.0" y="110" font-size="12" font-weight="700" fill="#777" text-anchor="middle">9,900 well</text><text x="525.0" y="125" font-size="10.5" fill="#777" text-anchor="middle">prevalence 99%</text>
+<line x1="180" y1="132" x2="100" y2="172" stroke="#777" stroke-width="1"/>
+<line x1="180" y1="132" x2="235" y2="172" stroke="#777" stroke-width="1"/>
+<line x1="525" y1="132" x2="440" y2="172" stroke="#777" stroke-width="1"/>
+<line x1="525" y1="132" x2="575" y2="172" stroke="#777" stroke-width="1"/>
+<rect x="40" y="172" width="120" height="46" rx="6" fill="#DEEFE0" stroke="#2F7A4A"/><text x="100.0" y="190" font-size="12" font-weight="700" fill="#04342C" text-anchor="middle">95 test +</text><text x="100.0" y="205" font-size="10.5" fill="#04342C" text-anchor="middle">true positives</text>
+<rect x="175" y="172" width="110" height="46" rx="6" fill="#fff" stroke="#E5E5EA"/><text x="230.0" y="190" font-size="12" font-weight="700" fill="#777" text-anchor="middle">5 test −</text><text x="230.0" y="205" font-size="10.5" fill="#777" text-anchor="middle">missed</text>
+<rect x="380" y="172" width="120" height="46" rx="6" fill="#fff" stroke="#B83A2E"/><text x="440.0" y="190" font-size="12" font-weight="700" fill="#791F1F" text-anchor="middle">990 test +</text><text x="440.0" y="205" font-size="10.5" fill="#791F1F" text-anchor="middle">false positives</text>
+<rect x="515" y="172" width="120" height="46" rx="6" fill="#fff" stroke="#E5E5EA"/><text x="575.0" y="190" font-size="12" font-weight="700" fill="#777" text-anchor="middle">8,910 test −</text><text x="575.0" y="205" font-size="10.5" fill="#777" text-anchor="middle">true negatives</text>
+<rect x="120" y="262" width="40.3" height="22" fill="#2F7A4A"/>
+<rect x="160.3" y="262" width="419.7" height="22" fill="#EDEDED" stroke="#E5E5EA"/>
+<text x="140.13824884792626" y="277" font-size="9" fill="#fff" text-anchor="middle">95</text>
+<text x="370.13824884792626" y="277" font-size="10.5" fill="#777" text-anchor="middle">990 false positives</text>
+<text x="350" y="300" font-size="12" font-weight="700" fill="#1E1E1E" text-anchor="middle">1,085 positives, only 95 truly sick &#8594; PPV = 95 / 1,085 = 8.8%</text>
+</svg>
+<figcaption>Out of 10,000 screened, a positive test points to just 95 true cases buried among 990 false alarms: the post-test chance of disease is only 95/1,085 = 8.8%.</figcaption>
+</figure>
+      <h2 id="newsvendor">6 · Operations &amp; retail — how many to stock <span class="act-tag act-econ">critical fractile</span></h2>
+      <p>
+        A cafe bakes croissants for tomorrow. Each sells for $\$5$ and costs
+        $\$2$ to make; whatever goes unsold by closing is worth $\$0$. So baking
+        one too few forfeits a margin of $C_u=5-2=\$3$, while baking one too many
+        sinks the $C_o=\$2$ it cost to make. Tomorrow's demand is Normal with mean
+        $\mu=100$ and standard deviation $\sigma=20$. How many should the cafe
+        bake this evening?
+      </p>
+      <div class="callout gold">
+        <span class="k">Principle · critical fractile</span>
+        <p style="margin:.3rem 0 0">
+          Bake one more croissant only while its expected gain beats its expected
+          loss. The marginal unit sells with probability $P(\text{Demand}\ge Q)$,
+          earning $C_u$, and sits unsold with probability $P(\text{Demand}&lt;Q)$,
+          costing $C_o$. Equating the two, the optimal stock is the demand
+          quantile whose cumulative probability equals the
+          <em>critical fractile</em>
+          $$F(Q^{\ast})=\frac{C_u}{C_u+C_o}.$$
+          A ratio of costs again sets a probability threshold, but here it selects
+          an optimal <em>quantity</em>, not a yes/no.
+        </p>
+      </div>
+      <div class="steps worked">
+        <div class="step"><div class="label">Costs</div>
+          Underage $C_u = 5-2 = \$3$ (lost margin); overage $C_o = \$2$ (sunk cost
+          of an unsold bake).</div>
+        <div class="step"><div class="label">Critical fractile</div>
+          $\dfrac{C_u}{C_u+C_o} = \dfrac{3}{3+2} = \dfrac{3}{5} = 0.60.$ Stock up
+          to the $60^{\text{th}}$ percentile of demand.</div>
+        <div class="step"><div class="label">Quantile in z-units</div>
+          $z = \Phi^{-1}(0.60) = 0.2533.$</div>
+        <div class="step"><div class="label">Convert to croissants</div>
+          $Q^{\ast} = \mu + z\,\sigma = 100 + 0.2533\times 20 = 105.07 \approx 105.$</div>
+      </div>
+      <div class="callout good">
+        <span class="k">Answer</span>
+        <p style="margin:.3rem 0 0">
+          Bake $\approx\!105$ croissants. Because lost margin ($\$3$) outweighs
+          waste ($\$2$), the optimal plan deliberately overshoots the mean of
+          $100$ and stocks out only $40\%$ of days. Slight, intentional waste is
+          cheaper than turning away paying customers.
+        </p>
+      </div>
+      <div class="aside-box"><span class="k">Takeaway</span>
+        <p style="margin:.25rem 0 0">This is the structural twin of the break-even rule $p^{\ast}=C/(L-D)$: a ratio of costs becomes a probability threshold. The newsvendor's twist is that the threshold is read off the demand distribution as a <em>quantile</em>, so the cost ratio chooses how much to stock rather than whether to act.</p>
+      </div>
+      <figure>
+<svg viewBox="0 0 560 282" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="A demand bell curve centered at 100 with the lower 60 percent shaded; the 60th-percentile cut at about 105 is the optimal order quantity.">
+<line x1="55" y1="232" x2="525" y2="232" stroke="#bbb"/><polygon points="55.0,232.0 55.0,229.9 56.9,229.8 58.9,229.6 60.8,229.4 62.8,229.2 64.7,229.0 66.6,228.8 68.6,228.6 70.5,228.3 72.4,228.1 74.4,227.8 76.3,227.5 78.2,227.2 80.2,226.8 82.1,226.5 84.1,226.1 86.0,225.7 87.9,225.3 89.9,224.8 91.8,224.4 93.8,223.9 95.7,223.4 97.6,222.8 99.6,222.2 101.5,221.6 103.4,221.0 105.4,220.3 107.3,219.6 109.2,218.9 111.2,218.1 113.1,217.3 115.1,216.4 117.0,215.5 118.9,214.6 120.9,213.7 122.8,212.7 124.8,211.6 126.7,210.5 128.6,209.4 130.6,208.2 132.5,207.0 134.4,205.7 136.4,204.4 138.3,203.0 140.2,201.6 142.2,200.1 144.1,198.6 146.1,197.0 148.0,195.4 149.9,193.7 151.9,192.0 153.8,190.2 155.8,188.4 157.7,186.5 159.6,184.6 161.6,182.6 163.5,180.6 165.4,178.5 167.4,176.3 169.3,174.2 171.2,171.9 173.2,169.7 175.1,167.3 177.1,165.0 179.0,162.6 180.9,160.1 182.9,157.6 184.8,155.1 186.8,152.5 188.7,149.9 190.6,147.3 192.6,144.6 194.5,142.0 196.4,139.2 198.4,136.5 200.3,133.7 202.2,131.0 204.2,128.2 206.1,125.4 208.1,122.6 210.0,119.8 211.9,117.0 213.9,114.2 215.8,111.4 217.8,108.6 219.7,105.8 221.6,103.1 223.6,100.4 225.5,97.7 227.4,95.0 229.4,92.4 231.3,89.8 233.2,87.2 235.2,84.7 237.1,82.2 239.1,79.8 241.0,77.5 242.9,75.2 244.9,73.0 246.8,70.8 248.8,68.7 250.7,66.7 252.6,64.8 254.6,63.0 256.5,61.2 258.4,59.6 260.4,58.0 262.3,56.5 264.2,55.1 266.2,53.9 268.1,52.7 270.1,51.6 272.0,50.7 273.9,49.8 275.9,49.1 277.8,48.4 279.8,47.9 281.7,47.5 283.6,47.2 285.6,47.1 287.5,47.0 289.4,47.1 291.4,47.2 293.3,47.5 295.2,47.9 297.2,48.4 299.1,49.1 301.1,49.8 303.0,50.7 304.9,51.6 306.9,52.7 307.1,232.0" fill="#DCE6F4"/><polyline points="55.0,229.9 56.9,229.8 58.9,229.6 60.8,229.4 62.8,229.2 64.7,229.0 66.6,228.8 68.6,228.6 70.5,228.3 72.4,228.1 74.4,227.8 76.3,227.5 78.2,227.2 80.2,226.8 82.1,226.5 84.1,226.1 86.0,225.7 87.9,225.3 89.9,224.8 91.8,224.4 93.8,223.9 95.7,223.4 97.6,222.8 99.6,222.2 101.5,221.6 103.4,221.0 105.4,220.3 107.3,219.6 109.2,218.9 111.2,218.1 113.1,217.3 115.1,216.4 117.0,215.5 118.9,214.6 120.9,213.7 122.8,212.7 124.8,211.6 126.7,210.5 128.6,209.4 130.6,208.2 132.5,207.0 134.4,205.7 136.4,204.4 138.3,203.0 140.2,201.6 142.2,200.1 144.1,198.6 146.1,197.0 148.0,195.4 149.9,193.7 151.9,192.0 153.8,190.2 155.8,188.4 157.7,186.5 159.6,184.6 161.6,182.6 163.5,180.6 165.4,178.5 167.4,176.3 169.3,174.2 171.2,171.9 173.2,169.7 175.1,167.3 177.1,165.0 179.0,162.6 180.9,160.1 182.9,157.6 184.8,155.1 186.8,152.5 188.7,149.9 190.6,147.3 192.6,144.6 194.5,142.0 196.4,139.2 198.4,136.5 200.3,133.7 202.2,131.0 204.2,128.2 206.1,125.4 208.1,122.6 210.0,119.8 211.9,117.0 213.9,114.2 215.8,111.4 217.8,108.6 219.7,105.8 221.6,103.1 223.6,100.4 225.5,97.7 227.4,95.0 229.4,92.4 231.3,89.8 233.2,87.2 235.2,84.7 237.1,82.2 239.1,79.8 241.0,77.5 242.9,75.2 244.9,73.0 246.8,70.8 248.8,68.7 250.7,66.7 252.6,64.8 254.6,63.0 256.5,61.2 258.4,59.6 260.4,58.0 262.3,56.5 264.2,55.1 266.2,53.9 268.1,52.7 270.1,51.6 272.0,50.7 273.9,49.8 275.9,49.1 277.8,48.4 279.8,47.9 281.7,47.5 283.6,47.2 285.6,47.1 287.5,47.0 289.4,47.1 291.4,47.2 293.3,47.5 295.2,47.9 297.2,48.4 299.1,49.1 301.1,49.8 303.0,50.7 304.9,51.6 306.9,52.7 308.8,53.9 310.8,55.1 312.7,56.5 314.6,58.0 316.6,59.6 318.5,61.2 320.4,63.0 322.4,64.8 324.3,66.7 326.2,68.7 328.2,70.8 330.1,73.0 332.1,75.2 334.0,77.5 335.9,79.8 337.9,82.2 339.8,84.7 341.8,87.2 343.7,89.8 345.6,92.4 347.6,95.0 349.5,97.7 351.4,100.4 353.4,103.1 355.3,105.8 357.2,108.6 359.2,111.4 361.1,114.2 363.1,117.0 365.0,119.8 366.9,122.6 368.9,125.4 370.8,128.2 372.8,131.0 374.7,133.7 376.6,136.5 378.6,139.2 380.5,142.0 382.4,144.6 384.4,147.3 386.3,149.9 388.2,152.5 390.2,155.1 392.1,157.6 394.1,160.1 396.0,162.6 397.9,165.0 399.9,167.3 401.8,169.7 403.8,171.9 405.7,174.2 407.6,176.3 409.6,178.5 411.5,180.6 413.4,182.6 415.4,184.6 417.3,186.5 419.2,188.4 421.2,190.2 423.1,192.0 425.1,193.7 427.0,195.4 428.9,197.0 430.9,198.6 432.8,200.1 434.8,201.6 436.7,203.0 438.6,204.4 440.6,205.7 442.5,207.0 444.4,208.2 446.4,209.4 448.3,210.5 450.2,211.6 452.2,212.7 454.1,213.7 456.1,214.6 458.0,215.5 459.9,216.4 461.9,217.3 463.8,218.1 465.8,218.9 467.7,219.6 469.6,220.3 471.6,221.0 473.5,221.6 475.4,222.2 477.4,222.8 479.3,223.4 481.2,223.9 483.2,224.4 485.1,224.8 487.1,225.3 489.0,225.7 490.9,226.1 492.9,226.5 494.8,226.8 496.8,227.2 498.7,227.5 500.6,227.8 502.6,228.1 504.5,228.3 506.4,228.6 508.4,228.8 510.3,229.0 512.2,229.2 514.2,229.4 516.1,229.6 518.1,229.8 520.0,229.9" fill="none" stroke="#1F4E9E" stroke-width="2.5"/><line x1="307.1" y1="232" x2="307.1" y2="52.8" stroke="#C9A227" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="307.1" cy="52.8" r="4" fill="#C9A227"/><text x="307.1" y="44.8" font-size="11" font-weight="700" fill="#633806" text-anchor="middle">order 105</text><text x="132.5" y="248" font-size="10" fill="#777" text-anchor="middle">60</text><text x="210.0" y="248" font-size="10" fill="#777" text-anchor="middle">80</text><text x="287.5" y="248" font-size="10" fill="#777" text-anchor="middle">100</text><text x="365.0" y="248" font-size="10" fill="#777" text-anchor="middle">120</text><text x="442.5" y="248" font-size="10" fill="#777" text-anchor="middle">140</text><text x="290" y="270" font-size="11" fill="#777" text-anchor="middle">tomorrow&#8217;s demand (croissants)</text><text x="150" y="150" font-size="10.5" fill="#0C447C" text-anchor="middle">stock this 60%</text>
+</svg>
+<figcaption>Underage \$3 vs overage \$2 gives a critical fractile of 0.6, so you bake up to the 60th percentile of demand &#8212; about 105. A cost ratio again picks a probability threshold, here a stocking quantile.</figcaption>
+</figure>
+      <h2 id="kelly">7 · Investing &amp; betting: how much to wager on an edge <span class="act-tag act-econ">growth-optimal sizing</span></h2>
+<p>A repeatable, favourable bet pays $b = 2$ to $1$ on a win, with win probability $p = 0.4$ and loss probability $q = 1 - p = 0.6$. Its expected value is positive: $0.4 \times 2 - 0.6 \times 1 = +0.2$ per unit staked. The question is not whether to bet a clear edge but how much: what fraction of your bankroll should you stake on each repetition to maximize the long-run growth of your wealth?</p>
+<div class="callout gold"><span class="k">Principle · Kelly criterion</span><p style="margin:.3rem 0 0">Because bets compound multiplicatively, the right objective is not expected wealth but expected <em>log</em>-wealth, whose growth rate per bet is $g(f) = p\ln(1 + bf) + q\ln(1 - f)$. Maximizing $g$ over the stake fraction $f$ gives the Kelly fraction $$f^{\ast} = \frac{bp - q}{b} = p - \frac{q}{b}.$$</p></div>
+<div class="steps worked"><div class="step"><div class="label">Apply formula</div> $f^{\ast} = \dfrac{bp - q}{b} = \dfrac{2 \times 0.4 - 0.6}{2} = \dfrac{0.8 - 0.6}{2} = \dfrac{0.2}{2} = 0.10$, so stake $10\%$ of the bankroll each time.</div><div class="step"><div class="label">Verify optimum</div> Set $g'(f) = \dfrac{bp}{1 + bf} - \dfrac{q}{1 - f} = 0$. At $f = 0.10$: $\dfrac{2 \times 0.4}{1.2} = \dfrac{0.8}{1.2} = 0.6\overline{6}$ and $\dfrac{0.6}{0.9} = 0.6\overline{6}$, equal, confirming the peak.</div><div class="step"><div class="label">Growth at $f^{\ast}$</div> $g(0.10) = 0.4\ln(1.2) + 0.6\ln(0.9) = 0.4(0.18232) + 0.6(-0.10536) = 0.07293 - 0.06322 = +0.00971$ per bet, the maximum attainable rate.</div><div class="step"><div class="label">Double the stake</div> At $f = 0.20$: $g(0.20) = 0.4\ln(1.4) + 0.6\ln(0.8) = 0.4(0.33647) + 0.6(-0.22314) = 0.13459 - 0.13389 = +0.00070$, barely positive, roughly $\tfrac{1}{14}$ of the Kelly growth rate.</div><div class="step"><div class="label">Find ruin threshold</div> $g(f) = 0$ for $f &gt; 0$ at $f \approx 0.204$; beyond it $g$ turns negative (e.g. $g(0.25) \approx -0.0104$). Past this point a positive-EV bet shrinks your wealth almost surely.</div></div>
+<div class="callout good"><span class="k">Answer</span><p style="margin:.3rem 0 0">Stake $f^{\ast} = 10\%$ of bankroll per bet, yielding the maximal log-growth rate of about $+0.97\%$ per wager. Doubling to $20\%$ collapses growth to $+0.07\%$ and a touch more turns it negative; the same edge, recklessly sized, destroys wealth.</p></div>
+<div class="aside-box"><span class="k">Takeaway</span><p style="margin:.25rem 0 0">Sizing matters as much as the edge itself. The growth curve is steep on the downside of its peak, so overbetting is far more dangerous than underbetting, which is why disciplined practitioners deliberately use fractional Kelly (half or quarter), trading a little growth for a large reduction in volatility and ruin risk.</p></div>
+<figure>
+<svg viewBox="0 0 560 282" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="A growth-rate curve versus stake fraction, peaking at 10 percent and falling back through zero just past 20 percent.">
+<line x1="55" y1="92" x2="520" y2="92" stroke="#bbb" stroke-dasharray="4 3"/><polyline points="55.0,92.0 56.9,90.6 58.9,89.3 60.8,88.0 62.8,86.7 64.7,85.4 66.6,84.1 68.6,82.8 70.5,81.6 72.4,80.4 74.4,79.2 76.3,78.0 78.2,76.8 80.2,75.7 82.1,74.6 84.1,73.5 86.0,72.4 87.9,71.3 89.9,70.3 91.8,69.2 93.8,68.2 95.7,67.2 97.6,66.2 99.6,65.3 101.5,64.3 103.4,63.4 105.4,62.5 107.3,61.6 109.2,60.7 111.2,59.9 113.1,59.0 115.1,58.2 117.0,57.4 118.9,56.6 120.9,55.8 122.8,55.1 124.8,54.4 126.7,53.6 128.6,52.9 130.6,52.3 132.5,51.6 134.4,50.9 136.4,50.3 138.3,49.7 140.2,49.1 142.2,48.5 144.1,47.9 146.1,47.4 148.0,46.9 149.9,46.4 151.9,45.9 153.8,45.4 155.8,44.9 157.7,44.5 159.6,44.0 161.6,43.6 163.5,43.2 165.4,42.8 167.4,42.5 169.3,42.1 171.2,41.8 173.2,41.5 175.1,41.2 177.1,40.9 179.0,40.6 180.9,40.4 182.9,40.2 184.8,39.9 186.8,39.7 188.7,39.6 190.6,39.4 192.6,39.2 194.5,39.1 196.4,39.0 198.4,38.9 200.3,38.8 202.3,38.7 204.2,38.7 206.1,38.6 208.1,38.6 210.0,38.6 211.9,38.6 213.9,38.6 215.8,38.7 217.8,38.7 219.7,38.8 221.6,38.9 223.6,39.0 225.5,39.1 227.4,39.2 229.4,39.4 231.3,39.5 233.2,39.7 235.2,39.9 237.1,40.1 239.1,40.4 241.0,40.6 242.9,40.9 244.9,41.1 246.8,41.4 248.8,41.7 250.7,42.1 252.6,42.4 254.6,42.8 256.5,43.1 258.4,43.5 260.4,43.9 262.3,44.3 264.2,44.7 266.2,45.2 268.1,45.7 270.1,46.1 272.0,46.6 273.9,47.1 275.9,47.7 277.8,48.2 279.8,48.7 281.7,49.3 283.6,49.9 285.6,50.5 287.5,51.1 289.4,51.7 291.4,52.4 293.3,53.0 295.2,53.7 297.2,54.4 299.1,55.1 301.1,55.8 303.0,56.6 304.9,57.3 306.9,58.1 308.8,58.9 310.8,59.7 312.7,60.5 314.6,61.3 316.6,62.2 318.5,63.0 320.4,63.9 322.4,64.8 324.3,65.7 326.2,66.6 328.2,67.5 330.1,68.5 332.1,69.4 334.0,70.4 335.9,71.4 337.9,72.4 339.8,73.4 341.8,74.5 343.7,75.5 345.6,76.6 347.6,77.7 349.5,78.8 351.4,79.9 353.4,81.0 355.3,82.2 357.2,83.3 359.2,84.5 361.1,85.7 363.1,86.9 365.0,88.1 366.9,89.4 368.9,90.6 370.8,91.9 372.8,93.2 374.7,94.5 376.6,95.8 378.6,97.1 380.5,98.4 382.4,99.8 384.4,101.2 386.3,102.6 388.2,104.0 390.2,105.4 392.1,106.8 394.1,108.2 396.0,109.7 397.9,111.2 399.9,112.7 401.8,114.2 403.8,115.7 405.7,117.2 407.6,118.8 409.6,120.4 411.5,121.9 413.4,123.5 415.4,125.2 417.3,126.8 419.2,128.4 421.2,130.1 423.1,131.8 425.1,133.4 427.0,135.1 428.9,136.9 430.9,138.6 432.8,140.4 434.8,142.1 436.7,143.9 438.6,145.7 440.6,147.5 442.5,149.3 444.4,151.2 446.4,153.0 448.3,154.9 450.3,156.8 452.2,158.7 454.1,160.6 456.1,162.5 458.0,164.5 459.9,166.4 461.9,168.4 463.8,170.4 465.7,172.4 467.7,174.5 469.6,176.5 471.6,178.6 473.5,180.6 475.4,182.7 477.4,184.8 479.3,186.9 481.3,189.1 483.2,191.2 485.1,193.4 487.1,195.6 489.0,197.8 490.9,200.0 492.9,202.2 494.8,204.4 496.8,206.7 498.7,209.0 500.6,211.3 502.6,213.6 504.5,215.9 506.4,218.2 508.4,220.6 510.3,222.9 512.2,225.3 514.2,227.7 516.1,230.1 518.1,232.6 520.0,235.0" fill="none" stroke="#1F4E9E" stroke-width="2.5"/><line x1="210.0" y1="92" x2="210.0" y2="38.6" stroke="#2F7A4A" stroke-dasharray="2 3"/><circle cx="210.0" cy="38.6" r="4.5" fill="#2F7A4A"/><text x="210.0" y="30.6" font-size="11" font-weight="700" fill="#04342C" text-anchor="middle">f* = 10%</text><circle cx="365.0" cy="88.1" r="4" fill="#B83A2E"/><text x="365.0" y="84.0" font-size="10" fill="#B83A2E" text-anchor="middle">2&#215; Kelly</text><text x="55.0" y="108" font-size="10" fill="#777" text-anchor="middle">0%</text><text x="210.00000000000003" y="108" font-size="10" fill="#777" text-anchor="middle">10%</text><text x="365.00000000000006" y="108" font-size="10" fill="#777" text-anchor="middle">20%</text><text x="520.0" y="108" font-size="10" fill="#777" text-anchor="middle">30%</text><text x="290" y="270" font-size="11" fill="#777" text-anchor="middle">fraction of bankroll staked, f</text><text x="64" y="40" font-size="10.5" fill="#777">long-run growth</text>
+</svg>
+<figcaption>Long-run growth peaks at f* = 10% of bankroll. Doubling to 20% nearly erases it, and a little more turns growth negative &#8212; over-betting ruins even a winning edge.</figcaption>
+</figure>
+      <h2 id="stopping">8 · Search &amp; hiring — when to stop looking <span class="act-tag act-econ">optimal stopping</span></h2>
+<p>
+  You are filling one role and interview candidates one at a time in random order. After each interview you must accept or reject on the spot, with no recalls, and you only care about hiring the single best of the $n$ applicants. The natural strategy: reject the first $r-1$ as a calibration sample, then hire the first one who beats everyone seen so far. For $n=100$, how many should you let walk, and what are your odds of landing the very best?
+</p>
+<div class="callout gold"><span class="k">Principle · the secretary problem</span><p style="margin:.3rem 0 0">Look-then-leap. After rejecting an initial sample of $r-1$, accept the next candidate who is a running record. The best wins exactly when it falls past the sample <em>and</em> the best-so-far at the cutoff lies inside the sample, giving $$P(r)=\frac{r-1}{n}\sum_{i=r}^{n}\frac{1}{i-1}.$$ As $n\to\infty$ the optimal cutoff is $r-1\approx n/e$ and the win probability approaches $1/e\approx 0.368$.</p></div>
+<div class="steps worked">
+  <div class="step"><div class="label">Why the formula</div> Condition on the best candidate sitting at position $i$. You hire it iff $i\ge r$ (it is past the sample) and the top of the first $i-1$ candidates fell inside the first $r-1$ slots, which has probability $\tfrac{r-1}{i-1}$. Summing $\tfrac1n\cdot\tfrac{r-1}{i-1}$ over $i=r,\dots,n$ gives $P(r)$.</div>
+  <div class="step"><div class="label">Locate the cutoff</div> The asymptotic optimum is $r-1\approx n/e = 100/2.71828 = 36.79$, so reject the first $37$ and let candidate $r=38$ be the first you may hire.</div>
+  <div class="step"><div class="label">Evaluate the sum</div> The harmonic tail is $\sum_{i=38}^{100}\frac{1}{i-1}=H_{99}-H_{36}=1.00282$, and the prefactor is $\frac{r-1}{n}=\frac{37}{100}=0.37$.</div>
+  <div class="step"><div class="label">Win probability</div> $P(38)=0.37\times 1.00282 = 0.37104\approx 37.1\%$. Checking neighbors confirms the peak: $P(37)=0.37101$ and $P(39)=0.37080$, both lower.</div>
+  <div class="step"><div class="label">Versus chance</div> Picking blindly wins with probability $1/n = 1/100 = 1\%$. The rule improves your odds by roughly $37\times$.</div>
+</div>
+<div class="callout good"><span class="k">Answer</span><p style="margin:.3rem 0 0">Reject the first $37$ candidates, then hire the first one who beats all of them: you land the very best $\approx 37.1\%$ of the time, against $1\%$ for a random pick. The famous $1/e\approx 36.8\%$ is the large-$n$ limit; at $n=100$ the exact figure is a touch higher.</p></div>
+<div class="aside-box"><span class="k">Takeaway</span><p style="margin:.25rem 0 0">When choices arrive sequentially and are irreversible, spend the first $\approx 37\%$ of your search purely learning the field, then commit to the next thing that beats everything you have seen. The same $37\%$ rule guides house-hunting, selling an asset into an uncertain market, and dating. This is the only <em>sequential</em> decision on the page; every other example is one-shot.</p></div>
+<figure>
+<svg viewBox="0 0 560 280" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="A success-probability hump versus the fraction of candidates observed before committing, peaking at 37 percent.">
+<line x1="55" y1="232" x2="525" y2="232" stroke="#bbb"/><polyline points="56.9,221.8 58.8,213.9 60.7,207.0 62.6,200.8 64.6,195.0 66.5,189.7 68.4,184.6 70.4,179.9 72.3,175.4 74.2,171.1 76.2,167.0 78.1,163.0 80.0,159.3 81.9,155.7 83.9,152.2 85.8,148.8 87.7,145.6 89.7,142.5 91.6,139.5 93.5,136.6 95.5,133.7 97.4,131.0 99.3,128.4 101.2,125.8 103.2,123.4 105.1,121.0 107.0,118.7 109.0,116.4 110.9,114.2 112.8,112.1 114.8,110.1 116.7,108.1 118.6,106.1 120.5,104.3 122.5,102.5 124.4,100.7 126.3,99.0 128.3,97.3 130.2,95.7 132.1,94.2 134.1,92.7 136.0,91.2 137.9,89.8 139.8,88.4 141.8,87.1 143.7,85.8 145.6,84.6 147.6,83.4 149.5,82.2 151.4,81.1 153.3,80.0 155.3,79.0 157.2,78.0 159.1,77.0 161.1,76.1 163.0,75.2 164.9,74.3 166.9,73.5 168.8,72.7 170.7,71.9 172.6,71.2 174.6,70.5 176.5,69.8 178.4,69.2 180.4,68.6 182.3,68.0 184.2,67.4 186.2,66.9 188.1,66.4 190.0,65.9 191.9,65.5 193.9,65.1 195.8,64.7 197.7,64.3 199.7,64.0 201.6,63.7 203.5,63.4 205.5,63.1 207.4,62.9 209.3,62.7 211.2,62.5 213.2,62.4 215.1,62.2 217.0,62.1 219.0,62.0 220.9,61.9 222.8,61.9 224.7,61.9 226.7,61.9 228.6,61.9 230.5,61.9 232.5,62.0 234.4,62.1 236.3,62.2 238.3,62.3 240.2,62.4 242.1,62.6 244.0,62.8 246.0,63.0 247.9,63.2 249.8,63.4 251.8,63.7 253.7,64.0 255.6,64.3 257.6,64.6 259.5,64.9 261.4,65.3 263.3,65.6 265.3,66.0 267.2,66.4 269.1,66.8 271.1,67.3 273.0,67.7 274.9,68.2 276.9,68.7 278.8,69.2 280.7,69.7 282.6,70.3 284.6,70.8 286.5,71.4 288.4,72.0 290.4,72.6 292.3,73.2 294.2,73.9 296.1,74.5 298.1,75.2 300.0,75.9 301.9,76.6 303.9,77.3 305.8,78.0 307.7,78.7 309.7,79.5 311.6,80.3 313.5,81.0 315.4,81.8 317.4,82.7 319.3,83.5 321.2,84.3 323.2,85.2 325.1,86.1 327.0,86.9 329.0,87.8 330.9,88.7 332.8,89.7 334.7,90.6 336.7,91.6 338.6,92.5 340.5,93.5 342.5,94.5 344.4,95.5 346.3,96.5 348.3,97.5 350.2,98.6 352.1,99.6 354.0,100.7 356.0,101.8 357.9,102.9 359.8,104.0 361.8,105.1 363.7,106.2 365.6,107.3 367.5,108.5 369.5,109.7 371.4,110.8 373.3,112.0 375.3,113.2 377.2,114.4 379.1,115.7 381.1,116.9 383.0,118.1 384.9,119.4 386.8,120.6 388.8,121.9 390.7,123.2 392.6,124.5 394.6,125.8 396.5,127.1 398.4,128.5 400.4,129.8 402.3,131.2 404.2,132.5 406.1,133.9 408.1,135.3 410.0,136.7 411.9,138.1 413.9,139.5 415.8,140.9 417.7,142.4 419.7,143.8 421.6,145.3 423.5,146.8 425.4,148.2 427.4,149.7 429.3,151.2 431.2,152.7 433.2,154.2 435.1,155.8 437.0,157.3 439.0,158.9 440.9,160.4 442.8,162.0 444.7,163.6 446.7,165.1 448.6,166.7 450.5,168.3 452.5,170.0 454.4,171.6 456.3,173.2 458.2,174.9 460.2,176.5 462.1,178.2 464.0,179.8 466.0,181.5 467.9,183.2 469.8,184.9 471.8,186.6 473.7,188.3 475.6,190.0 477.5,191.8 479.5,193.5 481.4,195.3 483.3,197.0 485.3,198.8 487.2,200.5 489.1,202.3 491.1,204.1 493.0,205.9 494.9,207.7 496.8,209.6 498.8,211.4 500.7,213.2 502.6,215.1 504.6,216.9 506.5,218.8 508.4,220.6 510.4,222.5 512.3,224.4 514.2,226.3 516.1,228.2 518.1,230.1 520.0,232.0" fill="none" stroke="#1F4E9E" stroke-width="2.5"/><line x1="226.1" y1="232" x2="226.1" y2="61.9" stroke="#8a4fbf" stroke-dasharray="2 3"/><circle cx="226.1" cy="61.9" r="4.5" fill="#8a4fbf"/><text x="226.1" y="52.9" font-size="11" font-weight="700" fill="#3C3489" text-anchor="middle">look 37%, then pounce</text><text x="226.1" y="61.9" font-size="10" fill="#3C3489" text-anchor="middle"></text><text x="55" y="248" font-size="10" fill="#777" text-anchor="middle">0%</text><text x="171.25" y="248" font-size="10" fill="#777" text-anchor="middle">25%</text><text x="287.5" y="248" font-size="10" fill="#777" text-anchor="middle">50%</text><text x="403.75" y="248" font-size="10" fill="#777" text-anchor="middle">75%</text><text x="520.0" y="248" font-size="10" fill="#777" text-anchor="middle">100%</text><text x="290" y="268" font-size="11" fill="#777" text-anchor="middle">fraction you look at before committing</text><text x="60" y="40" font-size="10.5" fill="#777">P(pick the best)</text>
+</svg>
+<figcaption>Reject the first 37% as a calibration sample, then take the next record-beater: the success curve peaks at 1/e &#8776; 37%, versus 1% for a blind guess.</figcaption>
+</figure>
+      <h2 id="potodds">9 · Game theory &amp; poker — pot odds and the honest bluff <span class="act-tag act-econ">implied probability + equilibrium</span></h2>
+<p>
+  The pot holds $\$100$. Your opponent bets $\$50$, so to call you must put in
+  $\$50$ to win the $\$150$ that is now out there. Two questions.
+  <strong>(i)</strong> What is the worst hand (the lowest win-probability)
+  you can still profitably call with? <strong>(ii)</strong> How often should a
+  balanced bettor bluff so that you cannot exploit them by always calling or
+  always folding?
+</p>
+<div class="callout gold">
+  <span class="k">Principle · a price you call, a frequency that pins you</span>
+  <p style="margin:.3rem 0 0">
+    Pot odds quote you a price: call iff your equity beats the cost of calling
+    divided by what the pot pays you after that call. And a balanced bettor sets
+    the bluff frequency that leaves you exactly indifferent between calling and
+    folding, so neither response gains.
+    $$q^{\ast}=\frac{\text{call}}{\text{pot after call}},\qquad
+    \frac{\text{bluffs}}{\text{value}}=\frac{\text{bet}}{\text{pot}+\text{bet}}.$$
+  </p>
+</div>
+<div class="steps worked">
+  <div class="step"><div class="label">Price the call</div>
+    You risk $\$50$ to win the $\$150$ already wagered plus your own $\$50$, a
+    total pot after calling of $\$150+\$50=\$200$. Break-even equity
+    $q^{\ast}=50/200=0.25=25\%$.</div>
+  <div class="step"><div class="label">Read it as odds</div>
+    The pot lays you $150:50=3{:}1$. The equity that breaks even at $3{:}1$ is
+    $1/(3+1)=25\%$, the same number. Call with any hand above $25\%$ equity.</div>
+  <div class="step"><div class="label">Balance the bettor</div>
+    For you to be indifferent, the bettor's bluff-to-value ratio must match the
+    odds they lay you: $\dfrac{\text{bluffs}}{\text{value}}=\dfrac{\text{bet}}{\text{pot}+\text{bet}}=\dfrac{50}{100+50}=\dfrac{1}{3}$.</div>
+  <div class="step"><div class="label">Convert ratio to frequency</div>
+    A $1{:}3$ bluff-to-value mix means bluffs are
+    $\dfrac{1}{1+3}=\dfrac{1}{4}=25\%$ of the betting range.</div>
+  <div class="step"><div class="label">Why $25\%$ is the magic number</div>
+    Call too rarely and the bluffs print free pots; call too often and the value
+    bets harvest you. At a $25\%$ bluff rate your call wins exactly often enough
+    to cover its $25\%$ break-even price, so both of your options net zero.</div>
+</div>
+<div class="callout good">
+  <span class="k">Answer</span>
+  <p style="margin:.3rem 0 0">
+    Both answers are $25\%$: you can profitably call with any hand above
+    $25\%$ equity, and a balanced bettor bluffs $25\%$ of the time. The
+    coincidence is not luck: the same $\$50$-into-$\$150$ price drives the
+    caller's threshold and the bettor's mix, so the equilibrium frequency is
+    pinned to the very odds the bet lays.
+  </p>
+</div>
+<div class="aside-box"><span class="k">Takeaway</span>
+  <p style="margin:.25rem 0 0">Pot odds are a price-to-probability inversion, the same move as reading an option or a betting line. The equilibrium bluff frequency is the strategic cousin of the bookmaker's vig: a number chosen not to win each hand but to make the other side indifferent, so they can never adjust their way to a profit against you.</p>
+</div>
+<figure>
+<svg viewBox="0 0 560 140" width="100%" style="max-width:560px;display:block;margin:0 auto" role="img" aria-label="A number line of hand equity from 0 to 100 percent with the 25 percent break-even marked: fold below, call above.">
+<rect x="60" y="60" width="115.0" height="26" fill="#EDE3F7"/><rect x="175.0" y="60" width="345.0" height="26" fill="#DEEFE0"/><line x1="60" y1="86" x2="520" y2="86" stroke="#bbb"/><line x1="175.0" y1="52" x2="175.0" y2="94" stroke="#1E1E1E" stroke-width="1.5"/><text x="175.0" y="46" font-size="11.5" font-weight="700" fill="#1E1E1E" text-anchor="middle">25%</text><text x="117.5" y="77" font-size="10.5" fill="#3C3489" text-anchor="middle">fold below</text><text x="336.0" y="77" font-size="10.5" fill="#04342C" text-anchor="middle">call above</text><text x="60" y="104" font-size="10" fill="#777" text-anchor="middle">0%</text><text x="175.0" y="104" font-size="10" fill="#777" text-anchor="middle">25%</text><text x="290.0" y="104" font-size="10" fill="#777" text-anchor="middle">50%</text><text x="405.0" y="104" font-size="10" fill="#777" text-anchor="middle">75%</text><text x="520.0" y="104" font-size="10" fill="#777" text-anchor="middle">100%</text><text x="290" y="128" font-size="11" fill="#777" text-anchor="middle">your hand&#8217;s equity (win probability)</text>
+</svg>
+<figcaption>The pot lays you 3-to-1, so 25% equity is break-even: call above it, fold below. A balanced bettor bluffs exactly 25% of the time to keep you indifferent.</figcaption>
+</figure>
 
       <footer class="colophon" id="colophon">
         <p>
