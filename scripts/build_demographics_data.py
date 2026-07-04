@@ -395,6 +395,11 @@ def build(args):
         tfr10 = tfr.get((code, 2010))
         tfr_slope = ((tfr25 - tfr10) / 15.0) if (tfr25 is not None and tfr10 is not None) else None
         esr25 = esr_from_vec(v25, yl_prof, c_prof)
+        # first-dividend growth rate: d/dt ln ESR over 2025-2030 (the g(SR) term
+        # of the identity g(Y/N) = g(Y/L) + d/dt ln SR)
+        v30 = yearvec(2030)
+        esr30 = esr_from_vec(v30, yl_prof, c_prof) if v30 is not None else None
+        fdg = (math.log(esr30 / esr25) / 5.0) if (esr25 and esr30) else None
 
         raw_metrics[iso3] = {"sr": sr, "ma": ma25, "poadr": poadr, "wrr": wrr,
                              "mom": mom, "tfr": tfr25, "cshift": cshift}
@@ -406,7 +411,8 @@ def build(args):
             "ma": siground(ma25, 3), "ma50": siground(ma50, 3),
             "tfr": siground(tfr25, 3), "sr": siground(sr, 3),
             "poadr": siground(poadr, 3), "pt": siground(pt, 3),
-            "esr": siground(esr25, 3), "wrr": siground(wrr, 3),
+            "esr": siground(esr25, 3), "fdg": siground(fdg, 2),
+            "wrr": siground(wrr, 3),
             "mom": siground(mom, 3), "cshift": siground(cshift, 3),
             "tfrsl": siground(tfr_slope, 2),
             "gdppc": siground(wb_latest(wb_c, "gdppc"), 3),
@@ -527,6 +533,9 @@ def build(args):
         "wpp": "2024 (medium variant; PPgp/wpp2024 mirror; CC BY 3.0 IGO)",
         "wb": "World Bank Indicators API v2" if wb else None,
         "refYear": REF_YEAR, "mxYear": mx_year,
+        "esrProfile": "one stylized global age-profile pair (identical to the "
+                      "article's Fig 3 curves, flat 90-100); levels are "
+                      "profile-relative, ranks and trends are not",
         "components": COMPONENTS, "presets": PRESETS,
         "featured": FEATURED,
     }
@@ -548,6 +557,16 @@ def build(args):
                 feat["countries"][iso3]["urb"] = detail[iso3]["wb"].get("urb")
     n = dump_json(OUT / "featured-series.json", feat)
     print(f"  featured-series.json    {n/1024:.1f} KB")
+
+    sub65 = sum(1 for c in summary.values() if c.get("pt") is not None and c["pt"] < 65)
+    print(f"  sub-65 prospective thresholds: {sub65} countries")
+    # parity print: copy-paste source for app.js parityCheck()
+    jz = summary.get("JPN", {}).get("z", {})
+    wz = PRESETS["zeihan"]
+    num = sum(wz[k] * jz[k] for k in wz if jz.get(k) is not None)
+    den = sum(wz[k] for k in wz if jz.get(k) is not None)
+    if den:
+        print(f"  parity: JPN z = {jz}  ->  zeihan score = {num/den:.4f}")
 
     return summary, detail
 
@@ -571,11 +590,17 @@ def verify(summary, detail):
         errs.append(f"Japan prospective threshold {jp.get('pt')} outside [73, 76]")
     if not (ng.get("pt") and ng["pt"] < 65):
         errs.append(f"Nigeria prospective threshold {ng.get('pt')} not sub-65")
+    if not (ng.get("poadr") and 0.08 <= ng["poadr"] <= 0.14):
+        errs.append(f"Nigeria canonical POADR {ng.get('poadr')} outside [0.08, 0.14]")
     # band admits the real extremes: guest-worker states (QAT 0.98) and
     # very-high-mortality young countries (CAF 0.44)
     for iso3, c in summary.items():
         if c.get("esr") is not None and not 0.40 <= c["esr"] <= 1.05:
             errs.append(f"{iso3} ESR {c['esr']} outside sanity band (0.40, 1.05)")
+        if c.get("pt") is not None and not 55 <= c["pt"] <= 90:
+            errs.append(f"{iso3} prospective threshold {c['pt']} outside [55, 90]")
+        if c.get("fdg") is not None and abs(c["fdg"]) >= 0.03:  # microstates hit ±0.025
+            errs.append(f"{iso3} first-dividend growth {c['fdg']} implausibly large")
     for iso3 in FEATURED:
         if iso3 not in summary:
             errs.append(f"featured {iso3} missing from summary")

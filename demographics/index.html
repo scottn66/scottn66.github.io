@@ -375,28 +375,88 @@
           the mechanism — <i>the same cohort that made capital cheap on the way up makes it
           scarce on the way down</i> — is exactly what sections 4 and 7 measure.
         </p>
+        <p>
+          The grown-up version of this toy is Abel (2003, <i>Econometrica</i>): an OLG
+          model where a baby boom is a random birth-rate shock and the price of capital
+          is endogenous. The boom raises saving, investment, and asset prices; the price
+          of capital is mean-reverting, so the rise is followed by a <i>predictable</i>
+          decline — an "asset meltdown" that rational investors see coming and that
+          happens anyway. Two caveats travel with this mechanism everywhere in the
+          article: the empirical support for large demographic asset-price effects is
+          weak (Poterba's verdict: "modest at best" — real retirees sell down far more
+          slowly than the model's; see §9), and the whole capital-scarcity leg is
+          regime-dependent — it presumes old age is asset-funded rather than
+          transfer-funded (see the callout in §4).
+        </p>
       </details>
 
       <h2 id="aggregation">4 · What the shape does to an economy</h2>
       <p>
         Sum the life-cycle curve over a population and the silhouette starts writing
-        macroeconomic history. Define the <b>support ratio</b> — this article uses the
-        blunt, transparent version:
+        macroeconomic history. This article ships two support ratios, because the honest
+        one and the intuitive one are not the same number. The intuitive one is the
+        <b>headcount old-age support ratio</b> — workers per retiree, ignoring children:
       </p>
       <p style="text-align:center">
-        \[ SR \;=\; \frac{\text{population aged } 20\text{–}64}{\text{population aged } 65+} \]
+        \[ SR_{\text{head}} \;=\; \frac{\text{population aged } 20\text{–}64}{\text{population aged } 65+} \]
       </p>
       <p>
-        When fertility first falls, a country gets forty golden years: the huge final
-        pre-collapse cohorts flow into working age while the number of children they must
-        support shrinks and the number of retirees above them is still small. Workers per
-        dependent surges. This is the <b>first demographic dividend</b> — Bloom and
-        Williamson credit it with as much as a third of East Asia's growth miracle. Then
-        those same workers, having few children to spend on, save — and their savings
-        become the deepest pool of investment capital the country has ever seen: the
-        <b>second dividend</b>. Cheap labor <i>and</i> cheap capital at once. Growth looks
-        unstoppable. Books get written about the national model.
+        The textbook-correct one is the <b>economic support ratio</b> of the National
+        Transfer Accounts literature: weight every person by how much a person of that
+        age actually produces and consumes — the very curves of Figure 3 — and divide
+        effective producers by effective consumers <i>of all ages</i>:
       </p>
+      <p style="text-align:center">
+        \[ SR_{\text{econ}} \;=\; \frac{\sum_a y_l(a)\,P(a)}{\sum_a c(a)\,P(a)} \]
+      </p>
+      <p>
+        The two disagree in an instructive way: Nigeria has the <i>best</i> headcount
+        ratio on the map (≈15 workers per retiree) and nearly the <i>worst</i> economic
+        one (≈0.57 effective producers per effective consumer) — because children consume
+        without producing, and the headcount ratio simply doesn't look at them. One
+        methodological honesty note: measured NTA age profiles exist for only some
+        countries, so — following Mason's (2005) original global implementation, which
+        used a single Taiwan-1998 profile for every country — this site applies
+        <i>one</i> stylized global profile pair (exactly the Figure 3 curves) everywhere.
+        The atlas discloses this wherever \(SR_{\text{econ}}\) appears.
+      </p>
+      <p>
+        Why the fuss over a denominator? Because the support ratio is where growth
+        accounting meets the pyramid. Income per effective consumer factors, as an
+        identity, into productivity times the support ratio, so its growth decomposes as
+      </p>
+      <p style="text-align:center">
+        \[ g\!\left(\tfrac{Y}{N}\right) \;=\; g\!\left(\tfrac{Y}{L}\right) \;+\; \tfrac{d}{dt}\ln SR_{\text{econ}} \]
+      </p>
+      <p>
+        The second term <i>is</i> the <b>first demographic dividend</b> (UN Population
+        Division Technical Paper 2017/1): it exists exactly while the support ratio is
+        rising, adds to growth one-for-one while it lasts, and is an accounting identity —
+        not a causal promise. When fertility first falls, a country gets its golden
+        decades: the huge final pre-collapse cohorts flow into working age while the
+        number of children they must support shrinks and the retirees above them are
+        still few. Bloom and Williamson credit this phase with as much as a third of East
+        Asia's growth miracle; Lee and Mason estimate the favorable window typically runs
+        <i>five decades or more</i> (Europe ~1962–2000, Asia ~1975–2033) before the term
+        flips sign. Then those same workers, having few children to spend on, save — and
+        their savings become the deepest pool of investment capital the country has ever
+        seen: the <b>second dividend</b>. Cheap labor <i>and</i> cheap capital at once.
+        Growth looks unstoppable. Books get written about the national model.
+      </p>
+      <div class="callout good">
+        <div class="k">The second dividend is a choice, not a birthright</div>
+        The NTA literature is explicit: the second dividend arises only <i>to the extent
+        that</i> a society funds old age out of <b>assets</b> rather than transfers.
+        Fund retirement through pay-as-you-go pensions or the family, and the incentive
+        to accumulate capital weakens — the dividend is diminished (Mason 2005; Lee &amp;
+        Mason 2006). And it has a second channel: parents of fewer children invest more
+        in each one, and Lee &amp; Mason's (2010) quantity–quality model shows the
+        human-capital deepening <i>can more than offset</i> the smaller workforce. Keep
+        both points in mind through the rest of this article: they are the strongest
+        internal check on any deterministic aging→decline story, including the one this
+        article is flirting with. The two-period model in §3's aside runs on the
+        asset-funded regime's rails; §9 collects the counter-evidence.
+      </div>
       <div class="callout warn">
         <div class="k">The no-kids acceleration</div>
         Notice the perverse mechanic: <b>not having children is stimulative — now.</b> A
@@ -417,6 +477,30 @@
         surpluses are not a strategy; they are a symptom. Meanwhile the fiscal engine
         reverses: the financier tranche that funded the state shrinks as the drawer
         tranche that bills it swells.
+      </p>
+      <p>
+        One timing correction the popular tellings get wrong: the consumption drought is
+        <i>not</i> about losing twenty-somethings. Look back at Figure 3 — consumption
+        peaks in mid-life, because spending follows income and income peaks after 45. A
+        shrinking birth cohort therefore takes decades to dent aggregate demand; the
+        drought arrives when the <i>prime-age</i> tranche thins, one generation after
+        the birth dearth. (Zeihan's version puts peak consumption in the 20s–30s, which
+        moves his timelines earlier than the age profiles support — see §9.)
+      </p>
+      <p>
+        The trade channel isn't a metaphor; it's measured. Higgins (1998,
+        <i>International Economic Review</i>) showed that age structure moves savings and
+        investment <i>differently</i> — investment demand tracks the youth share, savings
+        supply tracks the mature-adult share — so a country's position in the transition
+        predicts whether it imports or exports capital, with demographic effects on the
+        current account <b>exceeding six percent of GDP</b> over three decades for a
+        number of countries. The IMF institutionalized the channel: its External Balance
+        Assessment models the current account with a demographic block (population
+        growth, old-age dependency, prime-aged-saver share, plus a longevity term
+        interacted with dependency twenty years ahead) that has survived every
+        robustness pruning since — the official arithmetic behind "aging exporters must
+        run surpluses." Both specifications use exactly the age shares this atlas
+        computes.
       </p>
       <figure>
         <div id="fig-sr" class="chart"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
@@ -460,12 +544,15 @@
           <tr><td><b>Median age</b>, now &amp; 2050</td>
               <td>\( \tilde a \): half the population older, half younger</td>
               <td>Where on the pyramid→urn road you are; the 2050 value adds how fast you're driving</td></tr>
-          <tr><td><b>Support ratio</b></td>
-              <td>\( SR = P_{20\text{–}64} / P_{65+} \)</td>
-              <td>Today's pay-as-you-go arithmetic: workers available per retiree billed</td></tr>
+          <tr><td><b>Headcount old-age support ratio</b></td>
+              <td>\( SR_{\text{head}} = P_{20\text{–}64} / P_{65+} \)</td>
+              <td>Today's pay-as-you-go arithmetic: workers available per retiree billed. Blunt on purpose — it ignores children entirely (that's what the next row is for)</td></tr>
+          <tr><td><b>Economic support ratio</b></td>
+              <td>\( SR_{\text{econ}} = \sum_a y_l(a)P(a) \,/\, \sum_a c(a)P(a) \), weighted by the Fig 3 age profiles (one stylized global profile — levels are profile-relative, ranks and trends are not)</td>
+              <td>Effective producers per effective consumer, all ages counted. The NTA-canonical measure; its growth rate <i>is</i> the first dividend</td></tr>
           <tr><td><b>Prospective old-age dependency</b></td>
-              <td>\( POADR = P_{a &gt; T} / P_{20 \text{–} T} \), where \(T\) is the age at which remaining life expectancy is 15 years (from the country's own life table)</td>
-              <td>Aging measured against health, not the calendar. A 68-year-old Japanese and a 68-year-old Chadian are not the same distance from dependency; Sanderson &amp; Scherbov's fix</td></tr>
+              <td>\( POADR = P_{a &gt; x^{*}} / P_{20 \text{–} x^{*}} \), where \(x^{*}\) solves \(e(x^{*}) = 15\) in the country's own period life table — no anchor at 65, sub-65 thresholds allowed (Sanderson &amp; Scherbov, <i>Science</i> 2010)</td>
+              <td>Aging measured against health, not the calendar. Old age begins at 74.5 in Japan and at 60.5 in Nigeria — a 68-year-old is a different distance from dependency in each</td></tr>
           <tr><td><b>Workforce replacement ratio</b></td>
               <td>\( WRR = P_{20\text{–}24} / P_{60\text{–}64} \)</td>
               <td>The labor-market turnstile: entrants available per imminent retiree. Below 1, every retirement is a net vacancy</td></tr>
@@ -480,10 +567,29 @@
       <p>
         No single one of these is novel; the point is the <i>panel</i>. A country can look
         fine on TFR and terrifying on WRR (immigration-fed economies with aging natives),
-        or terrifying on TFR and fine for another decade on SR (China until ~2032). The
-        instruments disagree in informative ways, and the map in section 7 lets you watch
-        them disagree.
+        terrifying on TFR and fine for another decade on SR (China until ~2032), or best-
+        in-class on the headcount ratio and nearly worst on the economic one (Nigeria,
+        whose children the headcount simply doesn't count). The instruments disagree in
+        informative ways, and the map in section 7 lets you watch them disagree.
       </p>
+      <div class="aside-box">
+        <span class="k">Aside · why "built-in growth" and not Keyfitz momentum</span> —
+        Demographers have a beautiful closed form for momentum. Keyfitz (1971) asked:
+        if fertility snapped to bare replacement <i>today</i>, how much bigger would the
+        population still get? For a stable growing population the answer is
+        \( M = \frac{b\,e_0}{r\,\mu}\cdot\frac{R_0 - 1}{R_0} \) — about 1.6 for the
+        high-fertility countries of his day. Two problems bar it from this panel. First,
+        the sign has flipped: Blue &amp; Espenshade (2011) show a dozen aged countries
+        would <i>shrink</i> more than 10% even with instant replacement fertility —
+        momentum now works in reverse. Second, the formula presumes a stable growing
+        population; with 65 of 236 countries at \(r \le 0\) in 2025, it divides by
+        (nearly) zero exactly where the story is most interesting. So the panel ships
+        the projection-based \(P_{2050}/P_{2025}\) instead — less elegant, honest
+        everywhere. (A treasury would go further and compute <i>generational
+        accounts</i> — Auerbach &amp; Kotlikoff's per-cohort net tax burdens — but that
+        needs each country's tax-and-benefit age profiles, well beyond this page's
+        data diet.)
+      </div>
       <div class="callout good">
         <div class="k">Why this panel is trustworthy at all</div>
         Every instrument above is computed from people <b>already alive</b>, pushed forward
@@ -529,6 +635,20 @@
         \(A_c\) is the set of components a country actually has data for — missing
         components are excluded and disclosed, never imputed to zero. Authored rubric
         scores (0–10) map linearly onto the same scale via \(z = (s-5)/2\).
+      </p>
+      <p>
+        One measurement caveat baked into the demographic components: two of the three
+        structure signals hard-code age 65, and remaining-years-based measures
+        consistently show a <i>slower</i> pace of aging than fixed-age measures — that is
+        Sanderson &amp; Scherbov's central finding, and it is why the POADR (which lets
+        "old age" start at 74.5 in Japan and 60.5 in Nigeria) sits in the panel as the
+        corrective. The finding is conditional, not universal: it holds where life
+        expectancy is rising (nearly everywhere under the UN medium variant) and fails
+        where it stagnates, as in 1990s–2000s Russia. The gap is large and widening in
+        exactly the rich countries this article foregrounds — OECD-average remaining
+        life expectancy at 65 is already ~18.5 years (men) / ~21.6 (women), 3.5 to 6.6
+        years past the 15-year threshold, and projected to rise roughly four more years
+        by 2065.
       </p>
       <div class="callout warn">
         <div class="k">Honesty box — read before trusting the colors</div>
@@ -586,34 +706,91 @@
 
       <h2 id="limits">9 · What this lens misses</h2>
       <p>
-        A forecast tool is only as honest as its list of failure modes. Here is where
-        demographic determinism — mine included — breaks:
+        A forecast tool is only as honest as its list of failure modes. Start with the
+        framework this article set out to test-drive. Here is the Zeihan causal chain,
+        link by link, graded against the primary evidence — <b>SUPPORTED</b> where it's
+        textbook demography, <b>CONTESTED</b> where serious sources disagree, <b>WRONG</b>
+        where the data says otherwise:
+      </p>
+      <table>
+        <thead><tr><th>Link in the chain</th><th>Grade</th><th>The evidence</th></tr></thead>
+        <tbody>
+          <tr><td>Bretton Woods security order globalized trade &amp; industrialization</td>
+              <td style="color:var(--good)"><b>SUPPORTED</b></td>
+              <td>Standard postwar economic history — though "the US Navy is the sole load-bearing pillar" is the mono-causal stretch</td></tr>
+          <tr><td>Industrialization → urbanization → fertility collapse</td>
+              <td style="color:var(--good)"><b>SUPPORTED</b></td>
+              <td>Textbook demographic transition; the strongest part of the thesis (even Zeihan's sharpest critics concede it)</td></tr>
+          <tr><td>Staggered industrialization → staggered aging cliffs</td>
+              <td style="color:var(--good)"><b>SUPPORTED</b></td>
+              <td>Directly visible in the WPP data on this page</td></tr>
+          <tr><td>US withdrawal → trade-system collapse in the 2020s</td>
+              <td style="color:var(--warn)"><b>CONTESTED</b></td>
+              <td>The load-bearing <i>assumed</i> step; Smith: presumes zero naval/industrial adaptation, and even Depression + WWII didn't undo pre-1870 living standards</td></tr>
+          <tr><td>Fewer young people → imminent consumption collapse</td>
+              <td style="color:var(--warn)"><b>WRONG as stated</b></td>
+              <td>Consumption peaks after 35 (Fig 3); the drought arrives when <i>prime-age</i> cohorts thin — a generation later than his telling</td></tr>
+          <tr><td>China's collapse lands by ~2050 ("the 2020s are the decade")</td>
+              <td style="color:var(--warn)"><b>CONTESTED</b></td>
+              <td>Uses the most extreme projection; UN and Lancet put China's halving near 2100, and the "collapse within a decade" call has been running since ~2010</td></tr>
+          <tr><td>China overcounts its population by 100M+</td>
+              <td style="color:var(--warn)"><b>CONTESTED</b></td>
+              <td>The claim is Yi Fuxian's, not Zeihan's; UN demographers reject both the raw census and the overcount at face value, and WPP 2024 already reconciles cohorts</td></tr>
+          <tr><td>Aging savers → structural capital scarcity &amp; costly capital</td>
+              <td style="color:var(--warn)"><b>CONTESTED</b></td>
+              <td>Theoretically coherent (Abel 2003) but empirically weak — Poterba finds retirees barely sell down and projected asset demand doesn't fall through 2050</td></tr>
+        </tbody>
+      </table>
+      <p>
+        And here is where demographic determinism — mine included — breaks:
       </p>
       <ul>
+        <li><b>Aging hasn't lowered growth — yet.</b> Acemoglu &amp; Restrepo (2017):
+          across countries since 1990, <i>"there is no such negative relationship in the
+          data — if anything, countries experiencing more rapid aging have grown
+          more."</i> Their explanation: scarcer middle-aged labor accelerates automation,
+          and demographics alone explain nearly half the cross-country variation in
+          robot adoption. Every scary ratio above has workers in the denominator, and
+          the denominator is exactly what the aged, capital-rich economies are
+          engineering around (Japan and Germany lead the US in robot density for a
+          reason).</li>
+        <li><b>The asset-meltdown premise is weak in data.</b> Poterba (2001, 2004): no
+          robust link between age structure and returns on stocks, bonds, or bills in
+          US/UK/Canadian time series; age-wealth profiles <i>rise</i> steeply in the 30s
+          and 40s but <i>decline only gradually</i> in retirement; projected US asset
+          demand doesn't fall through 2050. The §3 toy model's capital-scarce leg is
+          theory ahead of evidence — "modest support at best."</li>
         <li><b>Migration is policy, and policy moves faster than birth rates.</b> The age
           structure of the already-born is fixed; <i>which ledger they're on</i> is not. The
           US, Canada and Australia have effectively outsourced their fertility problem to
           the admissions queue. A country that can attract and integrate 25-year-olds can
           repair a thin cohort in years, not generations — and one political cycle can
           shut the valve.</li>
-        <li><b>Productivity is a denominator with no birthday.</b> Every scary ratio above
-          has workers in it. If output per worker grows 2% a year, a workforce shrinking
-          1% a year still produces more every year. Automation and AI are precisely a bet
-          on the denominator — and the aged, capital-rich economies are the ones making it
-          hardest (Japan leads the world in robot density for a reason).</li>
-        <li><b>Retirement is a social convention wearing a biological costume.</b> The 65+
-          threshold in my own support ratio is an artifact of Bismarck's actuaries. Health
-          at a given age keeps improving (that's why POADR is on the panel); pension ages
-          move; second careers exist. The "drawer" tranche is more elastic than the
-          arithmetic admits.</li>
+        <li><b>Retirement is a social convention wearing a biological costume — and it's
+          already moving.</b> The 65+ threshold in the headcount ratio is an artifact of
+          Bismarck's actuaries; health at a given age keeps improving (that's why POADR
+          is on the panel). The adaptation is legislated, not hypothetical: the OECD
+          average normal retirement age rises to 66.4 (men) for workers entering in
+          2024, with 70+ already on the books in Denmark, Estonia, Italy, the
+          Netherlands and Sweden.</li>
+        <li><b>The institutions that price this professionally price strain, not
+          collapse.</b> The US intelligence community's Global Trends 2040 files
+          demographics under chronic fiscal and governance pressure — not deglobalization
+          or trade collapse. The OECD projects public pension spending rising from 8.8%
+          to 10.0% of GDP by 2050: a real bill, roughly one Italy-sized policy problem
+          per generation, not an apocalypse. When your thesis is more catastrophic than
+          the reinsurers', the burden of proof is yours.</li>
+        <li><b>The UN's track record cuts both ways.</b> World-total projections have
+          been remarkably good — most vintages within 1–2% even decades out. But the
+          <i>age-structure</i> components this article runs on have historically carried
+          larger errors (Europe's children overestimated, its elderly undercounted), and
+          end-of-century figures swing half a billion between revisions. Trust the 2050
+          working-age counts (already born); discount the 2080 tails.</li>
         <li><b>The authored layers can be wrong.</b> The geography scores encode a
           particular strategic worldview — that the maritime order frays and self-reliance
           gets repriced. If the next thirty years look like the last thirty, the "Zeihan
           lens" systematically overrates fortress economies and underrates trading hubs.
           That is exactly why the pure-demographics preset exists.</li>
-        <li><b>Variance is not shown.</b> The map runs on the UN medium variant. Fertility
-          surprises (in both directions), pandemics, and wars all exist. For the
-          already-born cohorts the bands are tight; for 2080 Africa they are not.</li>
         <li><b>Countries are not the only unit.</b> Sub-national structure matters (rural
           Japan vs. Tokyo are different planets), and this version aggregates it away. A
           US-state-level layer is the natural next build on this data schema.</li>
@@ -628,8 +805,11 @@
           via the UN-compiled <a href="https://github.com/PPgp/wpp2024">wpp2024 data
           package</a>. © 2024 United Nations, licensed
           <a href="https://creativecommons.org/licenses/by/3.0/igo/">CC BY 3.0 IGO</a>.
-          Life expectancy at 65 (for POADR thresholds) is computed from the WPP single-age
-          mortality schedules by standard life-table methods.
+          Prospective old-age thresholds solve \(e(x)=15\) directly from the WPP
+          single-age mortality schedules by standard life-table methods (Sanderson–Scherbov
+          convention; no anchor at 65). The economic support ratio uses one stylized
+          global age-profile pair — the Figure 3 curves — so its levels are
+          profile-relative while ranks and trends are not.
           <b>Economic series</b> (where shown): World Bank Indicators API v2.
           <b>Contextual scores:</b> hand-authored rubric,
           shipped verbatim as <a href="data/context-scores.json">context-scores.json</a>.
@@ -645,11 +825,25 @@
         <p>
           <b>Intellectual debts:</b> Modigliani &amp; Brumberg (1954) for the life-cycle
           hypothesis; Lee &amp; Mason and the <a href="https://www.ntaccounts.org/">National
-          Transfer Accounts</a> project for measured age profiles; Bloom &amp; Williamson
-          (1998) on the demographic dividend; Keyfitz (1971) on momentum; Sanderson &amp;
-          Scherbov on prospective aging; Peter Zeihan (<i>The Accidental Superpower</i>,
-          <i>The End of the World Is Just the Beginning</i>) for the geography-plus-demography
-          strategic frame this piece set out to test-drive with its own math. Errors,
+          Transfer Accounts</a> project for measured age profiles, the dividend framework
+          (Lee &amp; Mason 2006, 2010, 2011) and the global support-ratio implementation
+          (Mason, Lee, Abrigo &amp; Lee, UN Technical Paper 2017/1); Bloom &amp; Williamson
+          (1998) on the demographic dividend; Keyfitz (1971) and Blue &amp; Espenshade
+          (2011) on momentum and its sign flip; Sanderson &amp; Scherbov (<i>Nature</i> 2005,
+          <i>Science</i> 2010) on prospective aging; Higgins (1998) on demography and the
+          current account, institutionalized in the IMF's External Balance Assessment;
+          Abel (2003) and Poterba (2001, 2004) for both sides of the asset-meltdown
+          debate; Acemoglu &amp; Restrepo (2017, 2022) on aging and automation; the NIC's
+          <i>Global Trends 2040</i> and OECD <i>Pensions at a Glance</i> for the
+          institutional framings; Noah Smith and Joeri Schasfoort for the serious
+          published critiques, and Yi Fuxian (with the UN Population Division's pushback)
+          for the contested China-census dispute; Peter Zeihan (<i>The Accidental
+          Superpower</i>, <i>The End of the World Is Just the Beginning</i>) for the
+          geography-plus-demography strategic frame this piece set out to test-drive with
+          its own math. A fuller audit trail — every instrument checked against its
+          canonical source, with the caveat that citations were triangulated via search
+          indexes rather than page-verified — lives in
+          <a href="notes/research-pass-1.md">notes/research-pass-1.md</a>. Errors,
           scores and opinions are mine.
         </p>
         <p>Data vintage: WPP 2024 · page generated July 2026 · <a href="../index.html">← back to all projects</a></p>
@@ -662,7 +856,7 @@
 
   <template id="narrative-CHN">
     <p data-teaser>The fastest industrialization in history bought the biggest dividend in history — and the bill has the same magnitude. China's workforce peaked around 2015; its population peaked in 2021; the one-child cohorts now define every ratio that matters.</p>
-    <p>China compressed the pyramid-to-urn road into forty years, and the dividend it harvested was proportionate: the largest labor-and-savings boom ever recorded. But TFR 1.02 means each generation is roughly half the size of the one before it. Median age crosses from 41 today to 53 by 2050 — passing today's Japan on the way — while the workforce turnstile already runs at 0.8 entrants per retirement. The strategic bind is that the dividend was spent building an export machine precisely as the export customers age out and the home consumer base starts shrinking. Watch the capital-shift indicator here: China's savers-to-sellers rotation is the largest single redirection of capital flows on the map.</p>
+    <p>China compressed the pyramid-to-urn road into forty years, and the dividend it harvested was proportionate: the largest labor-and-savings boom ever recorded. But TFR 1.02 means each generation is roughly half the size of the one before it. Median age crosses from 41 today to 53 by 2050 — passing today's Japan on the way — while the workforce turnstile already runs at 0.8 entrants per retirement. The strategic bind is that the dividend was spent building an export machine precisely as the export customers age out and the home consumer base starts shrinking. Watch the capital-shift indicator here: China's savers-to-sellers rotation is the largest single redirection of capital flows on the map. (One popular claim to handle with tongs: the "China overcounts its population by 100 million+" figure originates with demographer Yi Fuxian, not with the data — UN demographers reject both the raw census and the overcount at face value, and the WPP numbers used here already apply cohort-by-cohort reconciliation.)</p>
   </template>
   <template id="narrative-JPN">
     <p data-teaser>The first country through the wall, and the best-case study in managed decline: three decades of urn-shaped demographics absorbed without social collapse — at the price of growth, and financed by assets accumulated when the pyramid still had a base.</p>

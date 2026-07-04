@@ -89,6 +89,8 @@ function drawShapes() {
 }
 
 /* -------------------------------------------------- Fig 3 (stylized, baked) */
+// KEEP IN SYNC with stylized_profiles() in scripts/build_demographics_data.py:
+// these same curves are the weights of the shipped economic support ratio.
 function drawLifecycle() {
   const ages = [], yl = [], cons = [];
   for (let a = 0; a <= 90; a += 1) {
@@ -266,13 +268,14 @@ function computeScores() {
   }
 }
 
-/* Parity check against the Python pipeline (zeihan preset, all components):
-   JPN z = {dems:-1.54, demt:-0.555, geo:1, agri:-1, ener:-1.5, trade:-0.5, cap:1}
-   S = .25(-1.54)+.20(-.555)+.15(1)+.10(-1)+.10(-1.5)+.10(-.5)+.10(1) = -0.546 */
+/* Parity check against the Python pipeline (zeihan preset, all components).
+   v1.1 (canonical POADR): JPN z = {dems:-1.58, demt:-0.555, geo:1, agri:-1,
+   ener:-1.5, trade:-0.5, cap:1}
+   S = .25(-1.58)+.20(-.555)+.15(1)+.10(-1)+.10(-1.5)+.10(-.5)+.10(1) = -0.556 */
 function parityCheck() {
   if (state.preset !== 'zeihan') return;
   const s = state.scores.JPN;
-  if (s !== null && Math.abs(s - (-0.546)) > 0.01) {
+  if (s !== null && Math.abs(s - (-0.556)) > 0.01) {
     console.warn('score parity check failed: JPN zeihan =', s);
   }
 }
@@ -285,7 +288,8 @@ const DIVERGING = [
 function hoverData(iso3) {
   const c = state.countries[iso3];
   const covWarn = state.cov[iso3] < 0.5 ? '⚠ low data coverage for these weights' : '';
-  return [c.n, fmt(c.ma, 1), fmt(c.ma50, 1), fmt(c.sr, 1), fmt(c.tfr, 2), fmt(c.wrr, 2), covWarn];
+  return [c.n, fmt(c.ma, 1), fmt(c.ma50, 1), fmt(c.sr, 1), fmt(c.tfr, 2), fmt(c.wrr, 2),
+          fmt(c.esr, 2), covWarn];
 }
 
 function drawMap() {
@@ -302,9 +306,9 @@ function drawMap() {
     hovertemplate:
       '<b>%{customdata[0]}</b> · score %{z:.2f}<br>' +
       'median age %{customdata[1]} → %{customdata[2]} by 2050<br>' +
-      'workers per retiree %{customdata[3]} · TFR %{customdata[4]}<br>' +
-      'entrants per exiting worker %{customdata[5]}<br>' +
-      '<span style="color:#f4c7c2">%{customdata[6]}</span>' +
+      'workers/retiree (headcount) %{customdata[3]} · TFR %{customdata[4]}<br>' +
+      'entrants per exit %{customdata[5]} · eff. workers/consumer %{customdata[6]}<br>' +
+      '<span style="color:#f4c7c2">%{customdata[7]}</span>' +
       '<extra>click for full workup</extra>',
   };
   const layout = Object.assign({}, BASE, {
@@ -476,8 +480,10 @@ async function selectCountry(iso3) {
       ${statBox('median age', fmt(c.ma, 1))}
       ${statBox('median 2050', fmt(c.ma50, 1))}
       ${statBox('TFR', fmt(c.tfr, 2))}
-      ${statBox('workers / retiree', fmt(c.sr, 1))}
+      ${statBox('workers / retiree (headcount)', fmt(c.sr, 1))}
+      ${statBox('eff. workers / consumer', fmt(c.esr, 2))}
       ${statBox('prospective OADR', fmt(c.poadr, 2))}
+      ${statBox('old-age begins (RLE 15y)', c.pt === null || c.pt === undefined ? '—' : fmt(c.pt, 1) + 'y')}
       ${statBox('entrants / exit', fmt(c.wrr, 2))}
       ${statBox('pop 2050 ÷ 2025', fmt(c.mom, 2))}
     </div>
