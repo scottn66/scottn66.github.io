@@ -147,8 +147,12 @@ const state = {
   weights: null, preset: 'zeihan',
   selected: null,
   scores: {}, cov: {},
-  detailCache: new Map(),               // iso3 -> Promise(detail json)
+  detailCache: new Map(),               // cache key -> Promise(detail json)
   playTimer: null,
+  view: 'world',                        // 'world' | 'states'
+  statesMeta: null, states: null,       // states-summary.json (lazy)
+  stateScores: {},
+  worldWeights: null,                   // stashed while in states view
 };
 
 const fmt = (v, d = 2) => (v === null || v === undefined) ? '—' : (+v).toFixed(d);
@@ -292,7 +296,10 @@ function hoverData(iso3) {
           fmt(c.esr, 2), covWarn];
 }
 
-function drawMap() {
+const COLORBAR = { title: { text: 'score', font: { size: 11 } }, thickness: 10, len: 0.6,
+  tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 10.5 } };
+
+function worldMapSpec() {
   const isos = Object.keys(state.countries);
   const trace = {
     type: 'choropleth', locationmode: 'ISO-3',
@@ -300,8 +307,7 @@ function drawMap() {
     z: isos.map(k => state.scores[k]),
     zmin: -2, zmax: 2, colorscale: DIVERGING,
     customdata: isos.map(hoverData),
-    colorbar: { title: { text: 'score', font: { size: 11 } }, thickness: 10, len: 0.6,
-      tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 10.5 } },
+    colorbar: COLORBAR,
     marker: { line: { color: PAPER, width: 0.4 } },
     hovertemplate:
       '<b>%{customdata[0]}</b> · score %{z:.2f}<br>' +
@@ -320,20 +326,73 @@ function drawMap() {
     },
     dragmode: false,
   });
-  Plotly.newPlot(mount('map'), [trace], layout,
-    Object.assign({}, NOPAD, { topojsonURL: 'vendor/topojson/', scrollZoom: false }));
-  document.getElementById('map').on('plotly_click', ev => {
-    const iso3 = ev.points && ev.points[0] && ev.points[0].location;
-    if (iso3) location.hash = '#country/' + iso3;
+  return { trace, layout };
+}
+
+function stateHoverData(u) {
+  const s = state.states[u];
+  return [s.n, fmt(s.ma, 1), fmt(s.ma50, 1), fmt(s.sr, 1), fmt(s.esr, 2),
+          fmt(s.wrr, 2), fmt(s.dommig, 0)];
+}
+
+function statesMapSpec() {
+  const units = Object.keys(state.states);
+  const trace = {
+    type: 'choropleth', locationmode: 'USA-states',
+    locations: units,
+    z: units.map(u => state.stateScores[u]),
+    zmin: -2, zmax: 2, colorscale: DIVERGING,
+    customdata: units.map(stateHoverData),
+    colorbar: COLORBAR,
+    marker: { line: { color: PAPER, width: 0.6 } },
+    hovertemplate:
+      '<b>%{customdata[0]}</b> · score %{z:.2f}<br>' +
+      'median age %{customdata[1]} → %{customdata[2]} by 2050 (closed-state)<br>' +
+      'workers/retiree (headcount) %{customdata[3]} · eff. workers/consumer %{customdata[4]}<br>' +
+      'entrants per exit %{customdata[5]} · net domestic migration %{customdata[6]}k/yr' +
+      '<extra>click for full workup</extra>',
+  };
+  const layout = Object.assign({}, BASE, {
+    margin: { l: 0, r: 0, t: 0, b: 0 },
+    geo: { scope: 'usa', showframe: false, showlakes: false, bgcolor: PAPER,
+      landcolor: '#F1EFEA' },
+    dragmode: false,
   });
+  return { trace, layout };
+}
+
+let mapInitialized = false;
+function renderMap() {
+  const spec = state.view === 'world' ? worldMapSpec() : statesMapSpec();
+  if (!mapInitialized) {
+    Plotly.newPlot(mount('map'), [spec.trace], spec.layout,
+      Object.assign({}, NOPAD, { topojsonURL: 'vendor/topojson/', scrollZoom: false }));
+    document.getElementById('map').on('plotly_click', ev => {
+      const loc = ev.points && ev.points[0] && ev.points[0].location;
+      if (!loc) return;
+      location.hash = (state.view === 'world' ? '#country/' : '#state/') + loc;
+    });
+    mapInitialized = true;
+  } else {
+    Plotly.react('map', [spec.trace], spec.layout);
+  }
 }
 
 function recolorMap() {
-  const isos = Object.keys(state.countries);
-  Plotly.restyle('map', {
-    z: [isos.map(k => state.scores[k])],
-    customdata: [isos.map(hoverData)],
-  });
+  if (state.view === 'world') {
+    const isos = Object.keys(state.countries);
+    Plotly.restyle('map', {
+      z: [isos.map(k => state.scores[k])],
+      customdata: [isos.map(hoverData)],
+    });
+  } else if (state.states) {
+    computeStateScores();
+    const units = Object.keys(state.states);
+    Plotly.restyle('map', {
+      z: [units.map(u => state.stateScores[u])],
+      customdata: [units.map(stateHoverData)],
+    });
+  }
 }
 
 /* ------------------------------------------------------- weights & presets */
@@ -383,9 +442,12 @@ function scheduleRescore() {
       document.querySelector('#presets [data-preset=puredemo]').classList.add('on');
       syncSliders();
     }
-    computeScores();
-    recolorMap();
-    if (state.selected) renderDecomp(state.selected);
+    if (state.view === 'world') computeScores();
+    recolorMap();                             // states branch recomputes internally
+    if (state.selected) {
+      if (state.view === 'world') renderDecomp(state.selected);
+      else renderStateDecomp(state.selected);
+    }
   }, 60);
 }
 
@@ -598,10 +660,10 @@ function drawPyramid(d) {
   render(idx);
 }
 
-function drawSparks(d) {
+function drawSparks(d, panelsOverride, dtick) {
   const s = d.series;
   const popM = s.pop.map(v => v === null ? null : v / 1000);   // thousands → millions
-  const panels = [
+  const panels = panelsOverride || [
     { key: 'tfr', title: 'fertility (TFR)', color: ACCENT },
     { key: 'sr', title: 'workers / retiree', color: WARN },
     { key: 'ma', title: 'median age', color: '#6A4FA3' },
@@ -616,7 +678,7 @@ function drawSparks(d) {
       hovertemplate: '%{x}: %{y:.6~r}<extra>' + p.title + '</extra>' });
     const col = i % 2, row = i < 2 ? 0 : 1;
     layoutAxes['xaxis' + (i ? i + 1 : '')] = grid({ domain: [col * 0.55, col * 0.55 + 0.45],
-      anchor: ya, tickfont: { size: 9, color: MUTED }, dtick: 50, fixedrange: true });
+      anchor: ya, tickfont: { size: 9, color: MUTED }, dtick: dtick || 50, fixedrange: true });
     layoutAxes['yaxis' + (i ? i + 1 : '')] = grid({ domain: [row === 0 ? 0.58 : 0, row === 0 ? 1 : 0.42],
       anchor: xa, tickfont: { size: 9, color: MUTED }, nticks: 4, fixedrange: true,
       rangemode: p.key === 'ma' ? 'normal' : 'tozero' });
@@ -664,31 +726,254 @@ function renderDecomp(iso3) {
   Plotly.react(el, traces, layout, NOPAD);
 }
 
+/* --------------------------------------------------------- US-state view */
+function computeStateScores() {
+  if (!state.states) return;
+  const wd = state.weights.dems || 0, wt = state.weights.demt || 0;
+  for (const [u, s] of Object.entries(state.states)) {
+    let num = 0, den = 0;
+    if (s.z.dems !== null && s.z.dems !== undefined && wd > 0) { num += wd * s.z.dems; den += wd; }
+    if (s.z.demt !== null && s.z.demt !== undefined && wt > 0) { num += wt * s.z.demt; den += wt; }
+    state.stateScores[u] = den > 0 ? num / den : null;
+  }
+  const p = state.statesMeta && state.statesMeta.parity;
+  if (p && Math.abs(wd - wt) < 1e-9 && state.stateScores[p.unit] != null &&
+      Math.abs(state.stateScores[p.unit] - p.score) > 0.01) {
+    console.warn('state score parity check failed:', p.unit, state.stateScores[p.unit], 'vs', p.score);
+  }
+}
+
+async function setView(v) {
+  if (v === state.view) return;
+  const pending = document.getElementById('states-pending');
+  if (v === 'states') {
+    if (!state.states) {
+      try {
+        const r = await fetch('data/states-summary.json');
+        if (!r.ok) throw new Error('no state dataset');
+        const j = await r.json();
+        state.statesMeta = j.meta;
+        state.states = j.states;
+      } catch (e) {
+        if (pending) pending.hidden = false;
+        document.querySelectorAll('#view-toggle button').forEach(b =>
+          b.classList.toggle('on', b.dataset.view === 'world'));
+        return;
+      }
+    }
+    state.view = 'states';
+    state.worldWeights = Object.assign({}, state.weights);
+    if (!state.weights.dems && !state.weights.demt) {
+      state.weights.dems = 0.5; state.weights.demt = 0.5;
+    }
+    document.getElementById('sliders').classList.add('states-mode');
+    document.getElementById('presets').classList.add('off');
+    computeStateScores();
+  } else {
+    state.view = 'world';
+    if (state.worldWeights) state.weights = state.worldWeights;
+    document.getElementById('sliders').classList.remove('states-mode');
+    document.getElementById('presets').classList.remove('off');
+    computeScores();
+  }
+  if (pending) pending.hidden = true;
+  document.querySelectorAll('#view-toggle button').forEach(b =>
+    b.classList.toggle('on', b.dataset.view === state.view));
+  state.selected = null;
+  if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
+  document.getElementById('country-panel').innerHTML =
+    '<div class="closed-hint">Click a ' + (state.view === 'world' ? 'country' : 'state') +
+    ' on the map — or type one above — to open its workup.</div>';
+  const input = document.getElementById('country-input');
+  if (input) input.value = '';
+  syncSliders();
+  renderMap();
+  rebuildPicker();
+}
+
+function wireViewToggle() {
+  const holder = document.getElementById('view-toggle');
+  if (!holder) return;
+  holder.addEventListener('click', ev => {
+    const v = ev.target.dataset.view;
+    if (v) setView(v);
+  });
+}
+
+function fetchStateDetail(u) {
+  const key = 'S:' + u;
+  if (!state.detailCache.has(key)) {
+    state.detailCache.set(key, fetch('data/states/' + u + '.json')
+      .then(r => { if (!r.ok) throw new Error(u + ' not found'); return r.json(); })
+      .catch(err => { state.detailCache.delete(key); throw err; }));
+  }
+  return state.detailCache.get(key);
+}
+
+function autoStateNarrative(u) {
+  const s = state.states[u];
+  const bits = [];
+  bits.push(`<b>${s.n}</b>: median age ${fmt(s.ma, 1)} today, drifting to ${fmt(s.ma50, 1)} ` +
+    `by 2050 <i>if nobody moved</i> — and people move; that's the point of the closed-state ` +
+    `projection below.`);
+  if (s.dommig !== null) {
+    bits.push(s.dommig > 5
+      ? `Right now the state is importing its demography: net domestic migration of ` +
+        `+${fmt(s.dommig, 0)}k people a year does what no birth rate can — it adds ` +
+        `working-age adults directly.`
+      : s.dommig < -5
+        ? `Right now the state is exporting people: net domestic migration of ` +
+          `${fmt(s.dommig, 0)}k a year, which ages the remaining structure faster than ` +
+          `births alone imply.`
+        : `Domestic migration is roughly balanced (${fmt(s.dommig, 0)}k/yr), so the ` +
+          `built-in structure below is close to the real trajectory.`);
+  }
+  if (s.natinc !== null) {
+    bits.push((s.natinc > 0 ? `Births still exceed deaths (+${fmt(s.natinc, 0)}k/yr).`
+      : `Deaths now exceed births (${fmt(s.natinc, 0)}k/yr) — growth, if any, is entirely imported.`));
+  }
+  bits.push(`${fmt(s.sr, 1)} workers per retiree (headcount); ${fmt(s.wrr, 2)} labor-market ` +
+    `entrants per exit.`);
+  return '<p>' + bits.join(' ') + '</p>';
+}
+
+function renderStateDecomp(u) {
+  const el = document.getElementById('cp-decomp');
+  if (!el || !state.states) return;
+  const s = state.states[u];
+  const comps = (state.statesMeta && state.statesMeta.components) || [];
+  const wAll = { dems: state.weights.dems || 0, demt: state.weights.demt || 0 };
+  const den = comps.reduce((acc, k) => (s.z[k.id] != null && wAll[k.id] > 0) ? acc + wAll[k.id] : acc, 0) || 1;
+  const rows = comps.map(k => ({
+    label: k.label,
+    contrib: (s.z[k.id] != null && wAll[k.id] > 0) ? (wAll[k.id] * s.z[k.id]) / den : 0,
+    missing: s.z[k.id] == null,
+  })).reverse();
+  const traces = [{
+    type: 'bar', orientation: 'h',
+    y: rows.map(r => r.label), x: rows.map(r => r.contrib),
+    marker: { color: rows.map(r => r.missing ? RULE : r.contrib >= 0 ? ACCENT : WARN) },
+    hovertemplate: '%{y}: %{x:.3f}<extra></extra>', width: 0.55,
+  }];
+  const layout = Object.assign({}, BASE, {
+    height: 150, margin: { l: 210, r: 12, t: 20, b: 40 },
+    xaxis: grid({ zerolinecolor: MUTED, fixedrange: true,
+      title: { text: 'weighted contribution w·z (states score on demographic components only)', font: { size: 10, color: MUTED } } }),
+    yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
+  });
+  Plotly.react(el, traces, layout, NOPAD);
+}
+
+async function selectState(u) {
+  const s = state.states && state.states[u];
+  if (!s) return;
+  state.selected = u;
+  if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
+  const panel = document.getElementById('country-panel');
+  panel.innerHTML = `<div class="closed-hint">Loading ${s.n}…</div>`;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  let d;
+  try { d = await fetchStateDetail(u); }
+  catch (e) { panel.innerHTML = `<div class="closed-hint">No detail file for ${s.n}.</div>`; return; }
+  if (state.selected !== u) return;
+
+  computeStateScores();
+  const score = state.stateScores[u];
+  panel.innerHTML = `
+    <div class="cp-head">
+      <h3>${s.n}</h3>
+      <span class="score" style="color:${score >= 0 ? ACCENT : WARN}">score ${score == null ? '—' : (score >= 0 ? '+' : '') + score.toFixed(2)}</span>
+      <span style="font-size:.75rem;color:var(--muted)">demographic components only</span>
+    </div>
+    <div class="statstrip">
+      ${statBox('population', fmtPop(s.pop))}
+      ${statBox('median age', fmt(s.ma, 1))}
+      ${statBox('median 2050 (closed)', fmt(s.ma50, 1))}
+      ${statBox('workers / retiree (headcount)', fmt(s.sr, 1))}
+      ${statBox('eff. workers / consumer', fmt(s.esr, 2))}
+      ${statBox('prospective OADR', fmt(s.poadr, 2))}
+      ${statBox('entrants / exit', fmt(s.wrr, 2))}
+      ${statBox('pop 2050 ÷ 2025 (closed)', fmt(s.mom, 2))}
+      ${statBox('net dom. migration', (s.dommig == null ? '—' : (s.dommig > 0 ? '+' : '') + fmt(s.dommig, 0) + 'k/yr'))}
+      ${statBox('births − deaths', (s.natinc == null ? '—' : (s.natinc > 0 ? '+' : '') + fmt(s.natinc, 0) + 'k/yr'))}
+    </div>
+    <div class="cp-grid">
+      <div>
+        <div class="pyr-controls">
+          <button id="pyr-play" aria-label="animate">▶</button>
+          <input type="range" id="pyr-year" min="0" max="${d.pyramid.years.length - 1}" step="1">
+          <span id="pyr-label" class="readout" style="font-weight:700;min-width:3ch"></span>
+          <button id="pyr-mode" title="toggle % / absolute" style="background:#fff;color:var(--muted);border:1px solid var(--rule)">%</button>
+        </div>
+        <div id="cp-pyramid" style="height:300px"></div>
+        <p style="font-size:.75rem;color:var(--muted);margin:.3rem 0 0">${d.note || ''}</p>
+      </div>
+      <div><div id="cp-sparks" style="height:336px"></div></div>
+      <div class="full"><div id="cp-decomp" style="height:150px"></div></div>
+    </div>
+    <div class="cp-narrative">
+      <div class="k">Auto-workup</div>
+      ${autoStateNarrative(u)}
+    </div>`;
+
+  drawPyramid(d);
+  drawSparks(d, [
+    { key: 'esr', title: 'eff. workers / consumer', color: ACCENT },
+    { key: 'sr', title: 'workers / retiree (headcount)', color: WARN },
+    { key: 'ma', title: 'median age', color: '#6A4FA3' },
+    { key: 'pop', title: 'population (millions)', color: '#2F7A4A',
+      data: d.series.pop.map(v => v === null ? null : v / 1000) },
+  ], 10);
+  renderStateDecomp(u);
+  const input = document.getElementById('country-input');
+  if (input && input.value !== s.n) input.value = s.n;
+}
+
 /* ------------------------------------------------------ routing & pickers */
 function wireRouting() {
   const apply = () => {
-    const m = location.hash.match(/^#country\/([A-Z]{3})$/);
-    if (m && state.countries[m[1]]) selectCountry(m[1]);
+    const mc = location.hash.match(/^#country\/([A-Z]{3})$/);
+    const ms = location.hash.match(/^#state\/([A-Z]{2})$/);
+    if (mc && state.countries[mc[1]]) {
+      if (state.view !== 'world') { setView('world').then(() => selectCountry(mc[1])); }
+      else selectCountry(mc[1]);
+    } else if (ms) {
+      if (state.view !== 'states') {
+        setView('states').then(() => { if (state.states && state.states[ms[1]]) selectState(ms[1]); });
+      } else if (state.states && state.states[ms[1]]) {
+        selectState(ms[1]);
+      }
+    }
   };
   window.addEventListener('hashchange', apply);
   apply();
 }
 
-function wirePicker() {
+let pickerByName = {};
+function rebuildPicker() {
   const input = document.getElementById('country-input');
   const list = document.getElementById('country-list');
-  const byName = {};
-  Object.entries(state.countries)
+  list.innerHTML = '';
+  pickerByName = {};
+  const src = state.view === 'world' ? state.countries : state.states;
+  const prefix = state.view === 'world' ? '#country/' : '#state/';
+  Object.entries(src || {})
     .sort((a, b) => a[1].n.localeCompare(b[1].n))
-    .forEach(([iso3, c]) => {
-      byName[c.n.toLowerCase()] = iso3;
+    .forEach(([code, c]) => {
+      pickerByName[c.n.toLowerCase()] = prefix + code;
       const opt = document.createElement('option');
       opt.value = c.n;
       list.appendChild(opt);
     });
-  input.addEventListener('change', () => {
-    const iso3 = byName[input.value.trim().toLowerCase()];
-    if (iso3) location.hash = '#country/' + iso3;
+  input.placeholder = state.view === 'world' ? 'Type a name… e.g. Japan' : 'Type a state… e.g. Utah';
+}
+
+function wirePicker() {
+  rebuildPicker();
+  document.getElementById('country-input').addEventListener('change', ev => {
+    const target = pickerByName[ev.target.value.trim().toLowerCase()];
+    if (target) location.hash = target;
   });
 }
 
@@ -721,9 +1006,10 @@ document.addEventListener('DOMContentLoaded', () => {
     parityCheck();
     renderSliders();
     wirePresets();
-    drawMap();
+    renderMap();
     drawCurrentAccount();
     wirePicker();
+    wireViewToggle();
     buildPortraits();
     wireRouting();
   }).catch(err => {
