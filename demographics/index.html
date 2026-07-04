@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Shape of People to Come · Demographics as Destiny, Audited</title>
+  <meta name="description"
+        content="An econometric deep dive on post-industrial demographic shape change:
+                 the capital structure of a human life, what inverted population pyramids
+                 do to labor, capital and trade, a richer instrument panel than birth
+                 rates, and an interactive world atlas scored by a transparent
+                 demographic-strategic index built from UN WPP 2024 data." />
+  <meta name="author" content="Scott Nelson" />
+  <meta name="unit" content="demographics" />
+  <meta property="og:title" content="The Shape of People to Come" />
+  <meta property="og:description" content="Capital, cohorts, and the end of the demographic dividend: an interactive econometric atlas of 236 countries built on UN World Population Prospects 2024." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://scottn66.github.io/demographics/" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon"
+        href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⏳</text></svg>" />
+  <link rel="stylesheet" href="vendor/katex/katex.min.css" />
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --gold-soft:#F6EFD8; --code-bg:#F2F2F5;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+      /* fixed categorical assignment — color follows the country everywhere */
+      --c-usa:#1F4E9E; --c-chn:#B83A2E; --c-deu:#A8861D; --c-nga:#2F7A4A;
+      --c-jpn:#6A4FA3; --c-kor:#0782AF; --c-ind:#C2632F;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem;flex-wrap:wrap}
+    .topbar a{color:#cfe0ff;border:none}
+    .topbar a:hover{color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    .page{display:grid;grid-template-columns:230px minmax(0,760px);gap:2.4rem;max-width:1080px;margin:0 auto;padding:2rem 1.2rem 5rem}
+    .toc{position:sticky;top:3.4rem;align-self:start;font-size:.85rem;max-height:90vh;overflow:auto}
+    .toc ol{list-style:none;margin:0;padding:0;counter-reset:t -1}
+    .toc li{counter-increment:t;margin:.15rem 0}
+    .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
+    .toc a{color:var(--muted);border:none}
+    .toc a:hover{color:var(--accent)}
+    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none;counter-increment:none}
+    .toc .act::before{content:""}
+    main{min-width:0}
+    h1{font-size:2.5rem;line-height:1.1;margin:.2rem 0 .6rem;letter-spacing:-.5px}
+    h2{font-size:1.5rem;margin:2.6rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
+    h3{font-size:1.12rem;margin:1.6rem 0 .3rem}
+    .lead{font-size:1.18rem;color:#333}
+    .badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .badge{font-size:.72rem;background:var(--accent-soft);color:var(--accent);padding:.2rem .6rem;border-radius:99px;border:none;font-weight:600}
+    .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:var(--radius);padding:.8rem 1rem;margin:1.1rem 0;box-shadow:var(--shadow)}
+    .callout.good{border-left-color:var(--good)} .callout.warn{border-left-color:var(--warn)} .callout.gold{border-left-color:var(--gold)}
+    .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .aside-box{border:1px dashed var(--rule);border-radius:var(--radius);padding:.75rem 1rem;margin:1.1rem 0;background:#FCFCFD;font-size:.93rem}
+    .aside-box .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gold)}
+    details.aside-box summary{cursor:pointer;font-weight:700;font-size:.85rem}
+    .toc-toggle{display:none}
+    figure{margin:1.2rem 0}
+    figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem;text-align:center}
+    table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
+    th,td{border:1px solid var(--rule);padding:.4rem .6rem;text-align:left;vertical-align:top}
+    th{background:var(--accent-soft);color:var(--accent)}
+    .katex-display{overflow-x:auto;overflow-y:hidden;padding:.2rem 0}
+    .chart{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow);padding:.5rem;min-height:120px}
+    .chart .ph{color:var(--muted);font-size:.85rem;text-align:center;padding:2.5rem 0}
+    .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}
+    .colophon h2{border:none;font-size:1.05rem;margin-top:1rem}
+    /* ---- the atlas (full-width band) ---- */
+    .wide{grid-column:1 / -1;max-width:100%}
+    .atlas-controls{display:flex;flex-wrap:wrap;gap:.9rem;align-items:flex-end;margin:.8rem 0}
+    .presets{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+    .presets button{border:none;background:#fff;padding:.34rem .7rem;font-size:.82rem;cursor:pointer;color:var(--muted)}
+    .presets button.on{background:var(--accent);color:#fff}
+    .country-pick{font-size:.85rem}
+    .country-pick input{padding:.3rem .5rem;border:1px solid var(--rule);border-radius:8px;font-family:inherit;font-size:.85rem;width:220px;background:#fff}
+    .sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem .9rem;margin:.6rem 0 .2rem}
+    .sl{font-size:.75rem;color:var(--muted)}
+    .sl label{display:flex;justify-content:space-between;font-weight:600}
+    .sl label .pct{font-variant-numeric:tabular-nums;color:var(--text)}
+    .sl input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+    .sl.authored label span.nm::after{content:" ✎";color:var(--gold);font-size:.8em}
+    .atlas-note{font-size:.78rem;color:var(--muted);margin:.2rem 0 .6rem}
+    #map{width:100%;height:520px}
+    /* ---- country panel ---- */
+    #country-panel{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.1rem 1.2rem;margin-top:1rem}
+    #country-panel .closed-hint{color:var(--muted);font-size:.9rem;text-align:center;padding:1.4rem 0}
+    .cp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.8rem;margin-bottom:.4rem}
+    .cp-head h3{margin:0;font-size:1.4rem}
+    .cp-head .score{font-size:1.05rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .cp-head .cov{font-size:.75rem;color:var(--warn)}
+    .statstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:.5rem;margin:.6rem 0 1rem}
+    .stat{background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .6rem}
+    .stat .v{font-size:1.12rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .stat .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    .cp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+    .cp-grid .full{grid-column:1 / -1}
+    .pyr-controls{display:flex;gap:.6rem;align-items:center;font-size:.8rem;margin:.2rem 0 .4rem}
+    .pyr-controls input[type=range]{flex:1;accent-color:var(--accent)}
+    .pyr-controls button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:.22rem .6rem;cursor:pointer;font-size:.8rem}
+    .cp-narrative{font-size:.95rem;border-top:1px dashed var(--rule);margin-top:1rem;padding-top:.8rem}
+    .cp-narrative .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+    .ctxnotes{font-size:.8rem;color:var(--muted);margin-top:.6rem}
+    .ctxnotes dt{font-weight:700;float:left;clear:left;margin-right:.4rem}
+    .ctxnotes dd{margin:0 0 .15rem 0}
+    .portraits{display:grid;grid-template-columns:1fr;gap:.6rem}
+    .portrait{border:1px solid var(--rule);border-radius:var(--radius);padding:.7rem .9rem;background:var(--card-bg)}
+    .portrait b a{border:none}
+    .portrait p{margin:.25rem 0 0;font-size:.92rem}
+    @media(max-width:880px){
+      .page{grid-template-columns:1fr}
+      h1{font-size:2rem}
+      .toc{display:block;position:static;max-height:none}
+      .toc>nav{display:none}
+      .toc.open>nav{display:block}
+      .toc-toggle{display:block;width:100%;text-align:left;background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .8rem;font-size:.9rem;cursor:pointer}
+      table{display:block;overflow-x:auto;white-space:normal}
+      #map{height:340px}
+      .cp-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <a class="brand" href="../index.html">Scott Nelson</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="../decision-theory.html">Decision theory</a>
+    <a href="../actuarial-pricing.html">Actuarial track</a>
+    <a href="../resume.html">Resume</a>
+  </nav>
+
+  <div class="page">
+    <aside class="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
+      <nav><ol>
+        <li><a href="#fixity">The fixity principle</a></li>
+        <li class="act">Part I · How we got here</li>
+        <li><a href="#shapes">Pyramid, column, urn</a></li>
+        <li><a href="#bretton">The order that industrialized everyone</a></li>
+        <li class="act">Part II · The economics</li>
+        <li><a href="#lifecycle">The price of a person</a></li>
+        <li><a href="#aggregation">What the shape does to an economy</a></li>
+        <li class="act">Part III · Measurement</li>
+        <li><a href="#instruments">Beyond birth rates</a></li>
+        <li><a href="#score">A composite score</a></li>
+        <li class="act">Part IV · The atlas</li>
+        <li><a href="#atlas">The map</a></li>
+        <li><a href="#portraits">Ten portraits</a></li>
+        <li class="act">Part V · Honesty</li>
+        <li><a href="#limits">What this lens misses</a></li>
+        <li><a href="#colophon">Sources &amp; methods</a></li>
+      </ol></nav>
+    </aside>
+
+    <main>
+      <header id="hero">
+        <div class="badges">
+          <span class="badge">UN WPP 2024 · 236 countries</span>
+          <span class="badge">interactive atlas + adjustable score</span>
+          <span class="badge">life-cycle economics · ~35 min read</span>
+          <a href="#colophon" style="border:none"><span class="badge">every number reproducible</span></a>
+        </div>
+        <h1>The Shape of People to Come</h1>
+        <p class="lead">
+          Capital, cohorts, and the end of the demographic dividend. Most macro forecasting
+          is guesswork dressed in confidence intervals. One input is different: the people
+          are already here. This piece builds the economics of age structure from the
+          ground up — what a human life looks like as a balance sheet, what happens when a
+          country's balance sheets all hit the same phase at once — and then puts a score
+          on every country on Earth, with the weights left unlocked so you can disagree
+          with me by dragging a slider.
+        </p>
+      </header>
+
+      <h2 id="fixity">0 · The fixity principle</h2>
+      <p>
+        Every person who will be 30 years old in 2045 has already been born. There is no
+        policy, no boom, no crisis that changes this. A government can print money; it
+        cannot print 25-year-olds. Once a generation is on the books, only two forces ever
+        edit it: <b>migration</b> moves people between ledgers, and <b>mortality</b>
+        retires entries early. Everything else — every workforce, every tax base, every
+        consumer market of the 2040s — is already standing in today's kindergartens and
+        cubicles, countable to within a rounding error.
+      </p>
+      <p>
+        This is what makes demographics unlike every other macro variable. GDP forecasts
+        five years out are famously embarrassing. Population-structure forecasts twenty
+        years out are boring — in the best possible sense. The UN has published population
+        projections since the 1950s, and for the already-born cohorts their medium-variant
+        errors are small single digits. When someone tells you what China's labor force
+        will look like in 2040, they are not speculating; they are doing arithmetic on
+        people who already exist.
+      </p>
+      <div class="callout">
+        <div class="k">The claim this article defends</div>
+        Age structure is the most under-priced forecastable input in economic and strategic
+        planning — and the single number everyone quotes (the birth rate) is close to the
+        least informative way to read it.
+      </div>
+
+      <h2 id="shapes">1 · Pyramid, column, urn</h2>
+      <p>
+        Plot a country's population by age — youngest at the bottom, men left, women
+        right — and you get its demographic silhouette. For nearly all of human history,
+        every country had the same one: a <b>pyramid</b>. Lots of children at the base,
+        attrition all the way up. High fertility, high mortality; a society perpetually
+        young, perpetually replacing itself.
+      </p>
+      <p>
+        Industrialization breaks the pyramid, and it breaks it in a specific order. First
+        mortality falls (sanitation, antibiotics, food security) while fertility stays
+        high — the base bulges, population explodes. Then fertility falls as people
+        urbanize, and the silhouette straightens into a <b>column</b>: cohorts of roughly
+        equal size, a population that neither grows nor shrinks much. Hold fertility below
+        replacement for another generation or two and the base narrows under the bulge:
+        the column becomes an <b>urn</b> — an inverted pyramid balancing on a thinning
+        stem of young people, top-heavy with retirees.
+      </p>
+      <figure>
+        <div id="fig-shapes" class="chart"><div class="ph">Figure 1 · three silhouettes, 2025 — loading…</div></div>
+        <figcaption>
+          Fig 1 — The three shapes, drawn from the data: Nigeria 2025 (pyramid),
+          United States 2025 (column), Japan 2050 (urn). Same axes, same scale per panel
+          (share of that country's population), UN WPP 2024 medium variant.
+        </figcaption>
+      </figure>
+      <p>
+        The three silhouettes are not three destinies; they are three <i>timestamps on the
+        same road</i>. Nigeria is where South Korea was in 1965. Japan is where South Korea
+        will be in 2045, except South Korea is traveling faster than any country ever has.
+        The only question a demographic profile really asks is: <i>where on the road are
+        you, and how fast are you moving?</i>
+      </p>
+
+      <h2 id="bretton">2 · The order that industrialized everyone</h2>
+      <p>
+        Why did the whole world start down that road, and why do countries sit at such
+        different mileposts today? The mechanism is urbanization, and the timetable was
+        set — mostly by accident — at a New Hampshire ski resort in 1944.
+      </p>
+      <p>
+        On a farm, a child is <b>free labor with a 6-year lead time</b>: another set of
+        hands for weeding, milking, hauling water. In a city apartment, that same child is
+        a <b>25-year unfunded liability</b> — an extra bedroom, school fees, university, a
+        delayed career for a parent. Nothing dissolves fertility like moving the family
+        from the first environment to the second, and industrialization is precisely that
+        move at civilizational scale. Every country that industrializes urbanizes; every
+        country that urbanizes watches its birth rate fall. No exceptions have been
+        observed. The correlation survives religion, regime type, and family policy;
+        governments have thrown every pro-natal incentive ever invented at it and bent the
+        curve by decimal points.
+      </p>
+      <p>
+        The Bretton Woods settlement is what made the move near-universal. The American
+        offer to its Cold War alliance — <i>we patrol the oceans, our market is open, sail
+        anything anywhere and it arrives</i> — decoupled industrialization from empire. You
+        no longer needed a navy and colonies to get inputs and reach customers; you needed
+        a port. So industrialization, which took Britain a century and a half, was
+        compressed into ~70 years for Germany and Japan's reconstruction, ~40 for Korea and
+        Taiwan, and roughly 30 for coastal China. Each compression compressed the fertility
+        collapse too. The countries that boarded the escalator late are riding it fastest —
+        which is why South Korea went from TFR 6 to TFR 0.75 within a single working
+        lifetime, a descent no society has ever experienced before.
+      </p>
+      <figure>
+        <div id="fig-tfr" class="chart"><div class="ph">Figure 2 · fertility trajectories — loading…</div></div>
+        <figcaption>
+          Fig 2 — Total fertility rate, 1950–2025, six countries on the same escalator at
+          different start dates. Dashed line: replacement (~2.1). The later you
+          industrialize, the faster you fall through it.
+        </figcaption>
+      </figure>
+      <div class="callout gold">
+        <div class="k">The staggered-cliff structure of the present</div>
+        Because industrialization arrived in waves, the fertility collapses are arriving in
+        waves too. The 2020s–2040s are the decades in which the <i>first</i> wave's collapse
+        (Japan, Germany, Italy, then China and Korea) reaches retirement age while the
+        <i>last</i> wave (Sub-Saharan Africa, parts of South Asia) is still young. The world
+        does not age uniformly; it ages in echelons. That asymmetry is the strategic map of
+        the century.
+      </div>
+
+      <h2 id="lifecycle">3 · The price of a person: capital structure by age</h2>
+      <p>
+        To convert silhouettes into economics you need one idea, and it is fifty years old:
+        people run a lifelong mismatch between what they produce and what they consume.
+        Modigliani called it the <b>life-cycle hypothesis</b> — we borrow young, save in
+        midlife, dissave old. The National Transfer Accounts project later measured it,
+        age by age, in dozens of countries. Define labor income \(y_l(a)\) and consumption
+        \(c(a)\) at age \(a\); the gap
+      </p>
+      <p style="text-align:center">
+        \[ \mathrm{LCD}(a) \;=\; c(a) - y_l(a) \]
+      </p>
+      <p>
+        is the <b>life-cycle deficit</b>. It is positive twice (childhood, old age) and
+        negative once (working life). Somebody must finance both deficits out of the one
+        surplus — through family transfers, through the state, or through assets. A
+        country's macroeconomy is, to first order, the sum of its citizens' positions
+        along this curve.
+      </p>
+      <figure>
+        <div id="fig-lifecycle" class="chart"><div class="ph">Figure 3 · the life-cycle deficit — loading…</div></div>
+        <figcaption>
+          Fig 3 — Stylized age profiles of labor income and consumption (shape follows the
+          National Transfer Accounts cross-country average; units are % of peak labor
+          income). Shaded: the two deficits and the one surplus that must pay for them.
+        </figcaption>
+      </figure>
+      <p>Walking the curve, tranche by tranche:</p>
+      <table>
+        <thead>
+          <tr><th>Age tranche</th><th>Economic role</th><th>Cash-flow profile</th><th>Balance-sheet behavior</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>0–4</b> · infants</td>
+              <td>Pure consumption. The most expensive humans per kilogram a household ever finances.</td>
+              <td>Deep deficit (childcare, parental time out of the workforce)</td>
+              <td>None — they <i>are</i> someone else's liability</td></tr>
+          <tr><td><b>5–17</b> · students</td>
+              <td>Consumption plus the largest public investment most states make: education.</td>
+              <td>Deficit, increasingly socialized (schools)</td>
+              <td>Human capital accumulating, financial capital nil</td></tr>
+          <tr><td><b>18–24</b> · entrants</td>
+              <td>Low-wage labor, apprenticeship, university. First earned income.</td>
+              <td>Near break-even at best; often debt-financed (tuition)</td>
+              <td>Negative net worth is normal here</td></tr>
+          <tr><td><b>25–45</b> · builders</td>
+              <td>Prime work plus maximum consumption: household formation, mortgages, cars, children — the demand engine of an economy.</td>
+              <td>Surplus begins, but consumption nearly keeps pace</td>
+              <td>Leveraged accumulation (borrow against future wages)</td></tr>
+          <tr><td><b>46–64</b> · financiers</td>
+              <td>Peak earnings, peak skill, kids launched, house paid down. The top of this band pays most of the income tax in every developed country.</td>
+              <td>Maximum surplus — the only tranche that reliably funds everyone else</td>
+              <td>Aggressive saving; this cohort <i>is</i> the domestic capital supply</td></tr>
+          <tr><td><b>65+</b> · drawers</td>
+              <td>Labor income largely ends; consumption doesn't — it tilts toward the most labor-intensive service there is, healthcare.</td>
+              <td>Deficit again, socialized via pensions and health systems</td>
+              <td>De-risking and drawdown: equities → bonds → cash → gone</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Two rows deserve a second look. The <b>financiers</b> (46–64) are the pivot of the
+        whole system: they simultaneously supply the tax base and the investment capital.
+        And the <b>drawers</b> (65+) don't just stop contributing capital — they invert
+        their portfolio. A 55-year-old buys equities and corporate bonds; a 75-year-old
+        holds government paper and cash, and sells assets to eat. Aging doesn't merely
+        shrink the pool of capital; it <i>changes what the remaining capital is willing to
+        finance</i>. Risk capital — the kind that funds startups, factories, and emerging
+        markets — is disproportionately a product of societies with fat 45–64 cohorts.
+      </p>
+      <details class="aside-box">
+        <summary>Aside · a two-period model of why capital gets cheap, then scarce</summary>
+        <p>
+          Take the simplest overlapping-generations sketch: everyone lives two periods,
+          works in the first (wage \(w\), saves \(s\)), retires in the second (consumes
+          savings times return). With \(N_t\) workers and \(N_{t-1}\) retirees, the
+          capital available per worker next period is
+          \( k_{t+1} = \frac{s \, N_t}{N_{t+1}} \).
+          Let the cohort growth ratio be \(g_t = N_{t+1}/N_t\). While fertility is falling
+          but the big cohorts are still working, \(g\) drops below 1 and \(k\) —
+          capital per worker — <i>rises</i>: capital is abundant, rates fall, asset prices
+          inflate. That is the boom phase, and it feels like genius. One period later the
+          big cohort retires and becomes the seller of those same assets to a smaller
+          generation of buyers, and the identity runs in reverse. The model is a toy, but
+          the mechanism — <i>the same cohort that made capital cheap on the way up makes it
+          scarce on the way down</i> — is exactly what sections 4 and 7 measure.
+        </p>
+      </details>
+
+      <h2 id="aggregation">4 · What the shape does to an economy</h2>
+      <p>
+        Sum the life-cycle curve over a population and the silhouette starts writing
+        macroeconomic history. Define the <b>support ratio</b> — this article uses the
+        blunt, transparent version:
+      </p>
+      <p style="text-align:center">
+        \[ SR \;=\; \frac{\text{population aged } 20\text{–}64}{\text{population aged } 65+} \]
+      </p>
+      <p>
+        When fertility first falls, a country gets forty golden years: the huge final
+        pre-collapse cohorts flow into working age while the number of children they must
+        support shrinks and the number of retirees above them is still small. Workers per
+        dependent surges. This is the <b>first demographic dividend</b> — Bloom and
+        Williamson credit it with as much as a third of East Asia's growth miracle. Then
+        those same workers, having few children to spend on, save — and their savings
+        become the deepest pool of investment capital the country has ever seen: the
+        <b>second dividend</b>. Cheap labor <i>and</i> cheap capital at once. Growth looks
+        unstoppable. Books get written about the national model.
+      </p>
+      <div class="callout warn">
+        <div class="k">The no-kids acceleration</div>
+        Notice the perverse mechanic: <b>not having children is stimulative — now.</b> A
+        childless 40-year-old spends and saves what a parent would have sunk into diapers
+        and tuition. Falling fertility therefore <i>boosts</i> growth for a generation
+        before it costs anything. The economy borrows demand and capital from a future
+        generation that, by construction, will never exist to repay it. Every miracle
+        economy of the late 20th century ran some version of this trade, mostly without
+        knowing it.
+      </div>
+      <p>
+        The bill arrives on a schedule you can read off the pyramid. The dividend cohorts
+        retire; the support ratio dives; the savers become sellers. Domestic consumption
+        sags (retirees buy services and medicine, not apartments and sedans), so
+        industrial capacity built for a bigger, younger home market must export or die —
+        which is why the world's aged industrial economies (Germany, Japan, China, Korea)
+        all run or ran structural surpluses aimed at whoever still has consumers. Their
+        surpluses are not a strategy; they are a symptom. Meanwhile the fiscal engine
+        reverses: the financier tranche that funded the state shrinks as the drawer
+        tranche that bills it swells.
+      </p>
+      <figure>
+        <div id="fig-sr" class="chart"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
+        <figcaption>
+          Fig 4 — Workers (20–64) per retiree (65+), 1950–2100, UN medium variant. The
+          gray band marks 2:1 and below — the zone where pay-as-you-go pension arithmetic
+          stops working without major reform. Note who enters it, and when.
+        </figcaption>
+      </figure>
+      <figure id="fig-ca-wrap" hidden>
+        <div id="fig-ca" class="chart"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
+        <figcaption>
+          Fig 5 — Current-account balance (% of GDP) against share of population 65+.
+          Aged industrial economies cluster in the surplus quadrant: exporting is what a
+          country does when its own consumers have retired.
+        </figcaption>
+      </figure>
+      <div class="aside-box" id="fig-ca-note">
+        <span class="k">Data note</span> — Figure 5 (current account vs. age structure)
+        requires World Bank series that are fetched in a separate pipeline step; it
+        appears automatically once that data ships with the page. The demographic figures
+        above are fully self-contained.
+      </div>
+
+      <h2 id="instruments">5 · Beyond birth rates: a better instrument panel</h2>
+      <p>
+        Public discussion of all this runs on one number: the total fertility rate. TFR is
+        a fine <i>thermometer</i> and a terrible <i>dashboard</i>. It tells you about one
+        flow at one edge of the pyramid, thirty to sixty years before that flow matters
+        economically — and it says nothing about the stock: the workers, taxpayers, savers
+        and retirees who are already here and already scheduled. Korea's crisis-grade
+        TFR of 0.75 will not touch its labor market until the 2040s; the workforce
+        contraction Korea faces <i>this decade</i> was locked in by the birth rates of the
+        1990s. If you want to read a country's economic future off its population, you
+        want instruments that look at the whole silhouette. This article computes six, for
+        every country, from the single-year age data:
+      </p>
+      <table>
+        <thead><tr><th>Instrument</th><th>Definition</th><th>What it actually measures</th></tr></thead>
+        <tbody>
+          <tr><td><b>Median age</b>, now &amp; 2050</td>
+              <td>\( \tilde a \): half the population older, half younger</td>
+              <td>Where on the pyramid→urn road you are; the 2050 value adds how fast you're driving</td></tr>
+          <tr><td><b>Support ratio</b></td>
+              <td>\( SR = P_{20\text{–}64} / P_{65+} \)</td>
+              <td>Today's pay-as-you-go arithmetic: workers available per retiree billed</td></tr>
+          <tr><td><b>Prospective old-age dependency</b></td>
+              <td>\( POADR = P_{a &gt; T} / P_{20 \text{–} T} \), where \(T\) is the age at which remaining life expectancy is 15 years (from the country's own life table)</td>
+              <td>Aging measured against health, not the calendar. A 68-year-old Japanese and a 68-year-old Chadian are not the same distance from dependency; Sanderson &amp; Scherbov's fix</td></tr>
+          <tr><td><b>Workforce replacement ratio</b></td>
+              <td>\( WRR = P_{20\text{–}24} / P_{60\text{–}64} \)</td>
+              <td>The labor-market turnstile: entrants available per imminent retiree. Below 1, every retirement is a net vacancy</td></tr>
+          <tr><td><b>Built-in growth</b></td>
+              <td>\( M = P_{2050} / P_{2025} \) (medium variant)</td>
+              <td>Momentum already banked in the age structure — growth or shrinkage that happens even if fertility never moves again</td></tr>
+          <tr><td><b>Capital-shift indicator</b></td>
+              <td>\( \Delta \left[ P_{35\text{–}64} / P_{65+} \right]_{2025 \to 2040} \)</td>
+              <td>The savers-to-sellers rotation of section 3: how fast the asset-accumulating tranche is draining into the asset-liquidating one. Negative nearly everywhere; magnitude is what matters</td></tr>
+        </tbody>
+      </table>
+      <p>
+        No single one of these is novel; the point is the <i>panel</i>. A country can look
+        fine on TFR and terrifying on WRR (immigration-fed economies with aging natives),
+        or terrifying on TFR and fine for another decade on SR (China until ~2032). The
+        instruments disagree in informative ways, and the map in section 7 lets you watch
+        them disagree.
+      </p>
+      <div class="callout good">
+        <div class="k">Why this panel is trustworthy at all</div>
+        Every instrument above is computed from people <b>already alive</b>, pushed forward
+        by survival rates. The 2050 median age of every country on the map is ~85% locked
+        regardless of what fertility does next, because everyone who will be over 25 in
+        2050 already exists. This is the fixity principle doing real analytical work:
+        these are not forecasts that might embarrass anyone; they are demographic
+        accounting.
+      </div>
+
+      <h2 id="score">6 · A composite demographic-strategic score</h2>
+      <p>
+        Demographics is the engine, but engines run on terrain. A young population inside
+        indefensible borders (the Sahel), or an old population sitting on the world's best
+        farmland behind two oceans (the US Midwest, give or take the "old"), are different
+        propositions. Following the geostrategic tradition — Zeihan is the loudest recent
+        voice, but the furniture goes back to Mackinder and Spykman — the atlas layers five
+        <b>contextual components</b> onto the two demographic ones:
+      </p>
+      <ol>
+        <li><b>Demographic structure</b> (computed): the average of the standardized
+            support-ratio, median-age and POADR signals.</li>
+        <li><b>Demographic trajectory</b> (computed): standardized WRR, built-in growth,
+            TFR and capital-shift — where the structure is <i>heading</i>.</li>
+        <li><b>Geographic security</b> (authored ✎): moats, plains, chokepoints, strategic depth.</li>
+        <li><b>Agricultural potential</b> (authored ✎): can it feed itself if trade gets expensive?</li>
+        <li><b>Energy &amp; resources</b> (authored ✎): domestic energy vs. import dependence.</li>
+        <li><b>Neighborhood &amp; trade resilience</b> (authored ✎): who are the neighbors; what happens to your model if long-haul shipping stops being free?</li>
+        <li><b>Capital access</b> (authored ✎): market depth, reserve status, sovereign balance sheet.</li>
+      </ol>
+      <p>
+        The computed components standardize each raw metric across all 236 countries
+        (winsorized at the 5th/95th percentiles, signed so that <i>younger/stronger is
+        positive</i>, clamped to ±3):
+      </p>
+      <p style="text-align:center">
+        \[ z_{c,m} \;=\; \mathrm{sgn}_m \cdot \frac{x_{c,m} - \mu_m}{\sigma_m},
+        \qquad
+        S_c \;=\; \frac{\sum_{j \in A_c} w_j \, z_{c,j}}{\sum_{j \in A_c} w_j} \]
+      </p>
+      <p>
+        where the weights \(w_j\) live on a simplex (sliders renormalize to sum to 1) and
+        \(A_c\) is the set of components a country actually has data for — missing
+        components are excluded and disclosed, never imputed to zero. Authored rubric
+        scores (0–10) map linearly onto the same scale via \(z = (s-5)/2\).
+      </p>
+      <div class="callout warn">
+        <div class="k">Honesty box — read before trusting the colors</div>
+        The five ✎ components are <b>editorial judgments</b>, informed by public data but
+        decided by a person. They are shipped as a
+        <a href="data/context-scores.json">plain-text rubric file</a> you can read, audit,
+        and disagree with; countries I haven't hand-scored fall back to neutral (geography,
+        neighborhood) or to no-data. The two demographic components, by contrast, are pure
+        computation from UN data — and the "Pure demographics" preset below shows you the
+        map with <i>only</i> those, no opinions included. If you take one methodological
+        idea from this page: separating the computed from the authored, visibly, is what
+        makes a composite index honest.
+      </div>
+
+      <h2 id="atlas" class="wide-title">7 · The atlas</h2>
+      <div class="wide">
+        <p style="max-width:760px">
+          Every country, colored by the composite score under your chosen weights. Presets
+          give you three coherent worldviews; the sliders let you build your own. <b>Hover</b>
+          for the instrument panel; <b>click</b> (or pick from the box) to open the full
+          country workup below the map. Deep-linkable: the address bar tracks your selection.
+        </p>
+        <div class="atlas-controls">
+          <div>
+            <div class="atlas-note">Preset lens</div>
+            <div class="presets" id="presets" role="group" aria-label="Score presets">
+              <button data-preset="zeihan" class="on">Zeihan lens</button>
+              <button data-preset="puredemo">Pure demographics</button>
+              <button data-preset="resource">Resource security</button>
+            </div>
+          </div>
+          <div class="country-pick">
+            <div class="atlas-note">Find a country</div>
+            <input list="country-list" id="country-input" placeholder="Type a name… e.g. Japan" autocomplete="off" />
+            <datalist id="country-list"></datalist>
+          </div>
+        </div>
+        <div class="sliders" id="sliders"></div>
+        <p class="atlas-note">✎ = component includes hand-authored rubric scores (see honesty box). Sliders renormalize; the map recolors live. Score scale is symmetric: <span style="color:var(--warn);font-weight:700">− headwinds</span> · <span style="color:var(--muted)">0</span> · <span style="color:var(--accent);font-weight:700">+ tailwinds</span>.</p>
+        <div id="map" class="chart"><div class="ph">The atlas — loading data…</div></div>
+
+        <section id="country-panel" aria-live="polite">
+          <div class="closed-hint">Click a country on the map — or type one above — to open its workup.</div>
+        </section>
+      </div>
+
+      <h2 id="portraits">8 · Ten portraits</h2>
+      <p>
+        Ten countries that between them cover the whole road from pyramid to urn. Each link
+        opens the full workup in the atlas above.
+      </p>
+      <div class="portraits" id="portraits-list">
+        <!-- filled by app.js from the narrative templates below -->
+      </div>
+
+      <h2 id="limits">9 · What this lens misses</h2>
+      <p>
+        A forecast tool is only as honest as its list of failure modes. Here is where
+        demographic determinism — mine included — breaks:
+      </p>
+      <ul>
+        <li><b>Migration is policy, and policy moves faster than birth rates.</b> The age
+          structure of the already-born is fixed; <i>which ledger they're on</i> is not. The
+          US, Canada and Australia have effectively outsourced their fertility problem to
+          the admissions queue. A country that can attract and integrate 25-year-olds can
+          repair a thin cohort in years, not generations — and one political cycle can
+          shut the valve.</li>
+        <li><b>Productivity is a denominator with no birthday.</b> Every scary ratio above
+          has workers in it. If output per worker grows 2% a year, a workforce shrinking
+          1% a year still produces more every year. Automation and AI are precisely a bet
+          on the denominator — and the aged, capital-rich economies are the ones making it
+          hardest (Japan leads the world in robot density for a reason).</li>
+        <li><b>Retirement is a social convention wearing a biological costume.</b> The 65+
+          threshold in my own support ratio is an artifact of Bismarck's actuaries. Health
+          at a given age keeps improving (that's why POADR is on the panel); pension ages
+          move; second careers exist. The "drawer" tranche is more elastic than the
+          arithmetic admits.</li>
+        <li><b>The authored layers can be wrong.</b> The geography scores encode a
+          particular strategic worldview — that the maritime order frays and self-reliance
+          gets repriced. If the next thirty years look like the last thirty, the "Zeihan
+          lens" systematically overrates fortress economies and underrates trading hubs.
+          That is exactly why the pure-demographics preset exists.</li>
+        <li><b>Variance is not shown.</b> The map runs on the UN medium variant. Fertility
+          surprises (in both directions), pandemics, and wars all exist. For the
+          already-born cohorts the bands are tight; for 2080 Africa they are not.</li>
+        <li><b>Countries are not the only unit.</b> Sub-national structure matters (rural
+          Japan vs. Tokyo are different planets), and this version aggregates it away. A
+          US-state-level layer is the natural next build on this data schema.</li>
+      </ul>
+
+      <div class="colophon" id="colophon">
+        <h2>10 · Sources &amp; methods</h2>
+        <p>
+          <b>Demographic data:</b> United Nations, Department of Economic and Social
+          Affairs, Population Division — <i>World Population Prospects 2024</i>, medium
+          variant, single-year age × sex estimates and projections (1950–2100), accessed
+          via the UN-compiled <a href="https://github.com/PPgp/wpp2024">wpp2024 data
+          package</a>. © 2024 United Nations, licensed
+          <a href="https://creativecommons.org/licenses/by/3.0/igo/">CC BY 3.0 IGO</a>.
+          Life expectancy at 65 (for POADR thresholds) is computed from the WPP single-age
+          mortality schedules by standard life-table methods.
+          <b>Economic series</b> (where shown): World Bank Indicators API v2.
+          <b>Contextual scores:</b> hand-authored rubric,
+          shipped verbatim as <a href="data/context-scores.json">context-scores.json</a>.
+        </p>
+        <p>
+          <b>Pipeline:</b> every number on this page is generated by
+          <a href="https://github.com/scottn66/scottn66.github.io/blob/main/scripts/build_demographics_data.py">scripts/build_demographics_data.py</a>
+          in this site's repository — from raw UN tables to the JSON files this page
+          fetches. No numbers are typed into the prose that the pipeline doesn't produce.
+          Charts render with a pinned, self-hosted <a href="https://plotly.com/javascript/">Plotly.js</a> 2.35.2;
+          math with self-hosted <a href="https://katex.org/">KaTeX</a> 0.16.9. No CDNs, no trackers.
+        </p>
+        <p>
+          <b>Intellectual debts:</b> Modigliani &amp; Brumberg (1954) for the life-cycle
+          hypothesis; Lee &amp; Mason and the <a href="https://www.ntaccounts.org/">National
+          Transfer Accounts</a> project for measured age profiles; Bloom &amp; Williamson
+          (1998) on the demographic dividend; Keyfitz (1971) on momentum; Sanderson &amp;
+          Scherbov on prospective aging; Peter Zeihan (<i>The Accidental Superpower</i>,
+          <i>The End of the World Is Just the Beginning</i>) for the geography-plus-demography
+          strategic frame this piece set out to test-drive with its own math. Errors,
+          scores and opinions are mine.
+        </p>
+        <p>Data vintage: WPP 2024 · page generated July 2026 · <a href="../index.html">← back to all projects</a></p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Featured-country narratives are cloned into the panel by app.js -->
+
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/auto-render.min.js"></script>
+  <script src="vendor/plotly-2.35.2.min.js"></script>
+  <script>
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left: "\\[", right: "\\]", display: true},
+        {left: "\\(", right: "\\)", display: false}
+      ]
+    });
+    document.getElementById('toc-toggle').addEventListener('click', function () {
+      document.querySelector('.toc').classList.toggle('open');
+    });
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
