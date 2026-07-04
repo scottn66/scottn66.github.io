@@ -264,8 +264,11 @@
         { id:"PF-2", title:"Robot-arm crawler (Q-learning → BO → R-MAX)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"robot-arm-sim", acceptance:"robot-arm-sim/ live — 15-act narrative; modernized from the CMSI 4320 / Cognitive Systems Design crawler. Being enriched (back-prop candidates in MOC-cmsi4320-rl).", deps:[] },
         { id:"PF-3", title:"HMM NER page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"hmm", acceptance:"HMM.html live", deps:[] },
         { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", unit:"mandelbrot", origin:"side-project", acceptance:"mandelbrot.html + landing page live", deps:[] },
-        { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", origin:"meta", acceptance:"dashboard.html with kanban + Eisenhower + true-state reconciliation overlay", deps:[] },
+        { id:"PF-5", title:"Dashboard page (this page)", status:"done", size:"M", epic:"Meta", urgency:"low", importance:"high", origin:"meta", acceptance:"dashboard.html with kanban + Eisenhower + true-state reconciliation overlay; card data refreshed 2026-07-04.", deps:[] },
         { id:"PF-6", title:"Speedy Q-learning crawler (original page)", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"q", acceptance:"Q.html live — the earlier single-page crawler write-up; superseded in scope by PF-2 robot-arm-sim.", deps:[] },
+        { id:"PF-7", title:"NER tagger comparison (HMM → LSTM → BERT)", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"medium", unit:"ner-taggers", acceptance:"ner-taggers.html live (PR #15) — three taggers compared, 0.888 entity-F1 fine-tuned DistilBERT on CoNLL-2003.", deps:[] },
+        { id:"PF-8", title:"Mandelbrot tutorial & background landing page", status:"done", size:"S", epic:"Shipped", urgency:"low", importance:"low", unit:"mandelbrot_landing", acceptance:"mandelbrot_landing.html live — companion tutorial/background page to PF-4.", deps:["PF-4"] },
+        { id:"PF-9", title:"Home-page crawler modal: 3-way page fork", status:"done", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"index.html #projectModal2 rebuilt as a 3-row choice (full project / technical dashboard / cinematic narrative — narrative link restored); polyfill.io removed from robot-arm-sim/narrative.html.", deps:["PF-2","PF-6"] },
       ]
     },
     {
@@ -303,6 +306,7 @@
         { id:"SV-1", title:"Multi-API ETL pipeline (NREL / NASA POWER / URDB / EIA / PVWatts)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", acceptance:"7 connector modules → DuckDB warehouse (2.6M rows); cleaned TOU schedules + NEM 3.0 rate tables.", deps:[] },
         { id:"SV-2", title:"Economics engine + FastAPI quote service", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"high", acceptance:"25-year cashflow + LCOE / payback / NPV viability scoring; address → quote API.", deps:["SV-1"] },
         { id:"SV-3", title:"Publish solar site (overview + 20 city reports + 2,593-ZIP heatmaps + paper)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"solar-viability", acceptance:"/solar/ live with overview, reports/, heatmap/, paper.pdf — SJSU DATA 201 (Database Technologies) final.", deps:["SV-2"] },
+        { id:"SV-4", title:"Legacy Solar Calculator (2023)", status:"done", size:"S", epic:"Legacy", urgency:"low", importance:"low", unit:"sun", acceptance:"/sun/ live — the original 2023 calculator, predecessor to the DATA 201 analysis. Kept live for the record.", deps:[] },
       ]
     },
     {
@@ -312,9 +316,40 @@
         { id:"DT-1", title:"Expand MOC to full 18-station topological DAG", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"MOC-decision-theory.md: 4 acts, 18 stations, prereq DAG, narrative spine 'The Price of Knowing You'.", deps:[] },
         { id:"DT-2", title:"concept-value-of-information (quality bar)", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"VPI concept note authored as the depth bar for the rest of the Tier-3 spine.", deps:["DT-1"] },
         { id:"DT-3", title:"5 new concept notes (bayes-nets, utility+DN, do-calculus, SCMs, counterfactuals)", status:"in_progress", size:"L", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"Tier-3 spine for Acts I–IV; concept-causal-inference is the rung-3 hub.", deps:["DT-2"] },
-        { id:"DT-4", title:"Smoke-test pgmpy Defendotron (MEU / VPI)", status:"backlog", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"Verified MEU + VPI numbers + runnable excerpts from the hand-rolled eu/meu/vpi (hw2).", deps:["DT-3"] },
-        { id:"DT-5", title:"Build decision-theory.html (4 acts + 3 interactive widgets)", status:"backlog", size:"L", epic:"Build", urgency:"low", importance:"high", unit:"decision-theory", acceptance:"Single long-form page: BN inference + VPI calculator + counterfactual stepper; Scott-authored spine, AIMA / Forney cited.", deps:["DT-4"] },
-        { id:"DT-6", title:"PR, publish, reconcile dashboard → publish_status done", status:"backlog", size:"S", epic:"Build", urgency:"low", importance:"medium", acceptance:"decision-theory.html live; MOC publish_status=done; manifest unit decision-theory PUBLISHED.", deps:["DT-5"] },
+        { id:"DT-4", title:"Smoke-test pgmpy Defendotron (MEU / VPI)", status:"done", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"MEU + VPI numbers verified and shipped inside the live page's eq-meu / eq-vpi widgets.", deps:["DT-3"] },
+        { id:"DT-5", title:"Build decision-theory.html (4 acts + 3 interactive widgets)", status:"done", size:"L", epic:"Build", urgency:"low", importance:"high", unit:"decision-theory", acceptance:"Live since PR #2 (Jun 6); revised for rigor + pedagogy (PRs #4, #6); Actuarial track link added (PR #17). BN inference + VPI calculator widgets shipped.", deps:["DT-4"] },
+        { id:"DT-6", title:"PR, publish, reconcile dashboard → publish_status done", status:"done", size:"S", epic:"Build", urgency:"low", importance:"medium", acceptance:"decision-theory.html live; manifest unit decision-theory PUBLISHED; dashboard reconciled 2026-07-04.", deps:["DT-5"] },
+        { id:"DT-7", title:"Applied word-problem playground", status:"done", size:"L", epic:"Anthology", urgency:"low", importance:"high", unit:"applied-decision-theory", acceptance:"applied-decision-theory.html live (PR #15) with live break-even calculator; expanded to 10 problems with worked solutions + SVG visuals (PR #17).", deps:["DT-5"] },
+        { id:"DT-8", title:"Actuarial pricing track", status:"done", size:"M", epic:"Anthology", urgency:"low", importance:"high", unit:"actuarial-pricing", acceptance:"actuarial-pricing.html live (PR #17): equivalence principle, loadings, ruin theory, P vs Q measures, credibility — each with a worked example + visual.", deps:["DT-7"] },
+      ]
+    },
+    {
+      name: "Bitcoin Power Law", color: "#f7931a",
+      link: "https://scottn66.github.io/bitcoin-power-law/", track: "efferent", origin: "side-project",
+      tasks: [
+        { id:"BP-1", title:"Econometric analysis — Does Bitcoin follow a power law?", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"bitcoin-power-law", acceptance:"bitcoin-power-law/ live (PR #7, Jun 16); sigma/Gaussian corridor + deepened lenses 3–7 (PR #10).", deps:[] },
+        { id:"BP-2", title:"Stacked-panel hero remake (log-log + calendar)", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"medium", acceptance:"Two stacked panels replace the toggling hero — kills the relayout tick-smear bug; declutter fixes for hero ticks + Mosca timeline (PRs #15, #16).", deps:["BP-1"] },
+        { id:"BP-3", title:"Daily live BTC price Action", status:"done", size:"S", epic:"Automation", urgency:"low", importance:"medium", acceptance:"update-btc-price.yml refreshes the price snapshot daily (~07:23 UTC) from Coinbase spot, committing with [skip ci] (PR #16).", deps:["BP-1"] },
+        { id:"BP-4", title:"Triage AUDIT.md findings", status:"backlog", size:"M", epic:"Quality", urgency:"low", importance:"medium", acceptance:"bitcoin-power-law/AUDIT.md (56 findings, PR #15) triaged; high-priority items fixed or explicitly declined.", deps:["BP-1"] },
+      ]
+    },
+    {
+      name: "Conscious Agents", color: "#d63384",
+      link: "https://scottn66.github.io/conscious-agents.html", track: "efferent", origin: "born-publishable",
+      tasks: [
+        { id:"CA-1", title:"Trace-logic study page (multi-level)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"conscious-agents", acceptance:"conscious-agents.html live (PR #12); per-section HS/UG/PhD reading triptych (PR #14).", deps:[] },
+        { id:"CA-2", title:"Rigor pass vs the Traces preprint (~50 corrections)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", acceptance:"Every claim checked against the Traces of Consciousness preprint; Part XI open-conjectures section + Leibniz/Wheeler lineage; 530 KaTeX expressions render with 0 errors (PR #18).", deps:["CA-1"] },
+        { id:"CA-3", title:"Open Conjectures research catalogue", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"medium", unit:"conscious-agents-conjectures", acceptance:"conscious-agents-conjectures.html live (PR #18) — standalone researcher-facing catalogue mirroring the corrections.", deps:["CA-2"] },
+        { id:"CA-4", title:"Coordinate-sphere favicons", status:"done", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Favicon added to both conscious-agents pages (PR #19).", deps:["CA-3"] },
+      ]
+    },
+    {
+      name: "City Cartography", color: "#17a2b8",
+      link: "https://scottn66.github.io/cartography_landing.html", track: "efferent", origin: "side-project",
+      tasks: [
+        { id:"CC-1", title:"Cartography viewer (roads + topography + bathymetry)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"cartography", acceptance:"cartography.html live (PR #8); legend kept clear of the control panel (PR #9).", deps:[] },
+        { id:"CC-2", title:"Landing page", status:"done", size:"S", epic:"Shipped", urgency:"low", importance:"low", unit:"cartography-landing", acceptance:"cartography_landing.html live — intro + link into the viewer.", deps:["CC-1"] },
+        { id:"CC-3", title:"Performance HUD + progress-bar rework", status:"done", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Optional FPS/render-ms HUD; status bar supports determinate fill + indeterminate shimmer for network waits (PR #15).", deps:["CC-1"] },
       ]
     }
   ];
