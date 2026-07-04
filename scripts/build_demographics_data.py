@@ -172,25 +172,58 @@ def median_age(single_age_pop):
     return 100.0
 
 
-def e_at_age(mx, start_age=65):
-    """Remaining life expectancy at start_age from single-age mortality rates
-    (index age 0..100; closed with the open-ended 100+ rate)."""
-    lx = 1.0
-    l_list = []  # survivors at each age from start_age
-    # survive to start_age
-    for a in range(0, start_age):
-        lx *= math.exp(-mx[a])
-    l_start = lx
-    if l_start <= 0:
-        return 0.0
-    person_years = 0.0
-    for a in range(start_age, 100):
-        l_next = lx * math.exp(-mx[a])
-        person_years += (lx + l_next) / 2.0
-        lx = l_next
-    if mx[100] > 0:
-        person_years += lx / mx[100]  # open interval closure
-    return person_years / l_start
+def e_curve(mx):
+    """Remaining life expectancy e(a) for every age a = 0..100, from single-age
+    mortality rates (open-ended 100+ closure). One survival pass + one backward
+    person-years accumulation."""
+    l = [1.0]
+    for a in range(100):
+        l.append(l[-1] * math.exp(-mx[a]))
+    L = [(l[a] + l[a + 1]) / 2.0 for a in range(100)]
+    L.append(l[100] / mx[100] if mx[100] > 0 else 0.0)
+    T = [0.0] * 101
+    T[100] = L[100]
+    for a in range(99, -1, -1):
+        T[a] = T[a + 1] + L[a]
+    return [T[a] / l[a] if l[a] > 0 else 0.0 for a in range(101)]
+
+
+def prospective_threshold(e, target=15.0):
+    """Canonical Sanderson-Scherbov old-age threshold: the age x* where
+    remaining life expectancy e(x) = target. e(a) is not strictly monotone at
+    the youngest ages (high infant mortality), so scan downward from 100 for
+    the last crossing and interpolate linearly within the year of age.
+    No anchor at 65 and no clamp: sub-65 thresholds are legitimate."""
+    for a in range(100, 0, -1):
+        if e[a] < target <= e[a - 1]:
+            return (a - 1) + (e[a - 1] - target) / (e[a - 1] - e[a])
+    return None  # e(100) > target (implausible) or e never reaches target
+
+
+# Stylized global age profiles for the weighted NTA economic support ratio —
+# the SAME logistic curves the article's Fig 3 draws (app.js drawLifecycle),
+# extended flat from age 90 to 100. One borrowed profile for every country
+# (Mason 2005 precedent, Taiwan-1998); normalization cancels in the ratio.
+def stylized_profiles():
+    yl, cons = [], []
+    for a in range(101):
+        aa = min(a, 90)
+        ramp = 100.0 / (1.0 + math.exp(-(aa - 30) / 5.5))
+        fade = 1.0 / (1.0 + math.exp((aa - 61) / 4.5))
+        yl.append(max(0.0, ramp * fade * 1.19 - (100.0 if aa < 15 else 0.0)))
+        c = 34.0 + 24.0 / (1.0 + math.exp(-(aa - 10) / 4.0))
+        c += 12.0 / (1.0 + math.exp(-(aa - 22) / 3.0))
+        c += 10.0 / (1.0 + math.exp(-(aa - 74) / 6.0))
+        cons.append(c)
+    return yl, cons
+
+
+def esr_from_vec(vec, yl, cons):
+    """Weighted NTA economic support ratio: effective producers over effective
+    consumers, single ages 0..100."""
+    num = sum(yl[a] * vec[a] for a in range(101))
+    den = sum(cons[a] * vec[a] for a in range(101))
+    return num / den if den > 0 else None
 
 
 def pyramid_matrix(df_years):
@@ -291,19 +324,21 @@ def build(args):
     e0 = load_series("e01dt.rda", "e0proj1dt.rda", "e0B")
     mig = load_series("mig1dt.rda", "migproj1dt.rda", "mig")
 
-    print("== life table e65 from mx (latest estimate year)")
+    print("== life tables from mx: canonical prospective old-age thresholds")
     mx = read_rda("mx1dt.rda")
     mx = mx[mx.country_code.isin(code2iso)]
     mx["year"] = mx.year.astype(int)
     # mx1dt spans 1950-2100 (estimates + medium projection); use the reference year
     mx_year = REF_YEAR if (mx.year == REF_YEAR).any() else int(mx.year.max())
     mx = mx[mx.year == mx_year][["country_code", "age", "mxB"]]
-    e65 = {}
+    xstar = {}   # Sanderson-Scherbov threshold: age where e(x) = 15
     for code, sub in mx.groupby("country_code"):
         vec = sub.sort_values("age").mxB.to_numpy()
         if len(vec) == 101:
-            e65[int(code)] = e_at_age(vec, 65)
-    print(f"  e65 computed for {len(e65)} countries (mx year {mx_year})")
+            t = prospective_threshold(e_curve(vec))
+            if t is not None:
+                xstar[int(code)] = t
+    print(f"  e(x)=15 thresholds for {len(xstar)} countries (mx year {mx_year})")
 
     # hand-authored rubric
     ctx_path = OUT / "context-scores.json"
@@ -314,6 +349,7 @@ def build(args):
     wb = None if args.skip_wb else fetch_worldbank()
 
     print("== computing per-country metrics")
+    yl_prof, c_prof = stylized_profiles()
     summary = {}
     detail = {}
     raw_metrics = {}   # iso3 -> dict of raw metric values (for z-scoring)
@@ -343,11 +379,12 @@ def build(args):
                 if v40 is not None else None)
         cshift = (cs40 - cs25) if cs40 is not None else None
 
-        # prospective OADR: threshold T where remaining LE ~ 15y
+        # canonical prospective OADR (Sanderson-Scherbov): old age begins at
+        # x* where remaining life expectancy = 15y; sub-65 thresholds allowed
         poadr = None
-        if code in e65:
-            T = 65 + max(0.0, e65[code] - 15.0)
-            T = min(T, 99.0)
+        pt = xstar.get(code)
+        if pt is not None:
+            T = max(20.0, min(pt, 99.0))   # denominator floor at 20 (documented)
             fl = int(math.floor(T))
             frac = 1.0 - (T - fl)                     # fraction of age-fl bucket above T
             old = frac * v25[fl] + age_slice_sum(v25, fl + 1, 100)
@@ -357,6 +394,7 @@ def build(args):
         tfr25 = tfr.get((code, REF_YEAR))
         tfr10 = tfr.get((code, 2010))
         tfr_slope = ((tfr25 - tfr10) / 15.0) if (tfr25 is not None and tfr10 is not None) else None
+        esr25 = esr_from_vec(v25, yl_prof, c_prof)
 
         raw_metrics[iso3] = {"sr": sr, "ma": ma25, "poadr": poadr, "wrr": wrr,
                              "mom": mom, "tfr": tfr25, "cshift": cshift}
@@ -367,7 +405,8 @@ def build(args):
             "pop": siground(pop25),
             "ma": siground(ma25, 3), "ma50": siground(ma50, 3),
             "tfr": siground(tfr25, 3), "sr": siground(sr, 3),
-            "poadr": siground(poadr, 3), "wrr": siground(wrr, 3),
+            "poadr": siground(poadr, 3), "pt": siground(pt, 3),
+            "esr": siground(esr25, 3), "wrr": siground(wrr, 3),
             "mom": siground(mom, 3), "cshift": siground(cshift, 3),
             "tfrsl": siground(tfr_slope, 2),
             "gdppc": siground(wb_latest(wb_c, "gdppc"), 3),
@@ -380,17 +419,20 @@ def build(args):
         series = {"years": GRID}
         for key, lookup in (("tfr", tfr), ("le", e0), ("nmig", mig)):
             series[key] = [siground(lookup.get((code, y)), 3) for y in GRID]
-        sr_series, ma_series, pop_series = [], [], []
+        sr_series, ma_series, pop_series, esr_series = [], [], [], []
         for y in GRID:
             v = yearvec(y)
             if v is None:
-                sr_series.append(None); ma_series.append(None); pop_series.append(None)
+                sr_series.append(None); ma_series.append(None)
+                pop_series.append(None); esr_series.append(None)
             else:
                 sr_series.append(siground(age_slice_sum(v, 20, 64) /
                                           max(age_slice_sum(v, 65, 100), 1e-9), 3))
                 ma_series.append(siground(median_age(v), 3))
                 pop_series.append(siground(v.sum()))
-        series.update({"sr": sr_series, "ma": ma_series, "pop": pop_series})
+                esr_series.append(siground(esr_from_vec(v, yl_prof, c_prof), 3))
+        series.update({"sr": sr_series, "ma": ma_series, "pop": pop_series,
+                       "esr": esr_series})
 
         wb_detail = None
         if wb_c:
@@ -522,6 +564,18 @@ def verify(summary, detail):
     ng = summary.get("NGA", {})
     if not (ng.get("ma") and ng["ma"] < 22):
         errs.append(f"Nigeria median age {ng.get('ma')} not < 22")
+    # canonical POADR checks (values pre-computed during planning)
+    if not (jp.get("poadr") and 0.26 <= jp["poadr"] <= 0.31):
+        errs.append(f"Japan canonical POADR {jp.get('poadr')} outside [0.26, 0.31]")
+    if not (jp.get("pt") and 73 <= jp["pt"] <= 76):
+        errs.append(f"Japan prospective threshold {jp.get('pt')} outside [73, 76]")
+    if not (ng.get("pt") and ng["pt"] < 65):
+        errs.append(f"Nigeria prospective threshold {ng.get('pt')} not sub-65")
+    # band admits the real extremes: guest-worker states (QAT 0.98) and
+    # very-high-mortality young countries (CAF 0.44)
+    for iso3, c in summary.items():
+        if c.get("esr") is not None and not 0.40 <= c["esr"] <= 1.05:
+            errs.append(f"{iso3} ESR {c['esr']} outside sanity band (0.40, 1.05)")
     for iso3 in FEATURED:
         if iso3 not in summary:
             errs.append(f"featured {iso3} missing from summary")
