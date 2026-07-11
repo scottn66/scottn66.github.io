@@ -12,7 +12,7 @@ const CC = {
 };
 const INK = '#1E1E1E', MUTED = '#555', RULE = '#E5E5EA', PAPER = '#FFFFFF';
 const GOOD_SOFT = '#DEEFE0', WARN_SOFT = '#F4DCDA';
-const ACCENT = '#1F4E9E', WARN = '#B83A2E', AMBER = '#A8861D';
+const ACCENT = '#1F4E9E', WARN = '#B83A2E', ORANGE = '#D97036';
 const FONT = {
   family: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif',
   color: INK, size: 12.5,
@@ -23,6 +23,16 @@ const BASE = {
   hoverlabel: { bgcolor: '#1b2330', font: { color: '#fff', size: 12 }, bordercolor: '#1b2330' },
 };
 const NOPAD = { displayModeBar: false, responsive: true };
+
+// Plotly's `responsive` flag only reacts to window `resize` events; pane
+// drags and CSS reflows change a figure's box without firing one. Watch each
+// figure's own container and resize the plot to match.
+const RESIZER = new ResizeObserver(entries => {
+  for (const e of entries) {
+    const el = e.target;
+    if (el.classList.contains('js-plotly-plot') && el.offsetWidth) Plotly.Plots.resize(el);
+  }
+});
 const AGE_LABELS = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49',
   '50-54','55-59','60-64','65-69','70-74','75-79','80-84','85-89','90-94','95-99','100+'];
 
@@ -33,6 +43,7 @@ const grid = (ax) => Object.assign({ gridcolor: RULE, zerolinecolor: RULE, linec
 function mount(id) {
   const el = document.getElementById(id);
   el.innerHTML = '';
+  RESIZER.observe(el);
   return el;
 }
 
@@ -64,7 +75,7 @@ function drawShapes() {
     });
     traces.push({
       type: 'bar', orientation: 'h', xaxis: xa, yaxis: 'y',
-      x: s.f, y: AGE_LABELS, marker: { color: AMBER }, width: 0.82,
+      x: s.f, y: AGE_LABELS, marker: { color: ORANGE }, width: 0.82,
       showlegend: i === 0, name: 'Female', legendgroup: 'f',
       hovertemplate: `<b>${name}</b> · %{y}<br>female %{x}%<extra></extra>`,
     });
@@ -124,7 +135,7 @@ function drawLifecycle() {
     line: { color: ACCENT, width: 2.4 },
     hovertemplate: 'age %{x} · income %{y:.0f}<extra></extra>' });
   traces.push({ x: ages, y: cons, name: 'Consumption c(a)', type: 'scatter', mode: 'lines',
-    line: { color: AMBER, width: 2.4 },
+    line: { color: ORANGE, width: 2.4 },
     hovertemplate: 'age %{x} · consumption %{y:.0f}<extra></extra>' });
   const layout = Object.assign({}, BASE, {
     height: 330,
@@ -622,7 +633,7 @@ function drawPyramid(d) {
     const traces = [
       { type: 'bar', orientation: 'h', x: a.m, y: AGE_LABELS, marker: { color: ACCENT }, width: 0.85,
         name: 'Male', customdata: a.hm, hovertemplate: '%{y} male: %{customdata}<extra></extra>' },
-      { type: 'bar', orientation: 'h', x: a.f, y: AGE_LABELS, marker: { color: AMBER }, width: 0.85,
+      { type: 'bar', orientation: 'h', x: a.f, y: AGE_LABELS, marker: { color: ORANGE }, width: 0.85,
         name: 'Female', customdata: a.hf, hovertemplate: '%{y} female: %{customdata}<extra></extra>' },
     ];
     const layout = Object.assign({}, BASE, {
@@ -636,10 +647,11 @@ function drawPyramid(d) {
       yaxis: grid({ tickfont: { size: 9, color: MUTED }, fixedrange: true }),
       annotations: [
         { xref: 'paper', yref: 'paper', x: 0.03, y: 0.98, text: 'M', showarrow: false, font: { size: 11, color: ACCENT } },
-        { xref: 'paper', yref: 'paper', x: 0.97, y: 0.98, text: 'F', showarrow: false, font: { size: 11, color: AMBER } },
+        { xref: 'paper', yref: 'paper', x: 0.97, y: 0.98, text: 'F', showarrow: false, font: { size: 11, color: ORANGE } },
       ],
     });
     Plotly.react(el, traces, layout, NOPAD);
+    RESIZER.observe(el);
   }
 
   slider.addEventListener('input', () => render(+slider.value));
@@ -691,6 +703,7 @@ function drawSparks(d, panelsOverride, dtick) {
     height: 336, margin: { l: 36, r: 6, t: 22, b: 20 }, annotations, shapes,
   });
   Plotly.newPlot('cp-sparks', traces, layout, NOPAD);
+  RESIZER.observe(document.getElementById('cp-sparks'));
 }
 
 function renderDecomp(iso3) {
@@ -724,6 +737,7 @@ function renderDecomp(iso3) {
     yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
+  RESIZER.observe(el);
 }
 
 /* --------------------------------------------------------- US-state view */
@@ -862,6 +876,7 @@ function renderStateDecomp(u) {
     yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
+  RESIZER.observe(el);
 }
 
 async function selectState(u) {
