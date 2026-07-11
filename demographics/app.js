@@ -63,37 +63,43 @@ const SHAPES = {
 
 function drawShapes() {
   const names = Object.keys(SHAPES);
-  const traces = [], annotations = [];
+  const traces = [], annotations = [], layoutAxes = {};
+  // one full-width pyramid per row, top to bottom
+  const rows = [[0.72, 1], [0.36, 0.64], [0, 0.28]];
   names.forEach((name, i) => {
     const s = SHAPES[name];
     const xa = i === 0 ? 'x' : 'x' + (i + 1);
+    const ya = i === 0 ? 'y' : 'y' + (i + 1);
     traces.push({
-      type: 'bar', orientation: 'h', xaxis: xa, yaxis: 'y',
+      type: 'bar', orientation: 'h', xaxis: xa, yaxis: ya,
       x: s.m.map(v => -v), y: AGE_LABELS, marker: { color: ACCENT }, width: 0.82,
       customdata: s.m, showlegend: i === 0, name: 'Male', legendgroup: 'm',
       hovertemplate: `<b>${name}</b> · %{y}<br>male %{customdata}%<extra></extra>`,
     });
     traces.push({
-      type: 'bar', orientation: 'h', xaxis: xa, yaxis: 'y',
+      type: 'bar', orientation: 'h', xaxis: xa, yaxis: ya,
       x: s.f, y: AGE_LABELS, marker: { color: ORANGE }, width: 0.82,
       showlegend: i === 0, name: 'Female', legendgroup: 'f',
       hovertemplate: `<b>${name}</b> · %{y}<br>female %{x}%<extra></extra>`,
     });
+    layoutAxes['xaxis' + (i ? i + 1 : '')] = Object.assign(
+      grid({ range: [-7.8, 7.8], tickvals: [-6, -4, -2, 0, 2, 4, 6],
+        ticktext: ['6%', '4%', '2%', '0', '2%', '4%', '6%'],
+        tickfont: { size: 12, color: MUTED }, fixedrange: true }),
+      { domain: [0, 1], anchor: ya });
+    layoutAxes['yaxis' + (i ? i + 1 : '')] = grid({
+      domain: rows[i], anchor: xa, dtick: 2,
+      tickfont: { size: 12, color: MUTED }, fixedrange: true });
     annotations.push({
       text: `<b>${name}</b> · <span style="color:${MUTED}">${s.tag}</span>`,
-      xref: xa + ' domain', yref: 'paper', x: 0.5, y: 1.09, showarrow: false,
-      font: { size: 12 }, align: 'center',
+      xref: 'paper', yref: ya + ' domain', x: 0.5, y: 1.1, showarrow: false,
+      font: { size: 14 }, align: 'center',
     });
   });
-  const axis = () => grid({ range: [-7.8, 7.8], tickvals: [-5, 0, 5], ticktext: ['5%', '0', '5%'], fixedrange: true });
-  const layout = Object.assign({}, BASE, {
-    barmode: 'overlay', bargap: 0.06, height: 380,
-    margin: { l: 44, r: 8, t: 46, b: 30 },
-    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.09 },
-    xaxis: Object.assign(axis(), { domain: [0, 0.315] }),
-    xaxis2: Object.assign(axis(), { domain: [0.3425, 0.6575] }),
-    xaxis3: Object.assign(axis(), { domain: [0.685, 1] }),
-    yaxis: grid({ tickfont: { size: 9.5, color: MUTED }, fixedrange: true }),
+  const layout = Object.assign({}, BASE, layoutAxes, {
+    barmode: 'overlay', bargap: 0.06, height: 1150,
+    margin: { l: 56, r: 12, t: 56, b: 34 },
+    legend: { orientation: 'h', x: 1, xanchor: 'right', y: 1.03 },
     annotations,
   });
   Plotly.newPlot(mount('fig-shapes'), traces, layout, NOPAD);
@@ -138,15 +144,15 @@ function drawLifecycle() {
     line: { color: ORANGE, width: 2.4 },
     hovertemplate: 'age %{x} · consumption %{y:.0f}<extra></extra>' });
   const layout = Object.assign({}, BASE, {
-    height: 330,
+    height: 480,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.14 },
-    xaxis: grid({ title: { text: 'age', font: { size: 11, color: MUTED } }, fixedrange: true, dtick: 10 }),
-    yaxis: grid({ title: { text: '% of peak labor income', font: { size: 11, color: MUTED } },
+    xaxis: grid({ title: { text: 'age', font: { size: 13, color: MUTED } }, fixedrange: true, dtick: 10 }),
+    yaxis: grid({ title: { text: '% of peak labor income', font: { size: 13, color: MUTED } },
       fixedrange: true, rangemode: 'tozero' }),
     annotations: [
-      { x: 9, y: 22, text: 'childhood<br>deficit', showarrow: false, font: { size: 11, color: WARN } },
-      { x: 44, y: 25, text: 'working-life<br>surplus', showarrow: false, font: { size: 11, color: '#2F7A4A' } },
-      { x: 81, y: 25, text: 'old-age<br>deficit', showarrow: false, font: { size: 11, color: WARN } },
+      { x: 9, y: 22, text: 'childhood<br>deficit', showarrow: false, font: { size: 12.5, color: WARN } },
+      { x: 44, y: 25, text: 'working-life<br>surplus', showarrow: false, font: { size: 12.5, color: '#2F7A4A' } },
+      { x: 81, y: 25, text: 'old-age<br>deficit', showarrow: false, font: { size: 12.5, color: WARN } },
     ],
   });
   Plotly.newPlot(mount('fig-lifecycle'), traces, layout, NOPAD);
@@ -195,15 +201,15 @@ function drawTFR(featured) {
     hovertemplate: `<b>${featured.countries[k].n}</b> %{x}: %{y:.2f}<extra></extra>`,
   }));
   const layout = Object.assign({}, BASE, {
-    height: 360,
+    height: 500,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
     xaxis: grid({ fixedrange: true, dtick: 10 }),
-    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 11, color: MUTED } },
+    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 13, color: MUTED } },
       fixedrange: true, rangemode: 'tozero' }),
     shapes: [{ type: 'line', x0: years[0], x1: 2025, y0: 2.1, y1: 2.1,
       line: { color: MUTED, width: 1.4, dash: 'dash' } }],
     annotations: [
-      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 10.5, color: MUTED }, xanchor: 'left' },
+      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' },
     ],
   });
   Plotly.newPlot(mount('fig-tfr'), traces, layout, NOPAD);
@@ -224,17 +230,17 @@ function drawSupport(featured) {
       hovertemplate: `<b>${c.n}</b> %{x} (proj.): %{y:.1f}<extra></extra>` });
   });
   const layout = Object.assign({}, BASE, {
-    height: 400,
+    height: 540,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
     xaxis: grid({ fixedrange: true, dtick: 25 }),
-    yaxis: grid({ title: { text: 'workers (20–64) per retiree (65+), log scale', font: { size: 11, color: MUTED } },
+    yaxis: grid({ title: { text: 'workers (20–64) per retiree (65+), log scale', font: { size: 13, color: MUTED } },
       type: 'log', tickvals: [1, 2, 4, 8, 16, 32], fixedrange: true, range: [Math.log10(0.8), Math.log10(36)] }),
     shapes: [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: Math.log10(0.8), y1: Math.log10(2),
       fillcolor: 'rgba(184,58,46,.07)', line: { width: 0 } }],
     annotations: [
       { xref: 'paper', x: 0.011, y: Math.log10(1.55), text: 'pay-as-you-go breaks down', showarrow: false,
-        font: { size: 10.5, color: WARN }, xanchor: 'left' },
-      { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 10, color: MUTED } },
+        font: { size: 12, color: WARN }, xanchor: 'left' },
+      { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 11.5, color: MUTED } },
     ],
   });
   Plotly.newPlot(mount('fig-sr'), traces, layout, NOPAD);
@@ -258,11 +264,11 @@ function drawCurrentAccount() {
     showlegend: false,
   }];
   const layout = Object.assign({}, BASE, {
-    height: 380,
-    xaxis: grid({ title: { text: 'median age', font: { size: 11, color: MUTED } }, fixedrange: true }),
-    yaxis: grid({ title: { text: 'current account, % GDP', font: { size: 11, color: MUTED } }, fixedrange: true, zerolinecolor: MUTED }),
+    height: 520,
+    xaxis: grid({ title: { text: 'median age', font: { size: 13, color: MUTED } }, fixedrange: true }),
+    yaxis: grid({ title: { text: 'current account, % GDP', font: { size: 13, color: MUTED } }, fixedrange: true, zerolinecolor: MUTED }),
     annotations: rows.filter(([k]) => label.has(k)).map(([k, c]) => ({
-      x: c.ma, y: c.ca, text: c.n, showarrow: false, yshift: 11, font: { size: 10, color: MUTED } })),
+      x: c.ma, y: c.ca, text: c.n, showarrow: false, yshift: 11, font: { size: 11.5, color: MUTED } })),
   });
   Plotly.newPlot(mount('fig-ca'), traces, layout, NOPAD);
 }
@@ -307,8 +313,8 @@ function hoverData(iso3) {
           fmt(c.esr, 2), covWarn];
 }
 
-const COLORBAR = { title: { text: 'score', font: { size: 11 } }, thickness: 10, len: 0.6,
-  tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 10.5 } };
+const COLORBAR = { title: { text: 'score', font: { size: 12.5 } }, thickness: 10, len: 0.6,
+  tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 11.5 } };
 
 function worldMapSpec() {
   const isos = Object.keys(state.countries);
@@ -568,9 +574,9 @@ async function selectCountry(iso3) {
           <span id="pyr-label" class="readout" style="font-weight:700;min-width:3ch"></span>
           <button id="pyr-mode" title="toggle % / absolute" style="background:#fff;color:var(--muted);border:1px solid var(--rule)">%</button>
         </div>
-        <div id="cp-pyramid" style="height:300px"></div>
+        <div id="cp-pyramid" style="height:420px"></div>
       </div>
-      <div><div id="cp-sparks" style="height:336px"></div></div>
+      <div><div id="cp-sparks" style="height:420px"></div></div>
       <div class="full"><div id="cp-decomp" style="height:200px"></div></div>
     </div>
     <div class="cp-narrative">
@@ -637,14 +643,14 @@ function drawPyramid(d) {
         name: 'Female', customdata: a.hf, hovertemplate: '%{y} female: %{customdata}<extra></extra>' },
     ];
     const layout = Object.assign({}, BASE, {
-      barmode: 'overlay', bargap: 0.08, height: 300, showlegend: false,
+      barmode: 'overlay', bargap: 0.08, height: 420, showlegend: false,
       margin: { l: 44, r: 10, t: 8, b: 24 },
       xaxis: grid({ range: a.range, fixedrange: true,
         tickvals: [a.range[0] * 0.66, 0, a.range[1] * 0.66],
         ticktext: mode === 'pct'
           ? [(maxPct * 0.7).toFixed(0) + '%', '0', (maxPct * 0.7).toFixed(0) + '%']
           : [fmtPop(maxAbs * 0.7), '0', fmtPop(maxAbs * 0.7)] }),
-      yaxis: grid({ tickfont: { size: 9, color: MUTED }, fixedrange: true }),
+      yaxis: grid({ tickfont: { size: 11, color: MUTED }, fixedrange: true }),
       annotations: [
         { xref: 'paper', yref: 'paper', x: 0.03, y: 0.98, text: 'M', showarrow: false, font: { size: 11, color: ACCENT } },
         { xref: 'paper', yref: 'paper', x: 0.97, y: 0.98, text: 'F', showarrow: false, font: { size: 11, color: ORANGE } },
@@ -690,17 +696,17 @@ function drawSparks(d, panelsOverride, dtick) {
       hovertemplate: '%{x}: %{y:.6~r}<extra>' + p.title + '</extra>' });
     const col = i % 2, row = i < 2 ? 0 : 1;
     layoutAxes['xaxis' + (i ? i + 1 : '')] = grid({ domain: [col * 0.55, col * 0.55 + 0.45],
-      anchor: ya, tickfont: { size: 9, color: MUTED }, dtick: dtick || 50, fixedrange: true });
+      anchor: ya, tickfont: { size: 11, color: MUTED }, dtick: dtick || 50, fixedrange: true });
     layoutAxes['yaxis' + (i ? i + 1 : '')] = grid({ domain: [row === 0 ? 0.58 : 0, row === 0 ? 1 : 0.42],
-      anchor: xa, tickfont: { size: 9, color: MUTED }, nticks: 4, fixedrange: true,
+      anchor: xa, tickfont: { size: 11, color: MUTED }, nticks: 4, fixedrange: true,
       rangemode: p.key === 'ma' ? 'normal' : 'tozero' });
     annotations.push({ xref: xa + ' domain', yref: ya + ' domain', x: 0.02, y: 1.16,
-      text: p.title, showarrow: false, font: { size: 10.5, color: MUTED }, xanchor: 'left' });
+      text: p.title, showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' });
     shapes.push({ type: 'line', xref: xa, yref: ya + ' domain',
       x0: 2025, x1: 2025, y0: 0, y1: 1, line: { color: RULE, width: 1, dash: 'dot' } });
   });
   const layout = Object.assign({}, BASE, layoutAxes, {
-    height: 336, margin: { l: 36, r: 6, t: 22, b: 20 }, annotations, shapes,
+    height: 420, margin: { l: 40, r: 6, t: 24, b: 22 }, annotations, shapes,
   });
   Plotly.newPlot('cp-sparks', traces, layout, NOPAD);
   RESIZER.observe(document.getElementById('cp-sparks'));
@@ -733,8 +739,8 @@ function renderDecomp(iso3) {
   const layout = Object.assign({}, BASE, {
     height: 214, margin: { l: 210, r: 12, t: 24, b: 44 },
     xaxis: grid({ zerolinecolor: MUTED, fixedrange: true,
-      title: { text: 'weighted contribution w·z under current sliders (✎ = authored rubric, · = default/derived)', font: { size: 10, color: MUTED } } }),
-    yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
+      title: { text: 'weighted contribution w·z under current sliders (✎ = authored rubric, · = default/derived)', font: { size: 11.5, color: MUTED } } }),
+    yaxis: grid({ tickfont: { size: 11.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
   RESIZER.observe(el);
@@ -872,8 +878,8 @@ function renderStateDecomp(u) {
   const layout = Object.assign({}, BASE, {
     height: 150, margin: { l: 210, r: 12, t: 20, b: 40 },
     xaxis: grid({ zerolinecolor: MUTED, fixedrange: true,
-      title: { text: 'weighted contribution w·z (states score on demographic components only)', font: { size: 10, color: MUTED } } }),
-    yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
+      title: { text: 'weighted contribution w·z (states score on demographic components only)', font: { size: 11.5, color: MUTED } } }),
+    yaxis: grid({ tickfont: { size: 11.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
   RESIZER.observe(el);
@@ -921,10 +927,10 @@ async function selectState(u) {
           <span id="pyr-label" class="readout" style="font-weight:700;min-width:3ch"></span>
           <button id="pyr-mode" title="toggle % / absolute" style="background:#fff;color:var(--muted);border:1px solid var(--rule)">%</button>
         </div>
-        <div id="cp-pyramid" style="height:300px"></div>
+        <div id="cp-pyramid" style="height:420px"></div>
         <p style="font-size:.75rem;color:var(--muted);margin:.3rem 0 0">${d.note || ''}</p>
       </div>
-      <div><div id="cp-sparks" style="height:336px"></div></div>
+      <div><div id="cp-sparks" style="height:420px"></div></div>
       <div class="full"><div id="cp-decomp" style="height:150px"></div></div>
     </div>
     <div class="cp-narrative">
