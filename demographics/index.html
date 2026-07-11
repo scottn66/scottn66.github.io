@@ -89,6 +89,8 @@
     .sl label .pct{font-variant-numeric:tabular-nums;color:var(--text)}
     .sl input[type=range]{width:100%;accent-color:var(--accent);margin:0}
     .sl.authored label span.nm::after{content:" ✎";color:var(--gold);font-size:.8em}
+    .sliders.states-mode .sl.authored{opacity:.3;pointer-events:none}
+    .presets.off{opacity:.35;pointer-events:none}
     .atlas-note{font-size:.78rem;color:var(--muted);margin:.2rem 0 .6rem}
     #map{width:100%;height:520px}
     /* ---- country panel ---- */
@@ -513,7 +515,7 @@
       <figure id="fig-ca-wrap" hidden>
         <div id="fig-ca" class="chart"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
         <figcaption>
-          Fig 5 — Current-account balance (% of GDP) against share of population 65+.
+          Fig 5 — Current-account balance (% of GDP) against median age.
           Aged industrial economies cluster in the surplus quadrant: exporting is what a
           country does when its own consumers have retired.
         </figcaption>
@@ -673,6 +675,13 @@
         </p>
         <div class="atlas-controls">
           <div>
+            <div class="atlas-note">View</div>
+            <div class="presets" id="view-toggle" role="group" aria-label="Atlas view">
+              <button data-view="world" class="on">World</button>
+              <button data-view="states">US states</button>
+            </div>
+          </div>
+          <div>
             <div class="atlas-note">Preset lens</div>
             <div class="presets" id="presets" role="group" aria-label="Score presets">
               <button data-preset="zeihan" class="on">Zeihan lens</button>
@@ -687,7 +696,13 @@
           </div>
         </div>
         <div class="sliders" id="sliders"></div>
-        <p class="atlas-note">✎ = component includes hand-authored rubric scores (see honesty box). Sliders renormalize; the map recolors live. Score scale is symmetric: <span style="color:var(--warn);font-weight:700">− headwinds</span> · <span style="color:var(--muted)">0</span> · <span style="color:var(--accent);font-weight:700">+ tailwinds</span>.</p>
+        <p class="atlas-note">✎ = component includes hand-authored rubric scores (see honesty box). Sliders renormalize; the map recolors live. Score scale is symmetric: <span style="color:var(--warn);font-weight:700">− headwinds</span> · <span style="color:var(--muted)">0</span> · <span style="color:var(--accent);font-weight:700">+ tailwinds</span>. In the <b>US states</b> view the score uses the two demographic components only (no authored geography for states yet), and projected years use a <b>closed-state</b> model — the built-in structure if nobody moved, which is precisely what people do; each state's panel shows the actual net domestic migration alongside.</p>
+        <div class="aside-box" id="states-pending" hidden>
+          <span class="k">US states — data pending</span> — the state dataset isn't generated
+          yet. Run <code>python3 scripts/build_demographics_data.py --states</code> from a
+          machine that can reach census.gov (it downloads two public PEP files), commit
+          <code>demographics/data/states*</code>, and this view lights up.
+        </div>
         <div id="map" class="chart"><div class="ph">The atlas — loading data…</div></div>
 
         <section id="country-panel" aria-live="polite">
@@ -792,8 +807,12 @@
           lens" systematically overrates fortress economies and underrates trading hubs.
           That is exactly why the pure-demographics preset exists.</li>
         <li><b>Countries are not the only unit.</b> Sub-national structure matters (rural
-          Japan vs. Tokyo are different planets), and this version aggregates it away. A
-          US-state-level layer is the natural next build on this data schema.</li>
+          Japan vs. Tokyo are different planets). The atlas now ships a US-state view as
+          a first cut at this — and it doubles as a demonstration of the biggest caveat
+          at sub-national grain: its projections are <i>closed-state</i> (zero migration)
+          precisely because interstate migration, the force that actually dominates
+          state demography, is the sub-national analog of the migration valve above.
+          Florida's pyramid is a policy outcome, not a birth history.</li>
       </ul>
 
       <div class="colophon" id="colophon">
@@ -810,6 +829,12 @@
           convention; no anchor at 65). The economic support ratio uses one stylized
           global age-profile pair — the Figure 3 curves — so its levels are
           profile-relative while ranks and trends are not.
+          <b>US-state layer</b> (when present): Census Bureau Population Estimates
+          Program, Vintage 2024 (civilian population by single year of age and sex,
+          plus components of change). State projections are a closed-state cohort
+          model — national WPP mortality, observed state birth rates, zero migration
+          by construction — an exhibit of built-in structure, not a forecast; the
+          national prospective threshold is applied to all states.
           <b>Economic series</b> (where shown): World Bank Indicators API v2.
           <b>Contextual scores:</b> hand-authored rubric,
           shipped verbatim as <a href="data/context-scores.json">context-scores.json</a>.

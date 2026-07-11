@@ -619,6 +619,301 @@ def verify(summary, detail):
           f"JPN ma {jp['ma']}, NGA ma {ng['ma']}")
 
 
+# ------------------------------------------------------------- US states
+# Census PEP Vintage 2024. These hosts are commonly unreachable from CI
+# sandboxes; the module degrades to printing download instructions.
+SC_AGESEX_URL = ("https://www2.census.gov/programs-surveys/popest/datasets/"
+                 "2020-2024/state/asrh/sc-est2024-agesex-civ.csv")
+NST_TOTALS_URL = ("https://www2.census.gov/programs-surveys/popest/datasets/"
+                  "2020-2024/state/totals/NST-EST2024-ALLDATA.csv")
+STATES_CACHE = CACHE / "states"
+
+FIPS_USPS = {
+    1: "AL", 2: "AK", 4: "AZ", 5: "AR", 6: "CA", 8: "CO", 9: "CT", 10: "DE",
+    11: "DC", 12: "FL", 13: "GA", 15: "HI", 16: "ID", 17: "IL", 18: "IN",
+    19: "IA", 20: "KS", 21: "KY", 22: "LA", 23: "ME", 24: "MD", 25: "MA",
+    26: "MI", 27: "MN", 28: "MS", 29: "MO", 30: "MT", 31: "NE", 32: "NV",
+    33: "NH", 34: "NJ", 35: "NM", 36: "NY", 37: "NC", 38: "ND", 39: "OH",
+    40: "OK", 41: "OR", 42: "PA", 44: "RI", 45: "SC", 46: "SD", 47: "TN",
+    48: "TX", 49: "UT", 50: "VT", 51: "VA", 53: "WA", 54: "WV", 55: "WI",
+    56: "WY",
+}
+STATE_GRID = [2020, 2025, 2030, 2035, 2040, 2045, 2050]
+STATE_BINS = list(range(0, 86, 5))                       # 0-4 ... 80-84, 85+
+STATE_BIN_LABELS = [f"{a}-{a+4}" for a in STATE_BINS[:-1]] + ["85+"]
+STATE_COMPONENTS = [
+    {"id": "dems", "label": "Demographic structure"},
+    {"id": "demt", "label": "Demographic trajectory"},
+]
+
+
+def fetch_state_cache(refresh=False):
+    """Download the two PEP CSVs if absent. Returns True when both exist."""
+    STATES_CACHE.mkdir(parents=True, exist_ok=True)
+    ok = True
+    for url in (SC_AGESEX_URL, NST_TOTALS_URL):
+        dest = STATES_CACHE / url.rsplit("/", 1)[1]
+        if dest.exists() and not refresh:
+            continue
+        try:
+            print(f"  downloading {dest.name} ...")
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=300) as r, open(dest, "wb") as f:
+                f.write(r.read())
+        except Exception as exc:
+            print(f"  !! could not fetch {dest.name}: {exc}")
+            ok = False
+    return ok
+
+
+def usa_national_inputs():
+    """National mortality + 85+ age shape from the already-cached WPP files.
+    Returns (survival s(a) a=0..100, open-bucket 85+ survival, 85-100 shape,
+    prospective threshold x*)."""
+    mx = read_rda("mx1dt.rda")
+    mx["year"] = mx.year.astype(int)
+    us = mx[(mx.country_code == 840) & (mx.year == REF_YEAR)].sort_values("age")
+    mxv = us.mxB.to_numpy()
+    surv = [math.exp(-m) for m in mxv]
+    xstar_us = prospective_threshold(e_curve(mxv))
+
+    pop = read_rda("popprojAge1dt.rda")
+    pop["year"] = pop.year.astype(int)
+    usp = pop[(pop.country_code == 840) & (pop.year == REF_YEAR)].sort_values("age")
+    v = (usp.popM + usp.popF).to_numpy()
+    shape85 = v[85:] / v[85:].sum()                       # national 85..100 shape
+    s_open = float(sum(v[85 + i] * surv[85 + i] for i in range(16)) / v[85:].sum())
+    return surv, s_open, shape85, xstar_us
+
+
+def pad_state_vector(vec86, shape85):
+    """Expand an 86-entry state vector (ages 0..84 + 85+) to 101 entries by
+    distributing the 85+ bucket along the national 85-100 shape, so every
+    existing metric function works unchanged."""
+    out = list(vec86[:85]) + [float(vec86[85]) * s for s in shape85]
+    return __import__("numpy").array(out)
+
+
+def project_closed(m86, f86, surv, s_open, birth_rate):
+    """One year of closed-state cohort aging: no migration by construction.
+    surv indexes national single-age survival; newborns split 1.05:1 M:F."""
+    def step(v):
+        nv = [0.0] * 86
+        for a in range(84):
+            nv[a + 1] = v[a] * surv[a]
+        nv[85] = v[84] * surv[84] + v[85] * s_open
+        return nv
+    nm, nf = step(m86), step(f86)
+    births = birth_rate * sum(f86[15:50])
+    nm[0] = births * (1.05 / 2.05) * surv[0]
+    nf[0] = births * (1.00 / 2.05) * surv[0]
+    return nm, nf
+
+
+def build_states(args):
+    import numpy as np
+    print("== states: cache")
+    if not fetch_state_cache(refresh=args.refresh):
+        print("  states data unavailable in this environment.")
+        print("  To generate the state layer, run locally (network to census.gov):")
+        print("    python3 scripts/build_demographics_data.py --states")
+        print("  or place these files under scripts/cache/states/ and re-run:")
+        print(f"    {SC_AGESEX_URL}")
+        print(f"    {NST_TOTALS_URL}")
+        return None
+
+    print("== states: loading PEP tables")
+    sc = pd.read_csv(STATES_CACHE / "sc-est2024-agesex-civ.csv")
+    sc.columns = [c.upper() for c in sc.columns]
+    popcols = sorted(c for c in sc.columns if c.startswith("POPEST") and c.endswith("_CIV"))
+    need = {"SUMLEV", "STATE", "NAME", "SEX", "AGE"}
+    if not need.issubset(sc.columns) or not popcols:
+        raise SystemExit(f"sc-est2024-agesex-civ.csv layout changed; columns = {list(sc.columns)}")
+    years = [int(c[6:10]) for c in popcols]
+    sc = sc[(sc.SUMLEV == 40) & (sc.SEX.isin([1, 2]))]
+
+    nst = pd.read_csv(STATES_CACHE / "NST-EST2024-ALLDATA.csv")
+    nst.columns = [c.upper() for c in nst.columns]
+    nst = nst[nst.SUMLEV == 40].set_index("STATE")
+
+    surv, s_open, shape85, xstar_us = usa_national_inputs()
+
+    print("== states: metrics")
+    yl_prof, c_prof = stylized_profiles()
+    summary, detail, raw_metrics = {}, {}, {}
+
+    for fips, usps in sorted(FIPS_USPS.items(), key=lambda kv: kv[1]):
+        sub = sc[sc.STATE == fips]
+        if sub.empty:
+            continue
+        name = sub.NAME.iloc[0]
+        vec = {}   # year -> (m86, f86) observed
+        for sex, key in ((1, "m"), (2, "f")):
+            s = sub[sub.SEX == sex].set_index("AGE")
+            for col, y in zip(popcols, years):
+                arr = [float(s.loc[a, col]) / 1000.0 if a in s.index else 0.0
+                       for a in range(86)]              # thousands, like WPP
+                vec.setdefault(y, {})[key] = arr
+        last = max(years)
+
+        # state birth rate: observed births per woman 15-49 per year
+        births_obs = float(nst.loc[fips].get(f"BIRTHS{last}", 0)) / 1000.0
+        f1549 = sum(vec[last]["f"][15:50])
+        birth_rate = births_obs / f1549 if f1549 > 0 else 0.0
+        dommig = float(nst.loc[fips].get(f"DOMESTICMIG{last}", 0)) / 1000.0
+        natinc = (births_obs - float(nst.loc[fips].get(f"DEATHS{last}", 0)) / 1000.0)
+
+        # closed-state projection: annual steps from the last observed year
+        m, f = vec[last]["m"], vec[last]["f"]
+        proj = {last: (m, f)}
+        for y in range(last + 1, 2051):
+            m, f = project_closed(m, f, surv, s_open, birth_rate)
+            proj[y] = (m, f)
+
+        def year_mf(y):
+            if y in vec:
+                return vec[y]["m"], vec[y]["f"]
+            return proj.get(y, (None, None))
+
+        pyramid_m, pyramid_f = [], []
+        series = {"years": STATE_GRID, "sr": [], "ma": [], "pop": [], "esr": []}
+        padded = {}
+        for y in STATE_GRID:
+            m, f = year_mf(y)
+            if m is None:
+                pyramid_m.append(None); pyramid_f.append(None)
+                for k in ("sr", "ma", "pop", "esr"):
+                    series[k].append(None)
+                continue
+            pyramid_m.append([siground(sum(m[a:a + 5])) for a in STATE_BINS[:-1]] + [siground(m[85])])
+            pyramid_f.append([siground(sum(f[a:a + 5])) for a in STATE_BINS[:-1]] + [siground(f[85])])
+            v101 = pad_state_vector(np.array(m) + np.array(f), shape85)
+            padded[y] = v101
+            series["sr"].append(siground(age_slice_sum(v101, 20, 64) /
+                                         max(age_slice_sum(v101, 65, 100), 1e-9), 3))
+            series["ma"].append(siground(median_age(v101), 3))
+            series["pop"].append(siground(float(v101.sum())))
+            series["esr"].append(siground(esr_from_vec(v101, yl_prof, c_prof), 3))
+
+        v25, v40, v50 = padded.get(2025), padded.get(2040), padded.get(2050)
+        if v25 is None:
+            continue
+        pop25 = float(v25.sum())
+        sr = age_slice_sum(v25, 20, 64) / max(age_slice_sum(v25, 65, 100), 1e-9)
+        ma25 = median_age(v25)
+        ma50 = median_age(v50) if v50 is not None else None
+        wrr = age_slice_sum(v25, 20, 24) / max(age_slice_sum(v25, 60, 64), 1e-9)
+        mom = float(v50.sum()) / pop25 if v50 is not None else None
+        cs = lambda v: age_slice_sum(v, 35, 64) / max(age_slice_sum(v, 65, 100), 1e-9)
+        cshift = (cs(v40) - cs(v25)) if v40 is not None else None
+        esr25 = esr_from_vec(v25, yl_prof, c_prof)
+
+        # national prospective threshold applied to every state (documented)
+        poadr = None
+        if xstar_us is not None:
+            T = min(xstar_us, 99.0)
+            fl = int(math.floor(T)); frac = 1.0 - (T - fl)
+            old = frac * v25[fl] + age_slice_sum(v25, fl + 1, 100)
+            workers = age_slice_sum(v25, 20, fl) - frac * v25[fl]
+            poadr = old / max(workers, 1e-9)
+
+        raw_metrics[usps] = {"sr": sr, "ma": ma25, "poadr": poadr, "wrr": wrr,
+                             "mom": mom, "tfr": None, "cshift": cshift}
+        summary[usps] = {
+            "n": name, "fips": fips, "pop": siground(pop25),
+            "ma": siground(ma25, 3), "ma50": siground(ma50, 3),
+            "sr": siground(sr, 3), "esr": siground(esr25, 3),
+            "poadr": siground(poadr, 3), "pt": siground(xstar_us, 3),
+            "wrr": siground(wrr, 3), "mom": siground(mom, 3),
+            "cshift": siground(cshift, 3), "tfr": None,
+            "dommig": siground(dommig, 3), "natinc": siground(natinc, 3),
+        }
+        detail[usps] = {
+            "usps": usps, "name": name, "fips": fips,
+            "pyramid": {"ages": STATE_BIN_LABELS, "years": STATE_GRID,
+                        "m": pyramid_m, "f": pyramid_f},
+            "series": series,
+            "note": ("Projected years use a CLOSED-state cohort model: national "
+                     "mortality, state birth rates, ZERO migration by construction. "
+                     "It shows what the already-resident population implies — "
+                     "interstate migration is exactly what it isn't modeling. "
+                     f"Net domestic migration {last}: {siground(dommig, 3)}k/yr."),
+        }
+
+    print(f"  computed {len(summary)} states")
+
+    # z-scores across the 51 units, same machinery, demographic components only
+    def zscores_local(key, sign):
+        vals = {k: v[key] for k, v in raw_metrics.items() if v[key] is not None}
+        s = pd.Series(vals)
+        lo, hi = s.quantile(0.05), s.quantile(0.95)
+        w = s.clip(lo, hi)
+        mu, sd = w.mean(), w.std()
+        if sd == 0 or math.isnan(sd):
+            return {}
+        return {k: max(-3.0, min(3.0, sign * (val - mu) / sd)) for k, val in w.items()}
+
+    zp = {"sr": zscores_local("sr", +1), "ma": zscores_local("ma", -1),
+          "poadr": zscores_local("poadr", -1), "wrr": zscores_local("wrr", +1),
+          "mom": zscores_local("mom", +1), "cshift": zscores_local("cshift", +1)}
+
+    def mean_avail(u, keys):
+        vals = [zp[k][u] for k in keys if u in zp[k]]
+        return sum(vals) / len(vals) if vals else None
+
+    for u in summary:
+        summary[u]["z"] = {
+            "dems": siground(mean_avail(u, ["sr", "ma", "poadr"]), 3),
+            "demt": siground(mean_avail(u, ["wrr", "mom", "cshift"]), 3),
+        }
+
+    # self-describing parity for app.js: CA under equal dems/demt weights
+    ca = summary.get("CA", {}).get("z", {})
+    parity = None
+    if ca.get("dems") is not None and ca.get("demt") is not None:
+        parity = {"unit": "CA", "weights": {"dems": 0.5, "demt": 0.5},
+                  "score": siground(0.5 * ca["dems"] + 0.5 * ca["demt"], 3)}
+
+    print("== states: writing outputs")
+    meta = {
+        "generated": args.stamp,
+        "source": f"Census PEP Vintage {max(years)} (sc-est{max(years)}-agesex-civ, "
+                  f"NST-EST{max(years)}-ALLDATA); projections 2025-2050 are a "
+                  "closed-state cohort model (national WPP mortality, state birth "
+                  "rates, zero migration)",
+        "refYear": 2025, "ptNote": f"national prospective threshold x*={siground(xstar_us,3)} applied to all states",
+        "esrProfile": "same stylized global profile as the world layer",
+        "components": STATE_COMPONENTS, "parity": parity,
+    }
+    n = dump_json(OUT / "states-summary.json", {"meta": meta, "states": summary})
+    print(f"  states-summary.json  {n/1024:.0f} KB  ({len(summary)} states)")
+    total = 0
+    for u, d in detail.items():
+        total += dump_json(OUT / "states" / f"{u}.json", d)
+    print(f"  states/*.json        {total/1024:.0f} KB")
+
+    if args.verify:
+        errs = []
+        if len(summary) != 51:
+            errs.append(f"{len(summary)} states (expected 51 incl. DC)")
+        capop = summary.get("CA", {}).get("pop") or 0
+        if not 36000 <= capop <= 41000:
+            errs.append(f"CA pop {capop}k outside [36M, 41M]")
+        if not (summary.get("UT", {}).get("ma") or 99) < (summary.get("FL", {}).get("ma") or 0):
+            errs.append("UT median age not < FL median age")
+        tot = sum(c["pop"] for c in summary.values() if c["pop"])
+        if not 320000 <= tot <= 350000:
+            errs.append(f"state total {tot}k implausible vs national")
+        for u, c in summary.items():
+            if c["esr"] is not None and not 0.40 <= c["esr"] <= 1.05:
+                errs.append(f"{u} ESR {c['esr']} out of band")
+        if errs:
+            print("  STATES VERIFY FAILED:\n   - " + "\n   - ".join(errs))
+            sys.exit(1)
+        print(f"  states verify OK — CA parity: {parity}")
+    return summary
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true", help="force re-download of cache")
@@ -628,10 +923,16 @@ def main():
     ap.add_argument("--verify", action="store_true", help="run sanity assertions")
     ap.add_argument("--stamp", default=None,
                     help="generation date stamp (YYYY-MM-DD); defaults to today")
+    ap.add_argument("--states", action="store_true",
+                    help="build the US-state layer only (Census PEP; needs "
+                         "network to census.gov or files in scripts/cache/states/)")
     args = ap.parse_args()
     if args.stamp is None:
         from datetime import date
         args.stamp = date.today().isoformat()
+    if args.states:
+        build_states(args)
+        return
     summary, detail = build(args)
     if args.verify:
         verify(summary, detail)
