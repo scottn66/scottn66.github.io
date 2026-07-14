@@ -26,13 +26,36 @@ const NOPAD = { displayModeBar: false, responsive: true };
 
 // Plotly's `responsive` flag only reacts to window `resize` events; pane
 // drags and CSS reflows change a figure's box without firing one. Watch each
-// figure's own container and resize the plot to match.
+// figure's own container and resize the plot to match. Figures that carry a
+// data-hratio keep height proportional to width (clamped to hmin/hmax) so
+// they never flatten on wide screens.
+function plotWidth(el) {
+  const cs = getComputedStyle(el);
+  return el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+}
 const RESIZER = new ResizeObserver(entries => {
   for (const e of entries) {
     const el = e.target;
-    if (el.classList.contains('js-plotly-plot') && el.offsetWidth) Plotly.Plots.resize(el);
+    if (!el.classList.contains('js-plotly-plot') || !el.offsetWidth) continue;
+    const ratio = parseFloat(el.dataset.hratio);
+    if (ratio) {
+      const w = plotWidth(el);
+      const target = Math.round(Math.min(Math.max(w * ratio, +el.dataset.hmin || 0), +el.dataset.hmax || 1e4));
+      const cur = el._fullLayout || {};
+      if (Math.abs((cur.width || 0) - w) > 2 || Math.abs((cur.height || 0) - target) > 2)
+        Plotly.relayout(el, { width: w, height: target });
+    } else {
+      Plotly.Plots.resize(el);
+    }
   }
 });
+
+// Declare a figure's proportions: height = clamp(width * ratio, hmin, hmax).
+// Returns the height for the initial draw; RESIZER maintains it afterwards.
+function sized(el, ratio, hmin, hmax) {
+  el.dataset.hratio = ratio; el.dataset.hmin = hmin; el.dataset.hmax = hmax;
+  return Math.round(Math.min(Math.max(plotWidth(el) * ratio, hmin), hmax));
+}
 const AGE_LABELS = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49',
   '50-54','55-59','60-64','65-69','70-74','75-79','80-84','85-89','90-94','95-99','100+'];
 
@@ -102,7 +125,9 @@ function drawShapes() {
     legend: { orientation: 'h', x: 1, xanchor: 'right', y: 1.03 },
     annotations,
   });
-  Plotly.newPlot(mount('fig-shapes'), traces, layout, NOPAD);
+  const el = mount('fig-shapes');
+  layout.height = sized(el, 1.6, 1250, 2400);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* -------------------------------------------------- Fig 3 (stylized, baked) */
@@ -155,7 +180,9 @@ function drawLifecycle() {
       { x: 81, y: 25, text: 'old-age<br>deficit', showarrow: false, font: { size: 12.5, color: WARN } },
     ],
   });
-  Plotly.newPlot(mount('fig-lifecycle'), traces, layout, NOPAD);
+  const el = mount('fig-lifecycle');
+  layout.height = sized(el, 0.85, 560, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* ------------------------------------------------------------ data loading */
@@ -212,7 +239,9 @@ function drawTFR(featured) {
       { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' },
     ],
   });
-  Plotly.newPlot(mount('fig-tfr'), traces, layout, NOPAD);
+  const el = mount('fig-tfr');
+  layout.height = sized(el, 0.85, 580, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 function drawSupport(featured) {
@@ -243,7 +272,9 @@ function drawSupport(featured) {
       { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 11.5, color: MUTED } },
     ],
   });
-  Plotly.newPlot(mount('fig-sr'), traces, layout, NOPAD);
+  const el = mount('fig-sr');
+  layout.height = sized(el, 0.9, 620, 1050);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* Fig 5 — only when World Bank data has been backfilled into the dataset. */
@@ -270,7 +301,9 @@ function drawCurrentAccount() {
     annotations: rows.filter(([k]) => label.has(k)).map(([k, c]) => ({
       x: c.ma, y: c.ca, text: c.n, showarrow: false, yshift: 11, font: { size: 11.5, color: MUTED } })),
   });
-  Plotly.newPlot(mount('fig-ca'), traces, layout, NOPAD);
+  const el = mount('fig-ca');
+  layout.height = sized(el, 0.9, 620, 1050);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* ------------------------------------------------------------- the scoring */
