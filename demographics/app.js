@@ -206,14 +206,15 @@ const fmtPop = t => (t === null || t === undefined) ? '—'
   : Math.round(t) + ' k';
 
 async function loadData() {
-  const [summary, featured] = await Promise.all([
+  const [summary, featured, continents] = await Promise.all([
     fetch('data/countries-summary.json').then(r => r.json()),
     fetch('data/featured-series.json').then(r => r.json()),
+    fetch('data/continents-series.json').then(r => r.ok ? r.json() : null).catch(() => null),
   ]);
   state.meta = summary.meta;
   state.countries = summary.countries;
   state.weights = Object.assign({}, state.meta.presets.zeihan);
-  return featured;
+  return { featured, continents };
 }
 
 /* ----------------------------------------- Fig 2 + Fig 4 (featured series) */
@@ -240,6 +241,38 @@ function drawTFR(featured) {
     ],
   });
   const el = mount('fig-tfr');
+  layout.height = sized(el, 0.85, 580, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
+}
+
+// Fig 2b — same escalator, aggregated to continents (population-weighted TFR).
+// Colors are a fixed, CVD-validated subset of the site palette; confusable hues
+// are kept off the near-coinciding lines (Asia and South America).
+const CONT_COLOR = { NA: '#8E4585', SA: '#A8861D', EU: '#1F4E9E', AS: '#0782AF', AF: '#B83A2E', OC: '#2F7A4A' };
+function drawTFRContinents(cont) {
+  const order = ['NA', 'SA', 'EU', 'AS', 'AF', 'OC'];         // fixed hue order
+  const years = cont.years;
+  const upto = years.indexOf(2025) + 1;
+  const traces = order.filter(k => cont.continents[k]).map(k => ({
+    x: years.slice(0, upto), y: cont.continents[k].tfr.slice(0, upto),
+    name: cont.continents[k].n, type: 'scatter', mode: 'lines',
+    line: { color: CONT_COLOR[k], width: 2.2 },
+    hovertemplate: `<b>${cont.continents[k].n}</b> %{x}: %{y:.2f}<extra></extra>`,
+  }));
+  const layout = Object.assign({}, BASE, {
+    height: 500,
+    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
+    xaxis: grid({ fixedrange: true, dtick: 10 }),
+    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 13, color: MUTED } },
+      fixedrange: true, rangemode: 'tozero' }),
+    shapes: [{ type: 'line', x0: years[0], x1: 2025, y0: 2.1, y1: 2.1,
+      line: { color: MUTED, width: 1.4, dash: 'dash' } }],
+    annotations: [
+      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' },
+    ],
+  });
+  const el = mount('fig-tfr-continents');
+  if (!el) return;
   layout.height = sized(el, 0.85, 580, 1000);
   Plotly.newPlot(el, traces, layout, NOPAD);
 }
@@ -1053,8 +1086,9 @@ function buildPortraits() {
 document.addEventListener('DOMContentLoaded', () => {
   drawShapes();
   drawLifecycle();
-  loadData().then(featured => {
+  loadData().then(({ featured, continents }) => {
     drawTFR(featured);
+    if (continents) drawTFRContinents(continents);
     drawSupport(featured);
     computeScores();
     parityCheck();
