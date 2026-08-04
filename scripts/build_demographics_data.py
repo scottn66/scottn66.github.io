@@ -61,6 +61,26 @@ BINS = list(range(0, 101, 5))                # 21 bins: 0-4 ... 95-99, 100+
 BIN_LABELS = [f"{a}-{a+4}" for a in BINS[:-1]] + ["100+"]
 FEATURED = ["CHN", "JPN", "KOR", "DEU", "ITA", "RUS", "USA", "MEX", "IND", "NGA"]
 
+# Six-continent map for the continental-TFR figure (Fig 2b). North America folds
+# in Central America and the Caribbean; South America stands alone.
+CONTINENTS = {
+    "AF": ("Africa", set("""DZA AGO BEN BWA BFA BDI CPV CMR CAF TCD COM COG COD CIV DJI EGY GNQ
+        ERI SWZ ETH GAB GMB GHA GIN GNB KEN LSO LBR LBY MDG MWI MLI MRT MUS MAR MOZ NAM NER NGA
+        RWA STP SEN SYC SLE SOM ZAF SSD SDN TZA TGO TUN UGA ZMB ZWE ESH MYT REU SHN""".split())),
+    "AS": ("Asia", set("""AFG ARM AZE BHR BGD BTN BRN KHM CHN GEO HKG IND IDN IRN IRQ ISR JPN JOR
+        KAZ KWT KGZ LAO LBN MAC MYS MDV MNG MMR NPL PRK OMN PAK PSE PHL QAT SAU SGP KOR LKA SYR
+        TWN TJK THA TLS TUR TKM ARE UZB VNM YEM""".split())),
+    "EU": ("Europe", set("""ALB AND AUT BLR BEL BIH BGR HRV CYP CZE DNK EST FRO FIN FRA DEU GIB GRC
+        GGY HUN ISL IRL IMN ITA JEY XKX LVA LIE LTU LUX MLT MDA MCO MNE NLD MKD NOR POL PRT ROU
+        RUS SMR SRB SVK SVN ESP SWE CHE UKR GBR""".split())),
+    "NA": ("North America", set("""CAN USA MEX GRL BMU SPM BLZ CRI SLV GTM HND NIC PAN ABW AIA ATG
+        BHS BRB BES BLM CUB CUW CYM DMA DOM GRD GLP HTI JAM KNA LCA MAF MTQ MSR PRI SXM TCA TTO
+        VCT VGB VIR""".split())),
+    "SA": ("South America", set("ARG BOL BRA CHL COL ECU GUY PRY PER SUR URY VEN FLK GUF".split())),
+    "OC": ("Oceania", set("""ASM AUS COK FJI PYF GUM KIR MHL FSM NRU NCL NZL NIU MNP PLW PNG WSM SLB
+        TKL TON TUV VUT WLF""".split())),
+}
+
 # WPP country_code is the ISO 3166-1 numeric code for real countries.
 # Exceptions / non-ISO codes that still deserve an entry:
 ISO_NUMERIC_EXCEPTIONS = {412: "XKX"}         # Kosovo (no ISO alpha-3; WB uses XKX)
@@ -286,6 +306,36 @@ def wb_latest(wb_c, key, since=2015):
         return None
     years = [y for y in wb_c[key] if y >= since]
     return wb_c[key][max(years)] if years else None
+
+
+# ------------------------------------------------------- continental series
+
+def build_continents(detail):
+    """Population-weighted continental TFR (Fig 2b) from the per-country series."""
+    iso2cont = {iso: key for key, (_, isos) in CONTINENTS.items() for iso in isos}
+    unmapped = sorted(set(detail) - set(iso2cont))
+    if unmapped:
+        raise SystemExit(f"continent map missing ISO3: {unmapped}")
+    years = GRID
+    out = {"years": years,
+           "note": "population-weighted mean of country TFR, WPP 2024 medium variant",
+           "continents": {}}
+    for key, (name, _) in CONTINENTS.items():
+        members = [iso for iso in detail if iso2cont.get(iso) == key]
+        tfr = []
+        for i in range(len(years)):
+            num = den = 0.0
+            for iso in members:
+                s = detail[iso]["series"]
+                t, p = s["tfr"][i], s["pop"][i]
+                if t is None or p is None:
+                    continue
+                num += t * p
+                den += p
+            tfr.append(round(num / den, 3) if den else None)
+        out["continents"][key] = {"n": name, "tfr": tfr}
+    n = dump_json(OUT / "continents-series.json", out)
+    print(f"  continents-series.json  {n/1024:.1f} KB  (6 continents)")
 
 
 # ------------------------------------------------------------------- build
@@ -557,6 +607,8 @@ def build(args):
                 feat["countries"][iso3]["urb"] = detail[iso3]["wb"].get("urb")
     n = dump_json(OUT / "featured-series.json", feat)
     print(f"  featured-series.json    {n/1024:.1f} KB")
+
+    build_continents(detail)
 
     sub65 = sum(1 for c in summary.values() if c.get("pt") is not None and c["pt"] < 65)
     print(f"  sub-65 prospective thresholds: {sub65} countries")

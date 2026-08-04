@@ -26,13 +26,36 @@ const NOPAD = { displayModeBar: false, responsive: true };
 
 // Plotly's `responsive` flag only reacts to window `resize` events; pane
 // drags and CSS reflows change a figure's box without firing one. Watch each
-// figure's own container and resize the plot to match.
+// figure's own container and resize the plot to match. Figures that carry a
+// data-hratio keep height proportional to width (clamped to hmin/hmax) so
+// they never flatten on wide screens.
+function plotWidth(el) {
+  const cs = getComputedStyle(el);
+  return el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+}
 const RESIZER = new ResizeObserver(entries => {
   for (const e of entries) {
     const el = e.target;
-    if (el.classList.contains('js-plotly-plot') && el.offsetWidth) Plotly.Plots.resize(el);
+    if (!el.classList.contains('js-plotly-plot') || !el.offsetWidth) continue;
+    const ratio = parseFloat(el.dataset.hratio);
+    if (ratio) {
+      const w = plotWidth(el);
+      const target = Math.round(Math.min(Math.max(w * ratio, +el.dataset.hmin || 0), +el.dataset.hmax || 1e4));
+      const cur = el._fullLayout || {};
+      if (Math.abs((cur.width || 0) - w) > 2 || Math.abs((cur.height || 0) - target) > 2)
+        Plotly.relayout(el, { width: w, height: target });
+    } else {
+      Plotly.Plots.resize(el);
+    }
   }
 });
+
+// Declare a figure's proportions: height = clamp(width * ratio, hmin, hmax).
+// Returns the height for the initial draw; RESIZER maintains it afterwards.
+function sized(el, ratio, hmin, hmax) {
+  el.dataset.hratio = ratio; el.dataset.hmin = hmin; el.dataset.hmax = hmax;
+  return Math.round(Math.min(Math.max(plotWidth(el) * ratio, hmin), hmax));
+}
 const AGE_LABELS = ['0-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49',
   '50-54','55-59','60-64','65-69','70-74','75-79','80-84','85-89','90-94','95-99','100+'];
 
@@ -63,40 +86,48 @@ const SHAPES = {
 
 function drawShapes() {
   const names = Object.keys(SHAPES);
-  const traces = [], annotations = [];
+  const traces = [], annotations = [], layoutAxes = {};
+  // one full-width pyramid per row, top to bottom
+  const rows = [[0.72, 1], [0.36, 0.64], [0, 0.28]];
   names.forEach((name, i) => {
     const s = SHAPES[name];
     const xa = i === 0 ? 'x' : 'x' + (i + 1);
+    const ya = i === 0 ? 'y' : 'y' + (i + 1);
     traces.push({
-      type: 'bar', orientation: 'h', xaxis: xa, yaxis: 'y',
+      type: 'bar', orientation: 'h', xaxis: xa, yaxis: ya,
       x: s.m.map(v => -v), y: AGE_LABELS, marker: { color: ACCENT }, width: 0.82,
       customdata: s.m, showlegend: i === 0, name: 'Male', legendgroup: 'm',
       hovertemplate: `<b>${name}</b> · %{y}<br>male %{customdata}%<extra></extra>`,
     });
     traces.push({
-      type: 'bar', orientation: 'h', xaxis: xa, yaxis: 'y',
+      type: 'bar', orientation: 'h', xaxis: xa, yaxis: ya,
       x: s.f, y: AGE_LABELS, marker: { color: ORANGE }, width: 0.82,
       showlegend: i === 0, name: 'Female', legendgroup: 'f',
       hovertemplate: `<b>${name}</b> · %{y}<br>female %{x}%<extra></extra>`,
     });
+    layoutAxes['xaxis' + (i ? i + 1 : '')] = Object.assign(
+      grid({ range: [-7.8, 7.8], tickvals: [-6, -4, -2, 0, 2, 4, 6],
+        ticktext: ['6%', '4%', '2%', '0', '2%', '4%', '6%'],
+        tickfont: { size: 12, color: MUTED }, fixedrange: true }),
+      { domain: [0, 1], anchor: ya });
+    layoutAxes['yaxis' + (i ? i + 1 : '')] = grid({
+      domain: rows[i], anchor: xa, dtick: 2,
+      tickfont: { size: 12, color: MUTED }, fixedrange: true });
     annotations.push({
       text: `<b>${name}</b> · <span style="color:${MUTED}">${s.tag}</span>`,
-      xref: xa + ' domain', yref: 'paper', x: 0.5, y: 1.09, showarrow: false,
-      font: { size: 12 }, align: 'center',
+      xref: 'paper', yref: ya + ' domain', x: 0.5, y: 1.1, showarrow: false,
+      font: { size: 14 }, align: 'center',
     });
   });
-  const axis = () => grid({ range: [-7.8, 7.8], tickvals: [-5, 0, 5], ticktext: ['5%', '0', '5%'], fixedrange: true });
-  const layout = Object.assign({}, BASE, {
-    barmode: 'overlay', bargap: 0.06, height: 380,
-    margin: { l: 44, r: 8, t: 46, b: 30 },
-    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.09 },
-    xaxis: Object.assign(axis(), { domain: [0, 0.315] }),
-    xaxis2: Object.assign(axis(), { domain: [0.3425, 0.6575] }),
-    xaxis3: Object.assign(axis(), { domain: [0.685, 1] }),
-    yaxis: grid({ tickfont: { size: 9.5, color: MUTED }, fixedrange: true }),
+  const layout = Object.assign({}, BASE, layoutAxes, {
+    barmode: 'overlay', bargap: 0.06, height: 1150,
+    margin: { l: 56, r: 12, t: 56, b: 34 },
+    legend: { orientation: 'h', x: 1, xanchor: 'right', y: 1.03 },
     annotations,
   });
-  Plotly.newPlot(mount('fig-shapes'), traces, layout, NOPAD);
+  const el = mount('fig-shapes');
+  layout.height = sized(el, 1.6, 1250, 2400);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* -------------------------------------------------- Fig 3 (stylized, baked) */
@@ -138,18 +169,20 @@ function drawLifecycle() {
     line: { color: ORANGE, width: 2.4 },
     hovertemplate: 'age %{x} · consumption %{y:.0f}<extra></extra>' });
   const layout = Object.assign({}, BASE, {
-    height: 330,
+    height: 480,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: 1.14 },
-    xaxis: grid({ title: { text: 'age', font: { size: 11, color: MUTED } }, fixedrange: true, dtick: 10 }),
-    yaxis: grid({ title: { text: '% of peak labor income', font: { size: 11, color: MUTED } },
+    xaxis: grid({ title: { text: 'age', font: { size: 13, color: MUTED } }, fixedrange: true, dtick: 10 }),
+    yaxis: grid({ title: { text: '% of peak labor income', font: { size: 13, color: MUTED } },
       fixedrange: true, rangemode: 'tozero' }),
     annotations: [
-      { x: 9, y: 22, text: 'childhood<br>deficit', showarrow: false, font: { size: 11, color: WARN } },
-      { x: 44, y: 25, text: 'working-life<br>surplus', showarrow: false, font: { size: 11, color: '#2F7A4A' } },
-      { x: 81, y: 25, text: 'old-age<br>deficit', showarrow: false, font: { size: 11, color: WARN } },
+      { x: 9, y: 22, text: 'childhood<br>deficit', showarrow: false, font: { size: 12.5, color: WARN } },
+      { x: 44, y: 25, text: 'working-life<br>surplus', showarrow: false, font: { size: 12.5, color: '#2F7A4A' } },
+      { x: 81, y: 25, text: 'old-age<br>deficit', showarrow: false, font: { size: 12.5, color: WARN } },
     ],
   });
-  Plotly.newPlot(mount('fig-lifecycle'), traces, layout, NOPAD);
+  const el = mount('fig-lifecycle');
+  layout.height = sized(el, 0.85, 560, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* ------------------------------------------------------------ data loading */
@@ -173,14 +206,15 @@ const fmtPop = t => (t === null || t === undefined) ? '—'
   : Math.round(t) + ' k';
 
 async function loadData() {
-  const [summary, featured] = await Promise.all([
+  const [summary, featured, continents] = await Promise.all([
     fetch('data/countries-summary.json').then(r => r.json()),
     fetch('data/featured-series.json').then(r => r.json()),
+    fetch('data/continents-series.json').then(r => r.ok ? r.json() : null).catch(() => null),
   ]);
   state.meta = summary.meta;
   state.countries = summary.countries;
   state.weights = Object.assign({}, state.meta.presets.zeihan);
-  return featured;
+  return { featured, continents };
 }
 
 /* ----------------------------------------- Fig 2 + Fig 4 (featured series) */
@@ -195,18 +229,52 @@ function drawTFR(featured) {
     hovertemplate: `<b>${featured.countries[k].n}</b> %{x}: %{y:.2f}<extra></extra>`,
   }));
   const layout = Object.assign({}, BASE, {
-    height: 360,
+    height: 500,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
     xaxis: grid({ fixedrange: true, dtick: 10 }),
-    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 11, color: MUTED } },
+    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 13, color: MUTED } },
       fixedrange: true, rangemode: 'tozero' }),
     shapes: [{ type: 'line', x0: years[0], x1: 2025, y0: 2.1, y1: 2.1,
       line: { color: MUTED, width: 1.4, dash: 'dash' } }],
     annotations: [
-      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 10.5, color: MUTED }, xanchor: 'left' },
+      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' },
     ],
   });
-  Plotly.newPlot(mount('fig-tfr'), traces, layout, NOPAD);
+  const el = mount('fig-tfr');
+  layout.height = sized(el, 0.85, 580, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
+}
+
+// Fig 2b — same escalator, aggregated to continents (population-weighted TFR).
+// Colors are a fixed, CVD-validated subset of the site palette; confusable hues
+// are kept off the near-coinciding lines (Asia and South America).
+const CONT_COLOR = { NA: '#8E4585', SA: '#A8861D', EU: '#1F4E9E', AS: '#0782AF', AF: '#B83A2E', OC: '#2F7A4A' };
+function drawTFRContinents(cont) {
+  const order = ['NA', 'SA', 'EU', 'AS', 'AF', 'OC'];         // fixed hue order
+  const years = cont.years;
+  const upto = years.indexOf(2025) + 1;
+  const traces = order.filter(k => cont.continents[k]).map(k => ({
+    x: years.slice(0, upto), y: cont.continents[k].tfr.slice(0, upto),
+    name: cont.continents[k].n, type: 'scatter', mode: 'lines',
+    line: { color: CONT_COLOR[k], width: 2.2 },
+    hovertemplate: `<b>${cont.continents[k].n}</b> %{x}: %{y:.2f}<extra></extra>`,
+  }));
+  const layout = Object.assign({}, BASE, {
+    height: 500,
+    legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
+    xaxis: grid({ fixedrange: true, dtick: 10 }),
+    yaxis: grid({ title: { text: 'births per woman (TFR)', font: { size: 13, color: MUTED } },
+      fixedrange: true, rangemode: 'tozero' }),
+    shapes: [{ type: 'line', x0: years[0], x1: 2025, y0: 2.1, y1: 2.1,
+      line: { color: MUTED, width: 1.4, dash: 'dash' } }],
+    annotations: [
+      { x: 1953, y: 2.45, text: 'replacement ≈ 2.1', showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' },
+    ],
+  });
+  const el = mount('fig-tfr-continents');
+  if (!el) return;
+  layout.height = sized(el, 0.85, 580, 1000);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 function drawSupport(featured) {
@@ -224,20 +292,22 @@ function drawSupport(featured) {
       hovertemplate: `<b>${c.n}</b> %{x} (proj.): %{y:.1f}<extra></extra>` });
   });
   const layout = Object.assign({}, BASE, {
-    height: 400,
+    height: 540,
     legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.16 },
     xaxis: grid({ fixedrange: true, dtick: 25 }),
-    yaxis: grid({ title: { text: 'workers (20–64) per retiree (65+), log scale', font: { size: 11, color: MUTED } },
+    yaxis: grid({ title: { text: 'workers (20–64) per retiree (65+), log scale', font: { size: 13, color: MUTED } },
       type: 'log', tickvals: [1, 2, 4, 8, 16, 32], fixedrange: true, range: [Math.log10(0.8), Math.log10(36)] }),
     shapes: [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: Math.log10(0.8), y1: Math.log10(2),
       fillcolor: 'rgba(184,58,46,.07)', line: { width: 0 } }],
     annotations: [
       { xref: 'paper', x: 0.011, y: Math.log10(1.55), text: 'pay-as-you-go breaks down', showarrow: false,
-        font: { size: 10.5, color: WARN }, xanchor: 'left' },
-      { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 10, color: MUTED } },
+        font: { size: 12, color: WARN }, xanchor: 'left' },
+      { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 11.5, color: MUTED } },
     ],
   });
-  Plotly.newPlot(mount('fig-sr'), traces, layout, NOPAD);
+  const el = mount('fig-sr');
+  layout.height = sized(el, 0.9, 620, 1050);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* Fig 5 — only when World Bank data has been backfilled into the dataset. */
@@ -258,13 +328,15 @@ function drawCurrentAccount() {
     showlegend: false,
   }];
   const layout = Object.assign({}, BASE, {
-    height: 380,
-    xaxis: grid({ title: { text: 'median age', font: { size: 11, color: MUTED } }, fixedrange: true }),
-    yaxis: grid({ title: { text: 'current account, % GDP', font: { size: 11, color: MUTED } }, fixedrange: true, zerolinecolor: MUTED }),
+    height: 520,
+    xaxis: grid({ title: { text: 'median age', font: { size: 13, color: MUTED } }, fixedrange: true }),
+    yaxis: grid({ title: { text: 'current account, % GDP', font: { size: 13, color: MUTED } }, fixedrange: true, zerolinecolor: MUTED }),
     annotations: rows.filter(([k]) => label.has(k)).map(([k, c]) => ({
-      x: c.ma, y: c.ca, text: c.n, showarrow: false, yshift: 11, font: { size: 10, color: MUTED } })),
+      x: c.ma, y: c.ca, text: c.n, showarrow: false, yshift: 11, font: { size: 11.5, color: MUTED } })),
   });
-  Plotly.newPlot(mount('fig-ca'), traces, layout, NOPAD);
+  const el = mount('fig-ca');
+  layout.height = sized(el, 0.9, 620, 1050);
+  Plotly.newPlot(el, traces, layout, NOPAD);
 }
 
 /* ------------------------------------------------------------- the scoring */
@@ -307,8 +379,8 @@ function hoverData(iso3) {
           fmt(c.esr, 2), covWarn];
 }
 
-const COLORBAR = { title: { text: 'score', font: { size: 11 } }, thickness: 10, len: 0.6,
-  tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 10.5 } };
+const COLORBAR = { title: { text: 'score', font: { size: 12.5 } }, thickness: 10, len: 0.6,
+  tickvals: [-2, -1, 0, 1, 2], outlinewidth: 0, tickfont: { size: 11.5 } };
 
 function worldMapSpec() {
   const isos = Object.keys(state.countries);
@@ -568,9 +640,9 @@ async function selectCountry(iso3) {
           <span id="pyr-label" class="readout" style="font-weight:700;min-width:3ch"></span>
           <button id="pyr-mode" title="toggle % / absolute" style="background:#fff;color:var(--muted);border:1px solid var(--rule)">%</button>
         </div>
-        <div id="cp-pyramid" style="height:300px"></div>
+        <div id="cp-pyramid" style="height:420px"></div>
       </div>
-      <div><div id="cp-sparks" style="height:336px"></div></div>
+      <div><div id="cp-sparks" style="height:420px"></div></div>
       <div class="full"><div id="cp-decomp" style="height:200px"></div></div>
     </div>
     <div class="cp-narrative">
@@ -637,14 +709,14 @@ function drawPyramid(d) {
         name: 'Female', customdata: a.hf, hovertemplate: '%{y} female: %{customdata}<extra></extra>' },
     ];
     const layout = Object.assign({}, BASE, {
-      barmode: 'overlay', bargap: 0.08, height: 300, showlegend: false,
+      barmode: 'overlay', bargap: 0.08, height: 420, showlegend: false,
       margin: { l: 44, r: 10, t: 8, b: 24 },
       xaxis: grid({ range: a.range, fixedrange: true,
         tickvals: [a.range[0] * 0.66, 0, a.range[1] * 0.66],
         ticktext: mode === 'pct'
           ? [(maxPct * 0.7).toFixed(0) + '%', '0', (maxPct * 0.7).toFixed(0) + '%']
           : [fmtPop(maxAbs * 0.7), '0', fmtPop(maxAbs * 0.7)] }),
-      yaxis: grid({ tickfont: { size: 9, color: MUTED }, fixedrange: true }),
+      yaxis: grid({ tickfont: { size: 11, color: MUTED }, fixedrange: true }),
       annotations: [
         { xref: 'paper', yref: 'paper', x: 0.03, y: 0.98, text: 'M', showarrow: false, font: { size: 11, color: ACCENT } },
         { xref: 'paper', yref: 'paper', x: 0.97, y: 0.98, text: 'F', showarrow: false, font: { size: 11, color: ORANGE } },
@@ -690,17 +762,17 @@ function drawSparks(d, panelsOverride, dtick) {
       hovertemplate: '%{x}: %{y:.6~r}<extra>' + p.title + '</extra>' });
     const col = i % 2, row = i < 2 ? 0 : 1;
     layoutAxes['xaxis' + (i ? i + 1 : '')] = grid({ domain: [col * 0.55, col * 0.55 + 0.45],
-      anchor: ya, tickfont: { size: 9, color: MUTED }, dtick: dtick || 50, fixedrange: true });
+      anchor: ya, tickfont: { size: 11, color: MUTED }, dtick: dtick || 50, fixedrange: true });
     layoutAxes['yaxis' + (i ? i + 1 : '')] = grid({ domain: [row === 0 ? 0.58 : 0, row === 0 ? 1 : 0.42],
-      anchor: xa, tickfont: { size: 9, color: MUTED }, nticks: 4, fixedrange: true,
+      anchor: xa, tickfont: { size: 11, color: MUTED }, nticks: 4, fixedrange: true,
       rangemode: p.key === 'ma' ? 'normal' : 'tozero' });
     annotations.push({ xref: xa + ' domain', yref: ya + ' domain', x: 0.02, y: 1.16,
-      text: p.title, showarrow: false, font: { size: 10.5, color: MUTED }, xanchor: 'left' });
+      text: p.title, showarrow: false, font: { size: 11.5, color: MUTED }, xanchor: 'left' });
     shapes.push({ type: 'line', xref: xa, yref: ya + ' domain',
       x0: 2025, x1: 2025, y0: 0, y1: 1, line: { color: RULE, width: 1, dash: 'dot' } });
   });
   const layout = Object.assign({}, BASE, layoutAxes, {
-    height: 336, margin: { l: 36, r: 6, t: 22, b: 20 }, annotations, shapes,
+    height: 420, margin: { l: 40, r: 6, t: 24, b: 22 }, annotations, shapes,
   });
   Plotly.newPlot('cp-sparks', traces, layout, NOPAD);
   RESIZER.observe(document.getElementById('cp-sparks'));
@@ -733,8 +805,8 @@ function renderDecomp(iso3) {
   const layout = Object.assign({}, BASE, {
     height: 214, margin: { l: 210, r: 12, t: 24, b: 44 },
     xaxis: grid({ zerolinecolor: MUTED, fixedrange: true,
-      title: { text: 'weighted contribution w·z under current sliders (✎ = authored rubric, · = default/derived)', font: { size: 10, color: MUTED } } }),
-    yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
+      title: { text: 'weighted contribution w·z under current sliders (✎ = authored rubric, · = default/derived)', font: { size: 11.5, color: MUTED } } }),
+    yaxis: grid({ tickfont: { size: 11.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
   RESIZER.observe(el);
@@ -872,8 +944,8 @@ function renderStateDecomp(u) {
   const layout = Object.assign({}, BASE, {
     height: 150, margin: { l: 210, r: 12, t: 20, b: 40 },
     xaxis: grid({ zerolinecolor: MUTED, fixedrange: true,
-      title: { text: 'weighted contribution w·z (states score on demographic components only)', font: { size: 10, color: MUTED } } }),
-    yaxis: grid({ tickfont: { size: 10.5 }, fixedrange: true }),
+      title: { text: 'weighted contribution w·z (states score on demographic components only)', font: { size: 11.5, color: MUTED } } }),
+    yaxis: grid({ tickfont: { size: 11.5 }, fixedrange: true }),
   });
   Plotly.react(el, traces, layout, NOPAD);
   RESIZER.observe(el);
@@ -921,10 +993,10 @@ async function selectState(u) {
           <span id="pyr-label" class="readout" style="font-weight:700;min-width:3ch"></span>
           <button id="pyr-mode" title="toggle % / absolute" style="background:#fff;color:var(--muted);border:1px solid var(--rule)">%</button>
         </div>
-        <div id="cp-pyramid" style="height:300px"></div>
+        <div id="cp-pyramid" style="height:420px"></div>
         <p style="font-size:.75rem;color:var(--muted);margin:.3rem 0 0">${d.note || ''}</p>
       </div>
-      <div><div id="cp-sparks" style="height:336px"></div></div>
+      <div><div id="cp-sparks" style="height:420px"></div></div>
       <div class="full"><div id="cp-decomp" style="height:150px"></div></div>
     </div>
     <div class="cp-narrative">
@@ -1014,8 +1086,9 @@ function buildPortraits() {
 document.addEventListener('DOMContentLoaded', () => {
   drawShapes();
   drawLifecycle();
-  loadData().then(featured => {
+  loadData().then(({ featured, continents }) => {
     drawTFR(featured);
+    if (continents) drawTFRContinents(continents);
     drawSupport(featured);
     computeScores();
     parityCheck();
