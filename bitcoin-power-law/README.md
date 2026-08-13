@@ -25,32 +25,29 @@ Eight analytical lenses, each interactive:
 7. **Risk & deceleration** — diminishing cycle returns as a power-law prediction.
 8. **Honest scorecard** — what survives scrutiny and what doesn't.
 
-## Deploy to GitHub Pages (scottn66.github.io)
+## How it stays fresh
 
 This folder is self-contained (HTML + `assets/`). Plotly and MathJax load from
-CDNs; all data and figures are local.
+CDNs; all data and figures are local. Two GitHub Actions keep the data current:
+
+- **Daily** (`.github/workflows/update-btc-price.yml`, 07:23 UTC) — fetches the
+  Coinbase spot price and patches only the `"current"` block in `assets/data.js`.
+- **Weekly** (`.github/workflows/refresh-power-law.yml`, Mondays 10:47 UTC) —
+  runs the full in-repo pipeline: refreshes the hourly candle cache, refits the
+  power law, reruns every econometric lens, redraws the five figures, and
+  commits `assets/data.js` + `assets/fig_*.png` if anything changed.
+
+## Regenerate the analysis locally
+
+From the repo root (deps: `pip install -r scripts/powerlaw_pipeline/requirements.txt`):
 
 ```bash
-# from your scottn66.github.io repo
-cp -r /path/to/coinbase/portfolio/bitcoin-power-law ./bitcoin-power-law
-git add bitcoin-power-law
-git commit -m "Add Bitcoin power-law econometric analysis"
-git push
-```
-
-It will be live at `https://scottn66.github.io/bitcoin-power-law/` within a minute.
-(For a user/organization Pages site, no `gh-pages` branch or config is needed —
-files on the default branch are served directly.)
-
-## Regenerate the analysis
-
-From the `coinbase` project root:
-
-```bash
-uv run python scripts/power_law.py          # fit + corridor + power_law.json
-uv run python scripts/pl_econometrics.py     # all econometric lenses -> econ.json
-uv run python scripts/pl_figures.py          # seaborn figures -> assets/*.png
-uv run python scripts/pl_data.py             # bundle -> assets/data.js
+python scripts/powerlaw_pipeline/fetch_candles.py     # candle cache -> .cache/candles/
+python scripts/powerlaw_pipeline/power_law.py         # fit + corridor -> runs/power_law/power_law.json
+python scripts/powerlaw_pipeline/pl_econometrics.py   # all econometric lenses -> econ.json
+python scripts/powerlaw_pipeline/pl_figures.py        # seaborn figures -> assets/fig_*.png
+python scripts/powerlaw_pipeline/pl_data.py           # bundle -> assets/data.js
+python scripts/powerlaw_pipeline/verify_data.py       # sanity gate
 ```
 
 ## Caveat
