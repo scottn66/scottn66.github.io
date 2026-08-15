@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /sun/
+Disallow: /pages/
+Disallow: /about-us/
+Disallow: /SITE-AUDIT.md
+
+Sitemap: https://scottn66.github.io/sitemap.xml
