@@ -10,7 +10,7 @@
   <meta name="keywords" content="Scott Nelson, Data Engineer, SJSU, DuckDB, pipelines, portfolio">
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Scott Nelson - Portfolio">
+  <meta property="og:title" content="Scott Nelson — Data Engineer">
   <meta property="og:description" content="Data engineering work: solar warehouse, ingest pipelines, econometric notes.">
   <meta property="og:image" content="https://scottn66.github.io/assets/decision-theory-card.png">
   <meta property="og:url" content="https://scottn66.github.io/">
@@ -216,7 +216,7 @@
   <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
-      <a class="navbar-brand" href="#">Scott Nelson</a>
+      <a class="navbar-brand" href="/">Scott Nelson</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
               data-bs-target="#navbarNav" aria-controls="navbarNav"
               aria-expanded="false" aria-label="Toggle navigation">
@@ -313,22 +313,6 @@
         <hr class="my-4">
         <h3 class="text-center mt-4 mb-4" style="color: var(--primary-color);">AI &amp; Machine Learning</h3>
         <div class="row">
-          <!-- Project Card 1 -->
-          <article class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100 border-0 shadow">
-              <img src="assets/images/projects/MAB/MAB.png"
-                   srcset="assets/images/projects/MAB/MAB-small.png 480w, assets/images/projects/MAB/MAB.png 800w"
-                   class="card-img-top" alt="Multi-Armed Bandit Agents" loading="lazy">
-              <div class="card-body">
-                <h5 class="card-title">Multi-Armed Bandit Agents</h5>
-                <p class="card-text">Exploring reinforcement learning through the classic multi-armed bandit problem.</p>
-              </div>
-              <div class="card-footer bg-light border-0">
-                <a href="MAB.html" class="btn btn-primary w-100">View Project</a>
-              </div>
-            </div>
-          </article>
-
           <!-- Project Card 2 -->
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
@@ -348,7 +332,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <img src="assets/images/projects/HMM/hmm.png"
-                   class="card-img-top" alt="NER with Viterbi HMM" loading="lazy">
+                   class="card-img-top" alt="From Counts to Context" loading="lazy">
               <div class="card-body">
                 <h5 class="card-title">From Counts to Context</h5>
                 <p class="card-text">HMM → LSTM → BERT for NER. A leakage bug in the validation split, then DistilBERT at test F1 0.888. The older Viterbi writeup is linked from the page.</p>
@@ -490,7 +474,7 @@
 
         <!-- Knowledge Source Scrapers -->
         <h3 class="text-center mt-5 mb-4" style="color: var(--primary-color);">Knowledge Source Scrapers</h3>
-        <p class="text-center text-muted mb-4">Three complementary Python scrapers forming the raw-sources layer of an LLM knowledge pipeline for cognitive science.</p>
+        <p class="text-center text-muted mb-4">Three complementary Python scrapers forming the raw-sources layer of an ingest pipeline: crawl, validate, and store.</p>
         <div class="row">
           <!-- Wikipedia Scraper Card -->
           <article class="col-lg-4 col-md-6 mb-4">
@@ -600,27 +584,6 @@
   </footer>
 
   <!-- Project Modals -->
-  <!-- Modal for Project 1 -->
-  <div class="modal fade" id="projectModal1" tabindex="-1" aria-labelledby="projectModalLabel1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabel1">Multi-Armed Bandit Agents</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-          <p>
-            Four armed bandit problem exploring Thompson Sampling and Upper Confidence Bound in a Monte Carlo simulation.
-          </p>
-        </div>
-        <div class="modal-footer">
-          <a href="https://scottn66.github.io/MAB.html" class="btn btn-primary" target="_blank">View Full Project</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Modal for Project 2 -->
   <div class="modal fade" id="projectModal2" tabindex="-1" aria-labelledby="projectModalLabel2" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -671,14 +634,14 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabel3">NER with Viterbi HMM</h5>
+          <h5 class="modal-title" id="projectModalLabel3">From Counts to Context</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>This project explores Natural Language Processing through probabilistic sequence classification, utilizing Hidden Markov Models (HMMs) to map observable text sequences to their hidden underlying states, such as in Named Entity Recognition. By employing algorithms like Viterbi for efficient decoding and the Forward-Backward algorithm for training, it demonstrates how statistical models can infer hidden linguistic structures and improve text analysis.</p>
+          <p>HMM → LSTM → BERT for NER. A leakage bug in the validation split, then DistilBERT at test F1 0.888. The older Viterbi writeup is linked from the page.</p>
         </div>
         <div class="modal-footer">
-          <a href="https://scottn66.github.io/HMM.html" class="btn btn-primary" target="_blank">View Full Project</a>
+          <a href="ner-taggers.html" class="btn btn-primary" target="_blank">View Full Project</a>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -694,7 +657,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p>Three complementary Wikipedia scrapers: <strong>sitehopper3_basic.py</strong> provides canonical page-key normalization, a SQLite pages/edges graph store, bounded BFS crawling, and a deterministic fake scraper for offline testing. <strong>wikiFetcher.py</strong> adds a 6-point soup validator that rejects disambiguation pages, missing content, and empty stubs before they enter the cache. <strong>wikiSearch.py</strong> wraps the MediaWiki search API with content-type validation and JSON decode fallback. Together they form the breadth layer of a cognitive-science knowledge pipeline.</p>
+          <p>Three complementary Wikipedia scrapers: <strong>sitehopper3_basic.py</strong> provides canonical page-key normalization, a SQLite pages/edges graph store, bounded BFS crawling, and a deterministic fake scraper for offline testing. <strong>wikiFetcher.py</strong> adds a 6-point soup validator that rejects disambiguation pages, missing content, and empty stubs before they enter the cache. <strong>wikiSearch.py</strong> wraps the MediaWiki search API with content-type validation and JSON decode fallback. Together they form the breadth layer of an ingest pipeline.</p>
         </div>
         <div class="modal-footer">
           <a href="wikipedia_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
