@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solar Viability Reports | DATA 201</title>
+<title>Solar Viability Reports</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -117,7 +117,7 @@
 <!-- ===== Hero ===== -->
 <div class="hero">
   <h1>Is solar worth it in your city?</h1>
-  <p>Independent viability reports for 20 California locations &mdash; the 15 largest cities plus Stanford &amp; Berkeley &mdash; powered by NREL irradiance data and live utility rate detection.</p>
+  <p>Independent viability reports for 32 locations across California and Oregon &mdash; from the largest cities to the Central Oregon high desert around Bend and Redmond &mdash; powered by NREL irradiance data and live utility rate detection.</p>
   <div class="hero-nav">
     <a href="../">&#8592; Project Home</a>
     <a href="../heatmap/">View ZIP Heatmaps &rarr;</a>
@@ -130,86 +130,23 @@
 
 <!-- ===== Cards ===== -->
 <div class="container">
-  <div class="result-count" id="result-count">Showing all 20 reports &middot; sorted by viability score &middot; Chula Vista leads at 96/100</div>
+  <div class="result-count" id="result-count">Showing all 32 reports &middot; sorted by viability score &middot; Bakersfield leads at 92/100</div>
   <div class="cards" id="cards">
-
-    <a class="card" href="chula-vista.html" data-s="chula vista 91910 sdg&amp;e nem 3.0 socal south bay san diego solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>96</span></div>
-        <div class="card-title">
-          <h3>Chula Vista</h3>
-          <div class="zip">ZIP 91910 &middot; <span class="rank">#15 · 276K</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,816 kWh</dd>
-          <dt>LCOE</dt><dd>$0.072/kWh</dd>
-          <dt>Payback</dt><dd>6.5 yr</dd>
-          <dt>Utility</dt><dd>SDG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="san-diego.html" data-s="san diego 92101 sdg&amp;e nem 3.0 socal coast solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>95</span></div>
-        <div class="card-title">
-          <h3>San Diego</h3>
-          <div class="zip">ZIP 92101 &middot; <span class="rank">#2 · 1.4M</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,643 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>6.6 yr</dd>
-          <dt>Utility</dt><dd>SDG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="long-beach.html" data-s="long beach 90802 sce nem 3.0 socal la county solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
-        <div class="card-title">
-          <h3>Long Beach</h3>
-          <div class="zip">ZIP 90802 &middot; <span class="rank">#7 · 451K</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,667 kWh</dd>
-          <dt>LCOE</dt><dd>$0.073/kWh</dd>
-          <dt>Payback</dt><dd>7.2 yr</dd>
-          <dt>Utility</dt><dd>SCE</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
 
     <a class="card" href="bakersfield.html" data-s="bakersfield 93301 pg&amp;e nem 3.0 central valley kern solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>92</span></div>
         <div class="card-title">
           <h3>Bakersfield</h3>
-          <div class="zip">ZIP 93301 &middot; <span class="rank">#9 · 413K</span></div>
+          <div class="zip">CA &middot; ZIP 93301 &middot; <span class="rank">#9 · 413K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,679 kWh</dd>
-          <dt>LCOE</dt><dd>$0.073/kWh</dd>
-          <dt>Payback</dt><dd>7.2 yr</dd>
+          <dt>Annual Yield</dt><dd>7,862 kWh</dd>
+          <dt>LCOE</dt><dd>$0.084/kWh</dd>
+          <dt>Payback</dt><dd>8.3 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
@@ -217,62 +154,41 @@
       </div>
     </a>
 
-    <a class="card" href="stanford.html" data-s="stanford 94305 pg&amp;e nem 3.0 bay area peninsula university solar california ca">
+    <a class="card" href="sacramento.html" data-s="sacramento 95814 smud net metering central valley capital solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>91</span></div>
         <div class="card-title">
-          <h3>Stanford</h3>
-          <div class="zip">ZIP 94305 &middot; <span class="rank">University</span></div>
+          <h3>Sacramento</h3>
+          <div class="zip">CA &middot; ZIP 95814 &middot; <span class="rank">#6 · 528K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,594 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>7.2 yr</dd>
-          <dt>Utility</dt><dd>PG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
+          <dt>Annual Yield</dt><dd>7,361 kWh</dd>
+          <dt>LCOE</dt><dd>$0.056/kWh</dd>
+          <dt>Payback</dt><dd>5.6 yr</dd>
+          <dt>Utility</dt><dd>SMUD</dd>
+          <dt>Export</dt><dd>Net metering</dd>
         </dl>
         <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
     </a>
 
-    <a class="card" href="atherton.html" data-s="atherton 94027 pg&amp;e nem 3.0 bay area peninsula solar california ca">
+    <a class="card" href="fresno.html" data-s="fresno 93721 pg&amp;e nem 3.0 central valley solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>91</span></div>
         <div class="card-title">
-          <h3>Atherton</h3>
-          <div class="zip">ZIP 94027 &middot; <span class="rank">Peninsula</span></div>
+          <h3>Fresno</h3>
+          <div class="zip">CA &middot; ZIP 93721 &middot; <span class="rank">#5 · 545K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,577 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>7.2 yr</dd>
-          <dt>Utility</dt><dd>PG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="redwood-city.html" data-s="redwood city 94061 pg&amp;e nem 3.0 bay area peninsula solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
-        <div class="card-title">
-          <h3>Redwood City</h3>
-          <div class="zip">ZIP 94061 &middot; <span class="rank">Peninsula</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,577 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>7.2 yr</dd>
+          <dt>Annual Yield</dt><dd>7,662 kWh</dd>
+          <dt>LCOE</dt><dd>$0.085/kWh</dd>
+          <dt>Payback</dt><dd>8.4 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
@@ -282,19 +198,124 @@
 
     <a class="card" href="irvine.html" data-s="irvine 92618 sce nem 3.0 socal orange county solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>91</span></div>
         <div class="card-title">
           <h3>Irvine</h3>
-          <div class="zip">ZIP 92618 &middot; <span class="rank">#13 · 311K</span></div>
+          <div class="zip">CA &middot; ZIP 92618 &middot; <span class="rank">#13 · 311K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,614 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>7.3 yr</dd>
+          <dt>Annual Yield</dt><dd>7,633 kWh</dd>
+          <dt>LCOE</dt><dd>$0.084/kWh</dd>
+          <dt>Payback</dt><dd>8.4 yr</dd>
           <dt>Utility</dt><dd>SCE</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="san-jose.html" data-s="san jose 95113 pg&amp;e nem 3.0 bay area south bay solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>90</span></div>
+        <div class="card-title">
+          <h3>San Jose</h3>
+          <div class="zip">CA &middot; ZIP 95113 &middot; <span class="rank">#3 · 1.0M</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,493 kWh</dd>
+          <dt>LCOE</dt><dd>$0.091/kWh</dd>
+          <dt>Payback</dt><dd>9.0 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="stockton.html" data-s="stockton 95202 pg&amp;e nem 3.0 central valley solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>90</span></div>
+        <div class="card-title">
+          <h3>Stockton</h3>
+          <div class="zip">CA &middot; ZIP 95202 &middot; <span class="rank">#11 · 322K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,493 kWh</dd>
+          <dt>LCOE</dt><dd>$0.092/kWh</dd>
+          <dt>Payback</dt><dd>9.1 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="anaheim.html" data-s="anaheim 92805 anaheim pu net metering socal orange county solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>90</span></div>
+        <div class="card-title">
+          <h3>Anaheim</h3>
+          <div class="zip">CA &middot; ZIP 92805 &middot; <span class="rank">#10 · 345K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,633 kWh</dd>
+          <dt>LCOE</dt><dd>$0.086/kWh</dd>
+          <dt>Payback</dt><dd>9.2 yr</dd>
+          <dt>Utility</dt><dd>Anaheim PU</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="riverside.html" data-s="riverside 92501 riverside pu net metering socal inland empire solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#1B9E77;box-shadow:0 3px 10px #1B9E7755;"><span>90</span></div>
+        <div class="card-title">
+          <h3>Riverside</h3>
+          <div class="zip">CA &middot; ZIP 92501 &middot; <span class="rank">#12 · 315K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,633 kWh</dd>
+          <dt>LCOE</dt><dd>$0.087/kWh</dd>
+          <dt>Payback</dt><dd>9.4 yr</dd>
+          <dt>Utility</dt><dd>Riverside PU</dd>
+          <dt>Export</dt><dd>Net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="san-diego.html" data-s="san diego 92101 sdg&amp;e nem 3.0 socal coast solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
+        <div class="card-title">
+          <h3>San Diego</h3>
+          <div class="zip">CA &middot; ZIP 92101 &middot; <span class="rank">#2 · 1.4M</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,914 kWh</dd>
+          <dt>LCOE</dt><dd>$0.095/kWh</dd>
+          <dt>Payback</dt><dd>8.6 yr</dd>
+          <dt>Utility</dt><dd>SDG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
         <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
@@ -306,79 +327,16 @@
         <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
         <div class="card-title">
           <h3>Santa Ana</h3>
-          <div class="zip">ZIP 92701 &middot; <span class="rank">#14 · 310K</span></div>
+          <div class="zip">CA &middot; ZIP 92701 &middot; <span class="rank">#14 · 310K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,596 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>7.3 yr</dd>
+          <dt>Annual Yield</dt><dd>7,633 kWh</dd>
+          <dt>LCOE</dt><dd>$0.087/kWh</dd>
+          <dt>Payback</dt><dd>8.7 yr</dd>
           <dt>Utility</dt><dd>SCE</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="san-jose.html" data-s="san jose 95113 pg&amp;e nem 3.0 bay area south bay solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
-        <div class="card-title">
-          <h3>San Jose</h3>
-          <div class="zip">ZIP 95113 &middot; <span class="rank">#3 · 1.0M</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,493 kWh</dd>
-          <dt>LCOE</dt><dd>$0.075/kWh</dd>
-          <dt>Payback</dt><dd>7.3 yr</dd>
-          <dt>Utility</dt><dd>PG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="fresno.html" data-s="fresno 93721 pg&amp;e nem 3.0 central valley solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
-        <div class="card-title">
-          <h3>Fresno</h3>
-          <div class="zip">ZIP 93721 &middot; <span class="rank">#5 · 545K</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,475 kWh</dd>
-          <dt>LCOE</dt><dd>$0.075/kWh</dd>
-          <dt>Payback</dt><dd>7.3 yr</dd>
-          <dt>Utility</dt><dd>PG&amp;E</dd>
-          <dt>Export</dt><dd>NEM 3.0</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="stockton.html" data-s="stockton 95202 pg&amp;e nem 3.0 central valley solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
-        <div class="card-title">
-          <h3>Stockton</h3>
-          <div class="zip">ZIP 95202 &middot; <span class="rank">#11 · 322K</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,404 kWh</dd>
-          <dt>LCOE</dt><dd>$0.076/kWh</dd>
-          <dt>Payback</dt><dd>7.4 yr</dd>
-          <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
         <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
@@ -387,18 +345,18 @@
 
     <a class="card" href="arnold.html" data-s="arnold 95223 pg&amp;e nem 3.0 sierra foothills solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>89</span></div>
         <div class="card-title">
           <h3>Arnold</h3>
-          <div class="zip">ZIP 95223 &middot; <span class="rank">Sierra foothills</span></div>
+          <div class="zip">CA &middot; ZIP 95223 &middot; <span class="rank">Sierra foothills</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,440 kWh</dd>
-          <dt>LCOE</dt><dd>$0.076/kWh</dd>
-          <dt>Payback</dt><dd>7.4 yr</dd>
+          <dt>Annual Yield</dt><dd>7,368 kWh</dd>
+          <dt>LCOE</dt><dd>$0.093/kWh</dd>
+          <dt>Payback</dt><dd>9.2 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
@@ -406,22 +364,43 @@
       </div>
     </a>
 
-    <a class="card" href="riverside.html" data-s="riverside 92501 riverside pu net metering socal inland empire solar california ca">
+    <a class="card" href="chula-vista.html" data-s="chula vista 91910 sdg&amp;e nem 3.0 socal south bay san diego solar california ca">
       <div class="card-top">
         <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
         <div class="card-title">
-          <h3>Riverside</h3>
-          <div class="zip">ZIP 92501 &middot; <span class="rank">#12 · 315K</span></div>
+          <h3>Chula Vista</h3>
+          <div class="zip">CA &middot; ZIP 91910 &middot; <span class="rank">#15 · 276K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,728 kWh</dd>
-          <dt>LCOE</dt><dd>$0.073/kWh</dd>
-          <dt>Payback</dt><dd>8.0 yr</dd>
-          <dt>Utility</dt><dd>Riverside PU</dd>
-          <dt>Export</dt><dd>Net metering</dd>
+          <dt>Annual Yield</dt><dd>6,914 kWh</dd>
+          <dt>LCOE</dt><dd>$0.097/kWh</dd>
+          <dt>Payback</dt><dd>8.8 yr</dd>
+          <dt>Utility</dt><dd>SDG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+      </div>
+    </a>
+
+    <a class="card" href="long-beach.html" data-s="long beach 90802 sce nem 3.0 socal la county solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>86</span></div>
+        <div class="card-title">
+          <h3>Long Beach</h3>
+          <div class="zip">CA &middot; ZIP 90802 &middot; <span class="rank">#7 · 451K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>7,090 kWh</dd>
+          <dt>LCOE</dt><dd>$0.098/kWh</dd>
+          <dt>Payback</dt><dd>9.8 yr</dd>
+          <dt>Utility</dt><dd>SCE</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
         <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
       </div>
@@ -429,18 +408,18 @@
 
     <a class="card" href="los-angeles.html" data-s="los angeles 90012 ladwp net metering socal la basin solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>83</span></div>
         <div class="card-title">
           <h3>Los Angeles</h3>
-          <div class="zip">ZIP 90012 &middot; <span class="rank">#1 · 3.8M</span></div>
+          <div class="zip">CA &middot; ZIP 90012 &middot; <span class="rank">#1 · 3.8M</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,637 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>8.1 yr</dd>
+          <dt>Annual Yield</dt><dd>7,948 kWh</dd>
+          <dt>LCOE</dt><dd>$0.096/kWh</dd>
+          <dt>Payback</dt><dd>10.4 yr</dd>
           <dt>Utility</dt><dd>LADWP</dd>
           <dt>Export</dt><dd>Net metering</dd>
         </dl>
@@ -448,108 +427,381 @@
       </div>
     </a>
 
-    <a class="card" href="anaheim.html" data-s="anaheim 92805 anaheim pu net metering socal orange county solar california ca">
+    <a class="card" href="atherton.html" data-s="atherton 94027 pg&amp;e nem 3.0 bay area peninsula solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>88</span></div>
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>80</span></div>
         <div class="card-title">
-          <h3>Anaheim</h3>
-          <div class="zip">ZIP 92805 &middot; <span class="rank">#10 · 345K</span></div>
+          <h3>Atherton</h3>
+          <div class="zip">CA &middot; ZIP 94027 &middot; <span class="rank">Peninsula</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,572 kWh</dd>
-          <dt>LCOE</dt><dd>$0.074/kWh</dd>
-          <dt>Payback</dt><dd>8.2 yr</dd>
-          <dt>Utility</dt><dd>Anaheim PU</dd>
-          <dt>Export</dt><dd>Net metering</dd>
-        </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
-      </div>
-    </a>
-
-    <a class="card" href="berkeley.html" data-s="berkeley 94704 pg&amp;e nem 3.0 bay area east bay university solar california ca">
-      <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
-        <div class="card-title">
-          <h3>Berkeley</h3>
-          <div class="zip">ZIP 94704 &middot; <span class="rank">UC Berkeley</span></div>
-        </div>
-      </div>
-      <div class="card-body">
-        <dl class="detail-grid">
-          <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,262 kWh</dd>
-          <dt>LCOE</dt><dd>$0.078/kWh</dd>
-          <dt>Payback</dt><dd>7.5 yr</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.106/kWh</dd>
+          <dt>Payback</dt><dd>10.4 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="redwood-city.html" data-s="redwood city 94061 pg&amp;e nem 3.0 bay area peninsula solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>80</span></div>
+        <div class="card-title">
+          <h3>Redwood City</h3>
+          <div class="zip">CA &middot; ZIP 94061 &middot; <span class="rank">Peninsula</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.106/kWh</dd>
+          <dt>Payback</dt><dd>10.4 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Good — solid investment with standard financing</span>
       </div>
     </a>
 
     <a class="card" href="oakland.html" data-s="oakland 94607 pg&amp;e nem 3.0 bay area east bay solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>79</span></div>
         <div class="card-title">
           <h3>Oakland</h3>
-          <div class="zip">ZIP 94607 &middot; <span class="rank">#8 · 419K</span></div>
+          <div class="zip">CA &middot; ZIP 94607 &middot; <span class="rank">#8 · 419K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,172 kWh</dd>
-          <dt>LCOE</dt><dd>$0.079/kWh</dd>
-          <dt>Payback</dt><dd>7.6 yr</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.109/kWh</dd>
+          <dt>Payback</dt><dd>10.7 yr</dd>
           <dt>Utility</dt><dd>PG&amp;E</dd>
           <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
       </div>
     </a>
 
-    <a class="card" href="sacramento.html" data-s="sacramento 95814 smud net metering central valley capital solar california ca">
+    <a class="card" href="berkeley.html" data-s="berkeley 94704 pg&amp;e nem 3.0 bay area east bay university solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>87</span></div>
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>78</span></div>
         <div class="card-title">
-          <h3>Sacramento</h3>
-          <div class="zip">ZIP 95814 &middot; <span class="rank">#6 · 528K</span></div>
+          <h3>Berkeley</h3>
+          <div class="zip">CA &middot; ZIP 94704 &middot; <span class="rank">UC Berkeley</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,401 kWh</dd>
-          <dt>LCOE</dt><dd>$0.076/kWh</dd>
-          <dt>Payback</dt><dd>8.3 yr</dd>
-          <dt>Utility</dt><dd>SMUD</dd>
-          <dt>Export</dt><dd>Net metering</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.113/kWh</dd>
+          <dt>Payback</dt><dd>11.1 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
         </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
       </div>
     </a>
 
     <a class="card" href="san-francisco.html" data-s="san francisco 94103 cleanpowersf net metering bay area peninsula solar california ca">
       <div class="card-top">
-        <div class="score-circle" style="background:#26A69A;box-shadow:0 3px 10px #26A69A55;"><span>86</span></div>
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>77</span></div>
         <div class="card-title">
           <h3>San Francisco</h3>
-          <div class="zip">ZIP 94103 &middot; <span class="rank">#4 · 810K</span></div>
+          <div class="zip">CA &middot; ZIP 94103 &middot; <span class="rank">#4 · 810K</span></div>
         </div>
       </div>
       <div class="card-body">
         <dl class="detail-grid">
           <dt>System Size</dt><dd>4.5 kW</dd>
-          <dt>Annual Yield</dt><dd>7,147 kWh</dd>
-          <dt>LCOE</dt><dd>$0.079/kWh</dd>
-          <dt>Payback</dt><dd>8.6 yr</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.124/kWh</dd>
+          <dt>Payback</dt><dd>13.2 yr</dd>
           <dt>Utility</dt><dd>CleanPowerSF</dd>
           <dt>Export</dt><dd>Net metering</dd>
         </dl>
-        <span class="verdict" style="background:#E8F5E9;color:#2E7D32;">Excellent — install with confidence</span>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="stanford.html" data-s="stanford 94305 pg&amp;e nem 3.0 bay area peninsula university solar california ca">
+      <div class="card-top">
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>76</span></div>
+        <div class="card-title">
+          <h3>Stanford</h3>
+          <div class="zip">CA &middot; ZIP 94305 &middot; <span class="rank">University</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,667 kWh</dd>
+          <dt>LCOE</dt><dd>$0.124/kWh</dd>
+          <dt>Payback</dt><dd>12.2 yr</dd>
+          <dt>Utility</dt><dd>PG&amp;E</dd>
+          <dt>Export</dt><dd>NEM 3.0</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="medford-or.html" data-s="medford 97501 pacific power 1:1 net metering rogue valley southern oregon solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>69</span></div>
+        <div class="card-title">
+          <h3>Medford</h3>
+          <div class="zip">OR &middot; ZIP 97501 &middot; <span class="rank">SW Oregon · 89K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,412 kWh</dd>
+          <dt>LCOE</dt><dd>$0.107/kWh</dd>
+          <dt>Payback</dt><dd>13.1 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="salem-or.html" data-s="salem 97301 salem electric 1:1 net metering willamette valley capital solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>67</span></div>
+        <div class="card-title">
+          <h3>Salem</h3>
+          <div class="zip">OR &middot; ZIP 97301 &middot; <span class="rank">#2 OR · 180K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>5,459 kWh</dd>
+          <dt>LCOE</dt><dd>$0.113/kWh</dd>
+          <dt>Payback</dt><dd>12.3 yr</dd>
+          <dt>Utility</dt><dd>Salem Electric</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="eugene-or.html" data-s="eugene 97401 city of eugene, oregon (utility company) 1:1 net metering willamette valley lane county solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#F39C12;box-shadow:0 3px 10px #F39C1255;"><span>67</span></div>
+        <div class="card-title">
+          <h3>Eugene</h3>
+          <div class="zip">OR &middot; ZIP 97401 &middot; <span class="rank">#3 OR · 178K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>5,459 kWh</dd>
+          <dt>LCOE</dt><dd>$0.120/kWh</dd>
+          <dt>Payback</dt><dd>13.2 yr</dd>
+          <dt>Utility</dt><dd>City of Eugene, Oregon (Utility Company)</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF8E1;color:#F57F17;">Good — solid investment with standard financing</span>
+      </div>
+    </a>
+
+    <a class="card" href="prineville-or.html" data-s="prineville 97754 pacific power 1:1 net metering central oregon high desert crook solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#E67E22;box-shadow:0 3px 10px #E67E2255;"><span>57</span></div>
+        <div class="card-title">
+          <h3>Prineville</h3>
+          <div class="zip">OR &middot; ZIP 97754 &middot; <span class="rank">Central OR · 11K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,164 kWh</dd>
+          <dt>LCOE</dt><dd>$0.113/kWh</dd>
+          <dt>Payback</dt><dd>14.3 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF3E0;color:#E65100;">Marginal — depends on financing and rate trajectory</span>
+      </div>
+    </a>
+
+    <a class="card" href="bend-or.html" data-s="bend 97701 pacific power 1:1 net metering central oregon high desert deschutes solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#E67E22;box-shadow:0 3px 10px #E67E2255;"><span>57</span></div>
+        <div class="card-title">
+          <h3>Bend</h3>
+          <div class="zip">OR &middot; ZIP 97701 &middot; <span class="rank">Central OR · 103K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,016 kWh</dd>
+          <dt>LCOE</dt><dd>$0.116/kWh</dd>
+          <dt>Payback</dt><dd>14.7 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF3E0;color:#E65100;">Marginal — depends on financing and rate trajectory</span>
+      </div>
+    </a>
+
+    <a class="card" href="redmond-or.html" data-s="redmond 97756 pacific power 1:1 net metering central oregon high desert deschutes solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#E67E22;box-shadow:0 3px 10px #E67E2255;"><span>57</span></div>
+        <div class="card-title">
+          <h3>Redmond</h3>
+          <div class="zip">OR &middot; ZIP 97756 &middot; <span class="rank">Central OR · 37K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,016 kWh</dd>
+          <dt>LCOE</dt><dd>$0.116/kWh</dd>
+          <dt>Payback</dt><dd>14.7 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF3E0;color:#E65100;">Marginal — depends on financing and rate trajectory</span>
+      </div>
+    </a>
+
+    <a class="card" href="madras-or.html" data-s="madras 97741 pacific power 1:1 net metering central oregon high desert jefferson solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#E67E22;box-shadow:0 3px 10px #E67E2255;"><span>57</span></div>
+        <div class="card-title">
+          <h3>Madras</h3>
+          <div class="zip">OR &middot; ZIP 97741 &middot; <span class="rank">Central OR · 8K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,016 kWh</dd>
+          <dt>LCOE</dt><dd>$0.116/kWh</dd>
+          <dt>Payback</dt><dd>14.7 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF3E0;color:#E65100;">Marginal — depends on financing and rate trajectory</span>
+      </div>
+    </a>
+
+    <a class="card" href="terrebonne-or.html" data-s="terrebonne 97760 pacific power 1:1 net metering central oregon high desert smith rock solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#E67E22;box-shadow:0 3px 10px #E67E2255;"><span>57</span></div>
+        <div class="card-title">
+          <h3>Terrebonne</h3>
+          <div class="zip">OR &middot; ZIP 97760 &middot; <span class="rank">Smith Rock</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,016 kWh</dd>
+          <dt>LCOE</dt><dd>$0.116/kWh</dd>
+          <dt>Payback</dt><dd>14.7 yr</dd>
+          <dt>Utility</dt><dd>Pacific Power</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#FFF3E0;color:#E65100;">Marginal — depends on financing and rate trajectory</span>
+      </div>
+    </a>
+
+    <a class="card" href="la-pine-or.html" data-s="la pine 97739 midstate electric co-op co-op monthly netting central oregon high desert deschutes solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#95A5A6;box-shadow:0 3px 10px #95A5A655;"><span>46</span></div>
+        <div class="card-title">
+          <h3>La Pine</h3>
+          <div class="zip">OR &middot; ZIP 97739 &middot; <span class="rank">Central OR · 3K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,379 kWh</dd>
+          <dt>LCOE</dt><dd>$0.109/kWh</dd>
+          <dt>Payback</dt><dd>21.3 yr</dd>
+          <dt>Utility</dt><dd>Midstate Electric Co-op</dd>
+          <dt>Export</dt><dd>Co-op monthly netting</dd>
+        </dl>
+        <span class="verdict" style="background:#ECEFF1;color:#546E7A;">Poor — unlikely to be cost-effective under current assumptions</span>
+      </div>
+    </a>
+
+    <a class="card" href="sunriver-or.html" data-s="sunriver 97707 midstate electric co-op co-op monthly netting central oregon high desert deschutes resort solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#95A5A6;box-shadow:0 3px 10px #95A5A655;"><span>46</span></div>
+        <div class="card-title">
+          <h3>Sunriver</h3>
+          <div class="zip">OR &middot; ZIP 97707 &middot; <span class="rank">Central OR resort</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,379 kWh</dd>
+          <dt>LCOE</dt><dd>$0.109/kWh</dd>
+          <dt>Payback</dt><dd>21.3 yr</dd>
+          <dt>Utility</dt><dd>Midstate Electric Co-op</dd>
+          <dt>Export</dt><dd>Co-op monthly netting</dd>
+        </dl>
+        <span class="verdict" style="background:#ECEFF1;color:#546E7A;">Poor — unlikely to be cost-effective under current assumptions</span>
+      </div>
+    </a>
+
+    <a class="card" href="sisters-or.html" data-s="sisters 97759 central electric co-op co-op monthly netting central oregon high desert deschutes solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#95A5A6;box-shadow:0 3px 10px #95A5A655;"><span>45</span></div>
+        <div class="card-title">
+          <h3>Sisters</h3>
+          <div class="zip">OR &middot; ZIP 97759 &middot; <span class="rank">Central OR · 3.5K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>6,016 kWh</dd>
+          <dt>LCOE</dt><dd>$0.116/kWh</dd>
+          <dt>Payback</dt><dd>23.4 yr</dd>
+          <dt>Utility</dt><dd>Central Electric Co-op</dd>
+          <dt>Export</dt><dd>Co-op monthly netting</dd>
+        </dl>
+        <span class="verdict" style="background:#ECEFF1;color:#546E7A;">Poor — unlikely to be cost-effective under current assumptions</span>
+      </div>
+    </a>
+
+    <a class="card" href="portland-or.html" data-s="portland 97202 pge (oregon) 1:1 net metering willamette valley portland metro solar oregon or">
+      <div class="card-top">
+        <div class="score-circle" style="background:#95A5A6;box-shadow:0 3px 10px #95A5A655;"><span>42</span></div>
+        <div class="card-title">
+          <h3>Portland</h3>
+          <div class="zip">OR &middot; ZIP 97202 &middot; <span class="rank">#1 OR · 630K</span></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <dl class="detail-grid">
+          <dt>System Size</dt><dd>4.5 kW</dd>
+          <dt>Annual Yield</dt><dd>5,166 kWh</dd>
+          <dt>LCOE</dt><dd>$0.135/kWh</dd>
+          <dt>Payback</dt><dd>19.9 yr</dd>
+          <dt>Utility</dt><dd>PGE (Oregon)</dd>
+          <dt>Export</dt><dd>1:1 net metering</dd>
+        </dl>
+        <span class="verdict" style="background:#ECEFF1;color:#546E7A;">Poor — unlikely to be cost-effective under current assumptions</span>
       </div>
     </a>
 
@@ -570,27 +822,35 @@
       weather data from the <a href="https://developer.nrel.gov/" target="_blank" rel="noopener">NREL Developer Network</a>
       (PVWatts&nbsp;v8). The utility and electricity rate are detected automatically per ZIP; for the three
       CPUC-regulated investor-owned utilities (PG&amp;E, SCE, SDG&amp;E) we apply current <strong>NEM&nbsp;3.0</strong>
-      export pricing, while municipal utilities (LADWP, SMUD, Anaheim, Riverside) use their own net-metering tariffs.
+      export pricing, while municipal utilities (LADWP, SMUD, Anaheim, Riverside) use their own net-metering
+      tariffs. Oregon locations use the state's <strong>1:1 retail-rate net metering</strong> (ORS&nbsp;757.300)
+      with rates from Portland General Electric, Pacific Power, or the Central Oregon electric co-ops.
     </p>
     <p>
       Viability scores (0&ndash;100) combine levelized cost of energy (LCOE), simple payback period,
       net present value (NPV), solar resource quality, panel orientation, and local market maturity
       into a single weighted index (25% resource + 50% economics + 15% site fit + 10% policy).
-      A score of 65 or above is rated "Good" for most homeowners; all 20 locations here clear that bar,
-      reflecting California's high retail rates and strong solar resource.
+      A score of 65 or above is rated "Good" for most homeowners. California locations clear that bar
+      easily on high retail rates; Oregon's cheap hydro-heavy electricity stretches paybacks even where
+      the solar resource is excellent, as it is east of the Cascades in Bend and Redmond.
     </p>
     <p>
       Data sources: <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts</a>,
       <a href="https://openei.org/wiki/Utility_Rate_Database" target="_blank" rel="noopener">OpenEI URDB</a>,
       <a href="https://www.eia.gov/" target="_blank" rel="noopener">EIA rate data</a>, and
       <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab TTS</a>.
-      Built for DATA&nbsp;201 at SJSU. &mdash; <a href="../heatmap/">Explore all 2,593 CA ZIPs on the heatmap &rarr;</a>
+      Started as a San Jose State DATA&nbsp;201 project; now an independent model.
+      &mdash; <a href="../heatmap/">Explore the ZIP-level heatmaps (California &amp; Oregon) &rarr;</a>
+    </p>
+    <p style="font-size:0.82rem;color:#888;margin-top:0.75rem;">
+      Independent research model — not financial, tax, or installation advice.
     </p>
   </div>
 </div>
 
 <footer>
-  Solar Viability Reports &middot; DATA 201 &middot; SJSU
+  Solar viability reports &middot; Scott Nelson &middot;
+  <a href="https://github.com/scottn66/solar-energy-analysis" style="color:#26A69A;">GitHub</a>
 </footer>
 
 <script>

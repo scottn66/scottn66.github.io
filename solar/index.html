@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="unit" content="solar-viability">
-<title>Solar Viability Analysis | DATA 201 — Scott Nelson</title>
+<title>Is solar worth it? — Solar Viability</title>
+<meta name="description" content="Independent 25-year solar ROI model for US rooftops. California in depth, including NEM 3.0. Look up any California ZIP. Open source.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,54 +16,107 @@
     color: #1A1A2E;
     -webkit-font-smoothing: antialiased;
   }
+  a { color: #26A69A; }
 
   .hero {
     background: linear-gradient(135deg, #1B1464 0%, #2D2B8C 45%, #4A3FB5 100%);
     color: #fff;
-    padding: 4rem 1.5rem 3.5rem;
+    padding: 3.6rem 1.5rem 3rem;
     text-align: center;
   }
   .hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.55rem; }
   .hero p {
-    font-size: 1.05rem; opacity: 0.82; max-width: 560px;
-    margin: 0 auto 2rem; line-height: 1.6;
+    font-size: 1.05rem; opacity: 0.86; max-width: 620px;
+    margin: 0 auto 1.6rem; line-height: 1.6;
   }
   .hero-badges {
-    display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;
+    display: flex; gap: 0.55rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.6rem;
   }
   .badge {
-    display: inline-block; padding: 0.3rem 0.85rem;
+    display: inline-block; padding: 0.28rem 0.8rem;
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 20px; font-size: 0.78rem; font-weight: 600; color: #fff;
+    border-radius: 20px; font-size: 0.76rem; font-weight: 600; color: #fff;
+  }
+  .search-wrap { max-width: 540px; margin: 0 auto 0.85rem; position: relative; }
+  .search-wrap svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
+  .search-wrap input {
+    width: 100%; padding: 0.95rem 1rem 0.95rem 2.8rem; border: none; border-radius: 14px;
+    font-size: 1.05rem; font-family: inherit; outline: none;
+    background: rgba(255,255,255,0.16); color: #fff;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .search-wrap input::placeholder { color: rgba(255,255,255,0.55); }
+  .search-wrap input:focus { background: rgba(255,255,255,0.24); }
+  .try {
+    font-size: 0.82rem; opacity: 0.75;
+  }
+  .try button {
+    background: none; border: none; color: #fff; font: inherit;
+    text-decoration: underline; cursor: pointer; opacity: 0.9;
   }
   .hero-cta {
-    display: inline-block; padding: 0.7rem 1.7rem;
+    display: inline-block; margin-top: 1.4rem; padding: 0.65rem 1.5rem;
     background: #fff; color: #1B1464; border-radius: 26px;
-    font-size: 0.95rem; font-weight: 700; text-decoration: none;
+    font-size: 0.92rem; font-weight: 700; text-decoration: none;
     box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.26); }
+  .hero-cta:hover { transform: translateY(-1px); }
 
-  .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 1rem; }
+  .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 1rem; }
 
-  .section-title {
-    font-size: 1.25rem; font-weight: 700; color: #1B1464;
-    margin-bottom: 1.1rem; padding-bottom: 0.5rem;
-    border-bottom: 2px solid #E8E9F0;
-  }
-
-  /* Nav cards */
-  .nav-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2.5rem;
-  }
-  .nav-card {
+  .result-panel {
+    display: none;
     background: #fff;
     border-radius: 18px;
-    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(27,20,100,0.12);
+    padding: 1.4rem 1.5rem 1.5rem;
+    margin: -2.2rem auto 2rem;
+    position: relative;
+    z-index: 2;
+  }
+  .result-panel.open { display: block; }
+  .result-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.9rem; }
+  .score-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    color: #fff; font-weight: 800; font-size: 1.35rem;
+  }
+  .result-head h2 { font-size: 1.2rem; font-weight: 700; color: #1B1464; }
+  .result-head .meta { font-size: 0.85rem; color: #666; margin-top: 0.15rem; }
+  .kpis {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem;
+    margin: 0.8rem 0 1rem;
+  }
+  .kpi { background: #F4F5F7; border-radius: 12px; padding: 0.7rem 0.8rem; }
+  .kpi dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: #777; }
+  .kpi dd { font-size: 1.05rem; font-weight: 700; color: #1A1A2E; margin-top: 0.15rem; }
+  .result-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+  .result-actions a {
+    display: inline-block; padding: 0.5rem 1rem; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 600; text-decoration: none;
+  }
+  .btn-full { background: #1B1464; color: #fff; }
+  .btn-map { background: #EEF0FF; color: #3A37A0; }
+  .na-note { font-size: 0.88rem; color: #666; line-height: 1.5; }
+  .suggest { font-size: 0.85rem; color: #888; margin-top: 0.6rem; }
+  .suggest button {
+    background: none; border: none; color: #26A69A; font: inherit;
+    cursor: pointer; text-decoration: underline;
+  }
+
+  .section-title {
+    font-size: 1.2rem; font-weight: 700; color: #1B1464;
+    margin: 0.5rem 0 1.1rem; padding-bottom: 0.5rem;
+    border-bottom: 2px solid #E8E9F0;
+  }
+  .nav-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.15rem;
+    margin-bottom: 2.2rem;
+  }
+  .nav-card {
+    background: #fff; border-radius: 18px; overflow: hidden;
     box-shadow: 0 2px 10px rgba(27,20,100,0.07);
     text-decoration: none; color: inherit;
     display: flex; flex-direction: column;
@@ -71,36 +124,36 @@
   }
   .nav-card:hover { transform: translateY(-5px); box-shadow: 0 10px 28px rgba(27,20,100,0.14); }
   .nav-card-banner {
-    height: 100px; display: flex; align-items: center;
-    justify-content: center; font-size: 2.4rem;
+    height: 92px; display: flex; align-items: center;
+    justify-content: center; font-size: 2.2rem;
   }
   .banner-reports { background: linear-gradient(135deg, #26A69A 0%, #00796B 100%); }
   .banner-heatmap { background: linear-gradient(135deg, #7E57C2 0%, #4527A0 100%); }
   .banner-paper   { background: linear-gradient(135deg, #EF6C00 0%, #B53D00 100%); }
-  .nav-card-body { padding: 1.25rem 1.35rem 1.4rem; flex: 1; }
-  .nav-card-body h2 { font-size: 1.1rem; font-weight: 700; color: #1B1464; margin-bottom: 0.35rem; }
-  .nav-card-body p { font-size: 0.88rem; color: #555; line-height: 1.6; }
+  .banner-code    { background: linear-gradient(135deg, #37474F 0%, #263238 100%); }
+  .nav-card-body { padding: 1.15rem 1.3rem 1.3rem; flex: 1; }
+  .nav-card-body h2 { font-size: 1.05rem; font-weight: 700; color: #1B1464; margin-bottom: 0.35rem; }
+  .nav-card-body p { font-size: 0.86rem; color: #555; line-height: 1.6; }
 
-  /* About */
   .about {
-    padding: 2rem;
+    padding: 1.7rem 1.8rem;
     background: #fff;
     border-radius: 18px;
     box-shadow: 0 2px 10px rgba(27,20,100,0.05);
     margin-bottom: 1.5rem;
   }
-  .about h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.85rem; color: #1B1464; }
+  .about h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: #1B1464; }
   .about p { font-size: 0.9rem; line-height: 1.7; color: #555; margin-bottom: 0.65rem; }
-  .about a { color: #26A69A; text-decoration: none; font-weight: 500; }
-  .about a:hover { text-decoration: underline; }
+  .about a { font-weight: 500; }
 
   footer {
-    text-align: center; padding: 2.25rem 1rem;
-    font-size: 0.78rem; color: #AAA; letter-spacing: 0.01em;
+    text-align: center; padding: 2rem 1rem 2.4rem;
+    font-size: 0.78rem; color: #999; line-height: 1.6;
   }
 
   @media (max-width: 600px) {
-    .hero h1 { font-size: 1.75rem; }
+    .hero h1 { font-size: 1.7rem; }
+    .kpis { grid-template-columns: 1fr; }
     .nav-cards { grid-template-columns: 1fr; }
   }
 </style>
@@ -108,73 +161,217 @@
 <body>
 
 <div class="hero">
-  <h1>☀️ Solar Viability Analysis</h1>
-  <p>Address-to-financial-analysis for residential rooftop solar in California — powered by NREL irradiance data, Berkeley Lab install records, and a 25-year cashflow engine.</p>
+  <h1>Is solar worth it at your address?</h1>
+  <p>An independent 25-year cashflow model. California is modeled in depth (NEM 3.0, 2.6 million real installs). Oregon — especially Central Oregon around Bend and Redmond — is first-class. Type a California ZIP to see a score on this page.</p>
   <div class="hero-badges">
-    <span class="badge">2.6M-row DuckDB warehouse</span>
+    <span class="badge">2.6M install records</span>
     <span class="badge">2,593 CA ZIPs scored</span>
-    <span class="badge">NEM 3.0 model</span>
+    <span class="badge">NEM 3.0 · 1:1 NEM</span>
     <span class="badge">30% federal ITC</span>
-    <span class="badge">65 tests · CI green</span>
+    <span class="badge">Open source</span>
   </div>
-  <a class="hero-cta" href="paper.pdf" target="_blank" rel="noopener">📄 Read the Technical Paper (PDF)</a>
+  <div class="search-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="zip-search" placeholder="California ZIP or city — try 94061 or Bend" autocomplete="off" inputmode="search">
+  </div>
+  <p class="try">Try
+    <button type="button" data-q="94061">94061</button> ·
+    <button type="button" data-q="95113">San Jose</button> ·
+    <button type="button" data-q="97701">Bend, OR</button> ·
+    <button type="button" data-q="90012">Los Angeles</button>
+  </p>
+  <a class="hero-cta" href="paper.pdf" target="_blank" rel="noopener">Read the technical paper</a>
 </div>
 
 <div class="container">
-  <p class="section-title">Explore the Data</p>
+  <div class="result-panel" id="result"></div>
 
+  <p class="section-title">Explore</p>
   <div class="nav-cards">
     <a class="nav-card" href="reports/">
       <div class="nav-card-banner banner-reports">📋</div>
       <div class="nav-card-body">
-        <h2>City Reports</h2>
-        <p>Deep-dive viability reports for individual cities — full 25-year cashflow charts, LCOE breakdown, payback curves, and recommendation verdict.</p>
+        <h2>City reports</h2>
+        <p>Full 25-year cashflow charts for California cities plus 12 Oregon locations (Bend, Redmond, Sisters, Portland, and more) — LCOE, payback, NPV, and the recommendation.</p>
       </div>
     </a>
-
     <a class="nav-card" href="heatmap/">
       <div class="nav-card-banner banner-heatmap">🗺️</div>
       <div class="nav-card-body">
-        <h2>ZIP Heatmaps</h2>
-        <p>Interactive maps of viability scores across all 2,593 California ZIP codes. Includes statewide view and NorCal / Bay Area focus, with confidence tiers from real install data.</p>
+        <h2>California ZIP heatmaps</h2>
+        <p>Viability across all 2,593 California ZIP codes, with confidence from real Berkeley Lab installation counts.</p>
       </div>
     </a>
-
     <a class="nav-card" href="paper.pdf" target="_blank" rel="noopener">
       <div class="nav-card-banner banner-paper">📄</div>
       <div class="nav-card-body">
-        <h2>Technical Paper</h2>
-        <p>The full IEEE-style writeup — OLTP/OLAP architecture, the DuckDB warehouse schema, the 25-year financial model, the URDB staleness guard, and end-to-end verification.</p>
+        <h2>Technical paper</h2>
+        <p>OLTP/OLAP architecture, DuckDB warehouse, 25-year financial model, URDB staleness guard, and verification.</p>
+      </div>
+    </a>
+    <a class="nav-card" href="https://github.com/scottn66/solar-energy-analysis" target="_blank" rel="noopener">
+      <div class="nav-card-banner banner-code">⌘</div>
+      <div class="nav-card-body">
+        <h2>Source code</h2>
+        <p>Pipeline, tests, and the FastAPI quote app. Run a live address locally, or fork it.</p>
       </div>
     </a>
   </div>
 
   <div class="about">
-    <h2>About the Project</h2>
+    <h2>What this is</h2>
     <p>
-      Each analysis models a 4.5 kW residential rooftop system using irradiance and weather data
-      from the <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts API</a>.
-      Financial projections use current California <strong>NEM 3.0</strong> tariff schedules
-      (CPUC avoided-cost export credit &asymp; $0.055/kWh), the 30% federal Investment Tax Credit,
-      and 2024 retail electricity rates ($0.389/kWh blended IOU average).
+      A transparent answer to “is rooftop solar worth it here?” — not a sales funnel.
+      Production comes from <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts</a>.
+      California IOU export credits use <strong>NEM 3.0</strong> avoided-cost rates (~$0.055/kWh).
+      Oregon currently offers 1:1 net metering. Install costs and market maturity come from
+      <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab Tracking the Sun</a>
+      (2.6 million residential records).
     </p>
     <p>
-      The viability score (0&ndash;100) weights four components:
-      <em>25% solar resource</em>, <em>50% economics</em> (LCOE, payback, NPV),
-      <em>15% site fit</em>, and <em>10% local market maturity</em>.
-      Scores above 65 indicate a solid investment for most homeowners.
+      The viability score (0–100) is 25% solar resource, 50% economics (LCOE, payback, NPV),
+      15% site fit, and 10% local market maturity. Scores of 65+ are “Good” for a typical homeowner
+      under these assumptions. ZIP lookup on this page is a California centroid model;
+      city reports use a live PVWatts pull for a representative ZIP.
     </p>
     <p>
-      Data: <a href="https://pvwatts.nrel.gov/" target="_blank" rel="noopener">NREL PVWatts</a> &middot;
-      <a href="https://emp.lbl.gov/tracking-the-sun" target="_blank" rel="noopener">Berkeley Lab Tracking the Sun</a> &middot;
-      <a href="https://www.eia.gov/" target="_blank" rel="noopener">EIA</a> &middot;
-      <a href="https://www.dsireusa.org/" target="_blank" rel="noopener">DSIRE</a>.
-      Built for DATA 201 at SJSU.
+      Outside the US, NREL can still estimate production. Financials need a local electricity rate —
+      the open-source app accepts that as an input and turns off the US federal ITC.
+    </p>
+    <p>
+      Started as a San Jose State DATA 201 project. Maintained by
+      <a href="https://scottn66.github.io/">Scott Nelson</a>.
     </p>
   </div>
 </div>
 
-<footer>Solar Viability Analysis &middot; DATA 201 &middot; SJSU</footer>
+<footer>
+  Independent research model — not financial, tax, or installation advice.
+  Shading, your actual tariff, and installer quotes can change these numbers.<br>
+  Scott Nelson · <a href="https://github.com/scottn66/solar-energy-analysis">github.com/scottn66/solar-energy-analysis</a>
+</footer>
 
+<script>
+(function () {
+  var zips = [];
+  var featured = {};
+  var input = document.getElementById('zip-search');
+  var panel = document.getElementById('result');
+
+  function scoreColor(s) {
+    if (s >= 80) return '#26A69A';
+    if (s >= 65) return '#F39C12';
+    if (s >= 50) return '#E67E22';
+    return '#95A5A6';
+  }
+
+  function render(row, extra) {
+    extra = extra || '';
+    if (!row) {
+      panel.className = 'result-panel open';
+      panel.innerHTML = extra;
+      return;
+    }
+    var na = row.t === 'na' || row.s == null;
+    var html = '<div class="result-head">';
+    if (!na) {
+      html += '<div class="score-circle" style="background:' + scoreColor(row.s) + '">' + Math.round(row.s) + '</div>';
+    } else {
+      html += '<div class="score-circle" style="background:#95A5A6">—</div>';
+    }
+    html += '<div><h2>' + row.c + ', ' + (row.st || 'CA') + ' ' + row.z + '</h2>';
+    html += '<div class="meta">' + (row.co ? row.co + ' County · ' : '') + (na ? 'Insufficient local install data' : (row.v || '')) + '</div></div></div>';
+    if (na) {
+      html += '<p class="na-note">Too few Tracking the Sun installs in this ZIP3 to publish a score. Nearby ZIPs on the heatmap are a better guide.</p>';
+    } else {
+      html += '<dl class="kpis">';
+      html += '<div class="kpi"><dt>Payback</dt><dd>' + (row.p != null ? row.p.toFixed(1) + ' yr' : '—') + '</dd></div>';
+      html += '<div class="kpi"><dt>NPV (25 yr)</dt><dd>' + (row.n != null ? '$' + Math.round(row.n).toLocaleString() : '—') + '</dd></div>';
+      html += '<div class="kpi"><dt>LCOE</dt><dd>' + (row.l != null ? '$' + Number(row.l).toFixed(3) + '/kWh' : '—') + '</dd></div>';
+      html += '</dl>';
+    }
+    html += '<div class="result-actions">';
+    if (featured[row.z]) {
+      html += '<a class="btn-full" href="' + featured[row.z] + '">Open full report →</a>';
+    }
+    html += '<a class="btn-map" href="heatmap/heatmap_ca.html">See it on the CA heatmap</a>';
+    html += '</div>';
+    if (extra) html += extra;
+    panel.className = 'result-panel open';
+    panel.innerHTML = html;
+  }
+
+  function search(q) {
+    q = (q || '').trim();
+    if (!q) { panel.className = 'result-panel'; panel.innerHTML = ''; return; }
+    var ql = q.toLowerCase();
+
+    // Oregon / out-of-CA featured reports
+    var featuredHit = null;
+    Object.keys(featured).forEach(function (z) {
+      if (featuredHit) return;
+      var href = featured[z];
+      var name = (href.split('/').pop() || '').replace('.html', '').replace(/-/g, ' ');
+      if (z === q || name.indexOf(ql) !== -1) featuredHit = { z: z, href: href, name: name };
+    });
+
+    var exact = zips.find(function (r) { return r.z === q; });
+    if (exact) { render(exact); return; }
+
+    if (featuredHit && !exact) {
+      // Bend etc. live as full reports, not in the CA ZIP file
+      panel.className = 'result-panel open';
+      var pretty = featuredHit.name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      panel.innerHTML = '<div class="result-head"><div><h2>' + pretty + '</h2>' +
+        '<div class="meta">Full PVWatts report, not the CA ZIP centroid model</div></div></div>' +
+        '<div class="result-actions"><a class="btn-full" href="' + featuredHit.href + '">Open full report →</a></div>';
+      return;
+    }
+
+    var matches = zips.filter(function (r) {
+      return (r.c && r.c.toLowerCase().indexOf(ql) !== -1) ||
+             (r.co && r.co.toLowerCase().indexOf(ql) !== -1) ||
+             (r.z && r.z.indexOf(q) === 0);
+    }).slice(0, 8);
+    if (matches.length === 1) { render(matches[0]); return; }
+    if (matches.length > 1) {
+      var chips = matches.map(function (r) {
+        return '<button type="button" data-z="' + r.z + '">' + r.c + ' ' + r.z + '</button>';
+      }).join(' · ');
+      panel.className = 'result-panel open';
+      panel.innerHTML = '<p class="na-note">Several matches. Pick one:</p><p class="suggest">' + chips + '</p>';
+      return;
+    }
+    panel.className = 'result-panel open';
+    panel.innerHTML = '<p class="na-note">No California ZIP matched. City reports include Bend, Redmond, and Portland, Oregon. For any US address, run the open-source app.</p>';
+  }
+
+  Promise.all([
+    fetch('data/ca_zips.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
+    fetch('reports/_manifest.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; })
+  ]).then(function (pair) {
+    zips = pair[0] || [];
+    (pair[1] || []).forEach(function (c) {
+      if (c.zip && c.slug) featured[c.zip] = 'reports/' + c.slug + '.html';
+    });
+  });
+
+  var t = null;
+  input.addEventListener('input', function () {
+    clearTimeout(t);
+    var v = this.value;
+    t = setTimeout(function () { search(v); }, 180);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); search(this.value); }
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-q]');
+    if (b) { input.value = b.getAttribute('data-q'); search(input.value); }
+    var z = e.target.closest('button[data-z]');
+    if (z) { input.value = z.getAttribute('data-z'); search(input.value); }
+  });
+})();
+</script>
 </body>
 </html>
