@@ -59,7 +59,7 @@ jobs:
       - name: Warn about excluded flaky hosts
         if: always()
         run: |
-          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, and eia.gov are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
+          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, eia.gov, and nrel.gov are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
 
       - name: Install pa11y-ci 4.1.1
         if: always() && steps.links.conclusion != 'cancelled'
