@@ -1,0 +1,102 @@
+name: site-quality
+
+# Fails the build on broken internal links, images, and srcset candidates,
+# and on WCAG 2.1 AA errors (missing names/labels and contrast) on the
+# top-level pages. External hosts that stay flaky after retries are listed
+# in lychee.toml and reported as warnings.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site-quality:
+    name: site-quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+
+      - name: Install lychee 0.24.2
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            x86_64) asset=lychee-x86_64-unknown-linux-gnu.tar.gz ;;
+            aarch64) asset=lychee-aarch64-unknown-linux-gnu.tar.gz ;;
+            *) echo "unsupported architecture $(uname -m)" >&2; exit 1 ;;
+          esac
+          url="https://github.com/lycheeverse/lychee/releases/download/lychee-v0.24.2/${asset}"
+          curl -fsSL -o "/tmp/${asset}" "$url"
+          curl -fsSL -o "/tmp/${asset}.sha256" "${url}.sha256"
+          (cd /tmp && sha256sum -c "${asset}.sha256")
+          tar -xzf "/tmp/${asset}" -C /tmp
+          mkdir -p "$HOME/.local/bin"
+          install -m 755 "/tmp/${asset%.tar.gz}/lychee" "$HOME/.local/bin/lychee"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/lychee" --version
+
+      - name: Check links and assets
+        id: links
+        run: |
+          set -euo pipefail
+          lychee --config lychee.toml --root-dir "$GITHUB_WORKSPACE" --no-progress '**/*.html'
+
+      - name: Warn about excluded flaky hosts
+        if: always()
+        run: |
+          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, and eia.gov are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
+
+      - name: Install pa11y-ci 4.1.1
+        if: always() && steps.links.conclusion != 'cancelled'
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+        run: |
+          set -euo pipefail
+          npm install --prefix /tmp/site-quality --no-save --ignore-scripts pa11y-ci@4.1.1
+
+      - name: Check accessibility (WCAG2AA)
+        id: a11y
+        if: always() && steps.links.conclusion != 'cancelled'
+        env:
+          SITE_PORT: '4173'
+        run: |
+          set -euo pipefail
+          # Same step as the server: Actions stops background processes when a step ends.
+          python3 -m http.server "${SITE_PORT}" >/tmp/site-server.log 2>&1 &
+          ready=0
+          for _ in $(seq 1 50); do
+            if curl -sf -o /dev/null "http://127.0.0.1:${SITE_PORT}/index.html"; then
+              ready=1
+              break
+            fi
+            sleep 0.1
+          done
+          if [ "$ready" -ne 1 ]; then
+            echo "static server did not start" >&2
+            cat /tmp/site-server.log >&2 || true
+            exit 1
+          fi
+          if command -v google-chrome >/dev/null 2>&1; then
+            export CHROME_PATH="$(command -v google-chrome)"
+          elif command -v google-chrome-stable >/dev/null 2>&1; then
+            export CHROME_PATH="$(command -v google-chrome-stable)"
+          else
+            echo "google-chrome is required to run pa11y-ci" >&2
+            exit 1
+          fi
+          /tmp/site-quality/node_modules/.bin/pa11y-ci --config .pa11yci.js
