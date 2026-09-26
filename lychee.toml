@@ -1,0 +1,47 @@
+# Link and asset check for the static site.
+# Internal file links, images, and srcset candidates are errors.
+# External hosts below were retried and still blocked, rate-limited, or
+# timed out (not stable 404s). They are excluded and the workflow warns.
+
+no_progress = true
+format = "detailed"
+max_retries = 2
+retry_wait_time = 1
+timeout = 10
+max_concurrency = 32
+# Keep per-host pressure low so a slow host cannot stall the job.
+host_concurrency = 4
+
+# Directory links such as solar/ are valid when that directory has an index.
+index_files = ["index.html"]
+
+# A browser user agent. The default lychee agent gets 403s from hosts that
+# still serve the page to browsers; those 403s are not 404s.
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+
+# Do not check mailto: addresses.
+include_mail = false
+
+exclude = [
+  # LinkedIn answers checkers with HTTP 999 (or a login interstitial), not the profile.
+  '^https?://([a-z0-9-]+\.)*linkedin\.com',
+  # doi.org returns 403 to non-browser clients; that is not a missing DOI.
+  '^https?://(dx\.)?doi\.org/',
+  # ResearchGate blocks checkers with 403.
+  '^https?://([a-z0-9-]+\.)*researchgate\.net',
+  # MDPI blocks checkers with 403.
+  '^https?://([a-z0-9-]+\.)*mdpi\.com',
+  # Medium blocks checkers with 403.
+  '^https?://([a-z0-9-]+\.)*medium\.com',
+  # ScienceDirect (Elsevier) blocks checkers with 403.
+  '^https?://([a-z0-9-]+\.)*sciencedirect\.com',
+  # PhilArchive blocks checkers with 403.
+  '^https?://([a-z0-9-]+\.)*philarchive\.org',
+  # Berkeley Lab's Tracking the Sun host returns 403 to checkers.
+  '^https?://emp\.lbl\.gov',
+  # EIA stalls or returns 503 under checker load (rate-limited), not a stable 404.
+  '^https?://([a-z0-9-]+\.)*eia\.gov',
+  # nrel.gov (pvwatts, developer, www) fails to connect from GitHub-hosted runners
+  # after retries. No HTTP status comes back, so this is not a confirmed 404.
+  '^https?://([a-z0-9-]+\.)*nrel\.gov',
+]
