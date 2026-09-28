@@ -158,7 +158,7 @@
         <section class="mb-4">
             <h2>The same task, climbing the model ladder</h2>
             <p>The <a href="HMM.html">companion page</a> builds a <strong>Hidden Markov Model</strong> from scratch to tag named entities. This page picks up where that one ends and walks up two more rungs of the modelling ladder - a recurrent <strong>LSTM</strong> tagger, and a fine-tuned <strong>BERT/DistilBERT</strong> tagger - all three solving the <em>same</em> problem so they can be compared apples-to-apples.</p>
-            <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">named entity recognition (NER)</a> over the <a href="https://www.clips.uantwerpen.be/conll2003/ner/" target="_blank">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
+            <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">named entity recognition (NER)</a> over the <a href="https://aclanthology.org/W03-0419/" target="_blank">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
             <p>The arc is a single idea: <strong>we keep widening the window of context a tagging decision can see, and we keep enriching how a word is represented</strong> - from atomic word-IDs (HMM), to learned dense vectors read left-to-right (LSTM), to pretrained <em>contextual</em> subword vectors that see the whole sentence at once (BERT).</p>
 
             <figure>
@@ -284,69 +284,69 @@ trainer.train()</code></pre>
         <table class="compare">
             <thead>
                 <tr>
-                    <th>Dimension</th>
-                    <th><span class="pill pill-hmm">HMM</span></th>
-                    <th><span class="pill pill-lstm">LSTM</span></th>
-                    <th><span class="pill pill-bert">BERT / DistilBERT</span></th>
+                    <th scope="col">Dimension</th>
+                    <th scope="col"><span class="pill pill-hmm">HMM</span></th>
+                    <th scope="col"><span class="pill pill-lstm">LSTM</span></th>
+                    <th scope="col"><span class="pill pill-bert">BERT / DistilBERT</span></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <th>Paradigm</th>
+                    <th scope="row">Paradigm</th>
                     <td>Generative, count-based</td>
                     <td>Discriminative, trained from scratch</td>
                     <td>Pretrained + fine-tuned (transfer learning)</td>
                 </tr>
                 <tr>
-                    <th>Word representation</th>
+                    <th scope="row">Word representation</th>
                     <td>Atomic ID; <code>&lt;UNK&gt;</code> for unseen</td>
                     <td>Learned dense vector (32-dim)</td>
                     <td>Pretrained <em>contextual</em> subword vectors (768-dim)</td>
                 </tr>
                 <tr>
-                    <th>Context per decision</th>
+                    <th scope="row">Context per decision</th>
                     <td>Previous tag only (Markov-1)</td>
                     <td>All words to the left (unidirectional)</td>
                     <td>Entire sentence, both directions (self-attention)</td>
                 </tr>
                 <tr>
-                    <th>Out-of-vocabulary words</th>
+                    <th scope="row">Out-of-vocabulary words</th>
                     <td>Brittle (smoothed <code>&lt;UNK&gt;</code>)</td>
                     <td>Single <code>&lt;UNK&gt;</code> embedding</td>
                     <td>Graceful (WordPiece subwords)</td>
                 </tr>
                 <tr>
-                    <th>Training</th>
+                    <th scope="row">Training</th>
                     <td>One MLE counting pass; seconds, CPU</td>
                     <td>Backprop, Adam, 10 epochs, 1 sentence/step</td>
                     <td>Fine-tune 3 epochs from pretrained; GPU-friendly</td>
                 </tr>
                 <tr>
-                    <th>Parameters</th>
+                    <th scope="row">Parameters</th>
                     <td>Count tables, O(tags² + tags·|V|)</td>
                     <td>Tiny (embed 32, hidden 12)</td>
                     <td>~66M (DistilBERT)</td>
                 </tr>
                 <tr>
-                    <th>Sequence decoding</th>
+                    <th scope="row">Sequence decoding</th>
                     <td>Viterbi (global optimum) or greedy</td>
                     <td>Per-token argmax</td>
                     <td>Per-token argmax (CRF head = stretch goal)</td>
                 </tr>
                 <tr>
-                    <th>Interpretability</th>
+                    <th scope="row">Interpretability</th>
                     <td>High - every value is a count</td>
                     <td>Low</td>
                     <td>Low</td>
                 </tr>
                 <tr>
-                    <th>Documented result</th>
+                    <th scope="row">Documented result</th>
                     <td>~90% greedy / ~91% Viterbi token acc. (in-code hint)</td>
                     <td>Not recorded (+ NLLLoss/logits caveat)</td>
                     <td><strong>0.888 entity-F1</strong> (CoNLL test) &middot; <strong>98.5% token-acc</strong> on local 5-class (vs HMM ~91%)</td>
                 </tr>
                 <tr>
-                    <th>Main limitation</th>
+                    <th scope="row">Main limitation</th>
                     <td>Markov-1 + atomic words</td>
                     <td>Left-only, tiny, no pretraining</td>
                     <td>Per-token decode (no CRF); cased/uncased to reconcile</td>
