@@ -35,7 +35,6 @@ const projectFrontDoors = [
   'demographics/',
   'robot-arm-sim/',
   'solar/',
-  'sun/',
 ];
 
 const urls = [...rootPages, ...projectFrontDoors].map((path) => {
