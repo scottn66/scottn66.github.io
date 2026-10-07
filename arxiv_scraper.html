@@ -127,7 +127,7 @@
 
     <section class="container mt-5">
 
-        <p><span class="badge-role">Role in pipeline</span> <strong>Primary-source verification.</strong> Direct access to recent research PDFs in CS, AI, math, and neuroscience. When a concept page in the knowledge base makes an empirical claim, the arXiv pipeline provides the paper that backs it up.</p>
+        <p><span class="badge-role">Role in pipeline</span> <strong>Primary sources.</strong> Direct access to recent research PDFs in CS, AI, math, and neuroscience. When a concept page in the knowledge base makes an empirical claim, the arXiv pipeline finds candidate papers to check it against.</p>
 
         <!-- Why arXiv -->
         <div class="concept-box">
@@ -220,7 +220,7 @@
     downloaded_ids = self._load_downloaded_articles()
     new_articles = []
 
-    base_url = <span class="string">"http://export.arxiv.org/api"</span>
+    base_url = <span class="string">"https://export.arxiv.org/api"</span>
     query = (
         <span class="string">f"/query?search_query=cat:{category}"</span>
         <span class="string">f"&amp;sortBy=submittedDate&amp;sortOrder=descending"</span>
@@ -237,10 +237,9 @@
 
         <!-- Live Output -->
         <div class="concept-box">
-            <h3>Live Output: Recent RAG Papers</h3>
-            <p>Search query: <code>all:retrieval-augmented generation</code>, 3 results, sorted by date:</p>
+            <h3>Live output: three newest submissions</h3>
+            <p>Snapshot of an unquoted query, <code>all:retrieval-augmented generation</code>, sorted by date. Without quotes, arXiv matches papers that contain the word generation, so these three are not all about retrieval-augmented generation.</p>
             <div class="output-box">=== arXiv fetch via Atom API ===
-  Feed status: 301 (redirect to https, expected)
   Entries returned: 3
 
   [1] Fast Spatial Memory with Elastic Test-Time Training
@@ -260,15 +259,15 @@
       published: 2026-04-08T17:57:26Z
       categories: [quant-ph, cond-mat.mes-hall]
       pdf: https://arxiv.org/pdf/2604.07346v1</div>
-            <p><em>Papers published yesterday (April 8, 2026). The pipeline fetches real-time preprints.</em></p>
+            <p><em>Snapshot from April 9, 2026. Re-running fetches the latest preprints.</em></p>
         </div>
 
         <!-- The Fundamental Limit -->
         <div class="callout-future">
             <h3>The Graph Gap &mdash; and How to Close It</h3>
-            <p>arXiv's Atom API exposes <strong>no references, no citation graph, no inbound counts</strong>. This is the fundamental structural difference from Wikipedia (834 outlinks per page) and SEP (31 curated cross-references). To reconstruct the citation network, the pipeline needs an external bridge.</p>
-            <p><strong>Planned approach:</strong> Semantic Scholar's free API provides <code>references</code> and <code>citations</code> endpoints for any paper, plus an <code>influentialCitationCount</code> field that approximates whether a paper is cited substantively (in the body) vs. perfunctorily (in the reference list). This gives ~80% of the signal of full PDF reference extraction at ~5% of the implementation cost.</p>
-            <p>Once wired in, this enables <strong>citation-distance visualization</strong> &mdash; plotting how the reachable paper set grows exponentially with hop distance, and why bounding traversal depth is critical for tractable knowledge ingest.</p>
+            <p>arXiv's Atom API exposes <strong>no references, no citation graph, no inbound counts</strong>. This is the fundamental structural difference from Wikipedia (834 outlinks on the Cognitive science article) and SEP (31 curated cross-references). To reconstruct the citation network, the pipeline needs an external bridge.</p>
+            <p><strong>Planned approach:</strong> Semantic Scholar's free API provides <code>references</code> and <code>citations</code> endpoints for any paper, plus an <code>influentialCitationCount</code> field, Semantic Scholar's estimate of how many citing papers rely heavily on this one. This should recover most of the citation signal for far less work than parsing references out of PDFs.</p>
+            <p>Once wired in, it will support a citation-distance chart: how many papers are reachable at each hop.</p>
         </div>
 
         <!-- Stats -->
@@ -292,9 +291,9 @@
             <table class="stats">
                 <tr><th></th><th>Wikipedia</th><th>SEP</th><th>arXiv</th></tr>
                 <tr><td><strong>Role</strong></td><td>Breadth + entities</td><td>Concept backbone</td><td>Primary-source verification</td></tr>
-                <tr><td><strong>Graph signal</strong></td><td>Dense (834 links/page)</td><td>Sparse, curated (31/page)</td><td>None in API</td></tr>
+                <tr><td><strong>Graph signal</strong></td><td>Dense (834 links on the Cognitive science article)</td><td>Sparse, curated (31/page)</td><td>None in API</td></tr>
                 <tr><td><strong>Content type</strong></td><td>Section-aware HTML</td><td>Section-aware HTML</td><td>Metadata + PDF</td></tr>
-                <tr><td><strong>Validation</strong></td><td>6-point soup check</td><td>Basic</td><td>HTTP status</td></tr>
+                <tr><td><strong>Validation</strong></td><td>6 content checks</td><td>Basic</td><td>HTTP status</td></tr>
                 <tr><td><strong>Storage</strong></td><td>SQLite</td><td>JSON</td><td>JSON + PDFs</td></tr>
                 <tr><td><strong>Unique strength</strong></td><td>Canonical keys + fake scraper</td><td>Query layer + preamble</td><td>35-category index + PDF text</td></tr>
             </table>
