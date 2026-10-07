@@ -120,8 +120,8 @@
                 <p><b>Training the Model:</b> Through a well-labeled corpus of text, we train the model with a labeled dataset to get it familiar with some of the sequential patterns:</p>
                     <ul>
                         <li><b>Transition probabilities</b>: how likely one tag is to follow another, for example from a PERSON tag to an ORGANIZATION tag, counted from the labeled training data.</li>
-                        <li><b>Emission Probabilities</b>: The probability of a particular word being observed given a particular entity tag as evidence.</li>
-                        <li><b>Initial Probabilities:</b> Represents the likelihood of seeing a particular tag at the start of a sequence.</li>
+                        <li><b>Emission probabilities</b>: The probability of a particular word being observed given a particular entity tag as evidence.</li>
+                        <li><b>Initial probabilities</b>: Represents the likelihood of seeing a particular tag at the start of a sequence.</li>
                     </ul>
             <h3>Decoding with Viterbi</h3>
 
@@ -147,7 +147,6 @@
                     <p>The <b>Decoding Process in MEMMs</b> is different from Viterbi's HMMs, MEMM decoding involves making local decisions (instead of most probable global sequence). At each step, the model chooses the most probable next state based on the current observation and the previous state. This is done by various strategies (<a href="https://en.wikipedia.org/wiki/Greedy_algorithm">greedy</a>, <a href="https://en.wikipedia.org/wiki/Beam_search">BEAM search</a>, etc.). The downside of MEMMs is they suffer from label bias (i.e. too greedy) because of normalization at each step</p>
             </aside>
     </section>
-        <!-- Forward link: the duplicated HMM recap was removed -->
     <section class="container mt-5">
         <p>Modern taggers do much better. <a href="ner-taggers.html">From Counts to Context</a> compares this HMM against an LSTM and a fine-tuned DistilBERT (0.888 entity-F1).</p>
     </section>
