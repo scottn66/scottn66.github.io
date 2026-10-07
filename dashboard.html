@@ -111,7 +111,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
       <a class="navbar-brand" href="index.html">Scott Nelson</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
@@ -140,19 +140,19 @@
         <button class="btn btn-sm btn-outline-secondary view-btn active" data-view="kanban"><i class="fas fa-columns me-1"></i>Kanban</button>
         <button class="btn btn-sm btn-outline-secondary view-btn" data-view="eisenhower"><i class="fas fa-border-all me-1"></i>Eisenhower</button>
       </div>
-      <select class="form-select form-select-sm" id="filter-project" style="max-width:200px;">
+      <select class="form-select form-select-sm" id="filter-project" aria-label="Filter by project" style="max-width:200px;">
         <option value="all">All Projects</option>
       </select>
-      <select class="form-select form-select-sm" id="filter-track" style="max-width:180px;" title="Default view is the efferent (publish) track">
+      <select class="form-select form-select-sm" id="filter-track" aria-label="Filter by track" style="max-width:180px;" title="Default view is the efferent (publish) track">
         <option value="efferent" selected>Efferent (publish)</option>
         <option value="all">All Tracks</option>
         <option value="project">Project backlog</option>
         <option value="substrate">Substrate</option>
       </select>
-      <select class="form-select form-select-sm" id="filter-epic" style="max-width:220px;">
+      <select class="form-select form-select-sm" id="filter-epic" aria-label="Filter by epic" style="max-width:220px;">
         <option value="all">All Epics</option>
       </select>
-      <select class="form-select form-select-sm" id="filter-status" style="max-width:160px;">
+      <select class="form-select form-select-sm" id="filter-status" aria-label="Filter by status" style="max-width:160px;">
         <option value="all">All Statuses</option>
         <option value="backlog">Backlog</option>
         <option value="todo">To Do</option>
@@ -175,7 +175,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modal-title"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="modal-body"></div>
         <div class="modal-footer">

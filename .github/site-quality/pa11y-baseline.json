@@ -1,0 +1,69 @@
+{
+  "standard": "WCAG2AA",
+  "notes": "Per-page WCAG 2.1 AA error counts. contrast is grandfathered (G18 and G145 only) and must match exactly: a rise fails the job, a drop means lower this file in the same PR. deferredNonContrast is an explicit allowlist for errors that are not contrast and are burned down in a later PR; any other non-contrast error fails. Regenerate with the site already serving: node .github/site-quality/pa11y-ratchet.js update",
+  "pages": {
+    "HMM.html": {
+      "contrast": 22
+    },
+    "MAB.html": {
+      "contrast": 10
+    },
+    "Q.html": {
+      "contrast": 19
+    },
+    "arxiv_scraper.html": {
+      "contrast": 20
+    },
+    "bitcoin-power-law/": {
+      "contrast": 0,
+      "deferredNonContrast": {
+        "WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.A.EmptyNoId": 30
+      }
+    },
+    "cartography.html": {
+      "contrast": 1
+    },
+    "cartography_landing.html": {
+      "contrast": 23
+    },
+    "conscious-agents-conjectures.html": {
+      "contrast": 12
+    },
+    "conscious-agents.html": {
+      "contrast": 25
+    },
+    "dashboard.html": {
+      "contrast": 54
+    },
+    "decision-theory.html": {
+      "contrast": 3
+    },
+    "demographics/": {
+      "contrast": 1
+    },
+    "index.html": {
+      "contrast": 1
+    },
+    "mandelbrot_landing.html": {
+      "contrast": 1
+    },
+    "ner-taggers.html": {
+      "contrast": 12
+    },
+    "resume.html": {
+      "contrast": 1
+    },
+    "sep_scraper.html": {
+      "contrast": 20
+    },
+    "solar/": {
+      "contrast": 5
+    },
+    "sun/": {
+      "contrast": 6
+    },
+    "wikipedia_scraper.html": {
+      "contrast": 19
+    }
+  }
+}

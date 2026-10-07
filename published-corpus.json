@@ -3,7 +3,7 @@
     "unit": "actuarial-pricing",
     "url": "/actuarial-pricing.html",
     "title": "Pricing Risk \u00b7 An Actuarial Track",
-    "last_modified": "2026-06-26T14:10:14-07:00",
+    "last_modified": "2026-09-28T00:24:03-07:00",
     "kind": "page"
   },
   {
@@ -31,7 +31,7 @@
     "unit": "cartography",
     "url": "/cartography.html",
     "title": "City Cartography \u2014 Roads + Topography",
-    "last_modified": "2026-06-24T23:48:35-07:00",
+    "last_modified": "2026-09-28T00:24:03-07:00",
     "kind": "page"
   },
   {
@@ -66,7 +66,7 @@
     "unit": "demographics",
     "url": "/demographics/",
     "title": "The Shape of People to Come \u00b7 Demographics as Destiny, Audited",
-    "last_modified": "2026-08-05T18:00:09-07:00",
+    "last_modified": "2026-09-25T02:54:07-07:00",
     "kind": "project"
   },
   {
@@ -80,7 +80,7 @@
     "unit": "mab",
     "url": "/MAB.html",
     "title": "Multi-Armed Bandit Agents Project",
-    "last_modified": "2025-03-29T22:22:13-07:00",
+    "last_modified": "2026-09-28T00:24:03-07:00",
     "kind": "page"
   },
   {
@@ -101,14 +101,14 @@
     "unit": "ner-taggers",
     "url": "/ner-taggers.html",
     "title": "From Counts to Context: HMM \u2192 LSTM \u2192 BERT for NER",
-    "last_modified": "2026-06-24T23:48:35-07:00",
+    "last_modified": "2026-09-28T00:24:03-07:00",
     "kind": "page"
   },
   {
     "unit": "q",
     "url": "/Q.html",
     "title": "The Speedy Q-Learning Crawler, and the 60% gap we didn't see",
-    "last_modified": "2026-06-01T15:03:36-07:00",
+    "last_modified": "2026-09-28T00:24:03-07:00",
     "kind": "page"
   },
   {
@@ -126,10 +126,10 @@
     "kind": "page"
   },
   {
-    "unit": "solar-viability",
+    "unit": "solar",
     "url": "/solar/",
-    "title": "Solar Viability Analysis | DATA 201 \u2014 Scott Nelson",
-    "last_modified": "2026-08-15T00:59:46-07:00",
+    "title": "Is solar worth it? \u2014 Solar Viability",
+    "last_modified": "2026-09-25T02:54:07-07:00",
     "kind": "project"
   },
   {
