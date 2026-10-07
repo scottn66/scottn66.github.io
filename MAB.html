@@ -93,7 +93,7 @@
                 <li>Greedy Approach</li>
                 <ul>
                     <li>Plan: always choose the action with the highest rewarded return. (i.e. The one that looks best at present). </li>
-                    <li>Problem: purely exploitative. No exploration! So, it relies on luck to get it right from the start. We'd like some guarentee, in the limit, to find the optimal policy</li>
+                    <li>Problem: purely exploitative. No exploration! So, it relies on luck to get it right from the start. We'd like a guarantee of finding the optimal policy in the limit.</li>
                 </ul>
                 <li>Epsilon-Greedy Approach</li>
                 <ul>
@@ -134,7 +134,7 @@
                 <img src="assets/images/projects/MAB/UCB.png" class="img-fluid" alt="Scott Nelson">
             </div>
             <p>Here, we can say that the action for Upper Confidence Bound (UCB) should be the argmax (a value at <i>a</i> at which <i>f(a)</i> takes its maximal value of the expression that follows). ln t denotes the natural logarithm of t (the number that e ≈ 2.71828 would have to be raised to in order to equal t), Nt(a) denotes the number of times that action a has been selected prior to time t (the denominator), and the number c > 0 controls the degree of exploration. If Nt(a) = 0, then a is considered to be a maximizing action</p>
-            <p>The idea is that the <i>upper confidence bound</i> action selection method is that the square root term is a measure of the uncertainty of a's value, with c determining the confidence level. We want to 'max' over the true value of action a. When a is selected, the Nt(a) increments, and as it is in the denominator, decreasing the uncertainty term. Using natural logarithm means that the increases get smaller over time, but are unbounded; all actions will eventually be selected, but actions with lower value estimates, or that hvae already been selected frequently, will be selected with decreasing frequency over time.</p>
+            <p>The idea is that the <i>upper confidence bound</i> action selection method is that the square root term is a measure of the uncertainty of a's value, with c determining the confidence level. We want to 'max' over the true value of action a. When a is selected, the Nt(a) increments, and as it is in the denominator, decreasing the uncertainty term. Using natural logarithm means that the increases get smaller over time, but are unbounded; all actions will eventually be selected, but actions with lower value estimates, or that have already been selected frequently, will be selected with decreasing frequency over time.</p>
         </div>
 
         <!-- Interactive Demo -->
@@ -156,7 +156,7 @@
             <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_4.html" title="Cumulative regret for reward probabilities 0.48, 0.49, 0.5, 0.4" style="width:100%; height:600px;"></iframe>
             <ul>
                     <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
-                    <li>To compensate for the difficult probabilities, lets increase the number of trials per <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method#">Monte Carlo</a> Simulations</li>
+                    <li>Because the arms are so close, the next run increases the number of <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method#">Monte Carlo</a> trials</li>
                 </ul>
             <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_3.html" title="Cumulative regret with more Monte Carlo trials" style="width:100%; height:600px;"></iframe>
 
