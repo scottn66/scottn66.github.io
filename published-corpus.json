@@ -133,13 +133,6 @@
     "kind": "project"
   },
   {
-    "unit": "sun",
-    "url": "/sun/",
-    "title": "Solar Calculator",
-    "last_modified": "2026-09-28T00:24:03-07:00",
-    "kind": "project"
-  },
-  {
     "unit": "wikipedia_scraper",
     "url": "/wikipedia_scraper.html",
     "title": "Wikipedia Scraper &mdash; Knowledge Source Pipeline",
