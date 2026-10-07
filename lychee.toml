@@ -44,4 +44,10 @@ exclude = [
   # nrel.gov (pvwatts, developer, www) fails to connect from GitHub-hosted runners
   # after retries. No HTTP status comes back, so this is not a confirmed 404.
   '^https?://([a-z0-9-]+\.)*nrel\.gov',
+  # forns.lmu.build times out from GitHub-hosted runners after retries.
+  # A direct request still returns 200, so this is not a confirmed 404.
+  '^https?://forns\.lmu\.build',
+  # openei.org's wiki is behind an ELB that returns 503. apps.openei.org
+  # rate pages still answer and stay checked.
+  '^https?://openei\.org/',
 ]
