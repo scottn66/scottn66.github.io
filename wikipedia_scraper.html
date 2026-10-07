@@ -149,7 +149,7 @@
         <div class="concept-box">
             <h3>Key design decisions</h3>
             <h4>Canonical page keys</h4>
-            <p>The function <code>canonicalize_page_key()</code> solves part of the identity problem at ingest time. It strips fragments and turns spaces into underscores. It does not force first-letter case, so <code>cognitive science</code> and <code>Cognitive_science</code> stay two keys, as the live output shows.</p>
+            <p>The function <code>canonicalize_page_key()</code> solves part of the identity problem at ingest time. It strips fragments and turns spaces into underscores. It does not force first-letter case, so "cognitive science" and "Cognitive_science" stay two keys, as the live output shows.</p>
 
             <h4>Graph persistence in SQLite</h4>
             <p>Unlike flat JSON metadata, the <code>pages</code>/<code>edges</code> schema gives you a real directed graph with bidirectional queries, neighbor lookups with limits, and upsert semantics that survive across sessions. Placeholder pages are created for unseen outlinks so the graph stays connected even before those pages are fetched.</p>
