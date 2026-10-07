@@ -20,11 +20,8 @@
         "WCAG2AA.Principle4.Guideline4_1.4_1_2.H91.A.EmptyNoId": 30
       }
     },
-    "cartography.html": {
-      "contrast": 1
-    },
     "cartography_landing.html": {
-      "contrast": 23
+      "contrast": 22
     },
     "conscious-agents-conjectures.html": {
       "contrast": 12

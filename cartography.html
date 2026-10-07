@@ -99,6 +99,8 @@
     #hud.show { display: block; }
     #hud .big { font-size: 15px; font-weight: 700; }
     #hud .dim { color: var(--panel-muted); }
+    #panel .back { margin: 0 0 8px; font-size: 12px; }
+    #panel .back a { color: var(--accent-2); text-decoration: none; }
     .foot { margin-top: 12px; font-size: 10.5px; color: var(--panel-muted); line-height: 1.5; }
     .foot a { color: var(--accent-2); text-decoration: none; }
     details { margin-top: 6px; }
@@ -133,6 +135,7 @@
   <button class="collapse-toggle" id="showPanel" title="Show controls">☰</button>
 
   <div id="panel">
+    <p class="back"><a href="cartography_landing.html">← City Cartography</a></p>
     <h1>🗺 City Cartography</h1>
     <p class="sub">A topographic take on <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener" style="color:var(--accent-2)">city-roads</a> — roads + elevation, drawn live from OpenStreetMap.</p>
 
@@ -1265,6 +1268,8 @@
   paintSwatches();
   render();
   placeInput.focus();
+  placeInput.value = EXAMPLES[0];
+  runRender();
 
   // hide zoom hint after first interaction
   ["wheel","mousedown","touchstart"].forEach(function (ev) {
