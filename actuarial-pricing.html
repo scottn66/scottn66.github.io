@@ -200,9 +200,9 @@
   <div class="callout gold">
     <span class="k">Tool 3 · the price of risk</span>
     <p style="margin:.3rem 0 0">
-      A premium equal to the expected loss is <em>fair</em> but suicidal: half
-      the time you lose, and there is no margin for the bad years or for holding
-      capital. So actuaries add a <strong>loading</strong> on top of the pure
+      A premium equal to the expected loss is <em>fair</em> but unsustainable: with
+      no margin, one bad year wipes out the insurer, and there is nothing left
+      to pay for the capital it must hold. So actuaries add a <strong>loading</strong> on top of the pure
       expected cost, and markets go further with a
       <strong>change of measure</strong> — pricing not under the real-world
       probabilities $\mathbb{P}$ (what actually happens) but under a
@@ -229,8 +229,8 @@
     <span class="k">How to read this track</span>
     <p style="margin:.3rem 0 0">
       Same field, harder questions. The playground asked whether a single
-      \$139.99 premium was worth it this year; here we ask what a 30-year
-      promise is worth today, and what cushion keeps it solvent through the bad
+      \$139.99 premium was worth it this year; here we ask what a multi-year
+      promise is worth today (thread 1 prices a 3-year term policy), and what cushion keeps it solvent through the bad
       tail. Prerequisites are the
       <a href="applied-decision-theory.html">applied playground</a> (expected
       utility, break-even probability, the value of information) and, behind it,
@@ -312,7 +312,7 @@
       <h2 id="loading">2 · From net premium to the price you pay <span class="act-tag act-econ">loadings &amp; premium principles</span></h2>
 <p>Thread 1 ended with a <em>net</em> premium of $P_{\text{net}}=\$23.58$ — the bare expected cost of claims. But no insurer can sell at cost: it carries salaries, commissions, capital against a bad year, and shareholders to pay. So what does the customer actually pay, and how is that markup set in a principled way rather than guessed?</p>
 <div class="aside-box"><span class="k">Givens &amp; assumptions</span><p style="margin:.25rem 0 0">Net premium $P_{\text{net}}=E[S]=\$23.58$, where $S$ is the random claim cost. Combined loading $\theta=0.20$ (20%), bundling expenses, profit, and a risk margin. Gross (office) premium $G$ is the posted price. We assume the loading is applied multiplicatively as an expense ratio on the gross — the standard "expense-as-fraction-of-premium" convention — so $G(1-\theta)$ must cover claims. Alternative <em>premium principles</em> reference $E[S]$ and $\mathrm{SD}[S]$; $\alpha$ is a safety multiplier and $a&gt;0$ the insurer's risk-aversion coefficient.</p></div>
-<div class="callout gold"><span class="k">From first principles</span><p style="margin:.3rem 0 0">Of every premium dollar collected, a fraction $\theta$ is consumed by expenses, profit, and margin before any claim is paid; the surviving fraction $(1-\theta)$ must equal the expected claims. Setting "what survives" equal to "what claims cost," $G\,(1-\theta)=E[S]$, gives the gross-up rule $$G=\frac{P_{\text{net}}}{1-\theta}=\frac{E[S]}{1-\theta}.$$ This is the expense-ratio special case of a general loaded principle $H[S]=(1+\theta)E[S]$ (expected-value), or $H[S]=E[S]+\alpha\,\mathrm{SD}[S]$ (standard-deviation), or the exponential/utility premium $H[S]=\tfrac1a\ln E\!\left[e^{aS}\right]$ — the law-thread's expected utility, now wielded by the <em>seller</em>.</p></div>
+<div class="callout gold"><span class="k">From first principles</span><p style="margin:.3rem 0 0">Of every premium dollar collected, a fraction $\theta$ is consumed by expenses, profit, and margin before any claim is paid; the surviving fraction $(1-\theta)$ must equal the expected claims. Setting "what survives" equal to "what claims cost," $G\,(1-\theta)=E[S]$, gives the gross-up rule $$G=\frac{P_{\text{net}}}{1-\theta}=\frac{E[S]}{1-\theta}.$$ This is equivalent to the expected-value principle with loading $\theta/(1-\theta) = 25\%$, one of several general loaded principles: $H[S]=(1+\theta)E[S]$ (expected-value), or $H[S]=E[S]+\alpha\,\mathrm{SD}[S]$ (standard-deviation), or the exponential/utility premium $H[S]=\tfrac1a\ln E\!\left[e^{aS}\right]$ — the law-thread's expected utility, now wielded by the <em>seller</em>.</p></div>
 <div class="steps worked"><div class="step"><div class="label">Gross-up</div> $G=\dfrac{23.58}{1-0.20}=\dfrac{23.58}{0.80}=\$29.48.$ The 20-cent-on-the-dollar wedge turns \$23.58 of expected claims into a \$29.48 price.</div>
 <div class="step"><div class="label">Split the loading</div> Total loading $=G-P_{\text{net}}=29.48-23.58=\$5.90.$ A typical breakdown of the 20%: expenses $13\%\to 0.13\times29.48=\$3.83$ and profit + risk margin $7\%\to 0.07\times29.48=\$2.06$, which sum to \$5.89; the \$0.01 gap is rounding.</div>
 <div class="step"><div class="label">Loss ratio</div> $\text{LR}=\dfrac{P_{\text{net}}}{G}=\dfrac{23.58}{29.48}=0.80.$ So 80 cents of each premium dollar is expected claims and 20 cents is loading — the loss ratio is exactly $1-\theta$.</div>
@@ -331,7 +331,7 @@
       <h2 id="ruin">3 · How much capital keeps the doors open <span class="act-tag act-econ">ruin theory</span></h2>
 <p>An insurer collects premium continuously and pays claims as they arrive. Hold too little surplus and one bad run of losses ends the company. The board asks a sharp question: how much starting capital \$u must we hold so the probability of <em>ever</em> going insolvent, over an infinite horizon, stays below 1%?</p>
 <div class="aside-box"><span class="k">Givens &amp; assumptions</span><p style="margin:.25rem 0 0">Claims arrive as a Poisson process with rate $\lambda$ (claims per unit time) and i.i.d. sizes $X$ that are exponential with mean $\mu = \$1000$. Security loading $\theta = 0.2$, so premium income arrives at rate $c = (1+\theta)\lambda\mu$. Surplus starts at $u$ and follows $U(t) = u + c\,t - S(t)$, where $S(t)$ is total claims paid by time $t$. <em>Ruin</em> is the event that $U(t) &lt; 0$ for some $t$; its probability is $\psi(u)$. Target: $\psi(u) \le 0.01$.</p></div>
-<div class="callout gold"><span class="k">From first principles</span><p style="margin:.3rem 0 0">Premium must beat expected claims or ruin is certain: the net drift per unit time is $c - \lambda\mu = \theta\lambda\mu &gt; 0$, so the loading is what keeps the path climbing on average. The <em>adjustment coefficient</em> $R$ is the positive root that balances the moment-generating forces of premium inflow against claim outflow; for exponential claims it solves cleanly to $R = \theta / [(1+\theta)\mu]$. The Cramer-Lundberg theorem then gives the ruin probability <em>exactly</em> for exponential claims: $$\psi(u) = \frac{1}{1+\theta}\,e^{-R u}.$$</p></div>
+<div class="callout gold"><span class="k">From first principles</span><p style="margin:.3rem 0 0">Premium must beat expected claims or ruin is certain: the net drift per unit time is $c - \lambda\mu = \theta\lambda\mu &gt; 0$, so the loading is what keeps the path climbing on average. The <em>adjustment coefficient</em> $R$ is the positive root that balances the moment-generating forces of premium inflow against claim outflow; for exponential claims it solves cleanly to $R = \theta / [(1+\theta)\mu]$. The Cramér–Lundberg theorem then gives the ruin probability <em>exactly</em> for exponential claims: $$\psi(u) = \frac{1}{1+\theta}\,e^{-R u}.$$</p></div>
 <div class="steps worked"><div class="step"><div class="label">Adjustment coeff.</div> $R = \dfrac{\theta}{(1+\theta)\mu} = \dfrac{0.2}{1.2 \times 1000} = \dfrac{1}{6000} = 0.00016667$ per dollar of surplus.</div><div class="step"><div class="label">Set the target</div> Require $\psi(u) = \dfrac{1}{1.2}\,e^{-R u} = 0.01$.</div><div class="step"><div class="label">Isolate the exponential</div> $e^{-R u} = 0.01 \times 1.2 = 0.012$.</div><div class="step"><div class="label">Take logs</div> $R u = -\ln(0.012) = 4.4228$.</div><div class="step"><div class="label">Solve for u</div> $u = 4.4228 \times 6000 = \dfrac{4.4228}{0.00016667} \approx 26{,}537$.</div></div>
 <div class="callout good"><span class="k">Answer</span><p style="margin:.3rem 0 0">About <strong>\$26,540 of surplus</strong> caps the lifetime probability of ruin at 1%; equivalently it is roughly 26.5 mean-claim payouts held in reserve, the buffer that absorbs an unlucky early cluster of losses before premium income catches up.</p></div>
 <div class="aside-box"><span class="k">In practice</span><p style="margin:.25rem 0 0">The clean closed form holds only because claims are exponential; with heavy-tailed (e.g. lognormal or Pareto) losses there is no exact $\psi(u)$, and the most you get analytically is Lundberg's general inequality $\psi(u) \le e^{-R u}$, an upper bound that drops the leading $\tfrac{1}{1+\theta}$ factor. Modern solvency regimes also abandon the infinite-horizon view entirely: Solvency II and US RBC instead hold capital against a one-year 99.5% Value-at-Risk (or a Tail-VaR / expected shortfall), computable by simulation for any loss distribution. The <em>cost</em> of holding that regulatory capital is itself a loading folded back into the premium (see thread 2).</p></div>
@@ -347,9 +347,9 @@
 <p>
   A catastrophe bond pays a healthy coupon, but if a hurricane above a defined
   size strikes you lose your principal. Your cat model says the annual trigger
-  probability is about $1\%$, and a trigger wipes the principal, so the modelled
+  probability is about $1\%$, and a trigger wipes the principal, so the modeled
   expected loss is also about $1\%$. Yet the bond trades at a spread of about
-  $4\%$ over the risk-free rate, four times the loss you modelled. Is the market
+  $4\%$ over the risk-free rate, four times the loss you modeled. Is the market
   simply wrong?
 </p>
 <div class="aside-box"><span class="k">Givens &amp; assumptions</span>
@@ -374,7 +374,7 @@
     <em>less</em> than the $P$-fair value; equivalently the embedded loss
     probability is inflated. With the spread compensating for the
     risk-neutral expected loss, $s \approx \text{EL}_Q = p_Q\,\text{LGT}$, the
-    quoted price implies a $Q$-probability above the modelled $P$-probability,
+    quoted price implies a $Q$-probability above the modeled $P$-probability,
     $$ p_Q \;=\; \frac{s}{\text{LGT}} \;\ge\; p_P, \qquad
        \text{multiple} \;=\; \frac{s}{\text{EL}_P}. $$
   </p>
@@ -385,18 +385,18 @@
     your model expects each year.</div>
   <div class="step"><div class="label">Cat-bond multiple</div>
     $\text{multiple} = \dfrac{s}{\text{EL}_P} = \dfrac{4\%}{1\%} = 4$, so the market
-    prices the event as if it were $\approx 4\times$ more likely than modelled.</div>
+    prices the event as if it were $\approx 4\times$ more likely than modeled.</div>
   <div class="step"><div class="label">Implied Q-probability</div>
     Invert the spread: $p_Q = \dfrac{s}{\text{LGT}} = \dfrac{0.04}{1.00} = 0.04 = 4\%$,
-    versus the modelled $p_P = 1\%$.</div>
+    versus the modeled $p_P = 1\%$.</div>
   <div class="step"><div class="label">The risk wedge</div>
     $p_Q - p_P = 4\% - 1\% = 3$ percentage points. That $3$-point gap is not a
-    modelling error; it is the price of bearing the tail.</div>
+    modeling error; it is the price of bearing the tail.</div>
 </div>
 <div class="callout good">
   <span class="k">Answer</span>
   <p style="margin:.3rem 0 0">
-    The market is pricing a $4\%$ implied ($Q$) probability against your modelled
+    The market is pricing a $4\%$ implied ($Q$) probability against your modeled
     $1\%$ ($P$) probability, a $4\times$ multiple, and the $3$-point wedge is
     compensation for undiversifiable catastrophe risk, not a mistake in the model.
   </p>
@@ -423,10 +423,10 @@
   </p>
 </div>
 <figure>
-<svg viewBox="0 0 460 244" width="100%" style="max-width:460px;display:block;margin:0 auto" role="img" aria-label="Two bars: modelled expected loss of 1 percent under P versus the market-implied 4 percent under Q, a multiple of four.">
+<svg viewBox="0 0 460 244" width="100%" style="max-width:460px;display:block;margin:0 auto" role="img" aria-label="Two bars: modeled expected loss of 1 percent under P versus the market-implied 4 percent under Q, a multiple of four.">
 <line x1="80" y1="210" x2="420" y2="210" stroke="#bbb"/><text x="72" y="214" font-size="10" fill="#777" text-anchor="end">0%</text><text x="72" y="178" font-size="10" fill="#777" text-anchor="end">1%</text><text x="72" y="142" font-size="10" fill="#777" text-anchor="end">2%</text><text x="72" y="106" font-size="10" fill="#777" text-anchor="end">3%</text><text x="72" y="70" font-size="10" fill="#777" text-anchor="end">4%</text><text x="72" y="34" font-size="10" fill="#777" text-anchor="end">5%</text><line x1="76" y1="210" x2="80" y2="210" stroke="#bbb"/><line x1="76" y1="174" x2="80" y2="174" stroke="#bbb"/><line x1="76" y1="138" x2="80" y2="138" stroke="#bbb"/><line x1="76" y1="102" x2="80" y2="102" stroke="#bbb"/><line x1="76" y1="66" x2="80" y2="66" stroke="#bbb"/><line x1="76" y1="30" x2="80" y2="30" stroke="#bbb"/><rect x="120" y="174.0" width="90" height="36.0" fill="#DCE6F4" stroke="#1F4E9E"/><text x="165" y="166.0" font-size="11" font-weight="700" fill="#0C447C" text-anchor="middle">1%</text><text x="165" y="226" font-size="10.5" fill="#777" text-anchor="middle">P: model</text><rect x="290" y="66.0" width="90" height="144.0" fill="#F6EFD8" stroke="#B83A2E"/><text x="335" y="58.0" font-size="11" font-weight="700" fill="#791F1F" text-anchor="middle">~4%</text><text x="335" y="226" font-size="10.5" fill="#777" text-anchor="middle">Q: market price</text><text x="250" y="32" font-size="12" font-weight="700" fill="#1E1E1E" text-anchor="middle">multiple = 4&#215; = the price of risk</text>
 </svg>
-<figcaption>The model says a 1% chance under the real-world measure P; the market prices the bond as if it were ~4% under the risk-neutral measure Q. The 4&#215; multiple is risk aversion to the tail, not a modelling error.</figcaption>
+<figcaption>The model says a 1% chance under the real-world measure P; the market prices the bond as if it were ~4% under the risk-neutral measure Q. The 4&#215; multiple is risk aversion to the tail, not a modeling error.</figcaption>
 </figure>
 
 
