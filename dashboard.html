@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roadmap — Scott Nelson</title>
+  <title>Roadmap | Scott Nelson</title>
   <meta name="description" content="Scott Nelson's public project roadmap: work he has shipped, what is in flight, and what comes next. Data engineer, M.S. Applied Data Intelligence, SJSU.">
-  <meta property="og:title" content="Roadmap — Scott Nelson">
+  <meta property="og:title" content="Roadmap | Scott Nelson">
   <meta property="og:description" content="Scott Nelson's public project roadmap: work he has shipped, what is in flight, and what comes next. Data engineer, M.S. Applied Data Intelligence, SJSU.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://scottn66.github.io/dashboard.html">
@@ -166,6 +166,10 @@
       margin: 0 0 0.65rem;
       color: var(--text-color);
     }
+    .credit {
+      margin: -0.35rem 0 0.65rem;
+      color: var(--text-color);
+    }
 
     .tags {
       list-style: none;
@@ -269,7 +273,7 @@
   <header class="page-header">
     <div class="container">
       <h1>Roadmap</h1>
-      <p>What Scott has shipped, what's in flight, and what's next. He's open to collaborating.</p>
+      <p>Shipped, in progress, and up next.</p>
     </div>
   </header>
 
@@ -284,6 +288,7 @@
               <article class="card">
                 <h3><a href="solar/">Solar warehouse and city reports</a></h3>
                 <p class="goal">A 25-year rooftop solar cashflow model, with a DuckDB warehouse and city reports for California and Oregon.</p>
+                <p class="credit">Started as a San Jose State DATA 201 project.</p>
                 <ul class="tags">
                   <li>DuckDB</li>
                   <li>FastAPI</li>
@@ -394,14 +399,25 @@
             </li>
             <li>
               <article class="card">
-                <h3>ClaimKB and corpus-engine</h3>
-                <p class="goal">A knowledge-graph pipeline that extracts claims from sources.</p>
+                <h3>ClaimKB</h3>
+                <p class="goal">Extracts claims from sources into a knowledge graph.</p>
                 <ul class="tags">
                   <li>Knowledge graph</li>
                   <li>Claim extraction</li>
                 </ul>
                 <p class="status status-wip">In progress</p>
                 <p class="dod"><strong>Definition of done:</strong> a source goes in and the extracted claims come out as a graph you can query.</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3>corpus-engine</h3>
+                <p class="goal">Generalizes that approach into a reusable corpus pipeline.</p>
+                <ul class="tags">
+                  <li>Corpus pipeline</li>
+                </ul>
+                <p class="status status-wip">In progress</p>
+                <p class="dod"><strong>Definition of done:</strong> the same approach can run on more than one corpus.</p>
               </article>
             </li>
             <li>
@@ -420,45 +436,10 @@
           </ul>
         </section>
 
-        <!-- Up next: placeholder themes pending Scott's list -->
+        <!-- Up next: pending Scott's list -->
         <section class="column">
           <h2>Up next</h2>
-          <p class="kicker">Next themes</p>
-          <ul class="card-list">
-            <li>
-              <article class="card">
-                <h3>Streaming ingestion for an existing pipeline</h3>
-                <p class="goal">Add a path that keeps up with new records on a pipeline that already runs in batches.</p>
-                <ul class="tags">
-                  <li>Streaming</li>
-                  <li>Ingest</li>
-                </ul>
-                <p class="status status-next">Up next</p>
-              </article>
-            </li>
-            <li>
-              <article class="card">
-                <h3>Data-quality tests and lineage across projects</h3>
-                <p class="goal">Add checks, and a record of where each dataset came from, that more than one project can use.</p>
-                <ul class="tags">
-                  <li>Data quality</li>
-                  <li>Lineage</li>
-                </ul>
-                <p class="status status-next">Up next</p>
-              </article>
-            </li>
-            <li>
-              <article class="card">
-                <h3>Monitoring on a pipeline that already runs</h3>
-                <p class="goal">Add a simple check that a finished pipeline still runs and that its outputs still look right.</p>
-                <ul class="tags">
-                  <li>Monitoring</li>
-                  <li>Checks</li>
-                </ul>
-                <p class="status status-next">Up next</p>
-              </article>
-            </li>
-          </ul>
+          <p>Next projects will be posted here.</p>
         </section>
       </div>
     </div>
@@ -466,7 +447,7 @@
 
   <footer>
     <div class="container">
-      <p>Open to collaborate. <a href="mailto:scottjnelson5@gmail.com">Reach out</a></p>
+      <p>Open to collaborating. <a href="mailto:scottjnelson5@gmail.com">Reach out</a></p>
     </div>
   </footer>
 
