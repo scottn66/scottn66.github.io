@@ -150,14 +150,14 @@
             <a href="HMM.html" class="btn btn-light">&larr; Back to the HMM page</a>
         </div>
         <h1>From Counts to Context</h1>
-        <p class="subtitle">One NER task, three generations of taggers: HMM &rarr; LSTM &rarr; BERT</p>
+        <p class="subtitle">One named-entity recognition (NER) task, three taggers. A fine-tuned DistilBERT reaches 0.888 entity-F1 on the CoNLL-2003 test set.</p>
     </header>
 
     <!-- Intro -->
     <div class="container mt-5">
         <section class="mb-4">
             <h2>The same task, climbing the model ladder</h2>
-            <p>The <a href="HMM.html">companion page</a> builds a <strong>Hidden Markov Model</strong> from scratch to tag named entities. This page picks up where that one ends and walks up two more rungs of the modelling ladder - a recurrent <strong>LSTM</strong> tagger, and a fine-tuned <strong>BERT/DistilBERT</strong> tagger - all three solving the <em>same</em> problem so they can be compared apples-to-apples.</p>
+            <p>The <a href="HMM.html">companion page</a> builds a <strong>Hidden Markov Model</strong> from scratch to tag named entities. This page picks up where that one ends and climbs two more rungs: a recurrent <strong>LSTM</strong> tagger and a fine-tuned <strong>DistilBERT</strong> tagger. All three solve the same problem, so they can be compared directly.</p>
             <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">named entity recognition (NER)</a> over the <a href="https://aclanthology.org/W03-0419/" target="_blank">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
             <p>The arc is a single idea: <strong>we keep widening the window of context a tagging decision can see, and we keep enriching how a word is represented</strong> - from atomic word-IDs (HMM), to learned dense vectors read left-to-right (LSTM), to pretrained <em>contextual</em> subword vectors that see the whole sentence at once (BERT).</p>
 
@@ -193,7 +193,7 @@
                 </svg>
                 <figcaption>Three taggers, one task. Each rung widens the context window and enriches the word representation.</figcaption>
             </figure>
-            <p style="margin-bottom:0;"><em>Provenance:</em> all three live in the CMSI 5370 (NLP) problem-set-2 archive. The HMM and LSTM were the submitted assignment; the BERT tagger is the post-submission &ldquo;kept going&rdquo; branch (<code>copy_ps2-scottn66/</code>) that adds HuggingFace fine-tuning.</p>
+            <p style="margin-bottom:0;"><em>Provenance:</em> the HMM and LSTM were my submitted assignment for CMSI 5370 (NLP) at Loyola Marymount. I built the DistilBERT tagger afterward, on my own, adding Hugging Face fine-tuning.</p>
         </section>
     </div>
 
@@ -201,13 +201,13 @@
     <section class="container mt-5">
         <h2><span class="pill pill-hmm">1</span>&nbsp; Hidden Markov Model - the count-based baseline</h2>
         <p>Full treatment lives on the <a href="HMM.html">HMM page</a>; here is the one-paragraph recap so the comparison stands on its own.</p>
-        <p>The HMM is a <strong>generative</strong>, count-based model. Training is a single pass of maximum-likelihood counting over the labelled corpus that fills three tables:</p>
+        <p>The HMM is a <strong>generative</strong>, count-based model. Training is a single pass of maximum-likelihood counting over the labeled corpus that fills three tables:</p>
         <ul>
             <li><strong>Initial</strong> <code>P(tag&#8321;)</code> - how often each tag starts a sentence.</li>
             <li><strong>Transition</strong> <code>P(tag&#8348; | tag&#8348;&#8331;&#8321;)</code> - the order-1 <a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank">Markov</a> assumption: a tag depends only on the tag immediately before it.</li>
             <li><strong>Emission</strong> <code>P(word | tag)</code> - how likely each word is, given a tag.</li>
         </ul>
-        <p>All three tables are initialised to ones rather than zeros, which folds <a href="https://en.wikipedia.org/wiki/Additive_smoothing" target="_blank">add-one (Laplace) smoothing</a> straight into the model so no unseen event gets zero probability. Decoding finds the best tag sequence two ways: <strong>greedy</strong> (pick the locally best tag at each step) or <strong>Viterbi</strong> (a dynamic program in log-space that recovers the single most-likely <em>whole-sequence</em> tagging via a trellis + backpointers).</p>
+        <p>All three tables are initialized to ones rather than zeros, which folds <a href="https://en.wikipedia.org/wiki/Additive_smoothing" target="_blank">add-one (Laplace) smoothing</a> straight into the model so no unseen event gets zero probability. Decoding finds the best tag sequence two ways: <strong>greedy</strong> (pick the locally best tag at each step) or <strong>Viterbi</strong> (a dynamic program in log-space that recovers the single most-likely <em>whole-sequence</em> tagging via a trellis + backpointers).</p>
         <div class="concept-box">
             <h4>What it gets right - and where it caps out</h4>
             <p><strong>Right:</strong> trains in seconds on a CPU, is fully interpretable (every number is a count), and Viterbi gives a provably optimal decode under the model. The in-code benchmark hint targets <strong>~90% token accuracy with greedy and ~91% with Viterbi</strong>.</p>
@@ -224,11 +224,11 @@
          ─▶ nn.Linear(hidden_dim=12, num_tags)      # project each step's state to tag scores</code></pre>
         <p>Two things change versus the HMM. First, words become <strong>learned dense vectors</strong> instead of atomic IDs, so the model can discover that &ldquo;Paris&rdquo; and &ldquo;London&rdquo; behave alike. Second, the recurrent cell means the tag for word <em>i</em> is informed by a hidden state that has absorbed <em>every word to its left</em> - far more context than the HMM's single previous tag. Training is gradient descent (Adam, <code>lr=0.001</code>, 10 epochs), one sentence per backward pass.</p>
         <div class="caveat-box">
-            <h4>&#9888; Honest notes from the code</h4>
+            <h4>&#9888; Caveats from the code</h4>
             <ul style="margin-bottom:0;">
                 <li>The LSTM is <strong>unidirectional</strong> (left context only) and intentionally tiny (<code>hidden_dim=12</code>) - an instructional baseline, not a tuned model.</li>
                 <li><code>forward()</code> returns <strong>raw logits</strong>, but the loss is <code>nn.NLLLoss()</code>, which expects log-probabilities (the <code>log_softmax</code> line is commented out). The network still trains and converges, but the printed loss is not interpretable as cross-entropy.</li>
-                <li>No held-out accuracy was recorded in the source, so this page does <strong>not</strong> quote an LSTM number - the honest comparison is structural, not a leaderboard.</li>
+                <li>The source recorded no held-out accuracy for the LSTM, so this page doesn't quote one. The comparison is structural, not a leaderboard.</li>
             </ul>
         </div>
         <p>The LSTM fixes the HMM's representation and left-context limits, but it still reads strictly left-to-right and learns its embeddings from scratch on a small corpus. The next model removes both of those constraints at once.</p>
@@ -256,6 +256,7 @@ trainer.train()</code></pre>
             <h4>The result, measured</h4>
             <p>The original archived <code>bert.py</code> couldn't be trusted to report a number: it had a <strong>train/eval leak</strong> (<code>train_dataset == eval_dataset</code>) and fed word-level labels to the Trainer without aligning them to DistilBERT's <em>subword</em> tokens. A hardened rewrite (proper subword label alignment, a held-out split, and seqeval scoring - see the roadmap below) fixes all of that and produces real, reproducible numbers.</p>
             <p>Fine-tuned <strong>DistilBERT-cased, 3 epochs</strong> on CoNLL-2003 (HF 9-label BIO version) scores, on the held-out <strong>test</strong> set: <strong>entity-level F1 = 0.888</strong> (precision 0.880, recall 0.896) and <strong>token accuracy = 0.978</strong>. On the validation set the best epoch reaches <strong>0.934 entity-F1</strong> / 0.989 token accuracy. The ~88.8% test entity-F1 is right in the expected band for DistilBERT on CoNLL-2003.</p>
+            <p>(The model published on the Hub, <code>distilbert-base-uncased-finetuned-ner</code>, is an earlier uncased run.)</p>
             <p style="margin-bottom:0;">For a <strong>strict apples-to-apples</strong> check against the HMM and LSTM - the same local 5-class data, the same preprocessing - the fine-tuned model reaches <strong>98.5% token accuracy</strong> (macro token-F1 0.933) versus the HMM's ~91% Viterbi token accuracy. Same task, same labels: <strong>+7 points</strong> from contextual pretraining.</p>
         </div>
     </section>
@@ -273,7 +274,7 @@ trainer.train()</code></pre>
                 <li><strong>&#10003; Modernize the API.</strong> Real <code>transformers</code> import (no <code>trans4mers</code> shim) and a complete <code>requirements.txt</code>. Going further than planned: the rewrite runs on <strong>transformers 5.x</strong> (<code>processing_class</code> replaces the removed <code>tokenizer=</code> arg) and <strong>datasets 5.x</strong> (script loading was removed, so it pulls a parquet CoNLL-2003 mirror).</li>
                 <li><strong>Remaining stretch goals.</strong> Try <code>bert-base-cased</code> vs DistilBERT; reconcile the cased/uncased split with the published uncased Hub model; optionally add a CRF decode head so the transformer, like the HMM, optimizes the whole tag sequence rather than each token independently.</li>
             </ol>
-            <p style="margin-bottom:0;">Result: <strong>0.888 test entity-F1</strong> (0.934 on validation) - squarely in the expected band, and now trustworthy because the evaluation is honest.</p>
+            <p style="margin-bottom:0;">Result: <strong>0.888 test entity-F1</strong> (0.934 on validation), measured on a held-out split with seqeval.</p>
         </div>
     </section>
 
