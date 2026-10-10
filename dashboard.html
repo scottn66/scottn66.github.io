@@ -3,617 +3,418 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Dashboard &mdash; Scott Nelson</title>
+  <title>Roadmap | Scott Nelson</title>
+  <meta name="description" content="Scott Nelson's public project roadmap: work he has shipped, what is in flight, and what comes next. Data engineer, M.S. Applied Data Intelligence, SJSU.">
+  <meta property="og:title" content="Roadmap | Scott Nelson">
+  <meta property="og:description" content="Scott Nelson's public project roadmap: work he has shipped, what is in flight, and what comes next. Data engineer, M.S. Applied Data Intelligence, SJSU.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://scottn66.github.io/dashboard.html">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&amp;family=Montserrat:wght@700&amp;display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #f4f4f4; --card-bg: #fff; --text: #333; --muted: #6c757d;
-      --q1: #dc3545; --q2: #0d6efd; --q3: #ffc107; --q4: #6c757d;
-      --col-backlog: #e9ecef; --col-todo: #cfe2ff; --col-wip: #fff3cd; --col-done: #d1e7dd;
-    }
-    body { font-family: 'Open Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
-    h1,h2,h3,h4 { font-family: 'Montserrat', sans-serif; }
-    .navbar { background-color: #343a40 !important; }
-
-    /* Stats bar */
-    .stats-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .stat-card {
-      flex: 1; min-width: 120px; background: var(--card-bg); border-radius: 8px;
-      padding: 12px 16px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.1);
-    }
-    .stat-card .num { font-size: 1.8rem; font-weight: 700; line-height: 1; }
-    .stat-card .label { font-size: .75rem; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
-
-    /* Controls */
-    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
-    .view-btn.active { background: #0d6efd; color: #fff; }
-
-    /* Kanban */
-    .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; min-height: 400px; }
-    .kanban-col {
-      background: var(--col-backlog); border-radius: 8px; padding: 10px;
-      display: flex; flex-direction: column; gap: 8px; min-height: 200px;
-    }
-    .kanban-col:nth-child(2) { background: var(--col-todo); }
-    .kanban-col:nth-child(3) { background: var(--col-wip); }
-    .kanban-col:nth-child(4) { background: var(--col-done); }
-    .kanban-col h5 { font-size: .85rem; text-transform: uppercase; margin: 0 0 6px; color: var(--muted); }
-
-    /* Eisenhower */
-    .eisenhower { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 12px; }
-    .eq { border-radius: 8px; padding: 12px; min-height: 220px; }
-    .eq h5 { font-size: .8rem; text-transform: uppercase; margin: 0 0 8px; }
-    .eq-q1 { background: #f8d7da; } .eq-q1 h5 { color: var(--q1); }
-    .eq-q2 { background: #cfe2ff; } .eq-q2 h5 { color: var(--q2); }
-    .eq-q3 { background: #fff3cd; } .eq-q3 h5 { color: var(--q3); }
-    .eq-q4 { background: #e9ecef; } .eq-q4 h5 { color: var(--q4); }
-    .eq-axis-label {
-      font-size: .7rem; text-transform: uppercase; color: var(--muted);
-      text-align: center; font-weight: 600; letter-spacing: 1px;
+      --primary-color: #2C3E50;
+      --secondary-color: #E74C3C;
+      --accent-color: #ECF0F1;
+      --bg-color: #ffffff;
+      --text-color: #333;
+      --section-bg: #f4f4f4;
+      --navbar-bg: #343a40;
+      --footer-bg: #333;
+      --link: #1b4f72;
+      --card: #ffffff;
+      --line: #d5dbe3;
     }
 
-    /* Task cards */
-    .task-card {
-      background: var(--card-bg); border-radius: 6px; padding: 8px 10px;
-      box-shadow: 0 1px 2px rgba(0,0,0,.08); cursor: pointer; font-size: .82rem;
-      border-left: 4px solid var(--muted); transition: box-shadow .15s;
-    }
-    .task-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.15); }
-    .task-card .title { font-weight: 600; margin-bottom: 2px; }
-    .task-card .meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .badge-project {
-      font-size: .65rem; padding: 2px 6px; border-radius: 3px; color: #fff; font-weight: 600;
-    }
-    .badge-size {
-      font-size: .65rem; padding: 1px 5px; border-radius: 3px;
-      background: #e9ecef; color: #555;
-    }
-    .badge-epic {
-      font-size: .65rem; padding: 1px 5px; border-radius: 3px;
-      background: #f0f0f0; color: var(--muted);
-    }
-    /* True-state badges (derived from published-corpus.json) */
-    .badge-published {
-      font-size: .62rem; padding: 1px 6px; border-radius: 3px;
-      background: #d1e7dd; color: #0f5132; font-weight: 700;
-    }
-    .badge-falsedone {
-      font-size: .62rem; padding: 1px 6px; border-radius: 3px;
-      background: #f8d7da; color: #842029; font-weight: 700;
-    }
-    .badge-track {
-      font-size: .6rem; padding: 1px 5px; border-radius: 3px;
-      background: #ede7f6; color: #5a3e8c; text-transform: uppercase;
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      line-height: 1.6;
     }
 
-    /* Modal overrides */
-    .modal-body select { max-width: 200px; }
-    .detail-section { margin-top: 10px; }
-    .detail-section dt { font-weight: 600; font-size: .8rem; color: var(--muted); }
-    .detail-section dd { font-size: .85rem; margin-bottom: 8px; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .kanban { grid-template-columns: 1fr; }
-      .eisenhower { grid-template-columns: 1fr; }
+    h1, h2, h3 {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--primary-color);
+      line-height: 1.25;
     }
 
-    /* Progress bar */
-    .progress-row { margin-bottom: 1.5rem; }
-    .progress { height: 10px; border-radius: 5px; }
+    a { color: var(--link); }
+    a:hover { color: var(--primary-color); }
+
+    a:focus, button:focus {
+      outline: 2px dashed var(--secondary-color);
+      outline-offset: 4px;
+    }
+
+    .skip {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #fff;
+      color: var(--primary-color);
+      padding: 0.5rem 1rem;
+      z-index: 100;
+      font-weight: 600;
+    }
+    .skip:focus { left: 0.75rem; top: 0.75rem; }
+
+    .navbar {
+      background-color: var(--navbar-bg) !important;
+      padding: 0.35rem 0;
+    }
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f7f7f7 !important;
+    }
+    .navbar-dark .navbar-nav .nav-link {
+      color: #f7f7f7;
+      font-size: 1rem;
+      margin-right: 0.25rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 0.85rem;
+    }
+    .navbar-dark .navbar-nav .nav-link:hover,
+    .navbar-dark .navbar-nav .nav-link:focus {
+      color: #ffffff;
+      text-decoration: underline;
+      background: transparent;
+    }
+    .navbar-toggler {
+      border-color: #f7f7f7;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .page-header {
+      background: var(--primary-color);
+      color: var(--accent-color);
+      padding: 2.75rem 0 2.25rem;
+    }
+    .page-header h1 {
+      color: var(--accent-color);
+      font-size: 2.5rem;
+      margin: 0 0 0.6rem;
+    }
+    .page-header p {
+      color: var(--accent-color);
+      font-size: 1.125rem;
+      max-width: 40rem;
+      margin: 0;
+    }
+
+    main { padding: 2rem 0 3rem; }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .column {
+      background: var(--section-bg);
+      border-radius: 10px;
+      padding: 0.9rem;
+    }
+    .column h2 {
+      font-size: 1.15rem;
+      margin: 0.15rem 0 0.15rem;
+    }
+    .kicker {
+      margin: 0 0 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--primary-color);
+    }
+
+    .card-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.85rem 0.95rem 0.95rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .card h3 {
+      font-size: 1.02rem;
+      margin: 0 0 0.35rem;
+    }
+    .card h3 a {
+      color: var(--primary-color);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .card h3 a:hover { color: var(--link); }
+    .goal {
+      margin: 0 0 0.65rem;
+      color: var(--text-color);
+    }
+    .credit {
+      margin: -0.35rem 0 0.65rem;
+      color: var(--text-color);
+    }
+
+    .tags {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin: 0 0 0.7rem;
+      padding: 0;
+    }
+    .tags li {
+      background: #e7eef3;
+      color: var(--primary-color);
+      border: 1px solid #c5d4e0;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .sources {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin: 0 0 0.7rem;
+      padding: 0;
+    }
+    .sources a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid var(--link);
+      border-radius: 6px;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .status {
+      display: inline-block;
+      margin: 0;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .status-shipped { background: #d9f2e4; color: #0d3b24; }
+    .status-wip { background: #d9e6f7; color: #0a3058; }
+    .status-next { background: #eef1f4; color: #2C3E50; }
+
+    .dod {
+      margin: 0.65rem 0 0;
+      font-size: 0.92rem;
+      color: var(--text-color);
+    }
+    .dod strong { font-weight: 600; }
+
+    footer {
+      background: var(--footer-bg);
+      color: #f7f7f7;
+      padding: 1.5rem 0;
+    }
+    footer p { margin: 0; color: #f7f7f7; }
+    footer a {
+      color: #f7f7f7;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    footer a:hover { color: #ffffff; }
+
+    @media (max-width: 991.98px) {
+      .board { grid-template-columns: 1fr; }
+      .page-header h1 { font-size: 2rem; }
+    }
   </style>
 </head>
 <body>
+  <a class="skip" href="#roadmap">Skip to content</a>
 
-  <!-- Nav -->
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
       <a class="navbar-brand" href="index.html">Scott Nelson</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarNav" aria-controls="navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="index.html#projects">Projects</a></li>
-          <li class="nav-item"><a class="nav-link active" href="dashboard.html">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="index.html#projects">Work</a></li>
           <li class="nav-item"><a class="nav-link" href="resume.html">Resume</a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container mt-4 mb-5">
-    <h2 class="mb-1"><i class="fas fa-th-large me-2"></i>Project Dashboard</h2>
-    <p class="text-muted mb-3">Aggregate view of all active work. Click any card to update its status or priority.</p>
-
-    <!-- Stats -->
-    <div class="stats-bar" id="stats-bar"></div>
-
-    <!-- Progress -->
-    <div class="progress-row" id="progress-row"></div>
-
-    <!-- Controls -->
-    <div class="controls">
-      <div class="btn-group" role="group">
-        <button class="btn btn-sm btn-outline-secondary view-btn active" data-view="kanban"><i class="fas fa-columns me-1"></i>Kanban</button>
-        <button class="btn btn-sm btn-outline-secondary view-btn" data-view="eisenhower"><i class="fas fa-border-all me-1"></i>Eisenhower</button>
-      </div>
-      <select class="form-select form-select-sm" id="filter-project" aria-label="Filter by project" style="max-width:200px;">
-        <option value="all">All Projects</option>
-      </select>
-      <select class="form-select form-select-sm" id="filter-track" aria-label="Filter by track" style="max-width:180px;" title="Default view is the efferent (publish) track">
-        <option value="efferent" selected>Efferent (publish)</option>
-        <option value="all">All Tracks</option>
-        <option value="project">Project backlog</option>
-        <option value="substrate">Substrate</option>
-      </select>
-      <select class="form-select form-select-sm" id="filter-epic" aria-label="Filter by epic" style="max-width:220px;">
-        <option value="all">All Epics</option>
-      </select>
-      <select class="form-select form-select-sm" id="filter-status" aria-label="Filter by status" style="max-width:160px;">
-        <option value="all">All Statuses</option>
-        <option value="backlog">Backlog</option>
-        <option value="todo">To Do</option>
-        <option value="in_progress">In Progress</option>
-        <option value="done">Done</option>
-      </select>
-      <button class="btn btn-sm btn-outline-danger ms-auto" id="btn-reset" title="Reset all changes to defaults"><i class="fas fa-undo me-1"></i>Reset</button>
+  <header class="page-header">
+    <div class="container">
+      <h1>Roadmap</h1>
+      <p>Shipped, in progress, and up next.</p>
     </div>
+  </header>
 
-    <!-- Drift banner — published units with no card (from published-corpus.json) -->
-    <div id="drift-banner"></div>
+  <main id="roadmap">
+    <div class="container">
+      <div class="board">
+        <section class="column">
+          <h2>Completed</h2>
+          <p class="kicker">Milestone: shipped</p>
+          <ul class="card-list">
+            <li>
+              <article class="card">
+                <h3><a href="solar/">Solar warehouse and city reports</a></h3>
+                <p class="goal">A 25-year rooftop solar cashflow model, with a DuckDB warehouse and city reports for California and Oregon.</p>
+                <p class="credit">Started as a DATA 201 group project at San José State University (SJSU).</p>
+                <ul class="tags">
+                  <li>DuckDB</li>
+                  <li>FastAPI</li>
+                  <li>PVWatts</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3>Scraper pipeline</h3>
+                <p class="goal">Wikipedia, SEP, and arXiv scrapers that crawl or fetch, validate, and store raw sources.</p>
+                <ul class="sources">
+                  <li><a href="wikipedia_scraper.html">Wikipedia scraper</a></li>
+                  <li><a href="sep_scraper.html">SEP scraper</a></li>
+                  <li><a href="arxiv_scraper.html">arXiv scraper</a></li>
+                </ul>
+                <ul class="tags">
+                  <li>Python</li>
+                  <li>SQLite</li>
+                  <li>BeautifulSoup</li>
+                  <li>Atom API</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3><a href="decision-theory.html">Decision theory series</a></h3>
+                <p class="goal">A curriculum from Bayes nets and utility through the value of information to counterfactuals, with three interactive widgets.</p>
+                <ul class="tags">
+                  <li>pgmpy</li>
+                  <li>Python</li>
+                  <li>JavaScript</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3><a href="ner-taggers.html">NER and HMM taggers</a></h3>
+                <p class="goal">One named-entity task, tagged three ways: a from-scratch HMM, an LSTM, and a fine-tuned DistilBERT.</p>
+                <ul class="tags">
+                  <li>HMM</li>
+                  <li>PyTorch</li>
+                  <li>DistilBERT</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3><a href="bitcoin-power-law/">Bitcoin power-law study</a></h3>
+                <p class="goal">An econometric check of whether Bitcoin's price follows a power law in time, from the fit through stationarity, model choice, mean reversion, and bubbles.</p>
+                <ul class="tags">
+                  <li>Python</li>
+                  <li>statsmodels</li>
+                  <li>Plotly</li>
+                  <li>seaborn</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3><a href="demographics/">Demographics</a></h3>
+                <p class="goal">An interactive atlas of age structure and the demographic dividend, built from UN World Population Prospects 2024.</p>
+                <ul class="tags">
+                  <li>Python</li>
+                  <li>Plotly</li>
+                  <li>UN WPP 2024</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+            <li>
+              <article class="card">
+                <h3><a href="robot-arm-sim/">Robot-arm crawler</a></h3>
+                <p class="goal">A planar crawler learns to move with Q-learning, and Bayesian optimization picks the hyperparameters.</p>
+                <ul class="tags">
+                  <li>Python</li>
+                  <li>Q-learning</li>
+                  <li>SARSA</li>
+                  <li>Bayesian optimization</li>
+                </ul>
+                <p class="status status-shipped">Shipped</p>
+              </article>
+            </li>
+          </ul>
+        </section>
 
-    <!-- Board -->
-    <div id="board"></div>
-  </div>
+        <section class="column">
+          <h2>In progress</h2>
+          <p class="kicker">Sprint: now</p>
+          <ul class="card-list">
+            <li>
+              <article class="card">
+                <h3>SpectralWaste</h3>
+                <p class="goal">A DATA 255 group project at San José State University, in deep learning and computer vision.</p>
+                <ul class="tags">
+                  <li>DATA 255</li>
+                  <li>Deep learning</li>
+                  <li>Computer vision</li>
+                </ul>
+                <p class="status status-wip">In progress</p>
+                <p class="dod"><strong>Definition of done:</strong> the group can show the method, the data, and a result someone else can rerun.</p>
+              </article>
+            </li>
+          </ul>
+        </section>
 
-  <!-- Detail modal -->
-  <div class="modal fade" id="taskModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modal-title"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="modal-body"></div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="modal-save">Save</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
+        <!-- Up next: pending Scott's list -->
+        <section class="column">
+          <h2>Up next</h2>
+          <p>Next projects will be posted here.</p>
+        </section>
       </div>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Open to collaborating. <a href="mailto:scottjnelson5@gmail.com">Reach out</a></p>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-  // ============================================================
-  // PROJECT DATA — edit this array to add/update tasks
-  // ============================================================
-  const PROJECTS = [
-    {
-      name: "LLM Wiki", color: "#0d6efd",
-      link: null, track: "project", origin: "side-project",
-      tasks: [
-        // Epic 0 — Bootstrap
-        { id:"E0-S1", title:"Create wiki directory skeleton", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"pillars/, concepts/, entities/, sources/, questions/, syntheses/, raw/ all exist", deps:[] },
-        { id:"E0-S2", title:"Write minimal CLAUDE.md schema", status:"backlog", size:"M", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"Documents page types, frontmatter conventions, ingest/query/lint workflows; under 300 lines", deps:["E0-S1"] },
-        { id:"E0-S3", title:"Seed index.md and log.md", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"index.md has empty category headers; log.md has one bootstrap entry", deps:["E0-S1"] },
-        { id:"E0-S4", title:"Smoke test schema in conversation", status:"backlog", size:"S", epic:"Bootstrap", urgency:"low", importance:"high", acceptance:"Fresh Claude session reads CLAUDE.md and correctly creates one stub page", deps:["E0-S2","E0-S3"] },
-        // Epic 1 — First Ingest
-        { id:"E1-S1", title:"Define source page template", status:"backlog", size:"M", epic:"First Ingest", urgency:"low", importance:"high", acceptance:"Template in CLAUDE.md with frontmatter and section structure", deps:["E0-S2"] },
-        { id:"E1-S2", title:"Ingest one real Wikipedia article", status:"backlog", size:"M", epic:"First Ingest", urgency:"low", importance:"high", acceptance:"Raw saved, summary page created, index + log updated", deps:["E1-S1"] },
-        { id:"E1-S3", title:"Create stubs for top concepts", status:"backlog", size:"S", epic:"First Ingest", urgency:"low", importance:"medium", acceptance:"Concepts mentioned 3+ times get a stub page", deps:["E1-S2"] },
-        { id:"E1-S4", title:"Retro: update CLAUDE.md", status:"backlog", size:"S", epic:"First Ingest", urgency:"low", importance:"medium", acceptance:"At least one concrete schema improvement", deps:["E1-S2"] },
-        // Epic 2 — First Synthesis
-        { id:"E2-S1", title:"Define concept page template", status:"backlog", size:"M", epic:"First Synthesis", urgency:"low", importance:"medium", acceptance:"Template with Definition / Origins / Key proponents / Sources / Contradictions", deps:["E1-S4"] },
-        { id:"E2-S2", title:"Ingest 2 more sources", status:"backlog", size:"M", epic:"First Synthesis", urgency:"low", importance:"medium", acceptance:"SEP + Wikipedia articles on related entities", deps:["E1-S2"] },
-        { id:"E2-S3", title:"Author first concept page", status:"backlog", size:"L", epic:"First Synthesis", urgency:"low", importance:"high", acceptance:"3+ cited claims from different sources", deps:["E2-S1","E2-S2"] },
-        { id:"E2-S4", title:"Bidirectional linking pass", status:"backlog", size:"S", epic:"First Synthesis", urgency:"low", importance:"low", acceptance:"All source pages link forward; orphan check passes", deps:["E2-S3"] },
-        // Epic 3 — Query
-        { id:"E3-S1", title:"Define query workflow", status:"backlog", size:"M", epic:"Query Loop", urgency:"low", importance:"medium", acceptance:"Documented: read index → find pages → synthesize → cite", deps:["E0-S2"] },
-        { id:"E3-S2", title:"Run first real query", status:"backlog", size:"M", epic:"Query Loop", urgency:"low", importance:"high", acceptance:"Cited markdown answer to a real question", deps:["E3-S1","E2-S3"] },
-        { id:"E3-S3", title:"File answer as synthesis page", status:"backlog", size:"S", epic:"Query Loop", urgency:"low", importance:"medium", acceptance:"Lives in syntheses/, indexed, logged", deps:["E3-S2"] },
-        { id:"E3-S4", title:"Identify gaps from query", status:"backlog", size:"S", epic:"Query Loop", urgency:"low", importance:"low", acceptance:"1+ new stub or needs-more-sources note", deps:["E3-S2"] },
-        // Epic 4 — Pillar Scaffolding
-        { id:"E4-S1", title:"Write 8 pillar stub pages", status:"backlog", size:"M", epic:"Pillar Scaffolding", urgency:"low", importance:"medium", acceptance:"psychology, linguistics, neuroscience, philosophy-of-mind, CS, AI, anthropology, mathematics", deps:["E0-S1"] },
-        { id:"E4-S2", title:"Cross-link pillars ↔ concepts", status:"backlog", size:"S", epic:"Pillar Scaffolding", urgency:"low", importance:"low", acceptance:"Frontmatter + prose links both directions", deps:["E4-S1","E2-S3"] },
-        { id:"E4-S3", title:"Backlog concept stubs from pillars", status:"backlog", size:"S", epic:"Pillar Scaffolding", urgency:"low", importance:"low", acceptance:"New stubs for unaddressed concepts", deps:["E4-S1"] },
-        // Epic 5 — Automation
-        { id:"E5-S0", title:"Scraper survey doc", status:"done", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"SCRAPER_SURVEY.md with comparison table and unified Source schema", deps:[] },
-        { id:"E5-S1", title:"Wikipedia markdown emitter", status:"backlog", size:"L", epic:"Automation", urgency:"low", importance:"medium", acceptance:"wiki_emit.py writes sources/wikipedia/{slug}.md", deps:["E1-S1"] },
-        { id:"E5-S2", title:"SEP markdown emitter", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"low", acceptance:"Same shape, sources/sep/", deps:["E5-S1"] },
-        { id:"E5-S3", title:"arXiv markdown emitter", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"low", acceptance:"Frontmatter includes paper metadata", deps:["E5-S1"] },
-        { id:"E5-S4", title:"One-shot ingest CLI", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"python ingest.py --wikipedia 'Embodied cognition'", deps:["E5-S1"] },
-        { id:"E5-S5", title:"Hook link graph into frontmatter", status:"backlog", size:"S", epic:"Automation", urgency:"low", importance:"low", acceptance:"outbound_links from SQLite edges", deps:["E5-S4"] },
-        { id:"E5-S6", title:"Citation-graph visualization", status:"backlog", size:"M", epic:"Automation", urgency:"low", importance:"medium", acceptance:"3-panel figure: growth curve, branching histogram, inlaid bars", deps:["E5-S3"] },
-        // Epic 6 — Lint
-        { id:"E6-S1", title:"Define lint workflow", status:"backlog", size:"M", epic:"Lint", urgency:"low", importance:"low", acceptance:"Orphans, stale stubs, contradictions, frontmatter validation", deps:["E0-S2"] },
-        { id:"E6-S2", title:"First lint pass", status:"backlog", size:"M", epic:"Lint", urgency:"low", importance:"low", acceptance:"Lint report + 3 issues fixed", deps:["E6-S1"] },
-        { id:"E6-S3", title:"Lint cadence note", status:"backlog", size:"S", epic:"Lint", urgency:"low", importance:"low", acceptance:"Rule of thumb in CLAUDE.md", deps:["E6-S2"] },
-        // Epic 7 — Beachhead
-        { id:"E7-S1", title:"Pick beachhead topic", status:"backlog", size:"S", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"Topic in log.md, scope as questions/*.md", deps:[] },
-        { id:"E7-S2", title:"Ingest 10 sources", status:"backlog", size:"L", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"~4 SEP + ~4 Wikipedia + ~2 arXiv", deps:["E7-S1"] },
-        { id:"E7-S3", title:"Build concept + entity pages", status:"backlog", size:"L", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"5+ concept pages, 3+ entity pages, contradictions flagged", deps:["E7-S2"] },
-        { id:"E7-S4", title:"End-to-end demo query", status:"backlog", size:"M", epic:"Beachhead", urgency:"low", importance:"high", acceptance:"Hard multi-source question, fully cited answer", deps:["E7-S3"] },
-        // Epic 8 — Polish
-        { id:"E8-S1", title:"Obsidian setup notes", status:"backlog", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Vault config, plugins", deps:[] },
-        { id:"E8-S2", title:"Dataview dashboards", status:"backlog", size:"M", epic:"Polish", urgency:"low", importance:"low", acceptance:"Status overview queries", deps:[] },
-        { id:"E8-S3", title:"Local search (qmd/BM25)", status:"backlog", size:"M", epic:"Polish", urgency:"low", importance:"low", acceptance:"Works when index.md gets unwieldy", deps:[] },
-        { id:"E8-S4", title:"Marp slide template", status:"backlog", size:"S", epic:"Polish", urgency:"low", importance:"low", acceptance:"Wiki tour presentations", deps:[] },
-      ]
-    },
-    {
-      name: "Scrapers", color: "#198754",
-      link: "https://github.com/scottn66/wiki/pull/2", track: "efferent", origin: "side-project",
-      tasks: [
-        { id:"SC-1", title:"Merge PR #2 to main", status:"done", size:"S", epic:"Ship", urgency:"low", importance:"high", acceptance:"feat/scraper-showcase merged (2026-05-12), main has README + .gitignore + all fixes", deps:[] },
-        { id:"SC-2", title:"Wikipedia showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"wikipedia_scraper", acceptance:"wikipedia_scraper.html live on scottn66.github.io", deps:[] },
-        { id:"SC-3", title:"SEP showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"sep_scraper", acceptance:"sep_scraper.html live", deps:[] },
-        { id:"SC-4", title:"arXiv showcase page", status:"done", size:"M", epic:"Website", urgency:"low", importance:"high", unit:"arxiv_scraper", acceptance:"arxiv_scraper.html live", deps:[] },
-        { id:"SC-5", title:"Hygiene: import guards + UA", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"medium", acceptance:"No import-time network, polite UA on all scrapers", deps:[] },
-        { id:"SC-6", title:"Smoke tests pass (all 3)", status:"done", size:"S", epic:"Code Quality", urgency:"low", importance:"high", acceptance:"Wiki, SEP, arXiv all fetch live data", deps:[] },
-      ]
-    },
-    {
-      name: "Portfolio", color: "#6f42c1",
-      link: "https://scottn66.github.io", track: "efferent", origin: "lmu",
-      tasks: [
-        { id:"PF-1", title:"Multi-Armed Bandit agents", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"mab", acceptance:"MAB.html live with interactive sims", deps:[] },
-        { id:"PF-2", title:"Robot-arm crawler (Q-learning → BO → R-MAX)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"robot-arm-sim", acceptance:"robot-arm-sim/ live — 15-act narrative; modernized from the CMSI 4320 / Cognitive Systems Design crawler. Being enriched (back-prop candidates in MOC-cmsi4320-rl).", deps:[] },
-        { id:"PF-3", title:"HMM NER page", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"hmm", acceptance:"HMM.html live", deps:[] },
-        { id:"PF-4", title:"Mandelbrot visualization", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"low", unit:"mandelbrot", origin:"side-project", acceptance:"mandelbrot.html + landing page live", deps:[] },
-        { id:"PF-5", title:"Dashboard page (this page)", status:"in_progress", size:"M", epic:"Meta", urgency:"high", importance:"high", origin:"meta", acceptance:"dashboard.html with kanban + Eisenhower + true-state reconciliation overlay", deps:[] },
-        { id:"PF-6", title:"Speedy Q-learning crawler (original page)", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"low", unit:"q", acceptance:"Q.html live — the earlier single-page crawler write-up; superseded in scope by PF-2 robot-arm-sim.", deps:[] },
-      ]
-    },
-    {
-      name: "AInt", color: "#5a3e8c",
-      link: null, track: "substrate", origin: "meta",
-      tasks: [
-        // Epic — Substrate Hygiene (vault-layer cleanups from _duplicates-review.md + _questions.md Q-A2)
-        { id:"AI-H1", title:"Audit 137 inventory notes for locked enum compliance", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"All notes use locked enums: status ∈ {described|partial|uncertain|deleted|empty|stub}, authorship ∈ {mine|vendored|mixed|unknown}; kind/empty-folder vs kind/stub vs kind/duplicate vs kind/snapshot distinguished. Q-A2 closes.", deps:[] },
-        { id:"AI-H2", title:"Add publish_status field to all inventory notes", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Each inv-*.md has publish_status frontmatter (default backlog); drives the action-potential traversal documented in concept-action-potential-vault-traversal.md.", deps:["AI-H1"] },
-        { id:"AI-H3", title:"Fold loose huffman.cpp (cluster A1)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Assignment Packages/huffman.cpp deleted (byte-identical to submissions/huffman/huffman.cpp). ~13 KB reclaim.", deps:[] },
-        { id:"AI-H4", title:"Fold SURP NewsBiasDetection nested clone (cluster B1)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"SURP/NewsBiasDetection/NewsBiasDetection/ (the self-clone, 44 MB) deleted; gith/ copy preserves the published-version content; working tree intact.", deps:[] },
-        { id:"AI-H5", title:"Diff aima-python ×2; decide fold (cluster D1)", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"medium", acceptance:"diff agents.py + nlp.py between 3300/aima-python and portfolio/AI/aima-python; identify which side has substance; fold the redundant copy. ~190 MB potential reclaim.", deps:[] },
-        { id:"AI-H6", title:"Diff dsml/dataStructures ↔ eclipse/Productivity/src (D4)", status:"backlog", size:"M", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"diff -r the two trees. If identical, fold one; if diverged, keep both with cross-link improvements. ~25 MB potential reclaim.", deps:[] },
-        { id:"AI-H7", title:"Diff CS 3300 cw mirror (cluster B5)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"diff -r 3300/cw vs portfolio/AI/cw. If byte-identical, fold portfolio/AI/cw and replace with a stub note pointing to 3300/cw.", deps:[] },
-        { id:"AI-H8", title:"Diff DataSci-4 FinalProjDataSci pair (cluster A3)", status:"backlog", size:"S", epic:"Substrate Hygiene", urgency:"low", importance:"low", acceptance:"Determine whether twitterSentiment/FinalProjDataSci and Tweet Scraper/FinalProjDataSci are accidental macOS Keep-Both duplicates or substantive variants.", deps:[] },
-
-        // Epic — Publishable Extraction (action-potential canonical goal-state; efferent track)
-        { id:"AI-P1", title:"Polish Huffman C++ capstone for publication", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", track:"efferent", origin:"lmu", unit:"huffman", acceptance:"huffman.html live on scottn66.github.io alongside MAB.html / HMM.html / Q.html; explains compress/decompress roundtrip with code excerpts; cites Stanford CS 106B scaffolding.", deps:[] },
-        { id:"AI-P2", title:"Publish CTF Pacman linear-Q RL case study", status:"backlog", size:"L", epic:"Publishable Extraction", urgency:"low", importance:"high", track:"efferent", origin:"lmu", unit:"pacman_ctf", acceptance:"pacman_ctf.html (or similar) live; documents the LearningOffensiveAgent3 + Sentinel team from 3420 final; hyperparameters and reward shaping per myTeam.py signature in inv-3420-final-turtles.md.", deps:[] },
-        { id:"AI-P3", title:"Publish bigram LM tutorial (with Will Judy attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", track:"efferent", origin:"lmu", unit:"bigram_lm", acceptance:"bigram_lm.html live; explains add-alpha smoothing + perplexity using the 5370 ps0 lm.py code; credits Scott + Will Judy as co-authors.", deps:[] },
-        { id:"AI-P4", title:"Publish exercise-log sequence tagger explainer (5370 midterm)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"medium", track:"efferent", origin:"lmu", unit:"sequence_tagger", acceptance:"sequence_tagger.html (or similar); explains the 5-tag BIO scheme (BE/IE/BF/IF/O), three-word context window LR baseline + LSTM tagger; uses tagger.py signature from inv-5370-midterm.md.", deps:[] },
-        { id:"AI-P5", title:"Publish MABUC paper explainer (Forney attribution)", status:"backlog", size:"M", epic:"Publishable Extraction", urgency:"low", importance:"low", track:"efferent", origin:"lmu", unit:"mabuc", acceptance:"mabuc.html (or similar): summarizes Forney's AAAI-19 HI-RCT paper using simulation parameters from inv-3420-misc-mabuc-paper-repo.md; cites paper, makes clear code is vendored.", deps:[] },
-        { id:"AI-P6", title:"Rotate Q15 credentials so 5370 summarizer can be considered publishable", status:"backlog", size:"S", epic:"Publishable Extraction", urgency:"low", importance:"low", track:"efferent", origin:"lmu", acceptance:"OpenAI key rotated/revoked; GCP service-account JSON rotated; git history rewrite if archive ever goes public. Until then: blocked.", deps:[] },
-
-        // Epic — Meta / Vault Evolution
-        { id:"AI-M1", title:"Add blocked_by frontmatter field on inventory notes", status:"backlog", size:"S", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"inv-5370-summarizer gets blocked_by: Q15. Schema documented in _vault/README.md tag taxonomy section.", deps:["AI-H1"] },
-        { id:"AI-M2", title:"Vocabulary-hooks sweep across 11 remaining concept notes", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Each concept note has a Vocabulary handles section naming the orientation-vocabulary terms that activate it. (concept-causal-inference.md already done as the pattern.)", deps:[] },
-        { id:"AI-M3", title:"Pass 4 — incremental update routine when archive gains a new folder", status:"backlog", size:"M", epic:"Meta / Vault Evolution", urgency:"low", importance:"low", acceptance:"Documented procedure: detect new leaves via find-vs-inventory mismatch; generate inventory note(s); cross-link to relevant MOC; update concept hooks if needed.", deps:[] },
-      ]
-    },
-    {
-      name: "Solar Viability", color: "#E8A33D",
-      link: "https://scottn66.github.io/solar/", track: "efferent", origin: "sjsu",
-      tasks: [
-        { id:"SV-1", title:"Multi-API ETL pipeline (NREL / NASA POWER / URDB / EIA / PVWatts)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", acceptance:"7 connector modules → DuckDB warehouse (2.6M rows); cleaned TOU schedules + NEM 3.0 rate tables.", deps:[] },
-        { id:"SV-2", title:"Economics engine + FastAPI quote service", status:"done", size:"M", epic:"Shipped", urgency:"low", importance:"high", acceptance:"25-year cashflow + LCOE / payback / NPV viability scoring; address → quote API.", deps:["SV-1"] },
-        { id:"SV-3", title:"Publish solar site (overview + 20 city reports + 2,593-ZIP heatmaps + paper)", status:"done", size:"L", epic:"Shipped", urgency:"low", importance:"high", unit:"solar-viability", acceptance:"/solar/ live with overview, reports/, heatmap/, paper.pdf — SJSU DATA 201 (Database Technologies) final.", deps:["SV-2"] },
-      ]
-    },
-    {
-      name: "Decision Theory", color: "#2A9D8F",
-      link: null, track: "efferent", origin: "born-publishable",
-      tasks: [
-        { id:"DT-1", title:"Expand MOC to full 18-station topological DAG", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"MOC-decision-theory.md: 4 acts, 18 stations, prereq DAG, narrative spine 'The Price of Knowing You'.", deps:[] },
-        { id:"DT-2", title:"concept-value-of-information (quality bar)", status:"done", size:"M", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"VPI concept note authored as the depth bar for the rest of the Tier-3 spine.", deps:["DT-1"] },
-        { id:"DT-3", title:"5 new concept notes (bayes-nets, utility+DN, do-calculus, SCMs, counterfactuals)", status:"in_progress", size:"L", epic:"Curriculum", urgency:"low", importance:"high", acceptance:"Tier-3 spine for Acts I–IV; concept-causal-inference is the rung-3 hub.", deps:["DT-2"] },
-        { id:"DT-4", title:"Smoke-test pgmpy Defendotron (MEU / VPI)", status:"backlog", size:"M", epic:"Build", urgency:"low", importance:"medium", acceptance:"Verified MEU + VPI numbers + runnable excerpts from the hand-rolled eu/meu/vpi (hw2).", deps:["DT-3"] },
-        { id:"DT-5", title:"Build decision-theory.html (4 acts + 3 interactive widgets)", status:"backlog", size:"L", epic:"Build", urgency:"low", importance:"high", unit:"decision-theory", acceptance:"Single long-form page: BN inference + VPI calculator + counterfactual stepper; Scott-authored spine, AIMA / Forney cited.", deps:["DT-4"] },
-        { id:"DT-6", title:"PR, publish, reconcile dashboard → publish_status done", status:"backlog", size:"S", epic:"Build", urgency:"low", importance:"medium", acceptance:"decision-theory.html live; MOC publish_status=done; manifest unit decision-theory PUBLISHED.", deps:["DT-5"] },
-      ]
-    }
-  ];
-
-  // ============================================================
-  // STATE
-  // ============================================================
-  const STORAGE_KEY = "dashboard_overrides_v1";
-  let overrides = {};
-  try { overrides = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) {}
-
-  function getTask(t) {
-    const o = overrides[t.id] || {};
-    return { ...t, status: o.status || t.status, urgency: o.urgency || t.urgency, importance: o.importance || t.importance };
-  }
-  function saveOverride(id, field, value) {
-    if (!overrides[id]) overrides[id] = {};
-    overrides[id][field] = value;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
-  }
-
-  function allTasks(filterProject, filterStatus, filterEpic, filterTrack) {
-    const out = [];
-    for (const p of PROJECTS) {
-      if (filterProject !== "all" && p.name !== filterProject) continue;
-      for (const t of p.tasks) {
-        // Project-level track/origin are defaults; a task's own field overrides.
-        const merged = { track: p.track, origin: p.origin, ...getTask(t), project: p.name, projectColor: p.color };
-        if (filterStatus !== "all" && merged.status !== filterStatus) continue;
-        if (filterEpic !== "all" && merged.epic !== filterEpic) continue;
-        if (filterTrack !== "all" && merged.track !== filterTrack) continue;
-        out.push(merged);
-      }
-    }
-    return out;
-  }
-
-  // ============================================================
-  // PUBLISHED-CORPUS MANIFEST (the P plane) + derived true-state
-  // ============================================================
-  let liveUnits = new Set();   // units with a live page, from published-corpus.json
-  let manifestEntries = [];
-
-  async function loadManifest() {
-    try {
-      const res = await fetch("published-corpus.json", { cache: "no-store" });
-      if (res.ok) {
-        manifestEntries = await res.json();
-        liveUnits = new Set(manifestEntries.map(e => e.unit));
-      }
-    } catch (e) {
-      // offline / file:// — degrade gracefully, no badges
-    }
-    renderUntrackedBanner();
-    render();
-  }
-
-  // trueState(unit) derived from the triple, per _reconciliation.md.
-  // The browser knows I (card status) + P (manifest); the W-plane joins
-  // (BUILT / ORPHANED / back-prop) belong to the weekly audit.
-  function trueStateBadge(t) {
-    if (!t.unit) return "";
-    if (liveUnits.has(t.unit))
-      return `<span class="badge-published" title="Live on the site (P-plane)"><i class="fas fa-circle-check"></i> PUBLISHED</span>`;
-    if (t.status === "done")
-      return `<span class="badge-falsedone" title="Card says done but no live page — the FALSE-DONE guardrail"><i class="fas fa-triangle-exclamation"></i> FALSE-DONE</span>`;
-    return "";
-  }
-
-  function cardUnits() {
-    const s = new Set();
-    for (const p of PROJECTS) for (const t of p.tasks) if (t.unit) s.add(t.unit);
-    return s;
-  }
-
-  function renderUntrackedBanner() {
-    const el = document.getElementById("drift-banner");
-    if (!el) return;
-    const known = cardUnits();
-    const untracked = manifestEntries.filter(e => !known.has(e.unit));
-    if (!untracked.length) { el.innerHTML = ""; return; }
-    el.innerHTML = `
-      <div class="alert alert-warning py-2 px-3" style="font-size:.85rem; margin-bottom:1rem;">
-        <i class="fas fa-triangle-exclamation me-1"></i>
-        <strong>${untracked.length} published unit(s) untracked:</strong>
-        ${untracked.map(e => `<a href="${e.url}" target="_blank" rel="noopener">${e.unit}</a>`).join(", ")}
-        — live on the site with no card. Add a card or decide to retire the page.
-      </div>`;
-  }
-
-  // ============================================================
-  // RENDERING
-  // ============================================================
-  let currentView = "kanban";
-
-  function renderCard(t) {
-    const el = document.createElement("div");
-    el.className = "task-card";
-    el.style.borderLeftColor = t.projectColor;
-    el.innerHTML = `
-      <div class="title">${t.id}: ${t.title}</div>
-      <div class="meta">
-        <span class="badge-project" style="background:${t.projectColor}">${t.project}</span>
-        <span class="badge-size">${t.size}</span>
-        <span class="badge-epic">${t.epic}</span>
-        ${trueStateBadge(t)}
-      </div>`;
-    el.addEventListener("click", () => openModal(t));
-    return el;
-  }
-
-  function renderKanban(tasks) {
-    const cols = { backlog: [], todo: [], in_progress: [], done: [] };
-    for (const t of tasks) cols[t.status]?.push(t);
-    const labels = { backlog:"Backlog", todo:"To Do", in_progress:"In Progress", done:"Done" };
-    const board = document.getElementById("board");
-    board.innerHTML = "";
-    const grid = document.createElement("div");
-    grid.className = "kanban";
-    for (const key of ["backlog","todo","in_progress","done"]) {
-      const col = document.createElement("div");
-      col.className = "kanban-col";
-      col.innerHTML = `<h5>${labels[key]} (${cols[key].length})</h5>`;
-      for (const t of cols[key]) col.appendChild(renderCard(t));
-      grid.appendChild(col);
-    }
-    board.appendChild(grid);
-  }
-
-  function renderEisenhower(tasks) {
-    const quads = { q1:[], q2:[], q3:[], q4:[] };
-    for (const t of tasks) {
-      if (t.status === "done") continue;
-      const u = t.urgency === "high", i = t.importance === "high";
-      if (u && i) quads.q1.push(t);
-      else if (!u && i) quads.q2.push(t);
-      else if (u && !i) quads.q3.push(t);
-      else quads.q4.push(t);
-    }
-    const board = document.getElementById("board");
-    board.innerHTML = `
-      <div style="display:grid; grid-template-columns:40px 1fr 1fr; grid-template-rows:auto auto auto; gap:0;">
-        <div></div>
-        <div class="eq-axis-label" style="padding:6px;">Urgent</div>
-        <div class="eq-axis-label" style="padding:6px;">Not Urgent</div>
-        <div class="eq-axis-label" style="writing-mode:vertical-lr; transform:rotate(180deg); padding:6px;">Important</div>
-        <div class="eq eq-q1" id="eq-q1"><h5><i class="fas fa-fire me-1"></i>Do First (${quads.q1.length})</h5></div>
-        <div class="eq eq-q2" id="eq-q2"><h5><i class="fas fa-calendar-alt me-1"></i>Schedule (${quads.q2.length})</h5></div>
-        <div class="eq-axis-label" style="writing-mode:vertical-lr; transform:rotate(180deg); padding:6px;">Less Important</div>
-        <div class="eq eq-q3" id="eq-q3"><h5><i class="fas fa-user-friends me-1"></i>Delegate (${quads.q3.length})</h5></div>
-        <div class="eq eq-q4" id="eq-q4"><h5><i class="fas fa-trash-alt me-1"></i>Eliminate / Defer (${quads.q4.length})</h5></div>
-      </div>`;
-    for (const [k,arr] of Object.entries(quads)) {
-      const container = document.getElementById("eq-"+k);
-      for (const t of arr) container.appendChild(renderCard(t));
-    }
-  }
-
-  function renderStats(tasks) {
-    const counts = { backlog:0, todo:0, in_progress:0, done:0 };
-    for (const t of tasks) counts[t.status] = (counts[t.status]||0) + 1;
-    const total = tasks.length;
-    const pct = total ? Math.round(counts.done / total * 100) : 0;
-    document.getElementById("stats-bar").innerHTML = `
-      <div class="stat-card"><div class="num">${total}</div><div class="label">Total</div></div>
-      <div class="stat-card"><div class="num" style="color:var(--q1)">${counts.in_progress}</div><div class="label">In Progress</div></div>
-      <div class="stat-card"><div class="num" style="color:var(--q2)">${counts.todo}</div><div class="label">To Do</div></div>
-      <div class="stat-card"><div class="num" style="color:var(--muted)">${counts.backlog}</div><div class="label">Backlog</div></div>
-      <div class="stat-card"><div class="num" style="color:#198754">${counts.done}</div><div class="label">Done</div></div>
-      <div class="stat-card"><div class="num" style="color:#198754">${pct}%</div><div class="label">Complete</div></div>`;
-    document.getElementById("progress-row").innerHTML = `
-      <div class="progress">
-        <div class="progress-bar bg-success" style="width:${counts.done/total*100}%"></div>
-        <div class="progress-bar bg-warning" style="width:${counts.in_progress/total*100}%"></div>
-        <div class="progress-bar bg-primary" style="width:${counts.todo/total*100}%"></div>
-      </div>`;
-  }
-
-  function render() {
-    const fp = document.getElementById("filter-project").value;
-    const fs = document.getElementById("filter-status").value;
-    const fe = document.getElementById("filter-epic").value;
-    const ftk = document.getElementById("filter-track").value;
-    const tasks = allTasks(fp, fs, fe, ftk);
-    renderStats(tasks);
-    if (currentView === "kanban") renderKanban(tasks);
-    else renderEisenhower(tasks);
-  }
-
-  // ============================================================
-  // MODAL
-  // ============================================================
-  let modalTask = null;
-  function openModal(t) {
-    modalTask = t;
-    document.getElementById("modal-title").textContent = `${t.id}: ${t.title}`;
-    document.getElementById("modal-body").innerHTML = `
-      <div class="row g-3 mb-3">
-        <div class="col-auto">
-          <label class="form-label fw-bold" style="font-size:.8rem;">Status</label>
-          <select class="form-select form-select-sm" id="m-status">
-            <option value="backlog" ${t.status==="backlog"?"selected":""}>Backlog</option>
-            <option value="todo" ${t.status==="todo"?"selected":""}>To Do</option>
-            <option value="in_progress" ${t.status==="in_progress"?"selected":""}>In Progress</option>
-            <option value="done" ${t.status==="done"?"selected":""}>Done</option>
-          </select>
-        </div>
-        <div class="col-auto">
-          <label class="form-label fw-bold" style="font-size:.8rem;">Urgency</label>
-          <select class="form-select form-select-sm" id="m-urgency">
-            <option value="low" ${t.urgency==="low"?"selected":""}>Low</option>
-            <option value="high" ${t.urgency==="high"?"selected":""}>High</option>
-          </select>
-        </div>
-        <div class="col-auto">
-          <label class="form-label fw-bold" style="font-size:.8rem;">Importance</label>
-          <select class="form-select form-select-sm" id="m-importance">
-            <option value="low" ${t.importance==="low"?"selected":""}>Low</option>
-            <option value="medium" ${t.importance==="medium"?"selected":""}>Medium</option>
-            <option value="high" ${t.importance==="high"?"selected":""}>High</option>
-          </select>
-        </div>
-      </div>
-      <dl class="detail-section">
-        <dt>Project</dt><dd><span class="badge-project" style="background:${t.projectColor}">${t.project}</span></dd>
-        <dt>Epic</dt><dd>${t.epic}</dd>
-        <dt>Track</dt><dd>${t.track || "—"} &middot; <span class="text-muted">origin: ${t.origin || "—"}</span></dd>
-        <dt>Unit (reconciliation key)</dt><dd>${t.unit ? `<code>${t.unit}</code>` : "<span class='text-muted'>— none (sub-task)</span>"}</dd>
-        <dt>True-state (Intent &times; Publish)</dt><dd>${t.unit ? (liveUnits.has(t.unit) ? "<span style='color:#0f5132;font-weight:600'>PUBLISHED</span> — live on site" : (t.status==="done" ? "<span style='color:#842029;font-weight:700'>⚠ FALSE-DONE</span> — card says done but no live page" : "PLANNED — not yet live")) : "<span class='text-muted'>— (no unit to validate)</span>"}</dd>
-        <dt>Size</dt><dd>${t.size === "S" ? "Small (~30 min)" : t.size === "M" ? "Medium (~1-2 hr)" : "Large (half day+)"}</dd>
-        <dt>Acceptance Criteria</dt><dd>${t.acceptance || "—"}</dd>
-        <dt>Dependencies</dt><dd>${t.deps && t.deps.length ? t.deps.join(", ") : "None"}</dd>
-      </dl>`;
-    new bootstrap.Modal(document.getElementById("taskModal")).show();
-  }
-  document.getElementById("modal-save").addEventListener("click", () => {
-    if (!modalTask) return;
-    saveOverride(modalTask.id, "status", document.getElementById("m-status").value);
-    saveOverride(modalTask.id, "urgency", document.getElementById("m-urgency").value);
-    saveOverride(modalTask.id, "importance", document.getElementById("m-importance").value);
-    bootstrap.Modal.getInstance(document.getElementById("taskModal")).hide();
-    render();
-  });
-
-  // ============================================================
-  // INIT
-  // ============================================================
-  // Populate project filter
-  const filterEl = document.getElementById("filter-project");
-  for (const p of PROJECTS) {
-    const opt = document.createElement("option");
-    opt.value = p.name; opt.textContent = p.name;
-    filterEl.appendChild(opt);
-  }
-  // Populate epic filter (unique across all projects, project-prefixed)
-  const epicFilterEl = document.getElementById("filter-epic");
-  const epicsByProject = {};
-  for (const p of PROJECTS) {
-    const seen = new Set();
-    for (const t of p.tasks) {
-      if (t.epic && !seen.has(t.epic)) { seen.add(t.epic); }
-    }
-    epicsByProject[p.name] = Array.from(seen).sort();
-  }
-  for (const p of PROJECTS) {
-    if (!epicsByProject[p.name].length) continue;
-    const group = document.createElement("optgroup");
-    group.label = p.name;
-    for (const epic of epicsByProject[p.name]) {
-      const opt = document.createElement("option");
-      opt.value = epic; opt.textContent = epic;
-      group.appendChild(opt);
-    }
-    epicFilterEl.appendChild(group);
-  }
-  // View toggle
-  document.querySelectorAll(".view-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentView = btn.dataset.view;
-      render();
-    });
-  });
-  // Filters
-  document.getElementById("filter-project").addEventListener("change", render);
-  document.getElementById("filter-status").addEventListener("change", render);
-  document.getElementById("filter-epic").addEventListener("change", render);
-  document.getElementById("filter-track").addEventListener("change", render);
-  // Reset
-  document.getElementById("btn-reset").addEventListener("click", () => {
-    if (confirm("Reset all status/priority changes to defaults?")) {
-      localStorage.removeItem(STORAGE_KEY);
-      overrides = {};
-      render();
-    }
-  });
-  // Go — fetch the published-corpus manifest, then render (degrades if absent)
-  loadManifest();
-  </script>
 </body>
 </html>
