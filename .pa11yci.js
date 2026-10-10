@@ -51,17 +51,6 @@ const urls = [...rootPages, ...projectFrontDoors].map((path) => {
     };
   }
 
-  // modal-title is an empty template inside a display:none Bootstrap dialog;
-  // openModal() fills the heading before the dialog is shown.
-  if (path === 'dashboard.html') {
-    return {
-      url,
-      ignore: [
-        'WCAG2AA.Principle1.Guideline1_3.1_3_1.H42.2',
-      ],
-    };
-  }
-
   return url;
 });
 
