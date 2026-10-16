@@ -94,7 +94,7 @@
 <body>
   <header>
     <h1>City Cartography</h1>
-    <p class="tagline">A topographic recreation of <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener">anvaka / city-roads</a></p>
+    <p class="tagline">Street maps of any city layered over real terrain, built on Andrei Kashcha's <a href="https://github.com/anvaka/city-roads" target="_blank" rel="noopener">city-roads</a></p>
   </header>
 
   <main>
@@ -114,8 +114,7 @@
     <p>
       This recreation keeps that spirit but asks a question the original deliberately leaves out: <strong>what does the land underneath the
       streets look like?</strong> Roads bend around hills, hug rivers, and climb passes — so this version layers the city's road network on
-      top of <strong>real elevation data</strong>, plus water, green space, and rail, to make a richer map. Everything runs in the browser with
-      no API keys and no build step, matching the rest of this site.
+      top of <strong>real elevation data</strong>, plus water, green space, and rail, to make a richer map. Everything runs in your browser; there's nothing to install or sign up for.
     </p>
 
     <h2 class="section-title">What's different here</h2>
@@ -137,7 +136,7 @@
       which pack height into the RGB channels of ordinary PNG tiles:
     </p>
     <div class="pipeline">
-      <code>elevation_metres = (red × 256 + green + blue ÷ 256) − 32768</code>
+      <code>elevation_meters = (red × 256 + green + blue ÷ 256) − 32768</code>
       <ol>
         <li>Figure out which map tiles cover the city's bounding box and download them.</li>
         <li>Decode every pixel back into a height value to build an elevation grid.</li>
@@ -160,10 +159,9 @@
       <strong>Kyoto</strong>. Very large cities can be slow or hit Overpass rate limits — switch to "Major roads" or pick a smaller place.
     </p>
 
-    <h2 class="section-title">Brainstorm: candidates to push the cartography further</h2>
+    <h2 class="section-title">Shipped and next</h2>
     <p>
-      The whole point of the exercise is layering <em>more</em> meaning onto the map. Here are the enhancement candidates I considered —
-      the ones tagged <span class="tag done" style="margin:0;">shipped</span> are already in the viewer; the rest are the roadmap.
+      The goal is to layer more meaning onto the map. Cards marked Shipped are live in the viewer; the rest are planned.
     </p>
     <div class="cards">
       <div class="card"><span class="tag done">Shipped</span><h3>Elevation contours</h3><p>Marching-squares isolines with bold index contours every fifth line and an auto-chosen interval.</p></div>
