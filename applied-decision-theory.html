@@ -201,7 +201,7 @@
           <tr><td>$D$</td><td>the <strong>residual cost</strong> you still pay even when covered, so $C$ buys only $L-D$ of real protection</td><td>a deductible · a service fee · a copay · $D=0$ when the cover is total</td></tr>
         </table>
         <p>
-          The other three problems are the same inversion through sibling
+          Problems 2–4 are the same inversion through sibling
           formulas: in <a href="#finance">finance</a> the price <em>is</em> the
           probability; in <a href="#medicine">medicine</a> the "price" is a test
           and the payoff is the <a href="decision-theory.html#vpi">value of the
@@ -239,7 +239,7 @@
               <text x="601" y="205">price = prob</text>
             </g>
           </svg>
-          <figcaption>One engine behind all four problems: invert a price to recover the probability it implies.</figcaption>
+          <figcaption>One engine behind problems 1–4: invert a price to recover the probability it implies.</figcaption>
         </figure>
         <div class="callout landmark">
           <span class="k">The problem schema</span>
@@ -366,7 +366,7 @@
         <p style="margin:.3rem 0 0">
           The market says $62\%$ (buy above that); the two $1.90$ prices
           <em>look</em> like $52.63\%$ but really encode $50\%/50\%$ plus a
-          $5.26\%$ house edge. The naive implied probability overstates every
+          $5.26\%$ overround (a house edge of about $5.0\%$ per bet). The naive implied probability overstates every
           outcome by the half-vig, so normalize before you trust it — the same
           price-to-probability inversion as insurance, with the seller's margin
           folded in.
@@ -700,7 +700,7 @@
 <figcaption>Underage \$3 vs overage \$2 gives a critical fractile of 0.6, so you bake up to the 60th percentile of demand &#8212; about 105. A cost ratio again picks a probability threshold, here a stocking quantile.</figcaption>
 </figure>
       <h2 id="kelly">7 · Investing &amp; betting: how much to wager on an edge <span class="act-tag act-econ">growth-optimal sizing</span></h2>
-<p>A repeatable, favourable bet pays $b = 2$ to $1$ on a win, with win probability $p = 0.4$ and loss probability $q = 1 - p = 0.6$. Its expected value is positive: $0.4 \times 2 - 0.6 \times 1 = +0.2$ per unit staked. The question is not whether to bet a clear edge but how much: what fraction of your bankroll should you stake on each repetition to maximize the long-run growth of your wealth?</p>
+<p>A repeatable, favorable bet pays $b = 2$ to $1$ on a win, with win probability $p = 0.4$ and loss probability $q = 1 - p = 0.6$. Its expected value is positive: $0.4 \times 2 - 0.6 \times 1 = +0.2$ per unit staked. The question is not whether to bet a clear edge but how much: what fraction of your bankroll should you stake on each repetition to maximize the long-run growth of your wealth?</p>
 <div class="callout gold"><span class="k">Principle · Kelly criterion</span><p style="margin:.3rem 0 0">Because bets compound multiplicatively, the right objective is not expected wealth but expected <em>log</em>-wealth, whose growth rate per bet is $g(f) = p\ln(1 + bf) + q\ln(1 - f)$. Maximizing $g$ over the stake fraction $f$ gives the Kelly fraction $$f^{\ast} = \frac{bp - q}{b} = p - \frac{q}{b}.$$</p></div>
 <div class="steps worked"><div class="step"><div class="label">Apply formula</div> $f^{\ast} = \dfrac{bp - q}{b} = \dfrac{2 \times 0.4 - 0.6}{2} = \dfrac{0.8 - 0.6}{2} = \dfrac{0.2}{2} = 0.10$, so stake $10\%$ of the bankroll each time.</div><div class="step"><div class="label">Verify optimum</div> Set $g'(f) = \dfrac{bp}{1 + bf} - \dfrac{q}{1 - f} = 0$. At $f = 0.10$: $\dfrac{2 \times 0.4}{1.2} = \dfrac{0.8}{1.2} = 0.6\overline{6}$ and $\dfrac{0.6}{0.9} = 0.6\overline{6}$, equal, confirming the peak.</div><div class="step"><div class="label">Growth at $f^{\ast}$</div> $g(0.10) = 0.4\ln(1.2) + 0.6\ln(0.9) = 0.4(0.18232) + 0.6(-0.10536) = 0.07293 - 0.06322 = +0.00971$ per bet, the maximum attainable rate.</div><div class="step"><div class="label">Double the stake</div> At $f = 0.20$: $g(0.20) = 0.4\ln(1.4) + 0.6\ln(0.8) = 0.4(0.33647) + 0.6(-0.22314) = 0.13459 - 0.13389 = +0.00070$, barely positive, roughly $\tfrac{1}{14}$ of the Kelly growth rate.</div><div class="step"><div class="label">Find ruin threshold</div> $g(f) = 0$ for $f &gt; 0$ at $f \approx 0.204$; beyond it $g$ turns negative (e.g. $g(0.25) \approx -0.0104$). Past this point a positive-EV bet shrinks your wealth almost surely.</div></div>
 <div class="callout good"><span class="k">Answer</span><p style="margin:.3rem 0 0">Stake $f^{\ast} = 10\%$ of bankroll per bet, yielding the maximal log-growth rate of about $+0.97\%$ per wager. Doubling to $20\%$ collapses growth to $+0.07\%$ and a touch more turns it negative; the same edge, recklessly sized, destroys wealth.</p></div>
