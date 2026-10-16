@@ -114,12 +114,12 @@
             <a href="arxiv_scraper.html" class="btn btn-outline-light ml-2">arXiv Scraper</a>
         </div>
         <h1>Stanford Encyclopedia of Philosophy Scraper</h1>
-        <p>Peer-reviewed concept backbone with hand-curated cross-references</p>
+        <p>Pulls definitions and editor-curated cross-references from the Stanford Encyclopedia of Philosophy</p>
     </header>
 
     <section class="container mt-5">
 
-        <p><span class="badge-role">Role in pipeline</span> <strong>Concept backbone.</strong> Peer-reviewed entries, hand-curated <code>related_entries</code>, highest signal-per-page of any source in the stack. A single SEP entry on "Cognitive Science" yields 27 section headings and 31 curated cross-references.</p>
+        <p><span class="badge-role">Role in pipeline</span> <strong>Concept backbone.</strong> Peer-reviewed entries, hand-curated <code>related_entries</code>, the most curated links of the three sources. A single SEP entry on "Cognitive Science" yields 27 section headings and 31 curated cross-references.</p>
 
         <!-- Why SEP -->
         <div class="concept-box">
@@ -161,13 +161,13 @@
         <div class="concept-box">
             <h3>Key Design Decisions</h3>
             <h4>Explicit citation graph from related_entries</h4>
-            <p>SEP doesn't have a formal API. What saves the scraper is that every SEP article includes a hand-curated <code>&lt;div id="related-entries"&gt;</code>. The scraper parses this into a <code>{title: href_slug}</code> dictionary, giving you a directed graph where edges are editorial judgments, not accidental hyperlinks. This is the highest-quality citation signal in the entire stack.</p>
+            <p>SEP doesn't have a formal API. What saves the scraper is that every SEP article includes a hand-curated <code>&lt;div id="related-entries"&gt;</code>. The scraper parses this into a <code>{title: href_slug}</code> dictionary, giving you a directed graph where edges are editorial judgments, not accidental hyperlinks.</p>
 
             <h4>Two-class separation: Fetcher + Reader</h4>
-            <p><code>SepFetcher</code> writes to the cache; <code>DBreader</code> reads from it. This is the only source in the stack with a proper query layer over its own metadata. You can <code>.search("consciousness")</code> and get back matching articles without re-scraping.</p>
+            <p><code>SepFetcher</code> writes to the cache; <code>DBreader</code> reads from it. Of the three scrapers, only this one has a query layer over its cached metadata. You can <code>.search("consciousness")</code> and get back matching articles without re-scraping.</p>
 
             <h4>Initial paragraph extraction</h4>
-            <p>SEP articles have a distinct <code>&lt;div id="preamble"&gt;</code> that contains the lede &mdash; usually the single best one-paragraph definition of the concept. The scraper extracts this separately from the full section content, making it ideal for LLM context windows where brevity matters.</p>
+            <p>SEP articles have a distinct <code>&lt;div id="preamble"&gt;</code> that contains the entry's opening summary. The scraper extracts this separately from the full section content, making it ideal for LLM context windows where brevity matters.</p>
         </div>
 
         <!-- Code Sample -->
@@ -181,7 +181,7 @@
         <span class="keyword">for</span> link <span class="keyword">in</span> links:
             title = link.text.strip()
             href = link.get(<span class="string">'href'</span>)
-            <span class="keyword">if</span> href <span class="keyword">is not</span> <span class="keyword">None</span> <span class="keyword">or</span> title != <span class="string">'Related Entries'</span>:
+            <span class="keyword">if</span> href <span class="keyword">is not</span> <span class="keyword">None</span> <span class="keyword">and</span> title != <span class="string">'Related Entries'</span>:
                 clean_href = re.sub(<span class="string">r'^[^A-Za-z]+'</span>, <span class="string">''</span>, href)
                 related_entries[title] = clean_href
     <span class="keyword">return</span> related_entries</pre>
@@ -252,7 +252,7 @@
                 <tr><td>Storage backend</td><td>JSON (sep_articles/metadata.json)</td></tr>
                 <tr><td>Graph type</td><td>Explicit editor-curated cross-references</td></tr>
                 <tr><td>Query layer</td><td>DBreader.search() &mdash; keyword search over cached content</td></tr>
-                <tr><td>Unique extraction</td><td>Preamble paragraph (best one-sentence definition)</td></tr>
+                <tr><td>Unique extraction</td><td>Preamble (the entry's opening summary)</td></tr>
                 <tr><td>Post-processing</td><td>NLTK lexicon + bigram analysis (read_plato.py)</td></tr>
             </table>
         </div>
