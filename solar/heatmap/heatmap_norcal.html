@@ -112,11 +112,16 @@
   }
   .section a { color: #0B6E64; text-decoration: none; font-weight: 600; }
   .section a:hover { text-decoration: underline; }
+  .table-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
   .tier-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.88rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
   .tier-table th {
     background: #F4F5F7;
@@ -190,6 +195,7 @@
   <section class="section" aria-labelledby="legend-title">
     <h2 id="legend-title">How to read this map</h2>
     <p>Each dot is one ZIP code. Color is the viability score from 0 to 100 (purple is lower, yellow is higher). Opacity is how many real installations Berkeley Lab recorded in that three-digit ZIP prefix.</p>
+    <div class="table-scroll">
     <table class="tier-table">
       <caption class="map-summary">Confidence tiers based on local solar installations.</caption>
       <thead>
@@ -221,6 +227,7 @@
         </tr>
       </tbody>
     </table>
+    </div>
     <p>The score models a 4.5 kW south-facing system: 25% solar resource, 50% economics, 15% site fit, and 10% local market maturity. The <a href="./">heatmap overview</a> has the utility rates, cost inputs, and data sources.</p>
   </section>
 </main>
