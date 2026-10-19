@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes — working research logs</title>
+  <meta name="description" content="Working notes behind Scott Nelson's portfolio: Hoffman trace-logic research logs, review findings, and source audits. These are not project pages.">
+  <meta name="unit" content="notes">
+  <style>
+    :root {
+      --bg: #f7f6f3;
+      --card: #ffffff;
+      --ink: #1c1917;
+      --muted: #3f4a56;
+      --link: #0b3d78;
+      --line: #d5d1c8;
+      --nav: #1e2933;
+      --nav-ink: #ffffff;
+      --accent: #14375a;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      font-size: 1.125rem;
+      line-height: 1.6;
+    }
+    .skip:not(:focus) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+    .skip:focus {
+      position: fixed;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 20;
+      background: #fff;
+      color: var(--accent);
+      padding: 0.5rem 0.8rem;
+      font-family: "Segoe UI", sans-serif;
+      font-weight: 700;
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+    :where(a):focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+    header {
+      background: var(--nav);
+      color: var(--nav-ink);
+    }
+    nav {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 1.1rem;
+      align-items: center;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.95rem;
+    }
+    nav a {
+      color: var(--nav-ink);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    nav a:hover { text-decoration: underline; }
+    nav a:focus-visible { outline-color: #fff; }
+    nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.25em; }
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3.5rem;
+    }
+    h1, h2, h3 {
+      font-family: "Segoe UI", sans-serif;
+      line-height: 1.25;
+      color: var(--accent);
+    }
+    h1 { font-size: 2.25rem; margin: 0 0 0.6rem; }
+    h2 { font-size: 1.45rem; margin: 2.4rem 0 0.5rem; scroll-margin-top: 1rem; }
+    h3 { font-size: 1.05rem; margin: 1.4rem 0 0.35rem; }
+    p { margin: 0.7rem 0; }
+    .lede { font-size: 1.2rem; }
+    .kicker {
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 0.4rem;
+    }
+    a { color: var(--link); }
+    ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+    li { margin: 0.55rem 0; }
+    li p { margin: 0.15rem 0 0; color: var(--muted); font-size: 1rem; }
+    code {
+      font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", monospace;
+      font-size: 0.82em;
+      color: var(--ink);
+    }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 1.25rem;
+      text-align: center;
+      font-family: "Segoe UI", sans-serif;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    footer a { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to notes</a>
+  <header>
+    <nav aria-label="Site">
+      <a href="../index.html">Scott Nelson</a>
+      <a href="../index.html#projects">Work</a>
+      <a href="../resume.html">Resume</a>
+      <a href="./" aria-current="page">Notes</a>
+    </nav>
+  </header>
+  <main id="content" tabindex="-1">
+    <p class="kicker">Working notes</p>
+    <h1>Notes</h1>
+    <p class="lede">Research logs, review passes, and the longer writeups they support. The project pages are the <a href="../ner-taggers.html">NER taggers</a>, the <a href="../decision-theory.html">decision-theory curriculum</a>, and the <a href="../demographics/">demographics atlas</a>.</p>
+    <p>Each file below is a working record. Read it as notes in progress.</p>
+
+    <section>
+      <h2 id="hoffman">Conscious agents and trace logic</h2>
+      <p>The <a href="../ner-taggers.html">NER taggers</a> use a row-stochastic transition matrix and stop at the tagger comparison. These notes follow that same object into Donald Hoffman and Chetan Prakash's conscious-agent program: research logs, a rigor review, and two longer writeups. The NER project stands on its own.</p>
+
+      <h3>Writeups</h3>
+      <ul>
+        <li>
+          <a href="../conscious-agents.html">From Markov Chains to Conscious Agents</a>
+          <p>The long essay. Tagged claims, from textbook Markov chains through the trace logic.</p>
+        </li>
+        <li>
+          <a href="../conscious-agents-conjectures.html">Open conjectures of the conscious-agent program</a>
+          <p>A catalogue of what is still open, written for someone who wants the frontier rather than the exposition.</p>
+        </li>
+      </ul>
+
+      <h3>Research logs</h3>
+      <ul>
+        <li>
+          <a href="hoffman/HMM-hoffman-research.md">Pass 1 — breadth research report</a>
+          <p><code>notes/hoffman/HMM-hoffman-research.md</code></p>
+        </li>
+        <li>
+          <a href="hoffman/HMM-hoffman-research-2-trace-logic.md">Pass 2 — trace-logic threads</a>
+          <p><code>notes/hoffman/HMM-hoffman-research-2-trace-logic.md</code></p>
+        </li>
+        <li>
+          <a href="hoffman/HMM-hoffman-research-3-traces-paper.md">Pass 3 — Traces of Consciousness ground truth</a>
+          <p><code>notes/hoffman/HMM-hoffman-research-3-traces-paper.md</code></p>
+        </li>
+        <li>
+          <a href="hoffman/HMM-hoffman-research-4-recursion-bridges.md">Pass 4 — recursion bridges</a>
+          <p><code>notes/hoffman/HMM-hoffman-research-4-recursion-bridges.md</code></p>
+        </li>
+        <li>
+          <a href="hoffman/HMM-hoffman-research-5-verification-record.md">Pass 5 — adversarial verification record</a>
+          <p><code>notes/hoffman/HMM-hoffman-research-5-verification-record.md</code></p>
+        </li>
+        <li>
+          <a href="hoffman/HMM-hoffman-open-problems.md">Open-problems working brief</a>
+          <p><code>notes/hoffman/HMM-hoffman-open-problems.md</code></p>
+        </li>
+      </ul>
+
+      <h3>Review</h3>
+      <ul>
+        <li>
+          <a href="reviews/conscious-agents-review-findings.md">Rigor review of the conscious-agents essay</a>
+          <p><code>notes/reviews/conscious-agents-review-findings.md</code></p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="demographics">Demographics atlas</h2>
+      <p>Source audit for the <a href="../demographics/">demographics atlas</a>. The atlas is the project. This pass is the working trail behind its citations.</p>
+      <ul>
+        <li>
+          <a href="demographics/research-pass-1.md">Research pass 1 — framework, toolkit, and the Zeihan audit</a>
+          <p><code>notes/demographics/research-pass-1.md</code>. Previously <code>demographics/notes/research-pass-1.md</code>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="bitcoin">Bitcoin power law</h2>
+      <p>Internal review of the <a href="../bitcoin-power-law/">Bitcoin power-law project</a>. The project page is the portfolio piece. This audit is the working record of what the review found.</p>
+      <ul>
+        <li>
+          <a href="reviews/bitcoin-power-law-AUDIT.md">Audit of the Bitcoin power-law page</a>
+          <p><code>notes/reviews/bitcoin-power-law-AUDIT.md</code>. Previously <code>bitcoin-power-law/AUDIT.md</code>.</p>
+        </li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    <p><a href="../index.html">Back to the portfolio</a></p>
+  </footer>
+</body>
+</html>
