@@ -1,7 +1,14 @@
 # Link and asset check for the static site.
-# Internal file links, images, and srcset candidates are errors.
-# External hosts below were retried and still blocked, rate-limited, or
-# timed out (not stable 404s). They are excluded and the workflow warns.
+# Missing local files, images, and srcset candidates are errors.
+# External HTTP 404 and 410 are errors. HTTP 403 and 429 are not: a checker
+# gets blocked or rate-limited by hosts that still serve the page. Timeouts
+# are not errors either (accept_timeouts). A timeout does not hide a 404, a
+# 410, or a missing file; lychee still exits non-zero if any of those occurred.
+#
+# Hosts below were retried and still blocked, stalled, or never returned a
+# status. They stay excluded so this job does not wait on them. nrel.gov,
+# eia.gov, emp.lbl.gov, and openei.org are checked by
+# .github/site-quality/check-solar-sources.py, which fails only on 404 or 410.
 
 no_progress = true
 format = "detailed"
@@ -18,6 +25,15 @@ index_files = ["index.html"]
 # A browser user agent. The default lychee agent gets 403s from hosts that
 # still serve the page to browsers; those 403s are not 404s.
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+
+# `accept` replaces lychee's default (100..=103, 200..=299), so the success
+# range stays listed. 403 and 429 are bot-blocks and rate limits, not missing
+# pages. 404 and 410 are intentionally absent.
+accept = ["100..=103", "200..=299", "403", "429"]
+
+# frontiersin.org (and similar) can time out after retries without the page
+# being gone. Accept that. Any real error in the same run still fails it.
+accept_timeouts = true
 
 # Do not check mailto: addresses.
 include_mail = false

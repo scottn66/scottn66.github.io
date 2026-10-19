@@ -1,17 +1,33 @@
 name: site-quality
 
-# Fails the build on broken internal links, images, and srcset candidates.
+# Fails the build on broken internal links and images, and on external HTTP
+# 404 and 410. Timeouts, 403, and 429 do not fail this job (lychee.toml:
+# accept_timeouts, and accept includes 403 and 429). A timeout does not hide
+# a 404, a 410, or a missing file.
+#
+# Hosts that still do not return a usable status are excluded in lychee.toml.
+# nrel.gov, eia.gov, emp.lbl.gov, and the openei.org wiki are among them.
+# The solar-sources job checks those URLs on a weekly schedule and fails only
+# on 404 or 410. Pull requests run that check's self-test, not the live hosts.
+#
+# A tracked file over 1 MiB fails unless it is listed in
+# .github/site-quality/byte-budget-allowlist.txt. See
+# .github/site-quality/README.md.
+#
 # WCAG 2.1 AA is a ratchet against .github/site-quality/pa11y-baseline.json:
 # contrast counts already recorded may not rise, a lower count must update
 # the baseline in the same PR, and any non-contrast error fails unless it
-# is an explicit deferred code in pa11y-ratchet.js. External hosts that stay
-# flaky after retries are listed in lychee.toml and reported as warnings.
+# is an explicit deferred code in pa11y-ratchet.js.
 
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+  schedule:
+    # Weekly. Live solar-source requests only; the pull-request job is skipped.
+    - cron: '17 15 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,11 +39,18 @@ concurrency:
 jobs:
   site-quality:
     name: site-quality
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Check byte budget
+        run: |
+          set -euo pipefail
+          python3 .github/site-quality/check-byte-budget.py --self-test
+          python3 .github/site-quality/check-byte-budget.py
 
       - name: Set up Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -52,16 +75,22 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           "$HOME/.local/bin/lychee" --version
 
+      - name: Check link policy
+        run: |
+          set -euo pipefail
+          python3 .github/site-quality/check-link-policy.py
+
       - name: Check links and assets
         id: links
         run: |
           set -euo pipefail
           lychee --config lychee.toml --root-dir "$GITHUB_WORKSPACE" --no-progress '**/*.html'
+          echo "Link check passed. External timeouts, 403, and 429 are accepted. HTTP 404, HTTP 410, and missing local files are not."
 
       - name: Warn about excluded flaky hosts
         if: always()
         run: |
-          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, eia.gov, nrel.gov, forns.lmu.build, and the openei.org wiki are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
+          echo "::warning title=External link policy::Timeouts, HTTP 403, and HTTP 429 do not fail this job. HTTP 404, HTTP 410, and missing local files still do. LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, and forns.lmu.build stay excluded. emp.lbl.gov, eia.gov, nrel.gov, and the openei.org wiki stay excluded here and are checked by the weekly solar-sources job, which fails only on 404 or 410."
 
       - name: Install pa11y-ci 4.1.1
         if: always() && steps.links.conclusion != 'cancelled'
@@ -103,3 +132,22 @@ jobs:
           fi
           export PA11Y_CI=/tmp/site-quality/node_modules/.bin/pa11y-ci
           node .github/site-quality/pa11y-ratchet.js check
+
+  solar-sources:
+    name: solar-sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Self-test solar source rules
+        run: |
+          set -euo pipefail
+          python3 .github/site-quality/check-solar-sources.py --self-test
+
+      - name: Check cited solar source URLs
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          python3 .github/site-quality/check-solar-sources.py
