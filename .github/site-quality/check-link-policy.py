@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Prove lychee.toml still fails closed on real breakage.
 
-A local server returns 200, 301, 403, 404, 410, 429, and a hang.
+A local server returns 200, 301, 403, 404, 410, 429, 503, and a hang.
 lychee, using this repo's lychee.toml, must:
-  exit 0 when the only problems are 403, 429, and a timeout
+  exit 0 when the only problems are 403, 429, 503, and a timeout
   exit non-zero on 404, on 410, and on a missing local file
   exit non-zero when a timeout and a 404 are in the same file
 """
@@ -46,6 +46,7 @@ class Handler(BaseHTTPRequestHandler):
             "/gone": 410,
             "/forbidden": 403,
             "/rate": 429,
+            "/unavailable": 503,
         }
         code = codes.get(path, 500)
         body = b"x"
@@ -125,6 +126,7 @@ def main() -> int:
                         f'<a href="{base}/go">301</a>',
                         f'<a href="{base}/forbidden">403</a>',
                         f'<a href="{base}/rate">429</a>',
+                        f'<a href="{base}/unavailable">503</a>',
                         f'<a href="{base}/slow">slow</a>',
                     ]
                 )
@@ -142,7 +144,7 @@ def main() -> int:
             passed = run_lychee(lychee, root, root / "pass.html")
             expect(
                 passed,
-                "403, 429, and timeout did not fail",
+                "403, 429, 503, and timeout did not fail",
                 ok=True,
                 needles=["Request timed out"],
             )

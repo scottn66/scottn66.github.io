@@ -1,9 +1,10 @@
 # Link and asset check for the static site.
 # Missing local files, images, and srcset candidates are errors.
-# External HTTP 404 and 410 are errors. HTTP 403 and 429 are not: a checker
-# gets blocked or rate-limited by hosts that still serve the page. Timeouts
-# are not errors either (accept_timeouts). A timeout does not hide a 404, a
-# 410, or a missing file; lychee still exits non-zero if any of those occurred.
+# External HTTP 404 and 410 are errors. HTTP 403, 429, and 5xx are not:
+# a checker gets blocked, rate-limited, or a flaky host returns 503 without
+# the page being gone. Timeouts are not errors either (accept_timeouts).
+# None of those hide a 404, a 410, or a missing file; lychee still exits
+# non-zero if any of those occurred.
 #
 # Hosts below were retried and still blocked, stalled, or never returned a
 # status. They stay excluded so this job does not wait on them. nrel.gov,
@@ -27,12 +28,12 @@ index_files = ["index.html"]
 user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
 # `accept` replaces lychee's default (100..=103, 200..=299), so the success
-# range stays listed. 403 and 429 are bot-blocks and rate limits, not missing
-# pages. 404 and 410 are intentionally absent.
-accept = ["100..=103", "200..=299", "403", "429"]
+# range stays listed. 403 and 429 are bot-blocks and rate limits. 5xx is a
+# transient server failure (Frontiers returns 503). 404 and 410 are absent.
+accept = ["100..=103", "200..=299", "403", "429", "500..=599"]
 
-# frontiersin.org (and similar) can time out after retries without the page
-# being gone. Accept that. Any real error in the same run still fails it.
+# frontiersin.org (and similar) can time out or 503 after retries without the
+# page being gone. Accept that. Any real error in the same run still fails it.
 accept_timeouts = true
 
 # Do not check mailto: addresses.

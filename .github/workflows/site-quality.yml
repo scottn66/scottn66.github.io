@@ -1,9 +1,9 @@
 name: site-quality
 
 # Fails the build on broken internal links and images, and on external HTTP
-# 404 and 410. Timeouts, 403, and 429 do not fail this job (lychee.toml:
-# accept_timeouts, and accept includes 403 and 429). A timeout does not hide
-# a 404, a 410, or a missing file.
+# 404 and 410. Timeouts, 403, 429, and 5xx do not fail this job (lychee.toml:
+# accept_timeouts, and accept includes 403, 429, and 500..=599). None of
+# those hide a 404, a 410, or a missing file.
 #
 # Hosts that still do not return a usable status are excluded in lychee.toml.
 # nrel.gov, eia.gov, emp.lbl.gov, and the openei.org wiki are among them.
@@ -85,12 +85,12 @@ jobs:
         run: |
           set -euo pipefail
           lychee --config lychee.toml --root-dir "$GITHUB_WORKSPACE" --no-progress '**/*.html'
-          echo "Link check passed. External timeouts, 403, and 429 are accepted. HTTP 404, HTTP 410, and missing local files are not."
+          echo "Link check passed. External timeouts, 403, 429, and 5xx are accepted. HTTP 404, HTTP 410, and missing local files are not."
 
       - name: Warn about excluded flaky hosts
         if: always()
         run: |
-          echo "::warning title=External link policy::Timeouts, HTTP 403, and HTTP 429 do not fail this job. HTTP 404, HTTP 410, and missing local files still do. LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, and forns.lmu.build stay excluded. emp.lbl.gov, eia.gov, nrel.gov, and the openei.org wiki stay excluded here and are checked by the weekly solar-sources job, which fails only on 404 or 410."
+          echo "::warning title=External link policy::Timeouts, HTTP 403, HTTP 429, and 5xx do not fail this job. HTTP 404, HTTP 410, and missing local files still do. LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, and forns.lmu.build stay excluded. emp.lbl.gov, eia.gov, nrel.gov, and the openei.org wiki stay excluded here and are checked by the weekly solar-sources job, which fails only on 404 or 410."
 
       - name: Install pa11y-ci 4.1.1
         if: always() && steps.links.conclusion != 'cancelled'

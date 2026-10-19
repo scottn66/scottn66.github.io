@@ -15,7 +15,7 @@ python3 .github/site-quality/check-byte-budget.py
 
 ## Links
 
-`lychee.toml` checks every HTML file. A missing local file or image fails. An external **404** or **410** fails. External **403**, **429**, and **timeouts** do not: `accept` includes 403 and 429, and `accept_timeouts` is set. A timeout does not hide a 404, a 410, or a missing file in the same run. `check-link-policy.py` proves that against a local server (lychee 0.24.2 on `PATH`).
+`lychee.toml` checks every HTML file. A missing local file or image fails. An external **404** or **410** fails. External **403**, **429**, **5xx**, and **timeouts** do not: `accept` includes 403, 429, and 500..=599, and `accept_timeouts` is set. None of those hide a 404, a 410, or a missing file in the same run. `check-link-policy.py` proves that against a local server (lychee 0.24.2 on `PATH`).
 
 ```
 python3 .github/site-quality/check-link-policy.py
