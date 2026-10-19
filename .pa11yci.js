@@ -1,6 +1,7 @@
 // WCAG 2.1 AA for the site's top-level pages (repo-root documents and
 // project front doors). Nested reports, heatmaps, and vendored plots are
-// out of this list; lychee still checks every HTML file for broken links.
+// out of this list, except the two solar heatmaps and one city report
+// below. lychee still checks every HTML file for broken links.
 //
 // Ignores are one URL and one rule, each with a reason. Do not add a
 // site-wide ignore.
@@ -37,7 +38,14 @@ const projectFrontDoors = [
   'solar/',
 ];
 
-const urls = [...rootPages, ...projectFrontDoors].map((path) => {
+// Nested solar pages a visitor opens from the heatmap index.
+const solarNested = [
+  'solar/heatmap/heatmap_ca.html',
+  'solar/heatmap/heatmap_norcal.html',
+  'solar/reports/los-angeles.html',
+];
+
+const urls = [...rootPages, ...projectFrontDoors, ...solarNested].map((path) => {
   const url = `${origin}/${path}`;
 
   // #country/ISO and #state/XX are routes in demographics/app.js (hashchange),
