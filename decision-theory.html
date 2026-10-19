@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Value of Knowing You · Decision Theory → Causality</title>
   <meta name="description"
-        content="A topologically-sorted curriculum from Bayesian networks through utility,
-                 decision networks, the value of perfect information, interventions, and
-                 counterfactuals. An ad agent climbs Pearl's ladder; three interactive
-                 widgets; a modernized, runnable decision network." />
+        content="A step-by-step curriculum from Bayesian networks through utility, decision networks, the value of perfect information, interventions, and counterfactuals." />
   <meta name="author" content="Scott Nelson" />
   <meta property="og:title" content="The Value of Knowing You: Decision Theory to Causality" />
   <meta property="og:description" content="Bayes nets, VPI, do-calculus, counterfactuals; a modernized pgmpy decision network and three interactive widgets, by Scott Nelson." />
@@ -173,7 +170,7 @@
         <li><a href="#data">What data feeds which rung</a></li>
         <li><a href="#advanced">The advanced shelf</a></li>
         <li><a href="#cheatsheet">Cheat sheet</a></li>
-        <li><a href="#colophon">Sources &amp; honesty</a></li>
+        <li><a href="#colophon">Sources &amp; credits</a></li>
       </ol></nav>
     </aside>
 
@@ -191,10 +188,10 @@
           climb a ladder: from <em>seeing</em> patterns, to <em>deciding</em>
           under uncertainty, to putting a number on what one more fact about you
           is <em>worth</em>, all the way up to <em>imagining</em> the ad it never
-          showed. This page is a topologically-sorted curriculum for that climb,
-          and every rung has a worked example you can poke at. The destination is
-          genuinely exciting: by the end, the machinery answers questions courts,
-          central banks, and doctors ask every day.
+          showed. This page builds that climb step by step, each idea resting on the last,
+          and every rung has a worked example you can try. By the end, the same
+          machinery answers questions that courts, central banks, and doctors ask
+          every day.
         </p>
         <div class="callout">
           <span class="k">The spine</span>
@@ -214,7 +211,7 @@
             <li>The <a href="#defendotron">Defendotron's</a> <code>eu()</code>/<code>meu()</code>/<code>vpi()</code>
               engine, modernized from dead pomegranate-0.x and 2022-pgmpy code
               to pgmpy 1.1.2, fixing a latent indexing bug on the way.</li>
-            <li>Every number printed on this page is verified against fresh runs.</li>
+            <li>Every Defendotron and widget number on this page is verified against fresh runs.</li>
             <li>The three <a href="#widget-bn">interactive</a>
               <a href="#widget-vpi">widgets</a> <a href="#widget-cf">below</a>,
               vanilla JS mirroring the verified Python.
@@ -244,7 +241,7 @@
         </p>
         <figure>
           <table style="max-width:560px;margin:0 auto">
-            <tr><th>Tier</th><th>Question</th><th>Example</th><th>Denizen</th></tr>
+            <tr><th>Tier</th><th>Question</th><th>Example</th><th>Typical tool</th></tr>
             <tr><td><span class="act-tag act-imagine">3 · imagine</span></td><td>What if $X$ <em>had been</em> $x'$?</td><td>"Would I be home by now had I gotten off the 405?"</td><td>Structural Causal Models</td></tr>
             <tr><td><span class="act-tag act-do">2 · do</span></td><td>What if I <em>do</em> $X=x$?</td><td>"Will exercise lower my cholesterol?"</td><td>Causal Bayes nets · RL</td></tr>
             <tr><td><span class="act-tag act-see">1 · see</span></td><td>What if I <em>see</em> $X=x$?</td><td>"Is symptom $X$ tied to disease $Y$?"</td><td>Bayesian networks</td></tr>
@@ -1156,7 +1153,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           <li>record the variables your experts name as confounders
             <em>before</em> you need them;</li>
           <li>filtering a dataset on a common effect is conditioning on a
-            collider, and it will manufacture associations out of nothing
+            collider, and it will create associations that don't exist in the full population
             (survivorship bias is d-separation's revenge; Act I's Berkson
             example is the same trap).</li>
         </ul>
