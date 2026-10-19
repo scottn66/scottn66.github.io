@@ -1,6 +1,8 @@
 name: site-quality
 
 # Fails the build on broken internal links, images, and srcset candidates.
+# Also fails when sitemap.xml drifts from published-corpus.json, or when
+# robots.txt no longer covers a markdown file.
 # WCAG 2.1 AA is a ratchet against .github/site-quality/pa11y-baseline.json:
 # contrast counts already recorded may not rise, a lower count must update
 # the baseline in the same PR, and any non-contrast error fails unless it
@@ -28,6 +30,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Check sitemap and robots
+        run: python3 scripts/build_sitemap.py --check
 
       - name: Set up Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -61,7 +66,7 @@ jobs:
       - name: Warn about excluded flaky hosts
         if: always()
         run: |
-          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, eia.gov, nrel.gov, forns.lmu.build, and the openei.org wiki are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
+          echo "::warning title=Flaky external hosts excluded::LinkedIn (HTTP 999), doi.org, ResearchGate, MDPI, Medium, ScienceDirect, PhilArchive, emp.lbl.gov, eia.gov, nrel.gov, forns.lmu.build, the openei.org wiki, and frontiersin.org (timeout or HTTP 503) are excluded because retries still do not return a reliable status. Each reason is in lychee.toml."
 
       - name: Install pa11y-ci 4.1.1
         if: always() && steps.links.conclusion != 'cancelled'
