@@ -50,4 +50,7 @@ exclude = [
   # openei.org's wiki is behind an ELB that returns 503. apps.openei.org
   # rate pages still answer and stay checked.
   '^https?://openei\.org/',
+  # frontiersin.org returns 503, 502, or a timeout from GitHub-hosted runners
+  # after retries. The cited articles are still published; this is not a 404.
+  '^https?://([a-z0-9-]+\.)*frontiersin\.org',
 ]
