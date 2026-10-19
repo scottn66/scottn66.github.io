@@ -16,29 +16,29 @@
   {
     "unit": "arxiv_scraper",
     "url": "/arxiv_scraper.html",
-    "title": "arXiv Scraper &mdash; Knowledge Source Pipeline",
-    "last_modified": "2026-04-10T01:23:55-07:00",
+    "title": "arXiv scraper: category browse and search | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
     "unit": "bitcoin-power-law",
     "url": "/bitcoin-power-law/",
     "title": "Does Bitcoin Follow a Power Law? \u2014 An Econometric Autopsy",
-    "last_modified": "2026-06-25T00:40:58-07:00",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "project"
   },
   {
     "unit": "cartography",
     "url": "/cartography.html",
-    "title": "City Cartography \u2014 Roads + Topography",
-    "last_modified": "2026-09-28T00:24:03-07:00",
+    "title": "City cartography viewer | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
     "unit": "cartography-landing",
     "url": "/cartography_landing.html",
-    "title": "City Cartography \u2014 Roads, Topography &amp; Beyond",
-    "last_modified": "2026-06-15T15:50:33-07:00",
+    "title": "City cartography: street maps over terrain | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
@@ -72,29 +72,29 @@
   {
     "unit": "hmm",
     "url": "/HMM.html",
-    "title": "Hidden Markov Models and Named Entity Recognition",
-    "last_modified": "2026-06-20T12:31:32-07:00",
+    "title": "Hidden Markov models and Viterbi for NER | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
     "unit": "mab",
     "url": "/MAB.html",
-    "title": "Multi-Armed Bandit Agents Project",
-    "last_modified": "2026-09-28T00:24:03-07:00",
+    "title": "Multi-armed bandits: Thompson sampling vs. UCB | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
     "unit": "mandelbrot",
     "url": "/mandelbrot.html",
-    "title": "Mandelbrot Explorer",
-    "last_modified": "2026-06-10T21:47:56-07:00",
+    "title": "Mandelbrot explorer | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
     "unit": "mandelbrot_landing",
     "url": "/mandelbrot_landing.html",
-    "title": "Mandelbrot Explorer - Tutorial &amp; Background",
-    "last_modified": "2026-06-10T21:47:56-07:00",
+    "title": "Mandelbrot explorer: how it works | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
@@ -114,15 +114,15 @@
   {
     "unit": "robot-arm-sim",
     "url": "/robot-arm-sim/",
-    "title": "robot-arm-sim \u00b7 A crawler learns to walk",
-    "last_modified": "2026-06-01T15:03:36-07:00",
+    "title": "Q-learning crawler: technical write-up | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "project"
   },
   {
     "unit": "sep_scraper",
     "url": "/sep_scraper.html",
-    "title": "SEP Scraper &mdash; Knowledge Source Pipeline",
-    "last_modified": "2026-04-10T01:23:55-07:00",
+    "title": "Stanford Encyclopedia of Philosophy scraper | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   },
   {
@@ -135,8 +135,8 @@
   {
     "unit": "wikipedia_scraper",
     "url": "/wikipedia_scraper.html",
-    "title": "Wikipedia Scraper &mdash; Knowledge Source Pipeline",
-    "last_modified": "2026-04-10T01:23:55-07:00",
+    "title": "Wikipedia scraper: link graph in SQLite | Scott Nelson",
+    "last_modified": "2026-10-19T01:30:08-07:00",
     "kind": "page"
   }
 ]
