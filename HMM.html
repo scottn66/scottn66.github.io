@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <title>Hidden Markov models and Viterbi for NER | Scott Nelson</title>
     <meta name="description" content="How hidden Markov models and the Viterbi algorithm tag named entities. The page links to a comparison against an LSTM and a fine-tuned DistilBERT.">
+    <link rel="canonical" href="https://scottn66.github.io/HMM.html">
     <meta property="og:title" content="Hidden Markov models and Viterbi for NER | Scott Nelson">
     <meta property="og:description" content="How hidden Markov models and the Viterbi algorithm tag named entities. The page links to a comparison against an LSTM and a fine-tuned DistilBERT.">
     <meta property="og:url" content="https://scottn66.github.io/HMM.html">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary">
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
@@ -76,6 +79,12 @@
         .mt-5 { margin-top: 3rem; }
         .mb-4 { margin-bottom: 1.5rem; }
         h5 { font-weight: 400; }
+        /* WCAG 2.1 AA: Bootstrap 4's default link, inline-code and primary-button colours sit below 4.5:1 on these backgrounds */
+        a { color: #0056b3; }
+        code { color: #c81868; }
+        .btn-primary { background-color: #0056b3; border-color: #0056b3; }
+        .btn-primary:hover, .btn-primary:focus { background-color: #004494; border-color: #004494; }
+        .footer a { color: #cfe3ff; }
     </style>
 </head>
 <body>
@@ -90,18 +99,18 @@
         <!-- NLP Introduction -->
         <section class="mb-4">
             <h2>Natural Language Processing</h2>
-            <h5>Primer for Encyclopedic Knowledge</h5>
+            <h3 class="h5">Primer for Encyclopedic Knowledge</h3>
             <ul>
-                <li><a href="https://en.wikipedia.org/wiki/Natural_language_processing" target="_blank">Natural Language Processing (NLP)</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank">Markov property</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Hidden_Markov_model" target="_blank">Hidden Markov Model</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Markov_chain" target="_blank">Markov Chains</a></li>
-                <li><a href="https://en.wikipedia.org/wiki/Statistical_model" target="_blank">Statistical Model</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Natural_language_processing" target="_blank" rel="noopener">Natural Language Processing (NLP)</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank" rel="noopener">Markov property</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Hidden_Markov_model" target="_blank" rel="noopener">Hidden Markov Model</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Markov_chain" target="_blank" rel="noopener">Markov Chains</a></li>
+                <li><a href="https://en.wikipedia.org/wiki/Statistical_model" target="_blank" rel="noopener">Statistical Model</a></li>
             </ul>
-        <p>Hidden Markov Models are used for probabilistic sequence classification. This model can tell us about the state sequence probabilities. In essence, the <i>transition likelihoods</i> between states over time, which include the likelihood of a state persisting over time (indicated by an self-referential arrow).</p>
+        <p>Hidden Markov Models are used for probabilistic sequence classification. This model can tell us about the state sequence probabilities. In essence, the <i>transition likelihoods</i> between states over time, which include the likelihood of a state persisting over time (indicated by a self-referential arrow).</p>
         <p>HMMs help to map observations to explanations of these observations, known as hidden causes/states/classes. We consider the observations to be probabilistically dependent on the hidden, unobservable component (states/classes/causes). </p>
         <p>The figure below depicts the Conditional Probability Distribution of the next state <code>s'</code> given the current state <code>s</code>, known as the <u>transition model</u> <code>P(s'|s)</code></p>
-        <img src="assets/images/projects/HMM/weather-HMM.png" class="card-img-top" alt="weather-HMM">
+        <img src="assets/images/projects/HMM/weather-HMM.png" class="card-img-top" alt="Weather hidden Markov model: hidden HOT and COLD states with transition and emission probabilities">
         <p>Figure from "Speech and Language Processing" by D. Jurafsky 2023.</p>
         </section>
 
@@ -118,14 +127,12 @@
                         <li><a href="https://en.wikipedia.org/wiki/Ontology_(information_science)">Ontology</a></li>
                         <li><a href="https://en.wikipedia.org/wiki/Information_science">Information Science</a></li>
                     </ul>
-                <p>We love NLP!</p>
-                <p>Noun, Verb, Pronoun</p>
                 <p>Using Part of Speech Tagging <a href="https://en.wikipedia.org/wiki/Part-of-speech_tagging">(POS)</a> is sequentially labelling the words by their part of speech. If we collect enough data on the underlying part-of-speech sequences, we can get a good idea for the patterns behind sentences.</p>
                 <p><u>How are Hidden Markov Models used in named entity recognition?</u></p>
                 <p><b>Sequence Modeling: </b>We don't know the (hidden) parts-of-speech for the sequence of words, a.k.a. our sentence, but we can see the words (observations). The named entity tag (eg. Person, Organization, etc.) is, like the part of speech, considered the hidden state. The sequence of words in a sentence forms the sequence of observations, and the corresponding sequence of named entity tags forms the hidden state sequences.</p>
                 <p><b>Training the Model:</b> Through a well-labeled corpus of text, we train the model with a labeled dataset to get it familiar with some of the sequential patterns:</p>
                     <ul>
-                        <li><b>Transition Probabilities</b>: the likelihood of change between states: probability of going from a 'person' tag to a 'organization' tag. This is learned initially from memory of the training labels.</li>
+                        <li><b>Transition Probabilities</b>: the likelihood of change between states: probability of going from a 'person' tag to an 'organization' tag. This is learned initially from memory of the training labels.</li>
                         <li><b>Emission Probabilities</b>: The probability of a particular word being observed given a particular entity tag as evidence.</li>
                         <li><b>Initial Probabilities:</b> Represents the likelihood of seeing a particular tag at the start of a sequence.</li>
                     </ul>
@@ -134,17 +141,19 @@
             <p><b>Decoding:</b> Once trained, the HMM can be used to predict the most likely sequence of hidden states (entity tags) for a new sequence of observations (words in a sentence). This is typically done using algorithms like the Viterbi algorithm, which efficiently finds the most likely sequence of hidden states based on the observed data and the model’s parameters. </p>
                     <ul>
                         <li><b>Objective:</b> The Viterbi algorithm finds the most probable sequence of hidden states given a sequence of observations. In NER, this translates to identifying the most likely sequence of tags after observing a sentence.</li>
-                        <li><b>Process</b>:</li>
+                        <li><b>Process</b>:
                             <ul>
-                                <li><b>Iteration:</b> For each subsequent word (observation) in the sentence, calculate the probability of each state (tag) by considering:</li>
+                                <li><b>Iteration:</b> For each subsequent word (observation) in the sentence, calculate the probability of each state (tag) by considering:
                                     <ul>
                                         <li>The probability of transitioning from each of the previous states to the current state.</li>
                                         <li>The emission probability of the current observation (word) given the current state.</li>
                                         <li>Multiply these probabilities and select the maximum probability for each state.</li>
                                     </ul>
+                                </li>
                                 <li><b>Path Tracking:</b> Keep track of the path of states that led to these maximum probabilities.</li>
                                 <li><b>Termination:</b> After processing all observations, the path with the highest probability is chosen as the most likely sequence of states (tags).</li>
                             </ul>
+                        </li>
                         </ul>
                 <p>The Viterbi algorithm effectively navigates through the exponential number of possible state sequences to efficiently find the most probable sequence.</p>
             <aside>
@@ -153,6 +162,7 @@
                     <p>The <b>Decoding Process in MEMMs</b> is different from Viterbi's HMMs, MEMM decoding involves making local decisions (instead of most probable global sequence). At each step, the model chooses the most probable next state based on the current observation and the previous state. This is done by various strategies (<a href="https://en.wikipedia.org/wiki/Greedy_algorithm">greedy</a>, <a href="https://en.wikipedia.org/wiki/Beam_search">BEAM search</a>, etc.). The downside of MEMMs is they suffer from label bias (i.e. too greedy) because of normalization at each step</p>
             </aside>
     </section>
+    </div>
         <!-- Hidden Markov Models and Viterbi Algorithm Section -->
     <section class="container mt-5">
         <h2>Understanding Hidden Markov Models (HMMs)</h2>
@@ -177,7 +187,7 @@
             <p>Figure: The Forward-Backward Algorithm for training Hidden Markov Models.</p>
             <img src="assets/images/projects/HMM/viterbi-algorithm.png" alt="Viterbi-algorithm" class="mb-3">
             <p>Figure: The Viterbi Algorithm for decoding Hidden Markov Models.</p>
-            <p>It should be noted that the algorithms and models covered in this page are not the best</p>
+            <p>For how these taggers compare against an LSTM and a fine-tuned DistilBERT on the same task, see <a href="ner-taggers.html">From Counts to Context</a>.</p>
         </div>
     </section>
 
@@ -196,13 +206,10 @@
         <!-- Footer -->
     <footer class="footer">
         <p>Education content and figures courtesy of </p>
-        <p>Dan <a href="http://web.stanford.edu/~jurafsky/"><u>Jurafsky</u></a>, NLP researcher at Stanford and author of </p>
-        <p><a href="http://web.stanford.edu/~jurafsky/slp3/"><u>Speech and Language Processing</u></a></p>
-        <p>2024 Scott Nelson</p>
+        <p>Dan <a href="https://web.stanford.edu/~jurafsky/"><u>Jurafsky</u></a>, NLP researcher at Stanford and author of </p>
+        <p><a href="https://web.stanford.edu/~jurafsky/slp3/"><u>Speech and Language Processing</u></a></p>
+        <p>&copy; 2026 Scott Nelson</p>
     </footer>
     <!-- Scripts -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

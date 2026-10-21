@@ -604,7 +604,7 @@ async function selectCountry(iso3) {
   if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
   const panel = document.getElementById('country-panel');
   panel.innerHTML = `<div class="closed-hint">Loading ${c.n}…</div>`;
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
 
   let d;
   try { d = await fetchDetail(iso3); }
@@ -958,7 +958,7 @@ async function selectState(u) {
   if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
   const panel = document.getElementById('country-panel');
   panel.innerHTML = `<div class="closed-hint">Loading ${s.n}…</div>`;
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
 
   let d;
   try { d = await fetchStateDetail(u); }

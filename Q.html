@@ -6,23 +6,25 @@
   <title>The Speedy Q-Learning Crawler, and the 60% gap we didn't see</title>
 
   <!-- SEO / social -->
-  <meta name="description" content="A reinforcement-learning crawler: how a year of hyperparameter tuning reached only 42% of optimal, and how a 2002 model-based algorithm (R-MAX) closed the gap to 100%.">
+  <meta name="description" content="A reinforcement-learning crawler: a year of hyperparameter tuning reached 42% of optimal, then a 2002 model-based algorithm (R-MAX) closed the gap to 100%.">
+  <link rel="canonical" href="https://scottn66.github.io/Q.html">
   <meta property="og:title" content="The Speedy Q-Learning Crawler, and the 60% gap">
   <meta property="og:description" content="From Q-learning to dynamic programming: model-free RL plateaued at 42% of optimal; R-MAX closed it to 100%.">
   <meta property="og:image" content="https://scottn66.github.io/robot-arm-sim/img/end_card_resolution.png">
   <meta property="og:url" content="https://scottn66.github.io/Q.html">
+  <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary_large_image">
 
   <!-- Bootstrap 5 (match landing page) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <!-- Google Fonts (match landing page) -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous">
 
   <!-- MathJax for the Bellman equation -->
   <script>MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };</script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" async integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script>
 
   <style>
     /* Brand tokens, match scottn66.github.io landing page */
@@ -42,7 +44,9 @@
       color: var(--text-color);
       background-color: var(--bg-color);
       margin: 0; padding: 0; line-height: 1.7;
-      scroll-behavior: smooth;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
     }
     h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; color: var(--primary-color); }
     a { color: var(--secondary-color); }
@@ -116,7 +120,9 @@
     }
     .cta-card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: var(--text-color); }
     .cta-card .icon { font-size: 2rem; color: var(--secondary-color); margin-bottom: 0.6rem; }
-    .cta-card h4 { margin: 0 0 0.4rem; }
+    .cta-card h3 { margin: 0 0 0.4rem; font-size: 1.5rem; }
+    mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
     .cta-card p { margin: 0; font-size: 0.92rem; color: #607d8b; }
 
     .tag {
@@ -138,9 +144,11 @@
       font-size: 1.5rem; font-weight: 700; padding: 0.4rem 0; list-style: revert;
     }
     details.foundations[open] summary { margin-bottom: 1rem; }
+    .skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
 
   <!-- ===== Top nav ===== -->
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -148,7 +156,7 @@
       <a class="navbar-brand" href="index.html">Scott Nelson</a>
       <div class="ms-auto">
         <a class="btn btn-sm btn-outline-light me-2" href="index.html">Home</a>
-        <a class="btn btn-sm btn-outline-light me-2" href="robot-arm-sim/index.html">Dashboard</a>
+        <a class="btn btn-sm btn-outline-light me-2" href="robot-arm-sim/">Technical write-up</a>
         <a class="btn btn-sm btn-outline-light me-2" href="robot-arm-sim/narrative.html">Narrative</a>
         <a class="btn btn-sm btn-light" href="https://github.com/scottn66/robot-arm-sim" target="_blank" rel="noopener">GitHub</a>
       </div>
@@ -156,7 +164,7 @@
   </nav>
 
   <!-- ===== Hero ===== -->
-  <header class="hero">
+  <header class="hero" id="main">
     <div class="container">
       <div class="kicker" style="color:#90caf9;">Reinforcement Learning · Q-Learning → Dynamic Programming</div>
       <h1>The Speedy Q-Learning Crawler, and the 60% gap we didn't see</h1>
@@ -167,7 +175,7 @@
         algorithm from 2002 closed the gap to
         <strong style="color:#b9f6ca;">100%</strong>. Here's the whole story.
       </p>
-      <video autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_optimal.gif">
+      <video controls autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_optimal.gif">
         <source src="robot-arm-sim/img/crawler_optimal.mp4" type="video/mp4">
         <img class="herovid" src="robot-arm-sim/img/crawler_optimal.gif" alt="The optimal policy crawling forward">
       </video>
@@ -249,7 +257,7 @@
           <a href="https://en.wikipedia.org/wiki/Bellman_equation">Bellman update</a>:
         </p>
         <p style="text-align:center;">
-          $Q(s, a) \leftarrow Q(s, a) + \alpha\,\big[\,r + \gamma \max_{a'} Q(s', a') - Q(s, a)\,\big]$
+          $$Q(s, a) \leftarrow Q(s, a) + \alpha\,\big[\,r + \gamma \max_{a'} Q(s', a') - Q(s, a)\,\big]$$
         </p>
         <p>
           where $\alpha$ is the learning rate, $\gamma$ the discount factor, $r$ the
@@ -264,7 +272,7 @@
 
         <div class="concept-box">
           <h3>The crawling robot, concretely</h3>
-          <img src="assets/images/projects/crawler/crawler.gif" alt="crawler" style="border-radius:6px; margin-bottom:1rem;">
+          <img src="assets/images/projects/crawler/crawler.gif" alt="The two-jointed crawler robot arm moving across the floor" class="img-fluid" style="border-radius:6px; margin-bottom:1rem;">
           <ul>
             <li><b>States</b>: the discretized arm and hand angles, 36 arm buckets ×
               52 hand buckets = <strong>1,872 states</strong>.</li>
@@ -375,7 +383,7 @@
         </figcaption>
       </figure>
       <table class="stats">
-        <thead><tr><th>approach</th><th class="num">peak velocity</th><th class="num">% of optimum</th></tr></thead>
+        <thead><tr><th scope="col">approach</th><th scope="col" class="num">peak velocity</th><th scope="col" class="num">% of optimum</th></tr></thead>
         <tbody>
           <tr class="highlight"><td>π* via value iteration</td><td class="num">0.901</td><td class="num">100%</td></tr>
           <tr><td>Karp max-mean-cycle (theory)</td><td class="num">0.894</td><td class="num">99%</td></tr>
@@ -425,7 +433,7 @@
 
       <p>The bar chart says it numerically. The race says it viscerally:</p>
       <figure>
-        <video autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_race.gif">
+        <video controls autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_race.gif">
           <source src="robot-arm-sim/img/crawler_race.mp4" type="video/mp4">
           <img src="robot-arm-sim/img/crawler_race.gif" alt="4-panel race: epsilon-greedy, count-based, R-MAX, DP optimal">
         </video>
@@ -458,17 +466,17 @@
       <h2 class="section-title">Two ways to read the whole thing</h2>
       <div class="row g-4 mb-4">
         <div class="col-md-6">
-          <a class="cta-card" href="robot-arm-sim/index.html">
-            <div class="icon"><i class="fas fa-chart-line"></i></div>
-            <h4>The technical dashboard</h4>
+          <a class="cta-card" href="robot-arm-sim/">
+            <div class="icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div>
+            <h3>The technical dashboard</h3>
             <p>Every experiment, figure, and equation, schedule sweeps, BO, PBT,
               scaling laws, DQN, the DP reckoning, R-MAX. The complete reference.</p>
           </a>
         </div>
         <div class="col-md-6">
           <a class="cta-card" href="robot-arm-sim/narrative.html">
-            <div class="icon"><i class="fas fa-film"></i></div>
-            <h4>The cinematic narrative</h4>
+            <div class="icon"><i class="fas fa-film" aria-hidden="true"></i></div>
+            <h3>The cinematic narrative</h3>
             <p>The same story told as a 15-act script, with the videos in the order
               the narrative expects them. Built for watching, not just studying.</p>
           </a>
@@ -504,6 +512,10 @@ python3 scripts/compare_full_arc.py</code></pre>
     </div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll("video[autoplay]").forEach(function (v) { v.removeAttribute("autoplay"); v.pause(); });
+    }
+  </script>
 </body>
 </html>
