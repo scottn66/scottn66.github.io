@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 build_manifest.py — emit published-corpus.json, the machine-readable face
-of the P (Publish) plane for the three-plane reconciliation rig.
+of the P (Publish) plane for the three-plane reconciliation rig, and
+sitemap.xml for search engines (same scan, plus the homepage, resume and roadmap).
 
 Scans the site for published content pages and writes one entry per unit:
   { "unit", "url", "title", "last_modified", "kind" }
@@ -21,6 +22,7 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent  # repo root (scripts/ is one level down)
+SITE = "https://scottn66.github.io"
 
 # Infrastructure / chrome — published but not "project units".
 EXCLUDE_FILES = {"index.html", "dashboard.html", "resume.html", "404.html"}
@@ -93,6 +95,36 @@ def main():
     print(f"Wrote {out.name} — {len(entries)} units:")
     for e in entries:
         print(f"  {e['unit']:26} {e['url']:28} {e['kind']}")
+
+    write_sitemap(entries)
+
+
+# Site chrome the manifest excludes on purpose but search engines should still see.
+SITEMAP_EXTRA = ["index.html", "resume.html", "dashboard.html"]
+
+
+def write_sitemap(entries):
+    """Emit sitemap.xml: every corpus unit plus the chrome pages, with git lastmod."""
+    pages = []
+    for name in SITEMAP_EXTRA:
+        if (ROOT / name).exists():
+            url = "/" if name == "index.html" else "/" + name
+            pages.append((url, git_last_modified(name)))
+    for e in entries:
+        pages.append((e["url"], e["last_modified"]))
+
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for url, modified in pages:
+        lines.append("  <url>")
+        lines.append(f"    <loc>{SITE}{url}</loc>")
+        if modified:
+            lines.append(f"    <lastmod>{modified[:10]}</lastmod>")
+        lines.append("  </url>")
+    lines.append("</urlset>")
+    out = ROOT / "sitemap.xml"
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"Wrote {out.name} — {len(pages)} URLs")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="unit" content="ner-taggers">
     <meta name="description" content="One NER task, three taggers: a from-scratch HMM, an LSTM, and a fine-tuned DistilBERT (0.888 entity-F1 on CoNLL-2003), with a final comparison.">
+    <link rel="canonical" href="https://scottn66.github.io/ner-taggers.html">
+    <meta property="og:title" content="From Counts to Context: HMM → LSTM → BERT for NER">
+<meta property="og:description" content="One NER task, three taggers: a from-scratch HMM, an LSTM, and a fine-tuned DistilBERT (0.888 entity-F1 on CoNLL-2003), with a final comparison.">
+<meta property="og:url" content="https://scottn66.github.io/ner-taggers.html">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <title>From Counts to Context: HMM → LSTM → BERT for NER</title>
     <style>
@@ -69,7 +75,7 @@
             color: #0056b3;
             margin-bottom: 0.75rem;
         }
-        a { color: #007bff; }
+        a { color: #0056b3; }
         code {
             background: #f0f2f5;
             padding: 0.1rem 0.35rem;
@@ -90,6 +96,7 @@
         figure { text-align: center; margin: 1.5rem 0; }
         figcaption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
         table.compare {
+            display: block; overflow-x: auto;
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
@@ -119,7 +126,7 @@
         }
         .pill-hmm  { background: #0056b3; }
         .pill-lstm { background: #8a4bd6; }
-        .pill-bert { background: #d6534b; }
+        .pill-bert { background: #c4453d; }
         .footer {
             background: #333;
             color: #fff;
@@ -158,7 +165,7 @@
         <section class="mb-4">
             <h2>The same task, climbing the model ladder</h2>
             <p>The <a href="HMM.html">companion page</a> builds a <strong>Hidden Markov Model</strong> from scratch to tag named entities. This page picks up where that one ends and walks up two more rungs of the modelling ladder - a recurrent <strong>LSTM</strong> tagger, and a fine-tuned <strong>BERT/DistilBERT</strong> tagger - all three solving the <em>same</em> problem so they can be compared apples-to-apples.</p>
-            <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank">named entity recognition (NER)</a> over the <a href="https://aclanthology.org/W03-0419/" target="_blank">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
+            <p>The task is fixed throughout: <a href="https://en.wikipedia.org/wiki/Named-entity_recognition" target="_blank" rel="noopener">named entity recognition (NER)</a> over the <a href="https://aclanthology.org/W03-0419/" target="_blank" rel="noopener">CoNLL-2003</a> English corpus (<code>data/eng.train</code> &rarr; <code>data/eng.val</code>). Every token gets one of a small set of entity tags; the question each model answers differently is <em>how much context, and in what representation, do we bring to bear on each tagging decision?</em></p>
             <p>The arc is a single idea: <strong>we keep widening the window of context a tagging decision can see, and we keep enriching how a word is represented</strong> - from atomic word-IDs (HMM), to learned dense vectors read left-to-right (LSTM), to pretrained <em>contextual</em> subword vectors that see the whole sentence at once (BERT).</p>
 
             <figure>
@@ -204,10 +211,10 @@
         <p>The HMM is a <strong>generative</strong>, count-based model. Training is a single pass of maximum-likelihood counting over the labelled corpus that fills three tables:</p>
         <ul>
             <li><strong>Initial</strong> <code>P(tag&#8321;)</code> - how often each tag starts a sentence.</li>
-            <li><strong>Transition</strong> <code>P(tag&#8348; | tag&#8348;&#8331;&#8321;)</code> - the order-1 <a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank">Markov</a> assumption: a tag depends only on the tag immediately before it.</li>
+            <li><strong>Transition</strong> <code>P(tag&#8348; | tag&#8348;&#8331;&#8321;)</code> - the order-1 <a href="https://en.wikipedia.org/wiki/Markov_property" target="_blank" rel="noopener">Markov</a> assumption: a tag depends only on the tag immediately before it.</li>
             <li><strong>Emission</strong> <code>P(word | tag)</code> - how likely each word is, given a tag.</li>
         </ul>
-        <p>All three tables are initialised to ones rather than zeros, which folds <a href="https://en.wikipedia.org/wiki/Additive_smoothing" target="_blank">add-one (Laplace) smoothing</a> straight into the model so no unseen event gets zero probability. Decoding finds the best tag sequence two ways: <strong>greedy</strong> (pick the locally best tag at each step) or <strong>Viterbi</strong> (a dynamic program in log-space that recovers the single most-likely <em>whole-sequence</em> tagging via a trellis + backpointers).</p>
+        <p>All three tables are initialised to ones rather than zeros, which folds <a href="https://en.wikipedia.org/wiki/Additive_smoothing" target="_blank" rel="noopener">add-one (Laplace) smoothing</a> straight into the model so no unseen event gets zero probability. Decoding finds the best tag sequence two ways: <strong>greedy</strong> (pick the locally best tag at each step) or <strong>Viterbi</strong> (a dynamic program in log-space that recovers the single most-likely <em>whole-sequence</em> tagging via a trellis + backpointers).</p>
         <div class="concept-box">
             <h4>What it gets right - and where it caps out</h4>
             <p><strong>Right:</strong> trains in seconds on a CPU, is fully interpretable (every number is a count), and Viterbi gives a provably optimal decode under the model. The in-code benchmark hint targets <strong>~90% token accuracy with greedy and ~91% with Viterbi</strong>.</p>
@@ -218,7 +225,7 @@
     <!-- METHOD 2: LSTM -->
     <section class="container mt-5">
         <h2><span class="pill pill-lstm">2</span>&nbsp; LSTM tagger - learned representations + memory</h2>
-        <p>The <a href="https://en.wikipedia.org/wiki/Long_short-term_memory" target="_blank">LSTM</a> tagger (<code>nn.py</code> / <code>lstm.py</code>, PyTorch) swaps counting for <strong>learning</strong>. It is a small <strong>discriminative</strong> network with three layers:</p>
+        <p>The <a href="https://en.wikipedia.org/wiki/Long_short-term_memory" target="_blank" rel="noopener">LSTM</a> tagger (<code>nn.py</code> / <code>lstm.py</code>, PyTorch) swaps counting for <strong>learning</strong>. It is a small <strong>discriminative</strong> network with three layers:</p>
         <pre><code>word IDs ─▶ nn.Embedding(vocab, embed_dim=32)      # learn a dense vector per word
          ─▶ nn.LSTM(embed_dim=32, hidden_dim=12)   # carry a memory cell across the sentence
          ─▶ nn.Linear(hidden_dim=12, num_tags)      # project each step's state to tag scores</code></pre>
@@ -237,7 +244,7 @@
     <!-- METHOD 3: BERT -->
     <section class="container mt-5">
         <h2><span class="pill pill-bert">3</span>&nbsp; BERT / DistilBERT tagger - pretrained, bidirectional context</h2>
-        <p>The transformer tagger (<code>bert.py</code>) fine-tunes <a href="https://huggingface.co/distilbert-base-cased" target="_blank">DistilBERT</a> - a distilled, ~66M-parameter <a href="https://en.wikipedia.org/wiki/BERT_(language_model)" target="_blank">BERT</a> - for token classification through the HuggingFace <code>Trainer</code> API:</p>
+        <p>The transformer tagger (<code>bert.py</code>) fine-tunes <a href="https://huggingface.co/distilbert-base-cased" target="_blank" rel="noopener">DistilBERT</a> - a distilled, ~66M-parameter <a href="https://en.wikipedia.org/wiki/BERT_(language_model)" target="_blank" rel="noopener">BERT</a> - for token classification through the HuggingFace <code>Trainer</code> API:</p>
         <pre><code>datasets   = load_dataset('conll2003')                       # gold NER data
 tokenizer  = AutoTokenizer.from_pretrained('distilbert-base-cased')
 model      = AutoModelForTokenClassification.from_pretrained(
@@ -248,9 +255,9 @@ trainer.train()</code></pre>
         <p>Two qualitative leaps over the LSTM:</p>
         <ul>
             <li><strong>Transfer learning.</strong> DistilBERT arrives already knowing English from massive pretraining; fine-tuning on CoNLL only nudges those weights. The LSTM started from random vectors on a tiny corpus.</li>
-            <li><strong>Bidirectional, whole-sentence context via <a href="https://en.wikipedia.org/wiki/Attention_(machine_learning)" target="_blank">self-attention</a>.</strong> Every token attends to <em>every other token</em> in the sentence - left and right at once - instead of the LSTM's left-only stream. Subword (WordPiece) tokenization also means out-of-vocabulary words degrade gracefully into pieces rather than collapsing to <code>&lt;UNK&gt;</code>.</li>
+            <li><strong>Bidirectional, whole-sentence context via <a href="https://en.wikipedia.org/wiki/Attention_(machine_learning)" target="_blank" rel="noopener">self-attention</a>.</strong> Every token attends to <em>every other token</em> in the sentence - left and right at once - instead of the LSTM's left-only stream. Subword (WordPiece) tokenization also means out-of-vocabulary words degrade gracefully into pieces rather than collapsing to <code>&lt;UNK&gt;</code>.</li>
         </ul>
-        <p>This branch isn't just code: a fine-tuned model was pushed to the HuggingFace Hub as <a href="https://huggingface.co/scottn66/distilbert-base-uncased-finetuned-ner" target="_blank"><code>scottn66/distilbert-base-uncased-finetuned-ner</code></a>, and <code>trans4mers.py</code> wires it into live POS / NER / question-answering pipelines on sample text.</p>
+        <p>This branch isn't just code: a fine-tuned model was pushed to the HuggingFace Hub as <a href="https://huggingface.co/scottn66/distilbert-base-uncased-finetuned-ner" target="_blank" rel="noopener"><code>scottn66/distilbert-base-uncased-finetuned-ner</code></a>, and <code>trans4mers.py</code> wires it into live POS / NER / question-answering pipelines on sample text.</p>
 
         <div class="concept-box">
             <h4>The result, measured</h4>
@@ -268,7 +275,7 @@ trainer.train()</code></pre>
             <ol>
                 <li><strong>&#10003; Subword label alignment.</strong> Tokenize with <code>is_split_into_words=True</code> and use <code>word_ids()</code> to spread each word's gold tag onto its first subword while masking continuation pieces and specials with <code>-100</code> (ignored by the loss). This is the single change that makes the model correct. Verified against the live tokenizer: <code>Kubernetes</code> splits to <code>Ku</code>/<code>##ber</code>/<code>##net</code>/<code>##es</code>, and only the first piece keeps the word's tag (the rest become <code>-100</code>).</li>
                 <li><strong>&#10003; Real held-out evaluation.</strong> Train on the train split, evaluate on validation, report on the held-out test split - the train/eval leak is gone.</li>
-                <li><strong>&#10003; Entity-level metrics.</strong> A <code>compute_metrics</code> runs <a href="https://github.com/chakki-works/seqeval" target="_blank">seqeval</a> for entity-level precision / recall / F1 (the standard CoNLL score) on the BIO data, and falls back to token-level scoring for the bare 5-class data.</li>
+                <li><strong>&#10003; Entity-level metrics.</strong> A <code>compute_metrics</code> runs <a href="https://github.com/chakki-works/seqeval" target="_blank" rel="noopener">seqeval</a> for entity-level precision / recall / F1 (the standard CoNLL score) on the BIO data, and falls back to token-level scoring for the bare 5-class data.</li>
                 <li><strong>&#10003; Use the loaded data &amp; drop dead code.</strong> Trains on the actual <code>datasets</code> object; the unused <code>BERTPoSTagger</code>, <code>CustomDataset</code>, and precomputed-then-discarded <code>encoded_inputs</code> are gone.</li>
                 <li><strong>&#10003; Modernize the API.</strong> Real <code>transformers</code> import (no <code>trans4mers</code> shim) and a complete <code>requirements.txt</code>. Going further than planned: the rewrite runs on <strong>transformers 5.x</strong> (<code>processing_class</code> replaces the removed <code>tokenizer=</code> arg) and <strong>datasets 5.x</strong> (script loading was removed, so it pulls a parquet CoNLL-2003 mirror).</li>
                 <li><strong>Remaining stretch goals.</strong> Try <code>bert-base-cased</code> vs DistilBERT; reconcile the cased/uncased split with the published uncased Hub model; optionally add a CRF decode head so the transformer, like the HMM, optimizes the whole tag sequence rather than each token independently.</li>

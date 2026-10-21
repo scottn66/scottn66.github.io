@@ -4,11 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Applied Decision Theory · A Word-Problem Playground</title>
-  <meta name="description"
-        content="A companion playground to the causal-ladder curriculum: worked
-                 word-problems in insurance, markets, medicine, and law, each solved
-                 with expected utility, MEU, and the value of information, plus a
-                 live break-even calculator. By Scott Nelson." />
+  <meta name="description" content="Break-even probability, implied probability, and VPI applied to insurance, markets, medicine, and law, with a live calculator. By Scott Nelson.">
+  <link rel="canonical" href="https://scottn66.github.io/applied-decision-theory.html">
   <meta name="author" content="Scott Nelson" />
   <meta property="og:title" content="Applied Decision Theory: A Word-Problem Playground" />
   <meta property="og:description" content="Break-even probability, implied probability, and VPI applied to insurance, markets, medicine, and law — with a live calculator. Companion to the causal-ladder page, by Scott Nelson." />
@@ -23,7 +20,7 @@
       svg: { fontCache: 'global' }
     };
   </script>
-  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
   <style>
     :root{
       --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
@@ -33,7 +30,8 @@
       --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
     }
     *,*::before,*::after{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    html{scroll-padding-top:3.6rem}
+    @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
     body{margin:0;background:var(--bg);color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
       font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -42,7 +40,7 @@
     code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
     pre{background:#1f2430;color:#e6e6e6;padding:1rem 1.1rem;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.55}
     pre code{background:none;color:inherit;padding:0}
-    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
     .topbar a{color:#cfe0ff;border:none}
     .topbar a:hover{color:#fff}
     .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
@@ -76,6 +74,7 @@
     details.aside-box summary{cursor:pointer;font-weight:700;font-size:.8rem}
     .toc-toggle{display:none}
     mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+    @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
     figure{margin:1.2rem 0;text-align:center}
     figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
     table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
@@ -123,9 +122,11 @@
       table{display:block;overflow-x:auto;white-space:normal}
     }
   </style>
+<style>.skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}</style>
 </head>
 <body>
-  <nav class="topbar">
+  <a class="skip" href="#main">Skip to content</a>
+  <nav class="topbar" aria-label="Site">
     <a class="brand" href="index.html">Scott Nelson</a>
     <a href="decision-theory.html">← Decision theory</a>
     <a href="actuarial-pricing.html">Actuarial track →</a>
@@ -135,9 +136,9 @@
   </nav>
 
   <div class="page">
-    <aside class="toc" aria-label="Contents">
-      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
-      <nav><ol>
+    <aside class="toc" id="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc">Contents ▾</button>
+      <nav aria-label="Table of contents"><ol>
         <li><a href="#insurance">Insurance · break-even</a></li>
         <li><a href="#widget-be">▶ Break-even calculator</a></li>
         <li><a href="#finance">Finance · implied probability</a></li>
@@ -152,7 +153,7 @@
       </ol></nav>
     </aside>
 
-    <main>
+    <main id="main">
       <header id="hero">
         <div class="badges">
           <span class="badge">Applied · word-problem playground</span>
@@ -194,7 +195,7 @@
           point the equation at a real decision:
         </p>
         <table>
-          <tr><th>Symbol</th><th>Abstractly</th><th>Applied, it can be…</th></tr>
+          <tr><th scope="col">Symbol</th><th scope="col">Abstractly</th><th scope="col">Applied, it can be…</th></tr>
           <tr><td>$p^\ast$</td><td>the <strong>break-even probability</strong> of the bad event — transfer the risk if your true chance is higher, self-bear if it is lower</td><td>a screen-crack rate · the claim rate an insurer assumes · how likely you are to actually use the cover</td></tr>
           <tr><td>$C$</td><td>the <strong>certain cost paid up front</strong> to hand off the risk, per period</td><td>an insurance premium · an extended-warranty price · a maintenance plan · the cost of a hedge</td></tr>
           <tr><td>$L$</td><td>the <strong>full loss</strong> you eat if the event happens and you did <em>not</em> pay $C$</td><td>an out-of-warranty repair · a replacement device · the bill for an uncovered failure</td></tr>
@@ -383,7 +384,7 @@
         quality-adjusted value):
       </p>
       <table style="max-width:520px">
-        <tr><th>&nbsp;</th><th>Disease (0.40)</th><th>Healthy (0.60)</th></tr>
+        <tr><th scope="col">&nbsp;</th><th scope="col">Disease (0.40)</th><th scope="col">Healthy (0.60)</th></tr>
         <tr><td><strong>Treat</strong></td><td>90</td><td>70</td></tr>
         <tr><td><strong>Withhold</strong></td><td>30</td><td>100</td></tr>
       </table>
@@ -702,7 +703,7 @@
       <h2 id="kelly">7 · Investing &amp; betting: how much to wager on an edge <span class="act-tag act-econ">growth-optimal sizing</span></h2>
 <p>A repeatable, favourable bet pays $b = 2$ to $1$ on a win, with win probability $p = 0.4$ and loss probability $q = 1 - p = 0.6$. Its expected value is positive: $0.4 \times 2 - 0.6 \times 1 = +0.2$ per unit staked. The question is not whether to bet a clear edge but how much: what fraction of your bankroll should you stake on each repetition to maximize the long-run growth of your wealth?</p>
 <div class="callout gold"><span class="k">Principle · Kelly criterion</span><p style="margin:.3rem 0 0">Because bets compound multiplicatively, the right objective is not expected wealth but expected <em>log</em>-wealth, whose growth rate per bet is $g(f) = p\ln(1 + bf) + q\ln(1 - f)$. Maximizing $g$ over the stake fraction $f$ gives the Kelly fraction $$f^{\ast} = \frac{bp - q}{b} = p - \frac{q}{b}.$$</p></div>
-<div class="steps worked"><div class="step"><div class="label">Apply formula</div> $f^{\ast} = \dfrac{bp - q}{b} = \dfrac{2 \times 0.4 - 0.6}{2} = \dfrac{0.8 - 0.6}{2} = \dfrac{0.2}{2} = 0.10$, so stake $10\%$ of the bankroll each time.</div><div class="step"><div class="label">Verify optimum</div> Set $g'(f) = \dfrac{bp}{1 + bf} - \dfrac{q}{1 - f} = 0$. At $f = 0.10$: $\dfrac{2 \times 0.4}{1.2} = \dfrac{0.8}{1.2} = 0.6\overline{6}$ and $\dfrac{0.6}{0.9} = 0.6\overline{6}$, equal, confirming the peak.</div><div class="step"><div class="label">Growth at $f^{\ast}$</div> $g(0.10) = 0.4\ln(1.2) + 0.6\ln(0.9) = 0.4(0.18232) + 0.6(-0.10536) = 0.07293 - 0.06322 = +0.00971$ per bet, the maximum attainable rate.</div><div class="step"><div class="label">Double the stake</div> At $f = 0.20$: $g(0.20) = 0.4\ln(1.4) + 0.6\ln(0.8) = 0.4(0.33647) + 0.6(-0.22314) = 0.13459 - 0.13389 = +0.00070$, barely positive, roughly $\tfrac{1}{14}$ of the Kelly growth rate.</div><div class="step"><div class="label">Find ruin threshold</div> $g(f) = 0$ for $f &gt; 0$ at $f \approx 0.204$; beyond it $g$ turns negative (e.g. $g(0.25) \approx -0.0104$). Past this point a positive-EV bet shrinks your wealth almost surely.</div></div>
+<div class="steps worked"><div class="step"><div class="label">Apply formula</div> $f^{\ast} = \dfrac{bp - q}{b} = \dfrac{2 \times 0.4 - 0.6}{2} = \dfrac{0.8 - 0.6}{2} = \dfrac{0.2}{2} = 0.10$, so stake $10\%$ of the bankroll each time.</div><div class="step"><div class="label">Verify optimum</div> Set $g'(f) = \dfrac{bp}{1 + bf} - \dfrac{q}{1 - f} = 0$. At $f = 0.10$: $\dfrac{2 \times 0.4}{1.2} = \dfrac{0.8}{1.2} = 0.6\overline{6}$ and $\dfrac{0.6}{0.9} = 0.6\overline{6}$, equal, confirming the peak.</div><div class="step"><div class="label">Growth at $f^{\ast}$</div> $$g(0.10) = 0.4\ln(1.2) + 0.6\ln(0.9) = 0.4(0.18232) + 0.6(-0.10536) = 0.07293 - 0.06322 = +0.00971$$ per bet, the maximum attainable rate.</div><div class="step"><div class="label">Double the stake</div> At $f = 0.20$: $$g(0.20) = 0.4\ln(1.4) + 0.6\ln(0.8) = 0.4(0.33647) + 0.6(-0.22314) = 0.13459 - 0.13389 = +0.00070$$, barely positive, roughly $\tfrac{1}{14}$ of the Kelly growth rate.</div><div class="step"><div class="label">Find ruin threshold</div> $g(f) = 0$ for $f &gt; 0$ at $f \approx 0.204$; beyond it $g$ turns negative (e.g. $g(0.25) \approx -0.0104$). Past this point a positive-EV bet shrinks your wealth almost surely.</div></div>
 <div class="callout good"><span class="k">Answer</span><p style="margin:.3rem 0 0">Stake $f^{\ast} = 10\%$ of bankroll per bet, yielding the maximal log-growth rate of about $+0.97\%$ per wager. Doubling to $20\%$ collapses growth to $+0.07\%$ and a touch more turns it negative; the same edge, recklessly sized, destroys wealth.</p></div>
 <div class="aside-box"><span class="k">Takeaway</span><p style="margin:.25rem 0 0">Sizing matters as much as the edge itself. The growth curve is steep on the downside of its peak, so overbetting is far more dangerous than underbetting, which is why disciplined practitioners deliberately use fractional Kelly (half or quarter), trading a little growth for a large reduction in volatility and ruin risk.</p></div>
 <figure>
@@ -863,6 +864,7 @@
   document.getElementById("toc-toggle").addEventListener("click",function(){
     const t=document.querySelector(".toc");
     t.classList.toggle("open");
+    this.setAttribute("aria-expanded",t.classList.contains("open"));
     this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
   });
   </script>

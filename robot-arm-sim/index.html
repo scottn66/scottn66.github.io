@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Q-learning crawler: technical write-up | Scott Nelson</title>
   <meta name="description" content="Technical write-up of a Q-learning crawler: Bayesian optimization of the training recipe, learning-rate schedules, and how model-based methods compare.">
+  <link rel="canonical" href="https://scottn66.github.io/robot-arm-sim/">
   <meta property="og:title" content="Q-learning crawler: technical write-up | Scott Nelson">
   <meta property="og:description" content="Technical write-up of a Q-learning crawler: Bayesian optimization of the training recipe, learning-rate schedules, and how model-based methods compare.">
   <meta property="og:url" content="https://scottn66.github.io/robot-arm-sim/">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
   <link rel="icon"
         href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🦾</text></svg>" />
   <script>
@@ -20,7 +23,7 @@
     };
   </script>
   <script async id="MathJax-script"
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+          src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg:           #FAFAFA;
@@ -39,7 +42,8 @@
       --radius:       12px;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+    html { scroll-padding-top: 1.5rem; }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
     body {
       margin: 0;
       background: var(--bg);
@@ -79,9 +83,9 @@
     p { margin: 0.7rem 0; }
     p.lead { font-size: 1.1rem; color: var(--muted); }
 
-    img { max-width: 100%; height: auto; border-radius: var(--radius); display: block; }
+    img, video { max-width: 100%; height: auto; border-radius: var(--radius); display: block; }
     figure { margin: 1.6rem 0; }
-    figure img { box-shadow: var(--shadow); }
+    figure img, figure video { box-shadow: var(--shadow); }
     figcaption {
       font-size: 0.92em; color: var(--muted); margin-top: 0.6rem; line-height: 1.5;
       padding-left: 0.2rem;
@@ -107,6 +111,10 @@
       margin: 0 auto;
       padding: 1.5rem 1.3rem 6rem;
     }
+    .page > main { min-width: 0; }
+    main table { display: block; overflow-x: auto; }
+    mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
     @media (min-width: 1100px) {
       .page {
         grid-template-columns: 200px 1fr;
@@ -564,7 +572,7 @@
 
       <table>
         <thead>
-          <tr><th>$γ$</th><th>Agent behavior</th><th>Why</th></tr>
+          <tr><th scope="col">$γ$</th><th scope="col">Agent behavior</th><th scope="col">Why</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -612,7 +620,7 @@
 
       <table>
         <thead>
-          <tr><th>$ε$</th><th>Agent behavior</th><th>Why</th></tr>
+          <tr><th scope="col">$ε$</th><th scope="col">Agent behavior</th><th scope="col">Why</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -655,7 +663,7 @@
 
       <table>
         <thead>
-          <tr><th>$α$</th><th>Agent behavior</th><th>Why</th></tr>
+          <tr><th scope="col">$α$</th><th scope="col">Agent behavior</th><th scope="col">Why</th></tr>
         </thead>
         <tbody>
           <tr>
@@ -1219,8 +1227,8 @@
       <table>
         <thead>
           <tr>
-            <th>variant</th><th>best</th><th>worst</th><th>mean</th>
-            <th>spread</th><th>σ(α)</th><th>σ(ε)</th><th>σ(γ)</th>
+            <th scope="col">variant</th><th scope="col">best</th><th scope="col">worst</th><th scope="col">mean</th>
+            <th scope="col">spread</th><th scope="col">σ(α)</th><th scope="col">σ(ε)</th><th scope="col">σ(γ)</th>
           </tr>
         </thead>
         <tbody>
@@ -1386,7 +1394,7 @@
 
       <figure>
         <img src="img/title_card_act13.png"
-             alt="Title card citing Sutton 1990, Brafman-Tennenholtz 2002, S&B Chapter 8" />
+             alt="Title card citing Sutton 1990, Brafman-Tennenholtz 2002, S&amp;B Chapter 8" />
         <figcaption>
           The three papers that close the gap. Each describes how to
           learn a transition table from experience and <em>plan</em>
@@ -1415,8 +1423,10 @@
       </p>
 
       <figure>
-        <img src="img/optimism_evaporation.gif"
-             alt="V*(s) heatmap evolving as R-MAX trains" />
+        <video controls loop muted playsinline poster="img/optimism_evaporation.gif">
+          <source src="img/optimism_evaporation.mp4" type="video/mp4">
+          <img src="img/optimism_evaporation.gif" alt="V*(s) heatmap evolving as R-MAX trains">
+        </video>
         <figcaption>
           $V^*(s)$ for R-MAX over 10,000 environment steps. At step 0
           every state is uniformly optimistic, bright yellow
@@ -1448,8 +1458,10 @@
       </p>
 
       <figure>
-        <img src="img/crawler_race.gif"
-             alt="4-panel side-by-side race: ε-greedy, count-based, R-MAX, DP π*" />
+        <video controls loop muted playsinline poster="img/crawler_race.gif">
+          <source src="img/crawler_race.mp4" type="video/mp4">
+          <img src="img/crawler_race.gif" alt="4-panel side-by-side race: ε-greedy, count-based, R-MAX, DP π*">
+        </video>
         <figcaption>
           1,500 environment steps under each agent's final policy,
           starting from $x = 0$. ε-greedy: 0.42 / step. Count-based:
@@ -1468,8 +1480,10 @@
       </p>
 
       <figure>
-        <img src="img/crawler_cycle.gif"
-             alt="The 16-step optimal limit cycle, slow-motion" />
+        <video controls loop muted playsinline poster="img/crawler_cycle.gif">
+          <source src="img/crawler_cycle.mp4" type="video/mp4">
+          <img src="img/crawler_cycle.gif" alt="The 16-step optimal limit cycle, slow-motion">
+        </video>
         <figcaption>
           One pass through the optimal limit cycle, with the
           (arm, hand) bucket state shown at every step.
@@ -1521,8 +1535,10 @@
       </p>
 
       <figure>
-        <img src="img/crawler_optimal.gif"
-             alt="The optimal policy crawling, the cold-open shot" />
+        <video controls loop muted playsinline poster="img/crawler_optimal.gif">
+          <source src="img/crawler_optimal.mp4" type="video/mp4">
+          <img src="img/crawler_optimal.gif" alt="The optimal policy crawling, the cold-open shot">
+        </video>
         <figcaption>
           The optimal policy (discovered by R-MAX, verified against
           DP), running uninterrupted. This is the gait the rest of the
@@ -1620,7 +1636,7 @@ python3 scripts/make_narrative_figures.py all</code></pre>
     <footer>
       <p>
         Built on the
-        <a href="http://ai.berkeley.edu/">UC Berkeley CS188 Pacman AI</a>
+        <a href="https://ai.berkeley.edu/">UC Berkeley CS188 Pacman AI</a>
         crawler simulator, ported from Python 2 to Python 3 and
         extended with SARSA, parameter decay schedules,
         cross-validated decay-length sweeps, a live introspection

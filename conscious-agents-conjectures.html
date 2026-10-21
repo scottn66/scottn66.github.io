@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open Conjectures of the Conscious-Agent Program — a research catalogue</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><g fill='none' stroke='%235b4bd6' stroke-width='1.6' stroke-linecap='round'><circle cx='16' cy='16' r='14.1'/><ellipse cx='16' cy='16' rx='14.1' ry='4.7'/><ellipse cx='16' cy='16' rx='5' ry='14.1'/></g></svg>">
-<meta name="description" content="A consolidated, citable catalogue of the open conjectures of Hoffman &amp; Prakash's conscious-agent / trace-logic program: the mathematical open problems, the physics-projection dictionary, and the Eight Conjectures of physics. Each stated precisely, with what is proven, the exact gap, a first move, and a citation; every claim tagged by epistemic status.">
+<meta name="description" content="A citable catalogue of the open problems of the conscious-agent / trace-logic program: math problems, the physics dictionary, and the Eight Conjectures.">
 <link rel="canonical" href="https://scottn66.github.io/conscious-agents-conjectures.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Open Conjectures of the Conscious-Agent Program">
@@ -16,13 +16,10 @@
 <meta name="twitter:description" content="A citable catalogue of the open problems of the conscious-agent / trace-logic program: math problems, the physics dictionary, and the Eight Conjectures.">
 
 <!-- KaTeX (math) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"></script>
 
-<!-- highlight.js (Python) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,7 +52,7 @@ html[data-theme="dark"]{
   --x-bg:#2c1228; --x-fg:#f0a6da; --x-bd:#6e2557;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
 body{
   margin:0;background:var(--bg);color:var(--ink);
   font-family:"Newsreader",Georgia,serif;font-size:19px;line-height:1.62;
@@ -152,7 +149,7 @@ pre code{font-family:"JetBrains Mono",monospace;font-size:.8rem;line-height:1.6;
 .box.conj p{margin:.5rem 0}.box.conj p strong:first-child{color:var(--ink)}
 
 /* ---------- tables ---------- */
-.tbl-wrap{overflow-x:auto;margin:1.4rem 0;border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow)}
+.tbl-wrap{position:relative;overflow-x:auto;margin:1.4rem 0;border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow)}
 table{border-collapse:collapse;width:100%;font-family:"Inter",sans-serif;font-size:.82rem}
 th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top}
 th{background:var(--bg-soft);font-weight:700;color:var(--ink);position:sticky;top:0}
@@ -430,7 +427,7 @@ h2[data-depth="4"]+.section-rule{background:linear-gradient(90deg,var(--depth-4)
 <p>The authors' proposed identifications of Markov / recurrent‑communicating‑class (RCC) quantities with physical observables. All are conjectural; the recurring obstacle for <em>every</em> entry is the same — an <strong>undetermined dimensional bridge constant</strong>, since the projected quantity is dimensionless and the physical one is not.</p>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Observable</th><th>Proposed projection</th><th>Where</th><th>Note</th></tr></thead>
+<thead><tr><th scope="col">Observable</th><th scope="col">Proposed projection</th><th scope="col">Where</th><th scope="col">Note</th></tr></thead>
 <tbody>
 <tr><td><strong>Mass</strong></td><td>entropy rate of the RCC, \(h(Q)=-\sum_i\pi_i\sum_j Q_{ij}\log Q_{ij}\); a deterministic cycle (zero entropy rate) \(\Rightarrow\) massless</td><td>eq. 47</td><td>the cleanest entry</td></tr>
 <tr><td><strong>Spin</strong></td><td>determinant of \(Q\) collapsed via a geometric‑algebra "C‑spin" to \(S\in\{0,\tfrac12,1\}\)</td><td>eq. 50</td><td>⚠ thin sketch — verify eq. 50 in the PDF</td></tr>
@@ -457,7 +454,7 @@ h2[data-depth="4"]+.section-rule{background:linear-gradient(90deg,var(--depth-4)
 <p>The program's one branded, numbered list — the aspirational derivation targets, each gated on the mathematics of §1–§2. Source: Trace Institute, "Research → The Eight Conjectures," items 01/08–08/08 (a <em>pre‑publication</em> source; the trace‑logic anchor is itself a non‑peer‑reviewed preprint). The 2024 preprint contains no such list — cite it only for the individual correspondences, not for the branding.</p>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>#</th><th>Target</th><th>Conjectured claim</th></tr></thead>
+<thead><tr><th scope="col">#</th><th scope="col">Target</th><th scope="col">Conjectured claim</th></tr></thead>
 <tbody>
 <tr><td>01</td><td>Special relativity</td><td>Minkowski space emerges as the limiting behavior of Markov chains representing \(n\)-cycles as \(n\to\infty\).</td></tr>
 <tr><td>02</td><td>General relativity</td><td>Curved spacetime emerges from special classes of <em>non‑cyclic</em> chains. <em>(Entirely unrealized in the papers — only the SR sketch exists.)</em></td></tr>

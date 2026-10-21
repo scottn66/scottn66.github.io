@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mandelbrot explorer | Scott Nelson</title>
   <meta name="description" content="Interactive Mandelbrot explorer in the browser. Click a point to zoom in and right-click to zoom out. Zooming stops near a trillion times magnification.">
+  <link rel="canonical" href="https://scottn66.github.io/mandelbrot.html">
   <meta property="og:title" content="Mandelbrot explorer | Scott Nelson">
   <meta property="og:description" content="Interactive Mandelbrot explorer in the browser. Click a point to zoom in and right-click to zoom out. Zooming stops near a trillion times magnification.">
   <meta property="og:url" content="https://scottn66.github.io/mandelbrot.html">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
   <style>
     html, body {
       margin: 0;
@@ -24,10 +27,12 @@
       -webkit-user-select: none;
       user-select: none;
     }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   </style>
 </head>
 <body>
-  <canvas id="mandelbrotCanvas"></canvas>
+  <h1 class="visually-hidden">Mandelbrot explorer</h1>
+  <canvas id="mandelbrotCanvas" role="img" aria-label="Interactive Mandelbrot set: click to zoom in, right-click to zoom out"></canvas>
   <script>
     // Define the worker code as a string.
     //

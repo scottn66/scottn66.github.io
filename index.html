@@ -7,6 +7,7 @@
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="Scott Nelson, data engineer. Warehouses, pipelines, and models. MS Applied Data Intelligence, SJSU.">
+  <link rel="canonical" href="https://scottn66.github.io/">
   <meta name="keywords" content="Scott Nelson, Data Engineer, SJSU, DuckDB, pipelines, portfolio">
 
   <!-- Open Graph Meta Tags -->
@@ -14,6 +15,7 @@
   <meta property="og:description" content="Data engineering work: solar warehouse, ingest pipelines, econometric notes.">
   <meta property="og:image" content="https://scottn66.github.io/assets/decision-theory-card.png">
   <meta property="og:url" content="https://scottn66.github.io/">
+  <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
 
   <!-- Schema.org Structured Data -->
@@ -32,13 +34,13 @@
   </script>
 
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Montserrat:wght@700&display=swap" rel="stylesheet">
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous">
 
   <!-- Custom CSS -->
   <style>
@@ -73,7 +75,9 @@
       margin: 0;
       padding: 0;
       line-height: 1.6;
-      scroll-behavior: smooth;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
     }
     h1, h2, h3 {
       font-family: 'Montserrat', sans-serif;
@@ -181,6 +185,7 @@
       color: #eee;
       padding: 20px 0;
     }
+    footer p,
     footer a {
       color: #eee;
     }
@@ -209,9 +214,11 @@
         font-size: 2rem;
       }
     }
+    .skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}
   </style>
 </head>
 <body>
+  <a class="skip" href="#main">Skip to content</a>
 
   <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
@@ -227,8 +234,9 @@
           <li class="nav-item"><a class="nav-link" href="#projects">Work</a></li>
           <li class="nav-item"><a class="nav-link" href="solar/">Solar</a></li>
           <li class="nav-item"><a class="nav-link" href="resume.html">Resume</a></li>
+          <li class="nav-item"><a class="nav-link" href="dashboard.html">Roadmap</a></li>
           <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-          <li class="nav-item"><button id="darkModeToggle" class="btn btn-sm ms-lg-2" type="button">Dark</button></li>
+          <li class="nav-item"><button id="darkModeToggle" class="btn btn-sm ms-lg-2" type="button" aria-pressed="false">Dark</button></li>
         </ul>
       </div>
     </div>
@@ -243,7 +251,7 @@
   </header>
 
   <!-- Main Content -->
-  <main>
+  <main id="main">
     <!-- About Me Section -->
     <section id="about" class="section-bg">
       <div class="container">
@@ -274,7 +282,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">Project Overview</h5>
+                <h4 class="card-title h5">Project Overview</h4>
                 <p class="card-text">OLTP/OLAP warehouse, a FastAPI quote engine, and a 0&ndash;100 viability score blending LCOE, payback, NPV, solar resource, and local market maturity.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -287,8 +295,8 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">City Reports</h5>
-                <p class="card-text">Deep-dive reports for the 15 largest CA cities plus Stanford &amp; Berkeley: 25-year cashflows, payback curves, and utility-specific NEM&nbsp;3.0 economics.</p>
+                <h4 class="card-title h5">City Reports</h4>
+                <p class="card-text">Deep-dive reports for 32 locations: 20 in California (the 15 largest cities plus Stanford, Berkeley, Atherton, Redwood City, and Arnold) and 12 in Oregon (Bend, Redmond, Portland, and more), with 25-year cashflows, payback curves, and utility-specific export economics (NEM&nbsp;3.0 in California, 1:1 net metering in Oregon).</p>
               </div>
               <div class="card-footer bg-light border-0">
                 <a href="solar/reports/" class="btn btn-primary w-100">View Reports &rarr;</a>
@@ -300,7 +308,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">ZIP Heatmaps</h5>
+                <h4 class="card-title h5">ZIP Heatmaps</h4>
                 <p class="card-text">Interactive viability maps across all 2,593 California ZIP codes, with confidence tiers drawn from real Berkeley&nbsp;Lab installation data.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -319,7 +327,7 @@
               <img src="assets/images/projects/crawler/crawler.gif"
                    class="card-img-top" alt="The Speedy, Q-learning Crawler" loading="lazy">
               <div class="card-body">
-                <h5 class="card-title">The Speedy, Q-learning Crawler</h5>
+                <h4 class="card-title h5">The Speedy, Q-learning Crawler</h4>
                 <p class="card-text">A year of RL tuning reached only 42% of optimal, then a 2002 model-based algorithm (R-MAX) closed the gap to 100%.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -334,7 +342,7 @@
               <img src="assets/images/projects/HMM/hmm.png"
                    class="card-img-top" alt="From Counts to Context" loading="lazy">
               <div class="card-body">
-                <h5 class="card-title">From Counts to Context</h5>
+                <h4 class="card-title h5">From Counts to Context</h4>
                 <p class="card-text">HMM → LSTM → BERT for NER. A leakage bug in the validation split, then DistilBERT at test F1 0.888. The older Viterbi writeup is linked from the page.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -357,11 +365,11 @@
                 </g>
               </svg>
               <div class="card-body">
-                <h5 class="card-title">The Value of Knowing You</h5>
+                <h4 class="card-title h5">The Value of Knowing You</h4>
                 <p class="card-text">A topological curriculum from Bayes nets to counterfactuals: an ad agent climbing Pearl's ladder. Three interactive widgets and a modernized, runnable decision network.</p>
               </div>
               <div class="card-footer bg-light border-0">
-                <a href="decision-theory.html" class="btn btn-primary w-100" target="_blank">View Project</a>
+                <a href="decision-theory.html" class="btn btn-primary w-100" target="_blank" rel="noopener">View Project</a>
               </div>
             </div>
           </article>
@@ -394,7 +402,7 @@
                 </g>
               </svg>
               <div class="card-body">
-                <h5 class="card-title">City Cartography</h5>
+                <h4 class="card-title h5">City Cartography</h4>
                 <p class="card-text">A topographic recreation of anvaka/city-roads: OpenStreetMap road networks drawn live, layered over real elevation contours, hillshade, water, and green space.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -423,7 +431,7 @@
                 </g>
               </svg>
               <div class="card-body">
-                <h5 class="card-title">Mandelbrot Explorer</h5>
+                <h4 class="card-title h5">Mandelbrot Explorer</h4>
                 <p class="card-text">A deep-zoom fractal renderer: web-worker Mariani–Silver subdivision with Hilbert-curve ordering and smooth iteration coloring, down to the precision floor.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -462,7 +470,7 @@
                 </g>
               </svg>
               <div class="card-body">
-                <h5 class="card-title">The Shape of People to Come</h5>
+                <h4 class="card-title h5">The Shape of People to Come</h4>
                 <p class="card-text">An econometric atlas of post-industrial demographics: life-cycle capital structure, a six-instrument panel beyond birth rates, and 236 countries scored on an adjustable demographic-strategic index (UN WPP 2024).</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -480,7 +488,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">Wikipedia Scraper</h5>
+                <h4 class="card-title h5">Wikipedia Scraper</h4>
                 <p class="card-text">Bounded BFS crawl with canonical page keys, SQLite graph store, and a 6-point soup validator. 834 outlinks from a single seed article.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -493,7 +501,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">SEP Scraper</h5>
+                <h4 class="card-title h5">SEP Scraper</h4>
                 <p class="card-text">Stanford Encyclopedia of Philosophy: peer-reviewed concept backbone with hand-curated cross-references and a built-in query layer.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -506,7 +514,7 @@
           <article class="col-lg-4 col-md-6 mb-4">
             <div class="card h-100 border-0 shadow">
               <div class="card-body">
-                <h5 class="card-title">arXiv Scraper</h5>
+                <h4 class="card-title h5">arXiv Scraper</h4>
                 <p class="card-text">Atom API metadata ingest with category-driven queries, PDF download, and text extraction across 35 CS subcategories.</p>
               </div>
               <div class="card-footer bg-light border-0">
@@ -535,11 +543,11 @@
                 </g>
               </svg>
               <div class="card-body">
-                <h5 class="card-title">Does Bitcoin Follow a Power Law?</h5>
+                <h4 class="card-title h5">Does Bitcoin Follow a Power Law?</h4>
                 <p class="card-text">An interactive econometric autopsy. Eight lenses — HAC inference, residual stationarity, AIC model selection, OU mean-reversion, LPPLS bubbles, structural breaks — scrutinize the power-law claim with Plotly, statsmodels &amp; seaborn on a decade of data.</p>
               </div>
               <div class="card-footer bg-light border-0">
-                <a href="bitcoin-power-law/index.html" class="btn btn-primary w-100" target="_blank">View Project</a>
+                <a href="bitcoin-power-law/" class="btn btn-primary w-100" target="_blank" rel="noopener">View Project</a>
               </div>
             </div>
           </article>
@@ -583,150 +591,36 @@
     </div>
   </footer>
 
-  <!-- Project Modals -->
-  <!-- Modal for Project 2 -->
-  <div class="modal fade" id="projectModal2" tabindex="-1" aria-labelledby="projectModalLabel2" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabel2">The Speedy, Q-learning Crawler</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>A two-jointed robot teaches itself to crawl via Q-learning. The twist: an escalating stack of reinforcement-learning techniques, schedule sweeps, Bayesian optimization, population-based training, DQN, count-based exploration, all plateaued at <strong>42% of optimal</strong>. Dynamic programming solves the same problem exactly in three seconds, and a 2002 model-based algorithm (<strong>R-MAX</strong>) lets RL itself reach <strong>100%</strong>. The lesson: the axis that matters is model-free vs. model-based, not which exploration trick you pick.</p>
-          <p class="text-muted">It&rsquo;s one project at three altitudes &mdash; a portfolio read, a technical dashboard, and a cinematic narrative.</p>
-          <div class="list-group mt-3">
-            <a href="Q.html" target="_blank" rel="noopener" class="list-group-item list-group-item-action d-flex flex-wrap align-items-center gap-2 gap-md-3 py-3">
-              <span class="fs-3" aria-hidden="true">&#128214;</span>
-              <span class="flex-grow-1">
-                <strong>The full project</strong> <span class="text-muted small">&middot; ~8&nbsp;min read</span><br>
-                <span class="text-muted small">Start here. The whole arc in a portfolio-length read.</span>
-              </span>
-              <span class="btn btn-sm btn-primary flex-shrink-0">Read the story</span>
-            </a>
-            <a href="robot-arm-sim/index.html" target="_blank" rel="noopener" class="list-group-item list-group-item-action d-flex flex-wrap align-items-center gap-2 gap-md-3 py-3">
-              <span class="fs-3" aria-hidden="true">&#128202;</span>
-              <span class="flex-grow-1">
-                <strong>The technical dashboard</strong><br>
-                <span class="text-muted small">Every experiment, figure, and equation. The complete technical reference, made to scroll.</span>
-              </span>
-              <span class="btn btn-sm btn-outline-primary flex-shrink-0">Open</span>
-            </a>
-            <a href="robot-arm-sim/narrative.html" target="_blank" rel="noopener" class="list-group-item list-group-item-action d-flex flex-wrap align-items-center gap-2 gap-md-3 py-3">
-              <span class="fs-3" aria-hidden="true">&#127916;</span>
-              <span class="flex-grow-1">
-                <strong>The cinematic narrative</strong><br>
-                <span class="text-muted small">The same story as a video-first script in 15 timed acts. Made for watching.</span>
-              </span>
-              <span class="btn btn-sm btn-outline-primary flex-shrink-0">Watch</span>
-            </a>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal for Project 3 -->
-  <div class="modal fade" id="projectModal3" tabindex="-1" aria-labelledby="projectModalLabel3" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabel3">From Counts to Context</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>HMM → LSTM → BERT for NER. A leakage bug in the validation split, then DistilBERT at test F1 0.888. The older Viterbi writeup is linked from the page.</p>
-        </div>
-        <div class="modal-footer">
-          <a href="ner-taggers.html" class="btn btn-primary" target="_blank">View Full Project</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal for Wikipedia Scraper -->
-  <div class="modal fade" id="projectModalWiki" tabindex="-1" aria-labelledby="projectModalLabelWiki" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabelWiki">Wikipedia Scraper</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Three complementary Wikipedia scrapers: <strong>sitehopper3_basic.py</strong> provides canonical page-key normalization, a SQLite pages/edges graph store, bounded BFS crawling, and a deterministic fake scraper for offline testing. <strong>wikiFetcher.py</strong> adds a 6-point soup validator that rejects disambiguation pages, missing content, and empty stubs before they enter the cache. <strong>wikiSearch.py</strong> wraps the MediaWiki search API with content-type validation and JSON decode fallback. Together they form the breadth layer of an ingest pipeline.</p>
-        </div>
-        <div class="modal-footer">
-          <a href="wikipedia_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
-          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal for SEP Scraper -->
-  <div class="modal fade" id="projectModalSEP" tabindex="-1" aria-labelledby="projectModalLabelSEP" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabelSEP">SEP Scraper</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Scraper for the Stanford Encyclopedia of Philosophy: the highest signal-per-page source in the stack. Extracts section-keyed content, initial preamble paragraphs, and the hand-curated <code>related_entries</code> cross-reference graph that SEP editors maintain. Includes a <strong>DBreader</strong> query layer for keyword search over cached articles and an NLTK-based lexicon/bigram analyzer. Each SEP entry yields ~31 curated cross-references vs. Wikipedia's ~834 noisy hyperlinks.</p>
-        </div>
-        <div class="modal-footer">
-          <a href="sep_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
-          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal for arXiv Scraper -->
-  <div class="modal fade" id="projectModalArxiv" tabindex="-1" aria-labelledby="projectModalLabelArxiv" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="projectModalLabelArxiv">arXiv Scraper</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Atom API scraper for arXiv preprints with two entry patterns: category-driven browsing (35 CS subcategories) and free-text keyword search. Downloads PDFs and extracts the first 1&ndash;2 pages as text previews via PyPDF2. Normalizes results to structured metadata (arxiv_id, title, authors, categories, abstract). The primary-source verification layer is when a concept page makes an empirical claim, the arXiv pipeline provides the paper that backs it up.</p>
-        </div>
-        <div class="modal-footer">
-          <a href="arxiv_scraper.html" class="btn btn-primary" target="_blank">View Full Project</a>
-          <a href="https://github.com/scottn66/wiki" class="btn btn-outline-secondary" target="_blank">GitHub</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Scripts -->
   <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 
   <!-- Typed.js for Dynamic Header Text -->
-  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js" integrity="sha384-NMn9+T8zIKnDUstqb5le7vdLNSyAgSU9DtEPT/b7ks9NJQpPk4Dc9b1tI8oyzimc" crossorigin="anonymous"></script>
   <script>
-    new Typed('#typed-text', {
-      strings: ["Data Engineer", "Warehouses, pipelines, models", "MS Applied Data Intelligence, SJSU"],
-      typeSpeed: 50,
-      backSpeed: 30,
-      loop: true
-    });
+    (function () {
+      const el = document.getElementById('typed-text');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce || typeof Typed === 'undefined') {
+        el.textContent = 'Data Engineer';
+        return;
+      }
+      new Typed('#typed-text', {
+        strings: ["Data Engineer", "Warehouses, pipelines, models", "MS Applied Data Intelligence, SJSU", "Data Engineer"],
+        typeSpeed: 50,
+        backSpeed: 30,
+        loop: false,
+        onComplete: function (self) { if (self.cursor) self.cursor.remove(); }
+      });
+    })();
   </script>
   <!-- Dark Mode Toggle Script -->
   <script>
     const toggleButton = document.getElementById('darkModeToggle');
     toggleButton.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
+      const on = document.body.classList.toggle('dark-mode');
+      toggleButton.setAttribute('aria-pressed', String(on));
+      toggleButton.textContent = on ? 'Light' : 'Dark';
     });
   </script>
 </body>

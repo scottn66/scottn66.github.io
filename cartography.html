@@ -6,9 +6,12 @@
   <title>City cartography viewer | Scott Nelson</title>
   <meta name="unit" content="cartography">
   <meta name="description" content="City cartography viewer: render any city's streets over elevation contours, hillshade, and water. Built in the browser on Andrei Kashcha's city-roads.">
+  <link rel="canonical" href="https://scottn66.github.io/cartography.html">
   <meta property="og:title" content="City cartography viewer | Scott Nelson">
   <meta property="og:description" content="City cartography viewer: render any city's streets over elevation contours, hillshade, and water. Built in the browser on Andrei Kashcha's city-roads.">
   <meta property="og:url" content="https://scottn66.github.io/cartography.html">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary">
   <style>
     :root {
       --panel-bg: rgba(20, 24, 28, 0.92);
@@ -50,7 +53,7 @@
       letter-spacing: 0.2px; display: flex; align-items: center; gap: 8px;
     }
     #panel .sub { color: var(--panel-muted); font-size: 11.5px; margin: 0 0 12px; }
-    #panel label.field-label { display: block; font-weight: 600; margin: 12px 0 5px; font-size: 11.5px;
+    #panel .field-label { display: block; font-weight: 600; margin: 12px 0 5px; font-size: 11.5px;
       text-transform: uppercase; letter-spacing: 0.6px; color: var(--panel-muted); }
     .row { display: flex; gap: 8px; }
     input[type=text], select {
@@ -58,6 +61,7 @@
       background: var(--field-bg); color: var(--panel-fg); border: 1px solid var(--field-border);
     }
     input[type=text]:focus, select:focus { outline: none; border-color: var(--accent-2); }
+    input[type=text]:focus-visible, select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
     button {
       font-family: inherit; cursor: pointer; border: none; border-radius: 8px;
       padding: 9px 12px; font-size: 13px; font-weight: 600; transition: filter .15s, background .15s;
@@ -132,8 +136,8 @@
   </style>
 </head>
 <body>
-  <canvas id="map"></canvas>
-  <button class="collapse-toggle" id="showPanel" title="Show controls">☰</button>
+  <canvas id="map" role="img" aria-label="Rendered map"></canvas>
+  <button class="collapse-toggle" id="showPanel" title="Show controls" aria-label="Show controls">☰</button>
 
   <div id="panel">
     <h1>🗺 City Cartography</h1>
@@ -145,8 +149,8 @@
     </div>
     <div class="examples" id="examples"></div>
 
-    <label class="field-label">Layers</label>
-    <div class="layers">
+    <div class="field-label" id="layers-lbl">Layers</div>
+    <div class="layers" role="group" aria-labelledby="layers-lbl">
       <label><input type="checkbox" id="ly-roads" checked> <span><span class="swatch" id="sw-roads"></span> Roads</span></label>
       <label><input type="checkbox" id="ly-contours" checked> <span><span class="swatch" id="sw-contours"></span> Contours</span></label>
       <label><input type="checkbox" id="ly-hillshade"> <span><span class="swatch" style="background:#888"></span> Hillshade</span></label>
@@ -343,7 +347,7 @@
   var progBar = statusEl.querySelector(".bar"), progFill = progBar.querySelector(".fill");
   function status(msg, opts) {
     opts = opts || {};
-    statusMsg.innerHTML = msg;
+    statusMsg.textContent = msg;
     statusEl.className = (opts.loading ? "loading " : "") + (opts.err ? "err" : "");
     if (!opts.loading) progBar.classList.remove("indet");
   }
@@ -1047,6 +1051,7 @@
   function runRender() {
     if (rendering) return;
     var q = placeInput.value.trim();
+    if (q) canvas.setAttribute("aria-label", "Map of " + q + " with roads and elevation contours");
     if (!q) { status("Enter a place name first.", { err: true }); return; }
     rendering = true;
     $("render").disabled = true; $("download").disabled = true;

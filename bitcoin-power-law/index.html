@@ -4,19 +4,22 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Does Bitcoin Follow a Power Law? — An Econometric Autopsy</title>
-<meta name="description" content="Does Bitcoin follow a power law? An interactive, seven-lens econometric analysis: fit, inference, stationarity, model selection, mean reversion, and bubbles."/>
+<meta name="description" content="Does Bitcoin follow a power law? An interactive, eight-lens econometric analysis: fit, inference, stationarity, model selection, mean reversion, and bubbles."/>
+<link rel="canonical" href="https://scottn66.github.io/bitcoin-power-law/">
 <meta property="og:title" content="Does Bitcoin Follow a Power Law? — An Econometric Autopsy"/>
-<meta property="og:description" content="Does Bitcoin follow a power law? An interactive, seven-lens econometric analysis: fit, inference, stationarity, model selection, mean reversion, and bubbles."/>
+<meta property="og:description" content="Does Bitcoin follow a power law? An interactive, eight-lens econometric analysis: fit, inference, stationarity, model selection, mean reversion, and bubbles."/>
 <meta property="og:image" content="https://scottn66.github.io/bitcoin-power-law/assets/fig_cycles.png"/>
 <meta property="og:url" content="https://scottn66.github.io/bitcoin-power-law/"/>
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js" integrity="sha384-cCVCZkAjYNxaYKbM8lsArLznDF/SvMFr1jcZrvOpSTCa0W40ZAdLzHCEulnUa5i7" crossorigin="anonymous"></script>
 <script>
   window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" id="MathJax-script" async integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
 <script src="assets/data.js"></script>
 <style>
   :root{
@@ -79,7 +82,8 @@
   figure{margin:16px 0}
   figure img{width:100%;border:1px solid var(--line);border-radius:12px;display:block;background:var(--card2)}
   figcaption{color:var(--dim);font-size:12.5px;margin-top:8px}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+  .grid2>*{min-width:0}
   .verdict{border-radius:12px;padding:14px 16px;margin-top:16px;font-size:14.5px;border:1px solid}
   .v-real{background:rgba(63,185,80,.08);border-color:rgba(63,185,80,.32)}
   .v-warn{background:rgba(247,147,26,.08);border-color:rgba(247,147,26,.32)}
@@ -88,6 +92,7 @@
   table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
   th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
   th{color:var(--dim);font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+  th[scope="row"]{color:inherit;font-weight:inherit;text-transform:none;font-size:inherit;letter-spacing:0}
   td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:"JetBrains Mono",monospace;white-space:nowrap}
   .card>table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .win{color:var(--green);font-weight:600}
@@ -201,11 +206,11 @@
   <div class="card">
     <h3 style="margin-top:2px">What each curve actually claims</h3>
     <table>
-      <thead><tr><th>Model</th><th class="num">k</th><th>Shape of growth it assumes</th></tr></thead>
+      <thead><tr><th scope="col">Model</th><th scope="col" class="num">k</th><th scope="col">Shape of growth it assumes</th></tr></thead>
       <tbody>
         <tr><td><b>Power law</b> &nbsp;$P=A\,t^{n}$</td><td class="num">2</td><td>Growth <i>rate</i> fades like $n/t$ — each doubling takes proportionally longer. A straight line on log–log.</td></tr>
         <tr><td><b>Exponential</b> &nbsp;$P=A\,e^{kt}$</td><td class="num">2</td><td><b>Constant</b> % growth → a fixed doubling time. Straight on semi-log. The shape BTC has never obeyed.</td></tr>
-        <tr><td><b>Stretched-exp</b> &nbsp;$\log P=a+b\,t^{c}$</td><td class="num">3</td><td>A dial <i>between</i> the two ($c{<}1$ ⇒ sub-exponential). Flexible middle ground.</td></tr>
+        <tr><td><b>Stretched-exp</b> &nbsp;$\log P=a+b\,t^{c}$</td><td class="num">3</td><td>A dial <i>between</i> the two ($c{&lt;}1$ ⇒ sub-exponential). Flexible middle ground.</td></tr>
         <tr><td><b>Logistic</b> &nbsp;S-curve</td><td class="num">4</td><td>Power-law-like early, then bends to a hard <b>ceiling</b> — assumes eventual saturation.</td></tr>
       </tbody>
     </table>
@@ -430,8 +435,8 @@
       ['R² (log–log)', (fc.r2||0).toFixed(3)],
     ];
     document.getElementById('fittab').innerHTML =
-      '<thead><tr><th>Coinbase window 2016–2026</th><th class="num">value</th></tr></thead><tbody>'+
-      rows.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td></tr>`).join('')+'</tbody>';
+      '<thead><tr><th scope="col">Coinbase window 2016–2026</th><th scope="col" class="num">value</th></tr></thead><tbody>'+
+      rows.map(r=>`<tr><th scope="row">${r[0]}</th><td class="num">${r[1]}</td></tr>`).join('')+'</tbody>';
   })();
 
   // ---- spurious / stationarity ----
@@ -445,7 +450,7 @@
       ['Ljung–Box', 'Any structure left in the errors?', (c.ljungbox_p||0).toFixed(3), 'yes — serially dependent'],
     ];
     document.getElementById('statab').innerHTML =
-      '<thead><tr><th>Test</th><th>What it asks</th><th class="num">p / stat</th><th>Reading</th></tr></thead><tbody>'+
+      '<thead><tr><th scope="col">Test</th><th scope="col">What it asks</th><th scope="col" class="num">p / stat</th><th scope="col">Reading</th></tr></thead><tbody>'+
       rows.map(r=>`<tr><td><b>${r[0]}</b></td><td style="color:var(--mute)">${r[1]}</td><td class="num">${r[2]}</td><td style="color:var(--mute)">${r[3]}</td></tr>`).join('')+'</tbody>';
   })();
 
@@ -459,7 +464,7 @@
         `<td class="num ${win?'win':''}">${m.delta_aic===0?'0':'+'+Math.round(m.delta_aic)}</td></tr>`;
     }).join('');
     document.getElementById(elid).innerHTML=
-      '<thead><tr><th>Model</th><th class="num">R²</th><th class="num">k</th><th class="num">ΔAIC</th></tr></thead><tbody>'+rows+'</tbody>';
+      '<thead><tr><th scope="col">Model</th><th scope="col" class="num">R²</th><th scope="col" class="num">k</th><th scope="col" class="num">ΔAIC</th></tr></thead><tbody>'+rows+'</tbody>';
   }
   if(PL.model_comparison_full) modelTable('mtab_full', PL.model_comparison_full);
   if(PL.model_comparison) modelTable('mtab_recent', PL.model_comparison);
@@ -497,18 +502,18 @@
          dr = ${(m.lambda_per_year||0).toFixed(2)}·(${(m.theta||0).toFixed(3)} − r)·dt + ${(m.sigma_annual||0).toFixed(2)}·dW
        </div>
        <table>
-       <tr><td>Pull strength λ</td><td class="num">${(m.lambda_per_year||0).toFixed(2)} / yr</td></tr>
-       <tr><td>Half-life = ln2/λ</td><td class="num">${hl} d (~${(hl/30.4).toFixed(1)} mo)</td></tr>
-       <tr><td>Equilibrium θ</td><td class="num">${(m.theta||0).toFixed(3)} dex</td></tr>
-       <tr><td>Shock vol σ</td><td class="num">${(m.sigma_annual||0).toFixed(2)} dex/yr</td></tr>
-       <tr><td>AR(1) φ = e^(−λ·1d)</td><td class="num">${(m.ar1_phi||0).toFixed(3)}</td></tr>
+       <tr><th scope="row">Pull strength λ</th><td class="num">${(m.lambda_per_year||0).toFixed(2)} / yr</td></tr>
+       <tr><th scope="row">Half-life = ln2/λ</th><td class="num">${hl} d (~${(hl/30.4).toFixed(1)} mo)</td></tr>
+       <tr><th scope="row">Equilibrium θ</th><td class="num">${(m.theta||0).toFixed(3)} dex</td></tr>
+       <tr><th scope="row">Shock vol σ</th><td class="num">${(m.sigma_annual||0).toFixed(2)} dex/yr</td></tr>
+       <tr><th scope="row">AR(1) φ = e^(−λ·1d)</th><td class="num">${(m.ar1_phi||0).toFixed(3)}</td></tr>
        </table>`;
     document.getElementById('mrcard').innerHTML=
       `<h3 style="margin-top:2px">Where Bitcoin stands today</h3>
        <table>
-       <tr><td>Deviation from fair value</td><td class="num">${(m.current_zscore||0).toFixed(2)}σ</td></tr>
-       <tr><td>OU-model percentile</td><td class="num">${Math.round(m.current_percentile||0)}%</td></tr>
-       <tr><td>Stationary 1σ dispersion</td><td class="num">±${(m.resid_sigma||0).toFixed(2)} dex (≈${Math.round((Math.pow(10,m.resid_sigma||0)-1)*100)}%)</td></tr>
+       <tr><th scope="row">Deviation from fair value</th><td class="num">${(m.current_zscore||0).toFixed(2)}σ</td></tr>
+       <tr><th scope="row">OU-model percentile</th><td class="num">${Math.round(m.current_percentile||0)}%</td></tr>
+       <tr><th scope="row">Stationary 1σ dispersion</th><td class="num">±${(m.resid_sigma||0).toFixed(2)} dex (≈${Math.round((Math.pow(10,m.resid_sigma||0)-1)*100)}%)</td></tr>
        </table>
        <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${m.interpretation||''}</p>`;
     const vr=document.getElementById('volrange'); if(vr) vr.textContent=`${(m.vol_low||0).toFixed(2)}–${(m.vol_high||0).toFixed(2)} dex/yr`;
@@ -540,7 +545,7 @@
     Plotly.newPlot('lppls',tr,lay,CFG);
     const cyc=PL.lppls_cycles||[];
     document.getElementById('lpplstab').innerHTML=
-      '<thead><tr><th>Cycle run-up</th><th class="num">fitted t_c</th><th class="num">actual peak</th><th class="num">m</th><th class="num">ω</th><th class="num">R²</th><th>bubble verdict</th></tr></thead><tbody>'+
+      '<thead><tr><th scope="col">Cycle run-up</th><th scope="col" class="num">fitted t_c</th><th scope="col" class="num">actual peak</th><th scope="col" class="num">m</th><th scope="col" class="num">ω</th><th scope="col" class="num">R²</th><th scope="col">bubble verdict</th></tr></thead><tbody>'+
       cyc.map(c=>`<tr><td><b>${c.label}</b></td><td class="num">${c.tc_date}</td><td class="num">${c.actual_peak_date}</td>`+
         `<td class="num">${c.m.toFixed(2)}</td><td class="num">${c.omega.toFixed(1)}</td><td class="num">${c.r2.toFixed(3)}</td>`+
         `<td>${c.passes_strict_filter?'<span class="pill ok">passes strict</span>':'<span class="pill no">ω at floor — fails</span>'}</td></tr>`).join('')+'</tbody>';
@@ -569,8 +574,8 @@
     Plotly.newPlot('roll',tr,lay,CFG);
     const chow=(s.chow_tests||[]);
     document.getElementById('chowtab').innerHTML=
-      '<thead><tr><th>Halving</th><th class="num">Chow F</th><th class="num">p-value</th><th>break?</th></tr></thead><tbody>'+
-      chow.map(c=>`<tr><td>${c.halving}</td><td class="num">${c.F.toFixed(1)}</td><td class="num">${c.p<0.001?'<0.001':c.p.toFixed(3)}</td>`+
+      '<thead><tr><th scope="col">Halving</th><th scope="col" class="num">Chow F</th><th scope="col" class="num">p-value</th><th scope="col">break?</th></tr></thead><tbody>'+
+      chow.map(c=>`<tr><th scope="row">${c.halving}</th><td class="num">${c.F.toFixed(1)}</td><td class="num">${c.p<0.001?'<0.001':c.p.toFixed(3)}</td>`+
         `<td>${c.break?'<span class="pill no">break</span>':'<span class="pill ok">stable</span>'}</td></tr>`).join('')+'</tbody>';
   })();
 
@@ -582,16 +587,16 @@
     document.getElementById('riskcard').innerHTML=
       `<h3 style="margin-top:2px">Cycle mathematics</h3>
        <table>
-       <tr><td>Peak-to-peak multiples</td><td class="num">${p2p}</td></tr>
-       <tr><td>Worst drawdown on record</td><td class="num">${Math.round(Math.abs(rk.max_drawdown_pct||0))}%</td></tr>
+       <tr><th scope="row">Peak-to-peak multiples</th><td class="num">${p2p}</td></tr>
+       <tr><th scope="row">Worst drawdown on record</th><td class="num">${Math.round(Math.abs(rk.max_drawdown_pct||0))}%</td></tr>
        </table>
        <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${rk.interpretation||''}</p>`;
     const predEl=document.getElementById('predcard');
     if(predEl) predEl.innerHTML=
       `<h3 style="margin-top:2px">Estimating the 4th multiple</h3>
        <table>
-       <tr><td>Gentle — excess-multiple decay toward 1×</td><td class="num">${(pred.pred_excess_geometric||0).toFixed(2)}×</td></tr>
-       <tr><td>Steep — log-linear in cycle number</td><td class="num">${(pred.pred_loglinear||0).toFixed(2)}×</td></tr>
+       <tr><th scope="row">Gentle — excess-multiple decay toward 1×</th><td class="num">${(pred.pred_excess_geometric||0).toFixed(2)}×</td></tr>
+       <tr><th scope="row">Steep — log-linear in cycle number</th><td class="num">${(pred.pred_loglinear||0).toFixed(2)}×</td></tr>
        <tr><td><b>Bracketed estimate</b></td><td class="num"><b>${(pred.range_low||0).toFixed(1)}×–${(pred.range_high||0).toFixed(1)}×</b></td></tr>
        </table>
        <p style="color:var(--mute);font-size:13px;margin:12px 0 0">${pred.interpretation||''}</p>`;
@@ -599,6 +604,20 @@
     const om=document.getElementById('obsmults'); if(om) om.textContent=(pred.observed_multiples||[]).map(x=>x.toFixed(1)+'×').join(', ');
   })();
 })();
+</script>
+<script>
+  // Plotly's modebar is a row of empty <a> icons: give each one a name and make it a keyboard button.
+  (function () {
+    function label() {
+      document.querySelectorAll('a.modebar-btn:not([aria-label])').forEach(function (a) {
+        a.setAttribute('role', 'button');
+        a.setAttribute('aria-label', a.getAttribute('data-title') || 'Plot tool');
+        a.setAttribute('tabindex', '0');
+      });
+    }
+    new MutationObserver(label).observe(document.body, { childList: true, subtree: true });
+    label();
+  })();
 </script>
 </body>
 </html>

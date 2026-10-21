@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pricing Risk · An Actuarial Track</title>
-  <meta name="description" content="How actuaries price risk: life-insurance premiums via the equivalence principle, loadings, ruin theory and capital, real-world vs risk-neutral measures, and credibility. A companion to the applied decision-theory playground, by Scott Nelson." />
+  <meta name="description" content="Life-insurance pricing, loadings, ruin theory, P vs Q, and credibility: probability and financial mathematics applied to pricing risk, by Scott Nelson.">
+  <link rel="canonical" href="https://scottn66.github.io/actuarial-pricing.html">
   <meta name="author" content="Scott Nelson" />
   <meta property="og:title" content="Pricing Risk: An Actuarial Track" />
   <meta property="og:description" content="Life-insurance pricing, loadings, ruin theory, P vs Q, and credibility — probability and financial mathematics applied to pricing risk, by Scott Nelson." />
@@ -18,7 +19,7 @@
       svg: { fontCache: 'global' }
     };
   </script>
-  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
   <style>
     :root{
       --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
@@ -28,7 +29,8 @@
       --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
     }
     *,*::before,*::after{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    html{scroll-padding-top:3.6rem}
+    @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
     body{margin:0;background:var(--bg);color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
       font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -37,7 +39,7 @@
     code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
     pre{background:#1f2430;color:#e6e6e6;padding:1rem 1.1rem;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.55}
     pre code{background:none;color:inherit;padding:0}
-    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
     .topbar a{color:#cfe0ff;border:none}
     .topbar a:hover{color:#fff}
     .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
@@ -71,6 +73,7 @@
     details.aside-box summary{cursor:pointer;font-weight:700;font-size:.8rem}
     .toc-toggle{display:none}
     mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+    @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
     figure{margin:1.2rem 0;text-align:center}
     figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
     table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
@@ -118,9 +121,11 @@
       table{display:block;overflow-x:auto;white-space:normal}
     }
   </style>
+<style>.skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}</style>
 </head>
 <body>
-  <nav class="topbar">
+  <a class="skip" href="#main">Skip to content</a>
+  <nav class="topbar" aria-label="Site">
     <a class="brand" href="index.html">Scott Nelson</a>
     <a href="applied-decision-theory.html">← Applied playground</a>
     <a href="decision-theory.html">Decision theory</a>
@@ -129,9 +134,9 @@
   </nav>
 
   <div class="page">
-    <aside class="toc" aria-label="Contents">
-      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
-      <nav><ol>
+    <aside class="toc" id="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc">Contents ▾</button>
+      <nav aria-label="Table of contents"><ol>
         <li><a href="#equiv">1 · the price of a life</a></li>
         <li><a href="#loading">2 · net → gross premium</a></li>
         <li><a href="#ruin">3 · capital &amp; ruin</a></li>
@@ -142,7 +147,7 @@
       </ol></nav>
     </aside>
 
-    <main>
+    <main id="main">
       <header id="hero">
   <div class="badges">
     <span class="badge">Actuarial track</span>
@@ -522,6 +527,7 @@
   document.getElementById("toc-toggle").addEventListener("click",function(){
     var t=document.querySelector(".toc");
     t.classList.toggle("open");
+    this.setAttribute("aria-expanded",t.classList.contains("open"));
     this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
   });
   </script>

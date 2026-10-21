@@ -4,11 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Value of Knowing You · Decision Theory → Causality</title>
-  <meta name="description"
-        content="A topologically-sorted curriculum from Bayesian networks through utility,
-                 decision networks, the value of perfect information, interventions, and
-                 counterfactuals. An ad agent climbs Pearl's ladder; three interactive
-                 widgets; a modernized, runnable decision network." />
+  <meta name="description" content="A step-by-step curriculum from Bayesian networks through utility, the value of information, interventions, and counterfactuals, with three interactive widgets.">
+  <link rel="canonical" href="https://scottn66.github.io/decision-theory.html">
   <meta name="author" content="Scott Nelson" />
   <meta property="og:title" content="The Value of Knowing You: Decision Theory to Causality" />
   <meta property="og:description" content="Bayes nets, VPI, do-calculus, counterfactuals; a modernized pgmpy decision network and three interactive widgets, by Scott Nelson." />
@@ -24,7 +21,7 @@
       svg: { fontCache: 'global' }
     };
   </script>
-  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
   <style>
     :root{
       --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
@@ -34,7 +31,8 @@
       --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
     }
     *,*::before,*::after{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    html{scroll-padding-top:3.6rem}
+    @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
     body{margin:0;background:var(--bg);color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
       font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -43,7 +41,8 @@
     code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
     pre{background:#1f2430;color:#e6e6e6;padding:1rem 1.1rem;border-radius:var(--radius);overflow-x:auto;font-size:.86rem;line-height:1.55}
     pre code{background:none;color:inherit;padding:0}
-    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    code{overflow-wrap:anywhere}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
     .topbar a{color:#cfe0ff;border:none}
     .topbar a:hover{color:#fff}
     .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
@@ -78,6 +77,7 @@
     details.aside-box summary{cursor:pointer;font-weight:700;font-size:.8rem}
     .toc-toggle{display:none}
     mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+    @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
     figure{margin:1.2rem 0;text-align:center}
     figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem}
     table{border-collapse:collapse;width:100%;font-size:.86rem;margin:1rem 0}
@@ -125,22 +125,24 @@
       table{display:block;overflow-x:auto;white-space:normal}
     }
   </style>
+<style>.skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}</style>
 </head>
 <body>
-  <nav class="topbar">
+  <a class="skip" href="#main">Skip to content</a>
+  <nav class="topbar" aria-label="Site">
     <a class="brand" href="index.html">Scott Nelson</a>
     <a href="index.html#projects">Projects</a>
     <a href="dashboard.html">Roadmap</a>
-    <a href="robot-arm-sim/index.html">robot-arm-sim</a>
+    <a href="robot-arm-sim/">Q-learning crawler</a>
     <a href="applied-decision-theory.html">Applied playground</a>
     <a href="actuarial-pricing.html">Actuarial track</a>
     <a href="resume.html">Resume</a>
   </nav>
 
   <div class="page">
-    <aside class="toc" aria-label="Contents">
-      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
-      <nav><ol>
+    <aside class="toc" id="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc">Contents ▾</button>
+      <nav aria-label="Table of contents"><ol>
         <li><a href="#ladder">The ladder</a></li>
         <li class="act">Act I · Seeing</li>
         <li><a href="#definitions">First, the words</a></li>
@@ -177,7 +179,7 @@
       </ol></nav>
     </aside>
 
-    <main>
+    <main id="main">
       <header id="hero">
         <div class="badges">
           <span class="badge">Bayes nets → utility → VPI → counterfactuals</span>
@@ -244,7 +246,7 @@
         </p>
         <figure>
           <table style="max-width:560px;margin:0 auto">
-            <tr><th>Tier</th><th>Question</th><th>Example</th><th>Denizen</th></tr>
+            <tr><th scope="col">Tier</th><th scope="col">Question</th><th scope="col">Example</th><th scope="col">Denizen</th></tr>
             <tr><td><span class="act-tag act-imagine">3 · imagine</span></td><td>What if $X$ <em>had been</em> $x'$?</td><td>"Would I be home by now had I gotten off the 405?"</td><td>Structural Causal Models</td></tr>
             <tr><td><span class="act-tag act-do">2 · do</span></td><td>What if I <em>do</em> $X=x$?</td><td>"Will exercise lower my cholesterol?"</td><td>Causal Bayes nets · RL</td></tr>
             <tr><td><span class="act-tag act-see">1 · see</span></td><td>What if I <em>see</em> $X=x$?</td><td>"Is symptom $X$ tied to disease $Y$?"</td><td>Bayesian networks</td></tr>
@@ -750,7 +752,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
         </p>
         <figure>
           <table style="max-width:560px;margin:0 auto">
-            <tr><th>world</th><th>graph</th><th>factorization</th></tr>
+            <tr><th scope="col">world</th><th scope="col">graph</th><th scope="col">factorization</th></tr>
             <tr><td>observe (nature)</td><td>$S\!\to\!V,\,S\!\to\!E,\,VE\!\to\!H$</td><td>$P(S)\,P(V\!\mid\!S)\,P(E\!\mid\!S)\,P(H\!\mid\!V,E)$</td></tr>
             <tr><td>$do(V=v)$</td><td>cut $S\!\to\!V$</td><td>$P(S)\,\cdot\,1\,\cdot\,P(E\!\mid\!S)\,P(H\!\mid\!V\!=\!v,E)$</td></tr>
           </table>
@@ -908,7 +910,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           Define the variables precisely:
         </p>
         <table style="max-width:620px">
-          <tr><th>Variable</th><th>Meaning</th><th>Structural equation</th></tr>
+          <tr><th scope="col">Variable</th><th scope="col">Meaning</th><th scope="col">Structural equation</th></tr>
           <tr><td>$X$</td><td>hours per week the student attends the afterschool program</td><td>$X \gets U_X$ (chosen outside the model)</td></tr>
           <tr><td>$Z$</td><td>hours per week of homework completed (the program assigns and supervises homework, so $X$ drives $Z$)</td><td>$Z \gets 3X + U_Z$</td></tr>
           <tr><td>$Y$</td><td>change in GPA quality points since enrolling (positive = improvement)</td><td>$Y \gets 2X + 4Z + U_Y$</td></tr>
@@ -1083,7 +1085,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
 
         <h3>The gallery</h3>
         <table>
-          <tr><th>Domain</th><th>Tier-1/2 (see / decide / do)</th><th>Tier-3 (imagine)</th></tr>
+          <tr><th scope="col">Domain</th><th scope="col">Tier-1/2 (see / decide / do)</th><th scope="col">Tier-3 (imagine)</th></tr>
           <tr><td><strong>Advertising</strong> (the spine)</td><td>Defendotron: which ad? VPI of a demographic</td><td>ETT: would they have clicked under another ad?</td></tr>
           <tr><td><strong>A/B testing &amp; recommenders</strong></td><td>an A/B test is a physical $do()$; a recommender trained on its own logs inherits its past policy's confounding, so rung-1 retraining amplifies its own biases</td><td>uplift modeling: spend only on persuadables, users whose click the ad <em>causes</em>; "would have clicked anyway" is sufficiency without necessity</td></tr>
           <tr><td><strong>Central banking</strong></td><td>$do(\text{raise rate})$: transmission into credit creation; surprise-based identification</td><td>"Had the Fed held rates, would inflation have persisted?" (structural macro models)</td></tr>
@@ -1137,7 +1139,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           which kind you hold tells you which questions you've earned:
         </p>
         <table style="max-width:680px">
-          <tr><th>Data</th><th>Rung it natively answers</th><th>Character</th></tr>
+          <tr><th scope="col">Data</th><th scope="col">Rung it natively answers</th><th scope="col">Character</th></tr>
           <tr><td><strong>Observational</strong> (logs, surveys, medical records, market data)</td><td>1 · seeing</td><td>Cheap, plentiful, and confounded; the world chose who got "treated."</td></tr>
           <tr><td><strong>Experimental</strong> (RCTs, A/B tests)</td><td>2 · doing</td><td>A physical $do()$: randomization cuts every inbound arrow to the treatment. Expensive, slow, sometimes unethical or impossible (you cannot randomize smoking, or interest rates).</td></tr>
           <tr><td><strong>Counterfactual</strong></td><td>3 · imagining</td><td><em>Does not exist.</em> No dataset contains $Y_{x'}$ for an individual who received $x$; the road not taken is never logged.</td></tr>
@@ -1210,7 +1212,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
           <p style="margin:.3rem 0 0">
             The tier-2 bridge into sequential decisions (MDPs, bandits,
             reinforcement learning) is its own story. In
-            <a href="robot-arm-sim/index.html">robot-arm-sim</a> a crawler
+            <a href="robot-arm-sim/">the Q-learning crawler</a> a crawler
             teaches itself to walk by <a href="Q.html">Q-learning</a>, and the punchline is the same
             as here: a <em>model-based</em> method, one that can imagine roads
             not taken, beats every model-free one. Decision theory and that RL
@@ -1220,7 +1222,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
 
         <h3 id="cheatsheet">Appendix · the cheat sheet</h3>
         <table style="max-width:680px">
-          <tr><th>Symbol</th><th>Reads as</th><th>Rung</th><th>Defined in</th></tr>
+          <tr><th scope="col">Symbol</th><th scope="col">Reads as</th><th scope="col">Rung</th><th scope="col">Defined in</th></tr>
           <tr><td>$P(Q\mid e)$</td><td>belief in $Q$ given what was observed</td><td>1</td><td><a href="#inference">Inference</a></td></tr>
           <tr><td>$\mathrm{EU},\ \mathrm{MEU}$</td><td>expected utility of an action; the best achievable</td><td>1–2</td><td><a href="#eq-meu">Utility</a></td></tr>
           <tr><td>$\mathrm{VPI}_e(E')$</td><td>what learning $E'$ is worth before acting</td><td>2</td><td><a href="#eq-vpi">VPI</a></td></tr>
@@ -1437,6 +1439,7 @@ VPI("G" | H=0,T=1,P=0)  ≈ 66.8       # in context, the same fact is worth 3× 
   document.getElementById("toc-toggle").addEventListener("click",function(){
     const t=document.querySelector(".toc");
     t.classList.toggle("open");
+    this.setAttribute("aria-expanded",t.classList.contains("open"));
     this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
   });
   </script>
