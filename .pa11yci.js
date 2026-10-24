@@ -33,6 +33,7 @@ const rootPages = [
 const projectFrontDoors = [
   'bitcoin-power-law/',
   'demographics/',
+  'notes/',
   'robot-arm-sim/',
   'solar/',
 ];
