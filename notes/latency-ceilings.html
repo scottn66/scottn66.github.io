@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Can you prove a latency ceiling? | Scott Nelson</title>
+  <meta name="description" content="A latency ceiling holds only inside a model of how work arrives and how fast the machine serves it. Deterministic bounds, probabilistic tails, and what an NPU measurement does not certify." />
+  <meta name="author" content="Scott Nelson" />
+  <meta property="og:title" content="Can you prove a latency ceiling? | Scott Nelson" />
+  <meta property="og:description" content="A latency ceiling holds only inside a model of arrivals and service. What the bounds can say, and what an NPU measurement does not prove." />
+  <meta property="og:type" content="article" />
+  <meta name="twitter:card" content="summary" />
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --gold-soft:#F6EFD8; --code-bg:#F2F2F5;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
+    html{scroll-padding-top:3.6rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+    .skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:#fff;padding:.5rem .8rem;z-index:50;border:none}
+    .skip:focus{left:.5rem;top:.5rem}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;flex-wrap:wrap;gap:.35rem 1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem}
+    .topbar a{color:#cfe0ff;border:none;white-space:nowrap}
+    .topbar a:hover{color:#fff}
+    .topbar a:focus-visible{outline-color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    .page{display:grid;grid-template-columns:230px minmax(0,760px);gap:2.4rem;max-width:1080px;margin:0 auto;padding:2rem 1.2rem 4rem}
+    .toc{position:sticky;top:3.4rem;align-self:start;font-size:.85rem;max-height:90vh;overflow:auto}
+    .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+    .toc li{counter-increment:t;margin:.15rem 0}
+    .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
+    .toc a{color:var(--muted);border:none}
+    .toc a:hover{color:var(--accent)}
+    main{min-width:0}
+    h1{font-size:2.5rem;line-height:1.15;margin:.2rem 0 .6rem;letter-spacing:-.5px}
+    h2{font-size:1.5rem;margin:2.6rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
+    h3{font-size:1.12rem;margin:1.6rem 0 .3rem}
+    .byline{margin:.2rem 0 1rem;color:var(--muted);font-size:.95rem}
+    .lead{font-size:1.18rem;color:#333}
+    .callout{background:var(--card-bg);border:1px solid var(--rule);border-left:4px solid var(--warn);border-radius:var(--radius);padding:.8rem 1rem;margin:1.1rem 0;box-shadow:var(--shadow)}
+    .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);display:block;margin-bottom:.2rem}
+    .callout p:last-child{margin-bottom:0}
+    .eq{overflow-x:auto;overflow-y:hidden;max-width:100%;margin:1rem 0;padding:.2rem 0;-webkit-overflow-scrolling:touch}
+    mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}
+    .toc-toggle{display:none}
+    ul.parts{padding-left:1.2rem}
+    ul.parts li{margin:.35rem 0}
+    .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.95rem}
+    .colophon ul{padding-left:1.2rem}
+    .colophon li{margin:.45rem 0}
+    .site-footer{background:#333;color:#eee;padding:1.2rem 1.2rem 1.6rem;font-size:.9rem}
+    .site-footer .inner{max-width:1080px;margin:0 auto}
+    .site-footer a{color:#eee;border-bottom-color:rgba(238,238,238,.45)}
+    .site-footer a:focus-visible{outline-color:#fff}
+    .site-footer p{margin:.3rem 0}
+    @media(max-width:880px){
+      .page{grid-template-columns:1fr;padding:1.25rem 1rem 3rem}
+      h1{font-size:2rem}
+      .toc{position:static;max-height:none}
+      .toc>nav{display:none}
+      .toc.open>nav{display:block}
+      .toc-toggle{display:block;width:100%;text-align:left;background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .8rem;font-size:.9rem;cursor:pointer;color:var(--text)}
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <nav class="topbar" aria-label="Site">
+    <a class="brand" href="../index.html">Scott Nelson</a>
+    <a href="../index.html#projects">Work</a>
+    <a href="../solar/">Solar</a>
+    <a href="../resume.html">Resume</a>
+    <a href="../index.html#contact">Contact</a>
+  </nav>
+
+  <div class="page">
+    <aside class="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle" type="button" aria-expanded="false" aria-controls="toc-nav">Contents</button>
+      <nav id="toc-nav"><ol>
+        <li><a href="#answer">The answer</a></li>
+        <li><a href="#deterministic">A deterministic ceiling</a></li>
+        <li><a href="#probability">Probability instead of a ceiling</a></li>
+        <li><a href="#delay">What delay is made of</a></li>
+        <li><a href="#exact">When the exact worst case is computable</a></li>
+        <li><a href="#npu">An NPU latency target</a></li>
+        <li><a href="#sources">Sources</a></li>
+      </ol></nav>
+    </aside>
+
+    <main id="main">
+      <header>
+        <h1>Can you prove a latency ceiling?</h1>
+        <p class="byline">Scott Nelson, Data Engineer</p>
+      </header>
+
+      <aside class="callout" role="note">
+        <span class="k">Honesty</span>
+        <p>This is a synthesis of published results. It does not prove that any Mobilint/NPU run finishes under 12 or 14&nbsp;ms.</p>
+      </aside>
+
+      <section id="answer">
+        <h2>The answer</h2>
+        <p class="lead">Yes, but only inside a model that states how work arrives and how fast the machine serves it.</p>
+        <p>If the model does not state both, a formula can still print a number. That number is not a proof that the machine finishes by then.</p>
+      </section>
+
+      <section id="deterministic">
+        <h2>A deterministic ceiling</h2>
+        <p>Network calculus, in Le Boudec &amp; Thiran, is one such model. An arrival curve $\alpha$ bounds how much work can show up. A service curve $\beta$ bounds how fast the machine serves it. Delay at time $t$ is at most the horizontal deviation of those two curves:</p>
+        <div class="eq">
+          $$d(t) \le h(\alpha,\beta)$$
+        </div>
+        <p>The horizontal deviation is the smallest $\tau$ such that $\alpha(s) \le \beta(s+\tau)$:</p>
+        <div class="eq">
+          $$h(\alpha,\beta) = \inf\{\tau \ge 0 : \alpha(s) \le \beta(s+\tau)\ \text{for all}\ s \ge 0\}$$
+        </div>
+        <p>The bound is tight for a good arrival curve $\alpha$ and a wide-sense increasing service curve $\beta$ with $\beta(0)=0$. A greedy source achieves it.</p>
+        <p>Static-priority preemptive scheduling has its own ceiling, from the response-time analysis of Audsley, Burns, Richardson, Tindell, and Wellings. Let $r_i$ be the response time of task $i$, $C_i$ its execution time, $B_i$ its blocking, $T_j$ the period of a higher-priority task $j$, and $hp(i)$ those higher-priority tasks. The response time solves</p>
+        <div class="eq">
+          $$r_i = C_i + B_i + \sum_{j \in hp(i)} \left\lceil \frac{r_i}{T_j} \right\rceil C_j$$
+        </div>
+        <p>The deadline holds if and only if $r_i \le D_i$, where $D_i$ is the deadline of task $i$.</p>
+        <p>That kind of bound is machine-checkable. Maida, Bozhko &amp; Brandenburg, at ECRTS 2022, attach a Prosa certificate in Coq to a computed response-time bound, so a checker can confirm the bound rather than trust the tool that printed it.</p>
+      </section>
+
+      <section id="probability">
+        <h2>Probability instead of a ceiling</h2>
+        <p>Give up a number the delay is forbidden to cross, and the question becomes a tail. For an M/M/1 queue, with utilization $\rho$ and service rate $\mu$, the waiting time $W$ satisfies</p>
+        <div class="eq">
+          $$P(W > t) = \rho \exp(-\mu(1-\rho)t)$$
+        </div>
+        <p>For general queues the tails are exponential from both sides: an upper bound and a lower bound of exponential form. That is the conclusion Kelly draws, citing Kingman and Ross.</p>
+        <p>Stochastic network calculus moves the same idea onto a network. The result is a bound on the probability that delay exceeds a level, not a level it cannot exceed.</p>
+        <p>Cazorla et al. use extreme-value theory to estimate a probabilistic worst-case execution time (pWCET), which is valid only for the conditions that were sampled.</p>
+      </section>
+
+      <section id="delay">
+        <h2>What delay is made of</h2>
+        <p>End-to-end delay is several different times added together:</p>
+        <ul class="parts">
+          <li><strong>Processing</strong>, the work done at a node.</li>
+          <li><strong>Queueing</strong>, the wait behind other work.</li>
+          <li><strong>Transmission</strong>, $L/R$, packet length over link rate. It does not depend on distance.</li>
+          <li><strong>Propagation</strong>, $d/s$, distance over speed. The speed $s$ is about $2\times 10^{8}$ to $3\times 10^{8}$&nbsp;m/s.</li>
+        </ul>
+        <p>When queueing is negligible, the sum scales with the hop count. TCP adds a round trip before data. <a href="https://www.rfc-editor.org/info/rfc7413/">RFC 7413</a> specifies TCP Fast Open, the mechanism concerned with data on that opening exchange.</p>
+        <p>No single source writes one equation that contains all of these terms. In <a href="https://gaia.cs.umass.edu/kurose_ross/index.php">Kurose &amp; Ross</a>, the end-to-end delay expression drops queueing.</p>
+      </section>
+
+      <section id="exact">
+        <h2>When the exact worst case is computable</h2>
+        <p>Bouillard &amp; Thierry separate three cases.</p>
+        <ul class="parts">
+          <li>A tandem of servers reduces to one linear program, of polynomial size.</li>
+          <li>In a general feed-forward network, the exact worst-case delay at one server is NP-hard.</li>
+          <li>Cyclic networks are open.</li>
+        </ul>
+        <p>A bound is a different object from the exact worst case. The bound can be larger than the exact worst case, so passing a bound is not the same fact as knowing the worst case.</p>
+      </section>
+
+      <section id="npu">
+        <h2>An NPU latency target</h2>
+        <p>A FLOP count or a parameter count is not an arrival curve, and it is not a service curve. To write $\alpha$ and $\beta$ for an NPU you need a service model: bytes moved, memory bandwidth, MAC throughput, launch and runtime overhead, and interference. Without that model, the expression you can actually defend is a lower bound, activation bytes divided by bandwidth. A lower bound does not certify a ceiling.</p>
+        <p>The measurements in hand are these. A model with 0.12M parameters measured 14.0&nbsp;ms. A fastest run measured 12.2&nbsp;ms. A model with 78 times more parameters cost about 29 times the time, so a small model is paying a fixed floor. A formula that ignores that floor cannot certify the bucket.</p>
+        <p>None of those figures is a proof that a run finishes under 12 or 14&nbsp;ms. They are measurements of particular runs, not a service curve.</p>
+      </section>
+
+      <footer class="colophon" id="sources">
+        <h2>Sources</h2>
+        <ul>
+          <li><a href="https://leboudec.github.io/netcal/">Le Boudec &amp; Thiran, <em>Network Calculus</em></a>. Arrival curves, service curves, and the horizontal deviation.</li>
+          <li><a href="https://www.cs.york.ac.uk/rts/publications/Audsley1993.html">Audsley, Burns, Richardson, Tindell, and Wellings</a>, response-time analysis. The link is the University of York Real-Time Systems Group record of <em>Applying New Scheduling Theory to Static Priority Pre-emptive Scheduling</em>.</li>
+          <li><a href="https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ECRTS.2022.19">Maida, Bozhko &amp; Brandenburg, ECRTS 2022</a>, <em>Foundational Response-Time Analysis as Explainable Evidence of Timeliness</em>. Prosa certificates in Coq.</li>
+          <li>Kelly, citing Kingman and Ross. Exponential upper and lower tails for general queues.</li>
+          <li>Cazorla et al., pWCET. Extreme-value execution-time bounds, valid only for the sampled conditions.</li>
+          <li><a href="https://gaia.cs.umass.edu/kurose_ross/index.php">Kurose &amp; Ross</a>, <em>Computer Networking: A Top-Down Approach</em>. The end-to-end delay expression drops queueing.</li>
+          <li><a href="https://www.rfc-editor.org/info/rfc7413/">RFC 7413</a>, TCP Fast Open.</li>
+          <li><a href="https://www.di.ens.fr/~bouillard/Publis/jdeds15.pdf">Bouillard &amp; Thierry</a>, <em>Tight performance bounds in the worst-case analysis of feed-forward networks</em>.</li>
+        </ul>
+      </footer>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="inner">
+      <p>&copy; 2026 Scott Nelson</p>
+      <p>
+        <a href="https://www.linkedin.com/in/scott-nelson-adastra67/">LinkedIn</a>
+        · <a href="https://github.com/scottn66">GitHub</a>
+        · <a href="mailto:scottjnelson5@gmail.com">Email</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("toc-toggle").addEventListener("click", function () {
+      var toc = document.querySelector(".toc");
+      var open = toc.classList.toggle("open");
+      this.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  </script>
+</body>
+</html>

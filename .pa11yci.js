@@ -28,6 +28,9 @@ const rootPages = [
   'resume.html',
   'sep_scraper.html',
   'wikipedia_scraper.html',
+  // Hand-written public note. Nested reports stay off this list; this page
+  // is in it so a new WCAG failure here fails the build.
+  'notes/latency-ceilings.html',
 ];
 
 const projectFrontDoors = [
