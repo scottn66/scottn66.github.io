@@ -92,7 +92,7 @@
     .concept-box h3 { margin-top: 0; }
 
     figure { margin: 1.8rem 0; }
-    figure img, figure video { width: 100%; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+    figure img, figure video { width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
     figcaption { font-size: 0.9rem; color: #607d8b; font-style: italic; margin-top: 0.6rem; }
 
     pre {
@@ -425,9 +425,9 @@
 
       <p>The bar chart says it numerically. The race says it viscerally:</p>
       <figure>
-        <video autoplay loop muted playsinline poster="robot-arm-sim/img/crawler_race.gif">
+        <video autoplay loop muted playsinline width="1430" height="715" poster="robot-arm-sim/img/crawler_race_poster.jpg">
           <source src="robot-arm-sim/img/crawler_race.mp4" type="video/mp4">
-          <img src="robot-arm-sim/img/crawler_race.gif" alt="4-panel race: epsilon-greedy, count-based, R-MAX, DP optimal">
+          <img src="robot-arm-sim/img/crawler_race_poster.jpg" alt="4-panel race: epsilon-greedy, count-based, R-MAX, DP optimal">
         </video>
         <figcaption>
           1,500 steps under each agent's final policy, all starting from x=0.
