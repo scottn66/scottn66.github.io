@@ -10,6 +10,7 @@ const origin = `http://127.0.0.1:${port}`;
 
 const rootPages = [
   'index.html',
+  '404.html',
   'HMM.html',
   'MAB.html',
   'Q.html',
