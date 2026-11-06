@@ -8,12 +8,6 @@
     "MAB.html": {
       "contrast": 10
     },
-    "Q.html": {
-      "contrast": 19
-    },
-    "arxiv_scraper.html": {
-      "contrast": 20
-    },
     "bitcoin-power-law/": {
       "contrast": 0,
       "deferredNonContrast": {
@@ -22,9 +16,6 @@
     },
     "cartography.html": {
       "contrast": 1
-    },
-    "cartography_landing.html": {
-      "contrast": 23
     },
     "conscious-agents-conjectures.html": {
       "contrast": 12
@@ -38,26 +29,14 @@
     "demographics/": {
       "contrast": 1
     },
-    "index.html": {
-      "contrast": 1
-    },
     "mandelbrot_landing.html": {
       "contrast": 1
     },
     "ner-taggers.html": {
       "contrast": 12
     },
-    "resume.html": {
-      "contrast": 1
-    },
-    "sep_scraper.html": {
-      "contrast": 20
-    },
     "solar/": {
       "contrast": 5
-    },
-    "wikipedia_scraper.html": {
-      "contrast": 19
     }
   }
 }
