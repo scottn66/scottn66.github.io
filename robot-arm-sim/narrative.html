@@ -147,6 +147,7 @@
   }
   .visual video, .visual img {
     width: 100%;
+    height: auto;
     border-radius: 8px;
     background: black;
   }
@@ -846,9 +847,9 @@
   </p>
 
   <div class="visual">
-    <video autoplay loop muted playsinline poster="img/crawler_race.gif">
+    <video autoplay loop muted playsinline width="1430" height="715" poster="img/crawler_race_poster.jpg">
       <source src="img/crawler_race.mp4" type="video/mp4">
-      <img src="img/crawler_race.gif" alt="4-panel race comparison">
+      <img src="img/crawler_race_poster.jpg" alt="4-panel race comparison">
     </video>
     <div class="caption">
       1,500 environment steps under each agent's final policy, starting
