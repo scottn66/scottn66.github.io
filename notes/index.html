@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes | Scott Nelson</title>
+  <meta name="description" content="Working notes, research logs, and audits. Optional depth beside the portfolio, not the project pages.">
+  <meta name="unit" content="notes">
+  <style>
+    :root {
+      --primary-color: #2C3E50;
+      --bg-color: #ffffff;
+      --text-color: #333;
+      --section-bg: #f4f4f4;
+      --navbar-bg: #343a40;
+      --footer-bg: #333;
+      --link: #1b4f72;
+      --line: #d5dbe3;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--primary-color);
+      line-height: 1.25;
+    }
+
+    a { color: var(--link); }
+    a:hover { color: var(--primary-color); }
+
+    a:focus-visible {
+      outline: 2px solid var(--link);
+      outline-offset: 3px;
+    }
+
+    .skip {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #fff;
+      color: var(--primary-color);
+      padding: 0.5rem 1rem;
+      z-index: 100;
+      font-weight: 600;
+    }
+    .skip:focus { left: 0.75rem; top: 0.75rem; }
+
+    .site-header {
+      background: var(--navbar-bg);
+      color: #f7f7f7;
+    }
+    .site-header .bar {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      color: #f7f7f7;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1.25rem;
+    }
+    .brand:hover { color: #ffffff; }
+    .site-header nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.75rem;
+      margin: 0;
+      padding: 0;
+    }
+    .site-header nav a {
+      color: #f7f7f7;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 600;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.15rem;
+    }
+    .site-header nav a[aria-current="page"] { text-decoration-thickness: 2px; }
+
+    .page-header {
+      background: var(--primary-color);
+      color: #ECF0F1;
+      padding: 2.5rem 0 2rem;
+    }
+    .page-header h1 {
+      color: #ECF0F1;
+      font-size: 2.5rem;
+      margin: 0 0 0.6rem;
+    }
+    .page-header p {
+      color: #ECF0F1;
+      font-size: 1.125rem;
+      max-width: 40rem;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    main { padding: 0 0 3rem; }
+
+    .contents {
+      background: var(--section-bg);
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      margin: 0 0 2rem;
+    }
+    .contents h2 {
+      font-size: 1rem;
+      margin: 0 0 0.4rem;
+    }
+    .contents ul { margin: 0; }
+
+    section { margin: 0 0 2.5rem; }
+    section h2 {
+      font-size: 1.6rem;
+      margin: 0 0 0.4rem;
+      padding-top: 0.25rem;
+    }
+    section h3 {
+      font-size: 1.15rem;
+      margin: 1.4rem 0 0.4rem;
+    }
+
+    .docs {
+      list-style: none;
+      margin: 1rem 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .docs li {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.75rem 0.95rem;
+    }
+    .docs a {
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .what {
+      display: block;
+      margin-top: 0.2rem;
+    }
+    .file {
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.85rem;
+    }
+
+    .back {
+      margin: 1rem 0 0;
+    }
+
+    footer {
+      background: var(--footer-bg);
+      color: #f7f7f7;
+      padding: 1.5rem 0;
+    }
+    footer p { margin: 0; color: #f7f7f7; }
+    footer a {
+      color: #f7f7f7;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    @media (max-width: 40rem) {
+      .page-header h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#notes">Skip to content</a>
+
+  <header class="site-header">
+    <div class="bar">
+      <a class="brand" href="../index.html">Scott Nelson</a>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../index.html#projects">Work</a></li>
+          <li><a href="index.html" aria-current="page">Notes</a></li>
+          <li><a href="../resume.html">Resume</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="notes" tabindex="-1">
+    <div class="page-header">
+      <div class="wrap">
+        <h1>Notes</h1>
+        <p>Working notes, research logs, and audits. Optional depth beside the portfolio, not the project pages.</p>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <nav class="contents" aria-label="Notes">
+        <h2>On this page</h2>
+        <ul>
+          <li><a href="#conscious-agents">Conscious agents</a></li>
+          <li><a href="#demographics">Demographics</a></li>
+          <li><a href="#bitcoin">Bitcoin power law</a></li>
+        </ul>
+      </nav>
+
+      <section id="conscious-agents">
+        <h2>Conscious agents</h2>
+        <p>Essays on Hoffman and Prakash's Markov-chain program, and the research logs behind them. The NER project stays on its own page.</p>
+        <ul class="docs" role="list">
+          <li>
+            <a href="../conscious-agents.html">From Markov chains to conscious agents</a>
+            <span class="what">The essay: textbook Markov chains through trace logic.</span>
+          </li>
+          <li>
+            <a href="../conscious-agents-conjectures.html">Open conjectures</a>
+            <span class="what">The catalogue of what is still open.</span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-research.md">Breadth pass</a>
+            <span class="what">Pass 1. Paper map and the verified formalisms. <span class="file">HMM-hoffman-research.md</span></span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-research-2-trace-logic.md">Trace-logic threads</a>
+            <span class="what">Pass 2. Thread-by-thread reading of the trace logic. <span class="file">HMM-hoffman-research-2-trace-logic.md</span></span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-research-3-traces-paper.md">Traces paper, full PDF</a>
+            <span class="what">Pass 3. Ground truth from the 2024 preprint. <span class="file">HMM-hoffman-research-3-traces-paper.md</span></span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-research-4-recursion-bridges.md">Recursion bridges</a>
+            <span class="what">Pass 4. Partial Boolean algebra, commute time, and recursive trace logic. <span class="file">HMM-hoffman-research-4-recursion-bridges.md</span></span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-research-5-verification-record.md">Verification record</a>
+            <span class="what">Pass 5. The archived vote record the essay cites. <span class="file">HMM-hoffman-research-5-verification-record.md</span></span>
+          </li>
+          <li>
+            <a href="HMM-hoffman-open-problems.md">Open problems</a>
+            <span class="what">Working brief: each statement, its citation, and a tractable sub-question. <span class="file">HMM-hoffman-open-problems.md</span></span>
+          </li>
+          <li>
+            <a href="conscious-agents-review-findings.md">Rigor review</a>
+            <span class="what">Pass R1 findings on the essay. <span class="file">conscious-agents-review-findings.md</span></span>
+          </li>
+        </ul>
+        <p class="back"><a href="../ner-taggers.html">Back to the NER project</a></p>
+      </section>
+
+      <section id="demographics">
+        <h2>Demographics</h2>
+        <p>Source audit for the atlas. The atlas itself stays a portfolio piece.</p>
+        <ul class="docs" role="list">
+          <li>
+            <a href="demographics-research-pass-1.md">Research pass 1</a>
+            <span class="what">Framework, toolkit, and the Zeihan audit. <span class="file">demographics-research-pass-1.md</span></span>
+          </li>
+        </ul>
+        <h3>Figure drafts</h3>
+        <p>Screens kept with that pass. The published charts are on the atlas.</p>
+        <ul class="docs" role="list">
+          <li><a href="demographics-figures/fig1-three-shapes.png">Three population shapes</a></li>
+          <li><a href="demographics-figures/fig2b-tfr-continents.png">Total fertility rate by continent</a></li>
+          <li><a href="demographics-figures/fig5-current-account.png">Current account</a></li>
+          <li><a href="demographics-figures/jpn-pyramid.png">Japan pyramid</a></li>
+          <li><a href="demographics-figures/states-atlas.png">US states atlas</a></li>
+          <li><a href="demographics-figures/world-atlas.png">World atlas</a></li>
+        </ul>
+        <p class="back"><a href="../demographics/">Back to the atlas</a></p>
+      </section>
+
+      <section id="bitcoin">
+        <h2>Bitcoin power law</h2>
+        <p>The audit of the econometric page. The project page stays the portfolio piece.</p>
+        <ul class="docs" role="list">
+          <li>
+            <a href="bitcoin-power-law-audit.md">Audit of the power-law page</a>
+            <span class="what">Findings from the June 2026 review. <span class="file">bitcoin-power-law-audit.md</span></span>
+          </li>
+        </ul>
+        <p class="back"><a href="../bitcoin-power-law/">Back to the project</a></p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><a href="../index.html">Home</a></p>
+    </div>
+  </footer>
+</body>
+</html>
