@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scott Nelson - Resume</title>
+  <meta name="description" content="Scott Nelson, data engineer. Resume covering warehouses, pipelines, and a 2.6M-row DuckDB solar cashflow model. M.S. Applied Data Intelligence, SJSU.">
   <style>
     /* Global CSS Variables for Light Mode */
     :root {
@@ -95,6 +96,9 @@
       left: 0;
       color: var(--secondary-color);
     }
+    section a {
+      color: var(--primary-color);
+    }
     /* Footer styles */
     footer {
       text-align: center;
@@ -119,12 +123,9 @@
   <!-- Header: Name, Professional Summary & Contact -->
   <header>
     <h1>Scott Nelson</h1>
-    <p class="tagline">Data Scientist</p>
+    <p class="tagline">Data Engineer</p>
     <p>
-      Data scientist with strong Python skills and hands-on experience across the machine learning lifecycle, from
-      building automated data pipelines to LLM fine-tuning, red-teaming, and model evaluation for Meta's Llama 2 and
-      Llama 3 models. Currently pursuing an MS in Applied Data Intelligence at San José State University, with a strong
-      foundation in statistical analysis and a focus on turning complex data into clear, actionable insights.
+      Data engineer in the San Francisco Bay Area, currently in the M.S. in Applied Data Intelligence at San José State University, building warehouses, pipelines, and small tools that turn messy public and operational data into something you can actually run.
     </p>
     <p>
       San Francisco Bay Area •
@@ -176,6 +177,27 @@
         <li>Automated data-intelligence reporting by integrating APIs and JSON data pipelines with the Customer Relationship Management (CRM) system, using a scheduled workflow automation tool (n8n) to prioritize workload for attorneys.</li>
         <li>Integrated a document drafting software to cut routine legal drafting time by 80% via digitization and automation.</li>
         <li>Ordered public records requests from the Los Angeles Metro area’s multiple municipal bodies; client/customer service.</li>
+      </ul>
+    </article>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects" class="section-bg">
+    <h2 class="section-title">Projects</h2>
+    <article>
+      <h3>Solar Viability Analysis</h3>
+      <ul>
+        <li>Address-to-financial-analysis for rooftop solar: a 2.6M-row DuckDB warehouse, a 25-year cashflow model, and live NREL PVWatts plus utility-rate detection. California is modeled in depth (NEM 3.0); Oregon, including Bend, is included.</li>
+        <li>OLTP/OLAP warehouse and a FastAPI quote engine. A 0&ndash;100 viability score blends LCOE, payback, NPV, solar resource, and local market maturity. ZIP heatmaps cover all 2,593 California ZIP codes, with confidence tiers drawn from Berkeley Lab installation data. City reports are 25-year cashflow charts for California cities plus 12 Oregon locations, including LCOE, payback, and NPV.</li>
+        <li>Started as a San Jose State DATA 201 project. <a href="solar/">Project page</a>.</li>
+      </ul>
+    </article>
+    <article>
+      <h3>Public-source ingest pipelines</h3>
+      <ul>
+        <li>Three complementary Python scrapers forming the raw-sources layer of an ingest pipeline: crawl, validate, and store.</li>
+        <li>Wikipedia: bounded BFS crawl with canonical page keys, a SQLite graph store, and a 6-point soup validator (834 outlinks from a single seed article). Stanford Encyclopedia of Philosophy: hand-curated cross-references and a built-in query layer. arXiv: Atom API metadata ingest with category-driven queries, PDF download, and text extraction across 35 CS subcategories.</li>
+        <li><a href="wikipedia_scraper.html">Wikipedia scraper</a> · <a href="sep_scraper.html">SEP scraper</a> · <a href="arxiv_scraper.html">arXiv scraper</a></li>
       </ul>
     </article>
   </section>
@@ -236,12 +258,6 @@
       <li>Data-thon: 1st in 24-hour competition for cleaning, analysis, and inference on a large, econometric dataset</li>
       <li>Data Challenge: 1st place winner of ASA’s federal dataset analysis competition for successful educational insights</li>
     </ul>
-  </section>
-
-  <!-- Languages Section -->
-  <section id="languages" class="section-bg">
-    <h2 class="section-title">Languages</h2>
-    <p>Python (advanced), JavaScript, SQL, C++, Bash, R, Java</p>
   </section>
 
   <!-- Footer -->
