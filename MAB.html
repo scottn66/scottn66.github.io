@@ -53,10 +53,13 @@
             max-width: 100%;
             height: auto;
         }
-        iframe {
-            border: none;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        figure {
+            margin: 1rem 0 1.25rem;
+        }
+        figcaption {
+            color: #333;
+            font-size: 0.95rem;
+            margin-top: 0.45rem;
         }
         .footer {
             background: #333;
@@ -124,9 +127,10 @@
 
         <div class="concept-box">
             <h3>Thompson Sampling Explained</h3>
-            <div class="col-md-4">
-                <img src="assets/images/projects/MAB/Visualization_of_Thompson_sampling.gif" class="img-fluid" alt="Scott Nelson">
-            </div>
+            <figure>
+                <img src="assets/images/projects/MAB/thompson-sampling.png" class="img-fluid" width="1077" height="430" alt="Thompson sampling on three arms. Early, three wide Beta curves overlap. After many pulls, two curves are sharp peaks and the third stays wide. Vertical lines are one draw from each belief.">
+                <figcaption>Each curve is a Beta belief about one arm's reward rate, and each vertical line is one draw from that belief. The arm with the highest draw is played, and that belief tightens. Early, all three curves are wide and overlap. After many pulls, two arms have sharpened into peaks and the third is still spread out.</figcaption>
+            </figure>
             <p>We know that there is some unknown, but "fixed" probability of reward for each action/arm. Using <a href="https://en.wikipedia.org/wiki/Probability_density_function">Probability Density Functions</a>, we use area/distribution over possible likelihoods that have less variance the more samples are collected. We represent our belief in the best action by fitting some PDF to estimate this true reward, where PDFs can be sampled from to obtain a possible probability. Therefore, the more an arm is chosen/sampled, the closer the PDF P(R|a) is to its true probability, where R ∈ {0,1} ∀ arms a.</p>
             <p>In other words, the curves of options are estimates of reward. Random choice/sample refines confidence in expectation of the reward/outcome probability</p>
         </div>
@@ -135,36 +139,32 @@
             <h3>Understanding Upper Confidence Bound</h3>
             <p>Despite the elegant representation of the options, there still will be uncertainty about the accuracy of the action-value estimates. Plus, the environment may be dynamic, adapting to our experience live. Online learning like this is orders of magnitude harder.</p>
             <p>The greedy actions take the seemingly best actions in the present moment. So, we need exploration. Epsilon greedy action forces non-greedy actions to be tried, but indiscriminately, with no preference for the nearly greedy or particularly uncertain, mysterious actions. It would behoove us to take these aspects into account, selecting near-greedy actions according to their potential for being the optimal choice.</p>
-            <div class="col-md-4">
-                <img src="assets/images/projects/MAB/UCB.png" class="img-fluid" alt="Scott Nelson">
-            </div>
+            <figure>
+                <img src="assets/images/projects/MAB/UCB.png" class="img-fluid" width="562" height="126" loading="lazy" alt="Upper confidence bound formula: choose action a to maximize Q_t(a) plus c times the square root of ln t divided by N_t(a).">
+            </figure>
             <p>Here, we can say that the action for Upper Confidence Bound (UCB) should be the argmax (a value at <i>a</i> at which <i>f(a)</i> takes its maximal value of the expression that follows). ln t denotes the natural logarithm of t (the number that e ≈ 2.71828 would have to be raised to in order to equal t), Nt(a) denotes the number of times that action a has been selected prior to time t (the denominator), and the number c > 0 controls the degree of exploration. If Nt(a) = 0, then a is considered to be a maximizing action</p>
             <p>The idea is that the <i>upper confidence bound</i> action selection method is that the square root term is a measure of the uncertainty of a's value, with c determining the confidence level. We want to 'max' over the true value of action a. When a is selected, the Nt(a) increments, and as it is in the denominator, decreasing the uncertainty term. Using natural logarithm means that the increases get smaller over time, but are unbounded; all actions will eventually be selected, but actions with lower value estimates, or that hvae already been selected frequently, will be selected with decreasing frequency over time.</p>
         </div>
 
-        <!-- Interactive Demo -->
-        <div class="interactive-demo">
-            <h3>Interactive Simulations</h3>
-                <p>Engage with an interactive simulation that demonstrates these concepts in a dynamic and educational way.</p>
-                <ul>
-                    <li>reward signal probabilities: [0.3, 0.4, 0.5, 0.6]</li>
-                </ul>
-            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims.html" title="Cumulative regret for reward probabilities 0.3, 0.4, 0.5, 0.6" style="width:100%; height:600px;"></iframe>
-                <ul>
-                    <li>reward signal probabilities: [0.4, 0.45, 0.5, 0.55]</li>
-                </ul>
-            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims2.html" title="Cumulative regret for reward probabilities 0.4, 0.45, 0.5, 0.55" style="width:100%; height:600px;"></iframe>
-                <ul>
-                    <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
-                    <li>These probabilities are much closer together </li>
-                </ul>
-            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_4.html" title="Cumulative regret for reward probabilities 0.48, 0.49, 0.5, 0.4" style="width:100%; height:600px;"></iframe>
-            <ul>
-                    <li>reward signal probabilities: [0.48, 0.49, 0.5, 0.4]</li>
-                    <li>To compensate for the difficult probabilities, lets increase the number of trials per <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method#">Monte Carlo</a> Simulations</li>
-                </ul>
-            <iframe src="assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_3.html" title="Cumulative regret with more Monte Carlo trials" style="width:100%; height:600px;"></iframe>
-
+        <div class="simulation-results">
+            <h3>Simulation results</h3>
+            <p>The same six rules on a four-armed bandit. Each line is a <a href="https://en.wikipedia.org/wiki/Monte_Carlo_method#">Monte Carlo</a> average. The left panel is how often the rule picks the best arm. The right panel is cumulative regret, so lower is better.</p>
+            <figure>
+                <img src="assets/images/projects/MAB/regret-wide-gap.png" width="1344" height="540" loading="lazy" alt="Line chart over 1,250 trials with reward rates 0.3, 0.4, 0.5, and 0.6. Custom and Thompson sampling lead on the best arm. Greedy lags and has the highest cumulative regret.">
+                <figcaption>Reward rates 0.3, 0.4, 0.5, and 0.6, over 1,250 trials. Custom finishes on the best arm about 85% of the time, with the lowest regret (about 26). Thompson sampling is close (about 80%, regret about 33). Greedy stays near 46% and accumulates the most regret (about 58).</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/images/projects/MAB/regret-moderate-gap.png" width="1344" height="540" loading="lazy" alt="Line chart over 1,250 trials with reward rates 0.4, 0.45, 0.5, and 0.55. Custom still has the lowest regret. Greedy stays near chance on the best arm.">
+                <figcaption>Reward rates 0.4, 0.45, 0.5, and 0.55. The arms are closer, and the ordering holds: Custom still has the lowest regret (about 25), and greedy still ends near 46% on the best arm, with regret about 55.</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/images/projects/MAB/regret-tight-gap.png" width="1344" height="540" loading="lazy" alt="Line chart over 1,250 trials with reward rates 0.48, 0.49, 0.5, and 0.4. The six rules stay bunched, all under about 47 percent on the best arm.">
+                <figcaption>Reward rates 0.48, 0.49, 0.5, and 0.4. The best three arms are almost tied, and 1,250 trials are not enough to separate the rules: every one is still under about 47% on the best arm, and regret stays between about 15 and 23.</figcaption>
+            </figure>
+            <figure>
+                <img src="assets/images/projects/MAB/regret-tight-gap-long.png" width="1344" height="540" loading="lazy" alt="Line chart over 12,500 trials with reward rates 0.48, 0.49, 0.5, and 0.4. Custom and Thompson sampling pull ahead. Greedy stays near 35 percent with much higher regret.">
+                <figcaption>The same reward rates, with 12,500 trials. Custom reaches about 72% on the best arm and Thompson sampling about 69%, with regret about 74 and 86. Greedy is still near 35% and finishes with regret about 226.</figcaption>
+            </figure>
         </div>
 
     </section>
@@ -174,12 +174,6 @@
             <p>&copy; 2023 Multi-Armed Bandit Agents Project. All Rights Reserved.</p>
         </footer>
     <!-- (Copy the footer section from your main HTML file) -->
-
-    <!-- Scripts -->
-    <!-- Plotly Graph Script -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
