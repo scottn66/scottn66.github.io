@@ -1,0 +1,21 @@
+# Tracked files already over the 1 MiB budget (1048576 bytes).
+# A file this size fails the byte-budget check unless its path is listed here.
+# max_bytes is the size on main when this list was written, rounded up to the
+# next 256 KiB. Growing past that cap fails. Deleting a listed file does not:
+# drop the stale row when you notice the warning.
+#
+# path  max_bytes
+
+assets/images/projects/MAB/Visualization_of_Thompson_sampling.gif 8126464
+assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims.html 4194304
+assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims2.html 4194304
+assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims4.html 3932160
+assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_3.html 5767168
+assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_4.html 3932160
+demographics/vendor/plotly-2.35.2.min.js 4718592
+demographics/vendor/topojson/world_50m.json 1310720
+robot-arm-sim/img/bo_evolution.gif 2359296
+robot-arm-sim/img/crawler_race.gif 3407872
+robot-arm-sim/img/pbt_evolution.gif 2097152
+robot-arm-sim/img/q_evolution.gif 1572864
+solar/heatmap/heatmap_ca.html 1310720
