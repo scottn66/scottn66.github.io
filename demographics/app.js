@@ -300,7 +300,7 @@ function drawSupport(featured) {
     shapes: [{ type: 'rect', xref: 'paper', x0: 0, x1: 1, y0: Math.log10(0.8), y1: Math.log10(2),
       fillcolor: 'rgba(184,58,46,.07)', line: { width: 0 } }],
     annotations: [
-      { xref: 'paper', x: 0.011, y: Math.log10(1.55), text: 'pay-as-you-go breaks down', showarrow: false,
+      { xref: 'paper', x: 0.011, y: Math.log10(1.55), text: 'pay-as-you-go under severe strain', showarrow: false,
         font: { size: 12, color: WARN }, xanchor: 'left' },
       { x: 2025, yref: 'paper', y: 1.04, text: '← estimates · projections →', showarrow: false, font: { size: 11.5, color: MUTED } },
     ],
