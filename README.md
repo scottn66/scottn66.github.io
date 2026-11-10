@@ -2,7 +2,7 @@
 
 ## Site quality
 
-`.github/workflows/site-quality.yml` fails the build on any broken link or asset, and on WCAG 2.1 AA regressions against `.github/site-quality/pa11y-baseline.json`.
+`.github/workflows/site-quality.yml` fails the build on any broken link or asset, and on WCAG 2.1 AA regressions against `.github/site-quality/pa11y-baseline.json`. It also fails when `sitemap.xml` drifts from `published-corpus.json`, or when a markdown file is missing from `robots.txt` (`python3 scripts/build_sitemap.py --check`).
 
 Contrast errors already in that file are grandfathered. A page's count may not go up. A count that goes down fails until you lower the baseline in the same PR. Any non-contrast error fails, except the deferred codes named in `.github/site-quality/pa11y-ratchet.js`.
 
