@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finance: the productivity-weighted age structure · draft</title>
+  <meta name="description"
+        content="A draft finance section for The Shape of People to Come:
+                 a productivity-weighted age-structure score for countries,
+                 built from NTA labor-income profiles and UN WPP 2024." />
+  <meta name="author" content="Scott Nelson" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon"
+        href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⏳</text></svg>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous" />
+  <style>
+    :root{
+      --bg:#FAFAFA; --card-bg:#FFFFFF; --text:#1E1E1E; --muted:#555; --rule:#E5E5EA;
+      --accent:#1F4E9E; --accent-soft:#DCE6F4; --good:#2F7A4A; --good-soft:#DEEFE0;
+      --warn:#B83A2E; --warn-soft:#F4DCDA; --gold:#C9A227; --gold-soft:#F6EFD8; --code-bg:#F2F2F5;
+      --shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05); --radius:12px;
+      --c-usa:#1F4E9E; --c-chn:#B83A2E; --c-deu:#A8861D; --c-nga:#2F7A4A;
+      --c-jpn:#6A4FA3; --c-kor:#0782AF; --c-ind:#C2632F;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(31,78,158,.25)}
+    a:hover{border-bottom-color:var(--accent)}
+    code{font-family:SFMono-Regular,Consolas,Menlo,monospace;background:var(--code-bg);padding:.1rem .35rem;border-radius:5px;font-size:.92em}
+    .topbar{position:sticky;top:0;z-index:30;background:#1b2330;color:#fff;display:flex;gap:1rem;align-items:center;padding:.6rem 1.2rem;font-size:.92rem;flex-wrap:wrap}
+    .topbar a{color:#cfe0ff;border:none}
+    .topbar a:hover{color:#fff}
+    .topbar .brand{font-weight:700;color:#fff;margin-right:auto}
+    .draft-banner{background:var(--gold-soft);border-bottom:1px solid #e6d7a8;color:#5c4a0a;
+      padding:.7rem 1.2rem;font-size:.9rem;text-align:center}
+    .draft-banner strong{letter-spacing:.03em;text-transform:uppercase;font-size:.75rem;margin-right:.4rem}
+    .page{display:grid;grid-template-columns:210px minmax(0,820px);gap:2.2rem;max-width:1120px;margin:0 auto;padding:2rem 1.2rem 5rem}
+    .toc{position:sticky;top:3.4rem;align-self:start;font-size:.85rem;max-height:90vh;overflow:auto}
+    .toc ol{list-style:none;margin:0;padding:0;counter-reset:t}
+    .toc li{counter-increment:t;margin:.15rem 0}
+    .toc li::before{content:counter(t);color:var(--muted);font-variant-numeric:tabular-nums;margin-right:.5rem}
+    .toc a{color:var(--muted);border:none}
+    .toc a:hover{color:var(--accent)}
+    .toc .act{font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;font-size:.72rem;margin:.9rem 0 .25rem;list-style:none;counter-increment:none}
+    .toc .act::before{content:""}
+    main{min-width:0}
+    h1{font-size:2.35rem;line-height:1.12;margin:.2rem 0 .55rem;letter-spacing:-.4px}
+    h2{font-size:1.45rem;margin:2.5rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--rule)}
+    h3{font-size:1.08rem;margin:1.5rem 0 .3rem}
+    p{margin:.7rem 0}
+    .lead{font-size:1.08rem;color:#333}
+    .byline{color:var(--muted);font-size:.9rem;margin-bottom:1.4rem}
+    .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);font-size:.72rem;
+      font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.18rem .5rem;border-radius:99px;margin-right:.35rem}
+    .callout{border-left:4px solid var(--accent);background:var(--card-bg);border-radius:0 var(--radius) var(--radius) 0;
+      padding:.8rem 1rem;margin:1.2rem 0;box-shadow:var(--shadow)}
+    .callout.good{border-left-color:var(--good)}
+    .callout.warn{border-left-color:var(--warn)}
+    .callout .k{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+    .aside-box{border:1px dashed var(--rule);border-radius:var(--radius);padding:.75rem 1rem;margin:1.1rem 0;background:#FCFCFD;font-size:.93rem}
+    .aside-box .k{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gold)}
+    details.aside-box summary{cursor:pointer;font-weight:700;font-size:.85rem}
+    figure{margin:1.3rem 0}
+    figcaption{font-size:.82rem;color:var(--muted);margin-top:.4rem;text-align:center}
+    table{border-collapse:collapse;width:100%;font-size:.82rem;margin:1rem 0}
+    th,td{border:1px solid var(--rule);padding:.35rem .5rem;text-align:left;vertical-align:top}
+    th{background:var(--accent-soft);color:var(--accent);font-weight:700;white-space:nowrap}
+    td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+    td.neg{color:var(--warn)}
+    td.pos{color:var(--good)}
+    .katex-display{overflow-x:auto;overflow-y:hidden;padding:.2rem 0}
+    .chart{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow);padding:.5rem;min-height:120px}
+    .chart .ph{color:var(--muted);font-size:.85rem;text-align:center;padding:2.5rem 0}
+    .controls{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center;margin:.5rem 0 .7rem;font-size:.85rem}
+    .presets{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+    .presets button{border:none;background:#fff;padding:.34rem .7rem;font-size:.82rem;cursor:pointer;color:var(--muted);font-family:inherit}
+    .presets button.on{background:var(--accent);color:#fff}
+    .controls label{color:var(--muted)}
+    .statstrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem;margin:1rem 0 1.2rem}
+    .stat{background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.5rem .7rem;box-shadow:var(--shadow)}
+    .stat .v{font-size:1.18rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .stat .l{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+    .multiples{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+    .multiples .chart{min-height:230px}
+    .colophon{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}
+    .colophon h2{border:none;font-size:1.05rem;margin-top:1rem}
+    .toc-toggle{display:none}
+    .table-wrap{overflow-x:auto}
+    @media(max-width:880px){
+      .page{grid-template-columns:1fr}
+      h1{font-size:1.85rem}
+      .toc{display:block;position:static;max-height:none}
+      .toc>nav{display:none}
+      .toc.open>nav{display:block}
+      .toc-toggle{display:block;width:100%;text-align:left;background:var(--card-bg);border:1px solid var(--rule);border-radius:8px;padding:.45rem .8rem;font-size:.9rem;cursor:pointer}
+      .multiples{grid-template-columns:1fr}
+    }
+    @media(min-width:1100px){
+      .multiples{grid-template-columns:1fr 1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="draft-banner">
+    <strong>Draft only</strong>
+    Local prototype. Not published, not in a pull request, not on the live site.
+    Scores are computed from real UN and NTA data; they are a test of the method, not a finished ranking.
+  </div>
+  <div class="topbar">
+    <a class="brand" href="#">Scott Nelson</a>
+    <span>Demographics · finance section · draft</span>
+  </div>
+  <div class="page">
+    <aside class="toc">
+      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
+      <nav>
+        <div class="act">This draft</div>
+        <ol>
+          <li><a href="#claim">The claim</a></li>
+          <li><a href="#weight">The weight</a></li>
+          <li><a href="#score">The score</a></li>
+          <li><a href="#ranking">What the ranking shows</a></li>
+          <li><a href="#pyramids">Age structure under the curve</a></li>
+          <li><a href="#caveats">Caveats</a></li>
+          <li><a href="#sources">Sources and methods</a></li>
+        </ol>
+      </nav>
+    </aside>
+    <main>
+      <header>
+        <span class="badge">Draft</span>
+        <span class="badge">UN WPP 2024</span>
+        <span class="badge">NTA 56-country average</span>
+        <h1>Finance: the productivity-weighted age structure</h1>
+        <p class="byline">Scott Nelson · Data Engineer · November 2026 · a proposed section for
+          <i>The Shape of People to Come</i></p>
+      </header>
+
+      <p class="lead">
+        The demographics essay already draws a life-cycle of labor income and consumption
+        (Figure 3) and scores every country on an economic support ratio built from those
+        same curves. This draft takes a simpler claim, states it as a number, and tests
+        whether the number sorts countries in a useful way. It is meant to sit beside
+        Figure 3, not replace it. It is not yet on the geopolitical atlas.
+      </p>
+
+      <div class="statstrip">
+        <div class="stat"><div class="v" id="stat-world">0.50</div><div class="l">World S, 2025</div></div>
+        <div class="stat"><div class="v" id="stat-world50">0.50</div><div class="l">World S, 2050</div></div>
+        <div class="stat"><div class="v" id="stat-peak">44</div><div class="l">Peak age of the weight</div></div>
+        <div class="stat"><div class="v" id="stat-kor">−0.11</div><div class="l">South Korea, change to 2050</div></div>
+      </div>
+
+      <h2 id="claim">1 · The claim</h2>
+      <p>
+        For any one person, labor income (and with it, income-tax contribution) is low
+        at labor-market entry, rises through working life, peaks in middle age or toward
+        the end of a working career, and falls in retirement. Dependents sit at both
+        ends of the same life: children, then retirees. If that age profile is used as a
+        weight on a country's population by age, the result is a single score: how much
+        of the high-earning part of the life-cycle the country's current age structure
+        is sitting on. Call it the productivity-weighted age structure, \(S\).
+      </p>
+      <p>
+        The score can be computed at today's age structure and, with the UN medium-variant
+        projection, at 2050. The question for this draft is whether the ranking, and
+        especially the change between those two dates, is informative: whether it
+        separates countries that are in the middle of a working-age bulge from countries
+        that are still very young, and from countries that have already aged past the
+        bulge.
+      </p>
+
+      <h2 id="weight">2 · The weight</h2>
+      <p>
+        The weight \(w(a)\) is a measured labor-income age profile, not a freehand sketch.
+        It is the unweighted average of 56 country-team profiles from the
+        <a href="https://www.ntaccounts.org/">National Transfer Accounts</a> project,
+        published with Mason, Lee, Abrigo and Lee's 2017 UN technical paper. Each
+        country's profile is normalized so the mean labor income of ages 30 to 49 equals 1,
+        which is the NTA convention. The average peaks at age 44, at 1.05. It is
+        essentially zero before age 15, about 0.36 at 65, and about 0.07 at 80.
+      </p>
+      <p>
+        The shape is not universal. In the same 56-country file, labor income peaks at 29
+        in Vietnam and 32 in China (both mid-2000s vintages), and at 49 in the United
+        States and 47 in Japan. A single global average is a choice: it isolates the
+        effect of age structure from the effect of each country's labor market. The cost
+        of that choice is listed with the other caveats below. The faint gold line is the
+        stylized curve already used for Figure 3 on the live page, renormalized to the
+        same 30-to-49 mean so the two can be compared. They are close; country scores
+        computed from either have a correlation of 0.99.
+      </p>
+      <figure>
+        <div id="fig-weight" class="chart"><div class="ph">Figure 1 · labor-income age profile, loading…</div></div>
+        <figcaption>
+          Fig 1. Labor income by age, relative to the mean of ages 30 to 49.
+          Heavy line: unweighted average of 56 NTA country-team profiles (Mason, Lee,
+          Abrigo and Lee, 2017). Thin lines: a few of those country profiles, to show
+          how the shape varies. Dashed: the matching average consumption profile, on its
+          own 30-to-49 scale. Gold: the live page's stylized labor-income curve,
+          renormalized. NTA profiles end at age 90.
+        </figcaption>
+      </figure>
+
+      <h2 id="score">3 · The score</h2>
+      <p>
+        For a country at date \(t\), with population \(P(a,t)\) at age \(a\) and
+        population share \(s(a,t) = P(a,t) / \sum_{a'} P(a',t)\),
+      </p>
+      <p style="text-align:center">
+        \[ S_t \;=\; \sum_a w(a)\, s(a,t) \]
+      </p>
+      <p>
+        This is a weighted sum: the average labor-income weight of a person drawn at
+        random from that population. A country made entirely of 30-to-49-year-olds would
+        score 1. The world, population-weighted across the 236 countries and territories
+        in the essay's data, scores 0.50 in 2025. The units are prime-age labor-income
+        equivalents per person.
+      </p>
+      <p>
+        A weighted product of the same terms is a poor fit, and is not used. Labor income
+        is zero, or as good as zero, in childhood, so any product (or geometric mean)
+        that includes children collapses to zero in every country. A product of the
+        population shares themselves, raised to the weights, also changes when the width
+        of the age bins changes, which is arbitrary. The arithmetic sum has neither
+        problem, and it is already the numerator of the National Transfer Accounts
+        economic support ratio:
+      </p>
+      <p style="text-align:center">
+        \[ SR_t \;=\; \frac{\sum_a y_l(a)\, P(a,t)}{\sum_a c(a)\, P(a,t)} \]
+      </p>
+      <p>
+        where \(c(a)\) is the matching average consumption profile. \(S\) divides
+        effective producers by headcount; \(SR\) divides them by effective consumers.
+        With one global profile the two rankings almost agree (correlation 0.99 across
+        236 countries in 2025), because consumption varies less by age than labor income
+        does. \(SR\) is slightly harder on already-aged countries, whose older members
+        consume more than children do. Both disagree with the ordinary headcount ratio
+        of workers to retirees, which ignores children entirely. That is the Nigeria
+        result already in the essay: a high headcount ratio, a low weighted score.
+      </p>
+      <p>
+        Population counts are UN World Population Prospects 2024, medium variant, in
+        5-year age groups, taken from the data already shipped with the essay. The 2050
+        figures use the same medium-variant projection. Weights inside each 5-year group
+        are a simple average of the five single-year values. Recomputing the essay's
+        economic support ratio this way, against that page's official single-year figure,
+        differs by 0.001 on average, so the binning approximation is small. Levels of
+        \(SR\) here use the NTA average profiles, each normalized to its own 30-to-49
+        mean; those levels are profile-relative and should not be compared with the
+        essay's published support-ratio levels, which use a same-scale stylized pair.
+        Ranks and changes are the reliable part.
+      </p>
+
+      <h2 id="ranking">4 · What the ranking shows</h2>
+      <p>
+        The chart below is a test set of 34 countries: major economies, plus a few young
+        and already-aged contrasts. The full 236-country list sits behind the scatter
+        that follows. A 2025-only or 2050-only bar chart is one click away; the default
+        is a dumbbell that shows both dates at once.
+      </p>
+      <div class="controls">
+        <div>
+          <label>View</label>
+          <div class="presets" id="view-mode" role="group" aria-label="Chart view">
+            <button type="button" data-mode="dumbbell" class="on">Dumbbell, both years</button>
+            <button type="button" data-mode="bars">Bars, one year</button>
+          </div>
+        </div>
+        <div id="year-wrap" hidden>
+          <label>Year</label>
+          <div class="presets" id="year-mode" role="group" aria-label="Year">
+            <button type="button" data-year="2025" class="on">2025</button>
+            <button type="button" data-year="2050">2050</button>
+          </div>
+        </div>
+        <div>
+          <label>Sort</label>
+          <div class="presets" id="sort-mode" role="group" aria-label="Sort order">
+            <button type="button" data-sort="S25" class="on">2025 score</button>
+            <button type="button" data-sort="S50">2050 score</button>
+            <button type="button" data-sort="dS">Change</button>
+          </div>
+        </div>
+        <div>
+          <label>Metric</label>
+          <div class="presets" id="metric-mode" role="group" aria-label="Metric">
+            <button type="button" data-metric="S" class="on">Weighted sum \(S\)</button>
+            <button type="button" data-metric="esr">Support ratio \(SR\)</button>
+          </div>
+        </div>
+      </div>
+      <figure>
+        <div id="fig-rank" class="chart"><div class="ph">Figure 2 · country scores, loading…</div></div>
+        <figcaption>
+          Fig 2. Productivity-weighted age structure \(S\) (or, with the toggle, the
+          economic support ratio) for 34 countries. Filled marks are 2025; open marks
+          are 2050, UN medium variant. Green rises, red falls. The dotted line is the
+          2025 world population-weighted average of \(S\), 0.50. Ranks in the hover are
+          among all 236 countries and territories in the essay's data.
+        </figcaption>
+      </figure>
+      <p>
+        Among these 34, the highest 2025 scores belong to countries whose adults are
+        stacked in the high-weight ages and who have few children: Saudi Arabia (0.580),
+        South Korea (0.579), China (0.569), Iran (0.562) and Thailand (0.561). The lowest
+        belong to the youngest countries, where close to half the population is under 15:
+        Niger (0.331), Nigeria (0.380), Ethiopia (0.391), Pakistan (0.413) and Kenya
+        (0.415). Japan, the oldest large country, scores 0.495, below the United States
+        at 0.515 and just below the world average of 0.500.
+      </p>
+      <p>
+        The full 236-country list is led by Gulf states with large working-age migrant
+        populations: Qatar at 0.713, the United Arab Emirates at 0.677, Kuwait at 0.665.
+        That is a real feature of their age structure, not a data error, and it is also
+        a reminder that \(S\) is not GDP and is not a measure of output per worker. The
+        bottom of the full list is young Central and West Africa: the Central African
+        Republic at 0.297, then Niger, Somalia, the Democratic Republic of the Congo,
+        Mali and Chad.
+      </p>
+      <p>
+        The more informative view is the change to 2050. In this set, South Korea has
+        the sharpest fall, from 0.579 (17th of 236) to 0.466 (188th), as today's 45-to-64
+        cohort moves into the low-weight retirement ages. Taiwan, not in the chart but
+        in the full file, falls almost as far. Spain, Italy, Poland, Thailand and China
+        follow. India moves the other way, from 0.518 (101st) to 0.542 (19th). The
+        Philippines rises from 0.493 (135th) to 0.556 (10th). Bangladesh, Egypt, Mexico
+        and Indonesia also gain. The younger African countries rise the most in raw
+        points (Nigeria +0.089, Niger +0.102, Uganda +0.113) but start so low that they
+        are still below the world average in 2050. The United States changes little
+        (0.515 to 0.499).
+      </p>
+      <div class="callout good">
+        <div class="k">The world average barely moves</div>
+        The population-weighted world average of \(S\) is 0.500 in 2025 and 0.501 in
+        2050. Aging in East Asia and Europe is offset, in the global mean, by large
+        cohorts entering working age in South Asia and Africa. What changes is who holds
+        the favorable age structure, not the world's average score.
+      </div>
+      <p>
+        Plotted against median age, \(S\) has the shape the claim predicts: low in the
+        youngest countries, highest around a median age of 30 to 40, and lower again
+        past 50. The relationship is not a straight line. A linear correlation of 0.74
+        understates the bend. A simpler statistic, the share of the population aged 45
+        to 64, tracks \(S\) only loosely (correlation 0.77). The full curve adds the
+        gradual rise through the late twenties and thirties and the fade after 65, and
+        it counts children at nearly zero.
+      </p>
+      <figure>
+        <div id="fig-scatter" class="chart"><div class="ph">Figure 3 · S against median age, loading…</div></div>
+        <figcaption>
+          Fig 3. \(S\) in 2025 against median age, all 236 countries and territories.
+          Marker size is 2025 population. The 34-country test set is in color, with a
+          few labels; the rest are grey. The inverted-U is the claim in one picture:
+          too young, and too old, both sit below the countries whose median age is in
+          the thirties and early forties.
+        </figcaption>
+      </figure>
+
+      <h2 id="pyramids">5 · Age structure under the curve</h2>
+      <p>
+        The six panels below put the weight curve on top of each country's population
+        shares, in 2025 and in 2050. Nigeria still has a wide child base in 2050, so
+        its rising score has further to go. India and Mexico fill in the high-weight
+        ages. The United States barely changes shape. South Korea's 2025 pile in the
+        late working ages becomes, by 2050, a pile at 70 and older, which is why its
+        score is the steepest fall in the set. Japan is already there.
+      </p>
+      <p class="multi-legend" style="font-size:.85rem;color:var(--muted);margin:.2rem 0 .5rem">
+        <span style="display:inline-block;width:1.1rem;height:.7rem;background:rgba(31,78,158,.22);border-bottom:2px solid #1F4E9E;vertical-align:middle;margin-right:.3rem"></span>2025 population share
+        <span style="display:inline-block;width:1.2rem;border-top:2px solid #D97036;vertical-align:middle;margin:0 .35rem 0 1rem"></span>2050 population share
+        <span style="display:inline-block;width:1.2rem;border-top:2px dotted #C9A227;vertical-align:middle;margin:0 .35rem 0 1rem"></span>labor-income weight (right axis)
+      </p>
+      <div class="multiples" id="fig-multiples"></div>
+      <p class="aside-box" style="text-align:center;margin-top:.4rem">
+        Fig 4. Population share by 5-year age group and the NTA-average labor-income
+        weight (right axis, gold). Same vertical scales in every panel.
+      </p>
+
+      <div class="table-wrap">
+        <table id="score-table">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th class="num">S 2025</th>
+              <th class="num">Rank</th>
+              <th class="num">S 2050</th>
+              <th class="num">Rank</th>
+              <th class="num">Change</th>
+              <th class="num">SR 2025</th>
+              <th class="num">Median age</th>
+              <th class="num">Median 2050</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p style="font-size:.82rem;color:var(--muted)">
+        Ranks are among 236 countries and territories. \(SR\) is the economic support
+        ratio from the same NTA-average profiles. Median ages are from the essay's
+        shipped WPP 2024 file.
+      </p>
+
+      <h2 id="caveats">6 · Caveats</h2>
+      <p>
+        Four limits sit on every number above.
+      </p>
+      <p>
+        First, the same age profile is applied to every country. Real profiles differ
+        in peak age, in how long labor income lasts past 60, and in how much work is
+        informal. Holding the profile fixed is what makes \(S\) a pure age-structure
+        score. Using each country's own NTA profile, where one exists, would mix
+        labor-market institutions into the ranking. That is a useful sensitivity, and
+        it is not in this draft.
+      </p>
+      <p>
+        Second, the 56 measured profiles are vintages from 2002 to 2015. China's 2007
+        profile, which peaks at 32, may not describe China in 2025. The average is a
+        historical cross-section, not a 2025 measurement.
+      </p>
+      <p>
+        Third, \(S\) is not GDP, not income per capita, and not a forecast of growth.
+        It does not know about capital, education, labor-force participation, hours, or
+        wages. The first demographic dividend in the NTA literature is the growth rate
+        of the economic support ratio, not the level of \(S\). A high score says the
+        age structure is favorable for labor income under a common profile. It does not
+        say the country is rich, well governed, or about to grow.
+      </p>
+      <p>
+        Fourth, 2050 figures are the UN medium variant. Everyone who will be over 25 in
+        2050 is already alive, so the productive ages in 2050 are mostly a
+        survival-and-aging calculation. Fertility and migration still move the child
+        shares and, in the Gulf and in a few other countries, the working-age counts.
+      </p>
+
+      <div class="colophon" id="sources">
+        <h2>7 · Sources and methods</h2>
+        <p>
+          <b>Population.</b> United Nations, Department of Economic and Social Affairs,
+          Population Division,
+          <a href="https://population.un.org/wpp/"><i>World Population Prospects 2024</i></a>,
+          medium variant, 5-year age groups, taken from the country files already
+          shipped with
+          <a href="https://scottn66.github.io/demographics/">The Shape of People to Come</a>
+          (built by
+          <a href="https://github.com/scottn66/scottn66.github.io/blob/main/scripts/build_demographics_data.py">scripts/build_demographics_data.py</a>
+          from the <a href="https://github.com/PPgp/wpp2024">PPgp/wpp2024</a> package).
+          © 2024 United Nations, licensed
+          <a href="https://creativecommons.org/licenses/by/3.0/igo/">CC BY 3.0 IGO</a>.
+        </p>
+        <p>
+          <b>Labor-income and consumption profiles.</b>
+          Andrew Mason, Ronald Lee, Michael Abrigo and Sang-Hyop Lee, "Support Ratio and
+          Demographic Dividends: Estimates for the World," UN DESA Population Division
+          Technical Paper 2017/1. The 56 country-team ("Country estimate") profiles
+          were downloaded from the NTA project as
+          <a href="https://ntaccounts.org/doc/repository/Yl%20and%20C%20CSV.csv">Yl and C CSV</a>.
+          Project page:
+          <a href="https://ntaccounts.org/web/nta/show/Documents/UNPD%20Project%202016">UNPD Project 2016</a>.
+          Each profile is already normalized so the mean of ages 30 to 49 equals 1.
+          The global weight is the unweighted average of those 56, then renormalized so
+          the convention holds exactly. NTA profiles end at age 90; ages 91 to 100+
+          reuse the age-90 value.
+        </p>
+        <p>
+          <b>Method.</b> National Transfer Accounts
+          (<a href="https://www.ntaccounts.org/">Lee and Mason</a>; UN DESA
+          <i>NTA Manual</i>, 2013). The economic support ratio and the first and second
+          demographic dividends: Mason, Lee, Abrigo and Lee 2017; Lee and Mason 2006,
+          2010, 2011. The first dividend is the growth rate of \(SR\), not the level of
+          \(S\). The essay's Figure 3 and its support-ratio discussion are the parent
+          of this section. Computation is in
+          <code>scripts/compute_scores.py</code> in this draft folder, and is
+          reproducible from the shipped WPP files plus the downloaded NTA CSV.
+        </p>
+        <p>
+          Charts: Plotly.js 2.35.2. Math: KaTeX 0.16.9. In this review copy both load
+          from pinned CDN URLs with subresource-integrity hashes; the live essay
+          self-hosts them. This is a review draft on a branch, not part of the live site.
+        </p>
+        <p>Data vintage: WPP 2024 · NTA profiles 2002 to 2015 (2017 compilation) · draft of November 2026.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" integrity="sha384-cCVCZkAjYNxaYKbM8lsArLznDF/SvMFr1jcZrvOpSTCa0W40ZAdLzHCEulnUa5i7" crossorigin="anonymous"></script>
+  <script src="data/data.js"></script>
+  <script src="finance.js"></script>
+</body>
+</html>

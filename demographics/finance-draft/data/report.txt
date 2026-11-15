@@ -1,0 +1,152 @@
+=== DIAGNOSTICS ===
+  n_countries: 236
+  n_nta_country_profiles: 56
+  corr_S_nta_vs_S_sty_2025: 0.9922473761229631
+  corr_S_nta_vs_esr_nta_2025: 0.9856366942170602
+  corr_S_nta_vs_share_45_64_2025: 0.7719352617496792
+  corr_S_nta_vs_median_age_2025: 0.7378752871287823
+  corr_esr_nta_vs_esr_shipped_2025: 0.9924593000051213
+  corr_esr_sty_vs_esr_shipped_2025: 0.9999844930927677
+  corr_S_nta_2025_vs_2050: 0.628277572210638
+  mean_abs_esr_sty_vs_shipped: 0.18082667673314257
+  max_abs_esr_sty_vs_shipped: 0.2537412581429943
+
+  Top 15 by S_nta 2025:
+    QAT  Qatar                  0.713
+    ARE  UAE                    0.677
+    KWT  Kuwait                 0.665
+    BHR  Bahrain                0.645
+    MDV  Maldives               0.628
+    VGB  British Virgin Islands 0.619
+    CYM  Cayman Islands         0.618
+    MAC  Macao                  0.604
+    SGP  Singapore              0.598
+    TCA  Turks and Caicos Islands 0.597
+    OMN  Oman                   0.593
+    AND  Andorra                0.590
+    FLK  Falkland Islands (Malvinas) 0.589
+    SAU  Saudi Arabia           0.580
+    SYC  Seychelles             0.579
+  Bottom 15 by S_nta 2025:
+    GIN  Guinea                 0.378
+    BFA  Burkina Faso           0.377
+    TZA  Tanzania               0.369
+    MRT  Mauritania             0.366
+    AFG  Afghanistan            0.364
+    UGA  Uganda                 0.358
+    BDI  Burundi                0.357
+    AGO  Angola                 0.357
+    MOZ  Mozambique             0.353
+    TCD  Chad                   0.342
+    MLI  Mali                   0.340
+    COD  DR Congo               0.339
+    SOM  Somalia                0.335
+    NER  Niger                  0.331
+    CAF  Central African Republic 0.297
+
+  Top 15 by S_nta 2050:
+    ARE  UAE                    0.667
+    QAT  Qatar                  0.664
+    KWT  Kuwait                 0.648
+    BHR  Bahrain                0.625
+    OMN  Oman                   0.588
+    SAU  Saudi Arabia           0.573
+    BTN  Bhutan                 0.564
+    JAM  Jamaica                0.564
+    CPV  Cabo Verde             0.561
+    PHL  Philippines            0.556
+    NPL  Nepal                  0.552
+    BLZ  Belize                 0.551
+    SLV  El Salvador            0.550
+    LCA  Saint Lucia            0.549
+    MYS  Malaysia               0.547
+  Bottom 15 by S_nta 2050:
+    FLK  Falkland Islands (Malvinas) 0.436
+    WSM  Samoa                  0.434
+    NER  Niger                  0.433
+    TZA  Tanzania               0.432
+    HKG  Hong Kong              0.431
+    GLP  Guadeloupe             0.427
+    MYT  Mayotte                0.423
+    AGO  Angola                 0.421
+    MTQ  Martinique             0.419
+    MLI  Mali                   0.416
+    SOM  Somalia                0.414
+    TCD  Chad                   0.409
+    MAF  Saint Martin (French part) 0.408
+    COD  DR Congo               0.408
+    CAF  Central African Republic 0.407
+
+  Top 15 by ESR_nta 2025:
+    QAT  Qatar                  0.746
+    ARE  UAE                    0.710
+    KWT  Kuwait                 0.701
+    BHR  Bahrain                0.681
+    MDV  Maldives               0.663
+    CYM  Cayman Islands         0.647
+    VGB  British Virgin Islands 0.642
+    OMN  Oman                   0.640
+    SAU  Saudi Arabia           0.625
+    TCA  Turks and Caicos Islands 0.624
+    MAC  Macao                  0.623
+    SGP  Singapore              0.616
+    SYC  Seychelles             0.614
+    FLK  Falkland Islands (Malvinas) 0.614
+    BRN  Brunei Darussalam      0.610
+  Bottom 15 by ESR_nta 2025:
+    BFA  Burkina Faso           0.434
+    MCO  Monaco                 0.430
+    TZA  Tanzania               0.429
+    MRT  Mauritania             0.425
+    AFG  Afghanistan            0.423
+    AGO  Angola                 0.418
+    UGA  Uganda                 0.417
+    BDI  Burundi                0.417
+    MOZ  Mozambique             0.413
+    TCD  Chad                   0.405
+    COD  DR Congo               0.401
+    MLI  Mali                   0.401
+    SOM  Somalia                0.397
+    NER  Niger                  0.391
+    CAF  Central African Republic 0.354
+
+=== DISPLAY SET (S_nta 2025 and 2050, ESR, ranks among 236) ===
+iso name                      S25  rS25    S50  rS50     dS  ESR25  rE25  ESR50    ma  ma50
+SAU Saudi Arabia           0.580    14 0.573     6 -0.007 0.625     9 0.608  30.6  33.0
+KOR South Korea            0.578    17 0.466   188 -0.113 0.588    32 0.469  46.9  57.9
+CHN China                  0.569    26 0.512    80 -0.057 0.588    31 0.520  41.4  53.3
+IRN Iran                   0.562    34 0.513    77 -0.048 0.599    21 0.533  35.2  44.6
+THA Thailand               0.561    35 0.500   102 -0.061 0.581    36 0.512  41.8  49.7
+POL Poland                 0.551    43 0.485   144 -0.066 0.570    52 0.496  43.8  52.8
+BRA Brazil                 0.548    46 0.518    62 -0.030 0.579    41 0.537  36.0  45.0
+COL Colombia               0.543    54 0.531    30 -0.012 0.576    45 0.550  33.7  44.9
+ESP Spain                  0.543    55 0.455   204 -0.088 0.557    70 0.465  47.1  52.8
+RUS Russia                 0.543    56 0.499   110 -0.044 0.566    55 0.519  41.5  42.7
+TUR Turkey                 0.539    59 0.525    45 -0.014 0.572    51 0.544  34.7  45.5
+VNM Vietnam                0.536    61 0.511    83 -0.025 0.573    49 0.534  34.7  41.4
+CAN Canada                 0.528    76 0.505    96 -0.022 0.548    92 0.521  41.7  46.1
+IDN Indonesia              0.524    88 0.526    43 +0.002 0.563    61 0.555  31.5  38.0
+ITA Italy                  0.522    92 0.452   208 -0.070 0.534   127 0.461  49.4  53.9
+GRC Greece                 0.520    98 0.462   192 -0.058 0.534   129 0.473  47.9  50.8
+AUS Australia              0.519    99 0.493   123 -0.026 0.544   100 0.513  39.4  43.0
+IND India                  0.518   101 0.542    19 +0.025 0.557    69 0.569  30.0  39.4
+DEU Germany                0.515   107 0.470   176 -0.045 0.532   133 0.483  46.6  48.8
+ZAF South Africa           0.515   108 0.518    58 +0.003 0.560    68 0.552  29.8  33.3
+USA United States          0.515   111 0.499   107 -0.016 0.538   118 0.519  39.6  42.9
+MEX Mexico                 0.511   118 0.528    34 +0.017 0.550    87 0.554  30.8  39.9
+GBR United Kingdom         0.511   119 0.498   112 -0.013 0.534   128 0.517  41.1  43.9
+SWE Sweden                 0.507   125 0.496   117 -0.011 0.529   137 0.514  41.4  45.2
+JPN Japan                  0.495   132 0.445   216 -0.050 0.505   167 0.454  51.0  53.7
+PHL Philippines            0.493   135 0.556    10 +0.063 0.535   124 0.588  27.4  37.1
+FRA France                 0.491   139 0.472   169 -0.019 0.511   160 0.490  43.4  44.6
+BGD Bangladesh             0.482   146 0.528    35 +0.046 0.527   138 0.558  27.1  36.7
+EGY Egypt                  0.466   166 0.506    94 +0.040 0.515   156 0.545  25.6  32.1
+KEN Kenya                  0.415   192 0.492   131 +0.076 0.470   191 0.538  21.2  27.4
+PAK Pakistan               0.413   194 0.482   148 +0.068 0.467   193 0.529  21.7  27.4
+ETH Ethiopia               0.391   208 0.471   174 +0.080 0.448   206 0.519  20.2  25.7
+NGA Nigeria                0.380   220 0.469   180 +0.089 0.437   219 0.519  19.2  25.0
+NER Niger                  0.331   235 0.433   224 +0.102 0.391   235 0.487  16.6  22.3
+
+=== WORLD (population-weighted S) ===
+  2025: S=0.5002  population=8.27 billion
+  2050: S=0.5015  population=9.68 billion
