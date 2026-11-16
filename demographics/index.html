@@ -119,6 +119,39 @@
     .portrait{border:1px solid var(--rule);border-radius:var(--radius);padding:.7rem .9rem;background:var(--card-bg)}
     .portrait b a{border:none}
     .portrait p{margin:.25rem 0 0;font-size:.92rem}
+    /* ---- takeaways, the follow-a-country thread, the forecast section ---- */
+    .takeaway{font-size:.95rem;border-left:3px solid var(--gold);padding:.1rem 0 .1rem .8rem;margin:.6rem 0 1.4rem}
+    .takeaway>b:first-child{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-right:.35rem}
+    .takeaway [data-tk]:not(:empty){display:block;margin-top:.35rem;background:var(--accent-soft);border-radius:6px;padding:.3rem .55rem}
+    .follow{margin:.6rem 0 .2rem;font-size:.85rem}
+    .follow .chips{display:flex;flex-wrap:wrap;gap:.35rem}
+    .chip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--rule);background:#fff;border-radius:99px;padding:.22rem .65rem;font:inherit;font-size:.8rem;color:var(--text);cursor:pointer}
+    .chip i{width:.6rem;height:.6rem;border-radius:50%;display:inline-block}
+    .chip.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text);font-weight:600}
+    .chip:focus-visible,.rowpick:focus-visible,#focus-pill button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .follow .any{display:block;margin-top:.45rem;color:var(--muted);font-size:.8rem}
+    .follow .any input{padding:.25rem .5rem;border:1px solid var(--rule);border-radius:8px;font:inherit;font-size:.8rem;width:180px;background:#fff}
+    #focus-pill{position:fixed;right:1rem;bottom:1rem;z-index:25;display:flex;gap:.7rem;align-items:center;background:#1b2330;color:#fff;border-radius:99px;padding:.4rem .5rem .4rem .95rem;font-size:.82rem;box-shadow:var(--shadow)}
+    #focus-pill[hidden]{display:none}
+    #focus-pill a{color:#cfe0ff;border:none}
+    #focus-pill button{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:50%;width:1.6rem;height:1.6rem;cursor:pointer;font-size:.8rem;line-height:1}
+    .lever{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;margin:1rem 0 .3rem;font-size:.88rem;font-weight:600}
+    .lever input[type=range]{flex:1 1 220px;accent-color:var(--accent);margin:0}
+    .lever output{font-variant-numeric:tabular-nums;min-width:6.4rem;text-align:right}
+    .lever-out{font-size:.85rem;color:var(--muted);margin:.1rem 0 .6rem;min-height:1.4em}
+    .ledger-wrap{overflow-x:auto}
+    table.ledger{font-size:.8rem;font-variant-numeric:tabular-nums}
+    table.ledger th small,table.ledger td small{font-weight:400}
+    table.ledger th,table.ledger td{white-space:nowrap;padding:.38rem .42rem}
+    table.ledger td.past{color:var(--muted)}
+    table.ledger tr.is-focus>*{background:var(--accent-soft)}
+    .cert{display:inline-block;width:.62em;height:.62em;border-radius:50%;border:1.5px solid var(--muted);margin-right:.35rem;background:transparent}
+    .cert.c2{background:var(--muted)}
+    .cert.c1{background:linear-gradient(90deg,var(--muted) 50%,transparent 50%)}
+    table.ledger.tight th,table.ledger.tight td{padding:.25rem .4rem;font-size:.74rem;white-space:nowrap}
+    .rowpick{background:none;border:none;border-bottom:1px solid rgba(31,78,158,.25);padding:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;text-align:left}
+    .cert-key{font-size:.8rem;color:var(--muted);margin:.2rem 0 1rem}
+    @media(max-width:560px){#focus-pill{left:.6rem;right:.6rem;bottom:.6rem;justify-content:space-between}}
     @media(max-width:880px){
       .page{grid-template-columns:1fr}
       h1{font-size:2rem}
@@ -158,7 +191,9 @@
         <li class="act">Part IV · The atlas</li>
         <li><a href="#atlas">The map</a></li>
         <li><a href="#portraits">Ten portraits</a></li>
-        <li class="act">Part V · Honesty</li>
+        <li class="act">Part V · The forecast</li>
+        <li><a href="#forecast">What is locked in, and what it costs</a></li>
+        <li class="act">Part VI · Honesty</li>
         <li><a href="#limits">What this lens misses</a></li>
         <li><a href="#colophon">Sources &amp; methods</a></li>
       </ol></nav>
@@ -180,7 +215,9 @@
           ground up — what a human life looks like as a balance sheet, what happens when a
           country's balance sheets all hit the same phase at once — and then puts a score
           on every country on Earth, with the weights left unlocked so you can disagree
-          with me by dragging a slider.
+          with me by dragging a slider. It ends by committing to dated forecasts: what
+          is already locked in, what it costs in growth, and how much adaptation it
+          would take to cancel the bill.
         </p>
       </header>
 
@@ -207,7 +244,22 @@
         <div class="k">The claim this article defends</div>
         Age structure is the most under-priced forecastable input in economic and strategic
         planning — and the single number everyone quotes (the birth rate) is close to the
-        least informative way to read it.
+        least informative way to read it. The claim has two layers, and the article keeps
+        them apart. The <b>arithmetic</b> — how many workers and retirees, and when — is
+        set for decades, and §9 puts dates on it. The <b>economics</b> — what those
+        counts do to growth, capital and trade — depends on how societies adapt, so it is
+        stated as a hurdle to clear rather than a fate, and §10 tests it against the
+        evidence.
+      </div>
+      <div class="callout gold" id="thread">
+        <div class="k">One argument, one country at a time</div>
+        The figures are five steps of a single argument: a population's <b>shape</b>
+        (Fig 1), the <b>escalator</b> that produces it (Fig 2), what each age <b>earns
+        and costs</b> (Fig 3), the <b>ratio</b> that results (Fig 4), and what that ratio
+        does to <b>growth</b> (Figs 7 and 8). Pick a country and it stays highlighted
+        through all of them, with its own numbers under each chart. Clicking a line, a
+        point, or a country on the map does the same.
+        <div class="follow"></div>
       </div>
 
       <h2 id="shapes">1 · Pyramid, column, urn</h2>
@@ -236,6 +288,9 @@
           (share of that country's population), UN WPP 2024 medium variant.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Find the widest bar and you have read the
+        chart: ages 0–4 in Nigeria, 35–39 in the United States, 75–79 in Japan in 2050.
+        Figure 3 puts a price on each of those ages.</p>
       <p>
         The three silhouettes are not three destinies; they are three <i>timestamps on the
         same road</i>. Nigeria is where South Korea was in 1965. Japan is where South Korea
@@ -292,6 +347,15 @@
           shown on its own.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Every line crosses replacement, and the later
+        the start the steeper the drop. Germany crossed around
+        <span data-fc="tfrx:DEU">1969</span> and the United States around
+        <span data-fc="tfrx:USA">1973</span>. South Korea, which began above six births
+        per woman, crossed in <span data-fc="tfrx:KOR">1983</span>, China in
+        <span data-fc="tfrx:CHN">1992</span>, India in <span data-fc="tfrx:IND">2019</span>.
+        Nigeria is projected to cross around <span data-fc="tfrx:NGA">2078</span>.
+        Figure 4 shows the same sequence arriving a working lifetime later, as a
+        falling ratio of workers to retirees.<span data-tk="tfr"></span></p>
       <div class="callout gold">
         <div class="k">The staggered-cliff structure of the present</div>
         Because industrialization arrived in waves, the fertility collapses are arriving in
@@ -329,6 +393,10 @@
           income). Shaded: the two deficits and the one surplus that must pay for them.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> On this profile income exceeds consumption
+        only between about ages 32 and 59. Fewer than thirty years of a life pay for
+        the rest of it, and every ratio in this article is a way of counting how many
+        people are inside that window.</p>
       <p>Walking the curve, tranche by tranche:</p>
       <table>
         <thead>
@@ -397,7 +465,7 @@
           happens anyway. Two caveats travel with this mechanism everywhere in the
           article: the empirical support for large demographic asset-price effects is
           weak (Poterba's verdict: "modest at best" — real retirees sell down far more
-          slowly than the model's; see §9), and the whole capital-scarcity leg is
+          slowly than the model's; see §10), and the whole capital-scarcity leg is
           regime-dependent — it presumes old age is asset-funded rather than
           transfer-funded (see the callout in §4).
         </p>
@@ -447,7 +515,8 @@
         The second term <i>is</i> the <b>first demographic dividend</b> (UN Population
         Division Technical Paper 2017/1): it exists exactly while the support ratio is
         rising, adds to growth one-for-one while it lasts, and is an accounting identity —
-        not a causal promise. When fertility first falls, a country gets its golden
+        not a causal promise (§9 computes it, period by period, for 1950–2100). When
+        fertility first falls, a country gets its golden
         decades: the huge final pre-collapse cohorts flow into working age while the
         number of children they must support shrinks and the retirees above them are
         still few. Bloom and Williamson credit this phase with as much as a third of East
@@ -470,7 +539,7 @@
         both points in mind through the rest of this article: they are the strongest
         internal check on any deterministic aging→decline story, including the one this
         article is flirting with. The two-period model in §3's aside runs on the
-        asset-funded regime's rails; §9 collects the counter-evidence.
+        asset-funded regime's rails; §10 collects the counter-evidence.
       </div>
       <div class="callout warn">
         <div class="k">The no-kids acceleration</div>
@@ -500,7 +569,7 @@
         shrinking birth cohort therefore takes decades to dent aggregate demand; the
         drought arrives when the <i>prime-age</i> tranche thins, one generation after
         the birth dearth. (Zeihan's version puts peak consumption in the 20s–30s, which
-        moves his timelines earlier than the age profiles support — see §9.)
+        moves his timelines earlier than the age profiles support — see §10.)
       </p>
       <p>
         The trade channel isn't a metaphor; it's measured. Higgins (1998,
@@ -536,7 +605,7 @@
         absorbing the world's excess asset demand) — exactly the country-by-country
         rotation the capital-shift indicator watches. So read §3's toy model as a story
         about <i>which countries</i> rotate from financing the world to billing it, not
-        about the world price of capital going up (§9 grades the original claim).
+        about the world price of capital going up (§10 grades the original claim).
       </p>
       <figure>
         <div id="fig-sr" class="chart"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
@@ -546,13 +615,31 @@
           stops working without major reform. Note who enters it, and when.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Countries enter the shaded band in the order
+        they boarded the escalator: Japan around <span data-fc="sr2:JPN">2016</span>,
+        Germany around <span data-fc="sr2:DEU">2031</span>, South Korea around
+        <span data-fc="sr2:KOR">2035</span>, China around
+        <span data-fc="sr2:CHN">2046</span>. Up to the 2045 line every worker in the
+        ratio is already born, so the first three dates are arithmetic rather than
+        projection (Figure 6). The United States does not arrive until around
+        <span data-fc="sr2:USA">2074</span>, and that date does depend on births that
+        have not happened.<span data-tk="sr"></span></p>
       <figure id="fig-ca-wrap" hidden>
         <div id="fig-ca" class="chart"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
         <figcaption>
           Fig 5 — Current-account balance (% of GDP) against median age.
-          Aged industrial economies cluster in the surplus quadrant: exporting is what a
-          country does when its own consumers have retired.
+          Aged industrial economies sit mostly in the surplus half, but the cloud is
+          wide; the numbers below say how wide.
         </figcaption>
+        <p class="takeaway"><b>Takeaway</b> Age shifts the odds of a surplus; it does
+          not decide it. Across these countries the correlation is only
+          <span data-fc="ca:r">0.27</span>. Under a median age of 25,
+          <span data-fc="ca:young:pos">13</span> of <span data-fc="ca:young:n">46</span>
+          run a surplus and the average balance is
+          <span data-fc="ca:young:mean">−4.2</span>% of GDP. At 40 and over it is
+          <span data-fc="ca:old:pos">22</span> of <span data-fc="ca:old:n">39</span> and
+          <span data-fc="ca:old:mean">+1.6</span>%. The demographic channel is real
+          and it is one input among several.<span data-tk="ca"></span></p>
       </figure>
       <div class="aside-box" id="fig-ca-note">
         <span class="k">Data note</span> — Figure 5 (current account vs. age structure)
@@ -633,7 +720,8 @@
         regardless of what fertility does next, because everyone who will be over 25 in
         2050 already exists. This is the fixity principle doing real analytical work:
         these are not forecasts that might embarrass anyone; they are demographic
-        accounting.
+        accounting. Figure 6 in §9 measures how far that reach extends: to 2045 for
+        workers and to 2090 for retirees.
       </div>
 
       <h2 id="score">6 · A composite demographic-strategic score</h2>
@@ -768,7 +856,175 @@
         <!-- filled by app.js from the narrative templates below -->
       </div>
 
-      <h2 id="limits">9 · What this lens misses</h2>
+      <h2 id="forecast">9 · The forecast: what is locked in, what it costs, what would cancel it</h2>
+      <p>
+        An essay that opens by calling demographics forecastable owes its reader some
+        forecasts. This section makes them, and marks each one by how much of it is
+        arithmetic on people who already exist and how much is an assumption about
+        people who do not. It has three exhibits — how far the certainty reaches, what
+        age structure does to growth inside that reach, and how much adaptation would
+        cancel the effect — and ends with a table of dated claims that time can check.
+      </p>
+      <div class="follow"></div>
+
+      <h3 id="horizon">How far the fixity principle reaches</h3>
+      <p>
+        Section 0 claimed that the workforce of the 2040s is already standing in today's
+        kindergartens. Figure 6 measures that claim. Take the UN's medium projection for
+        any future year and ask what share of each group had already been born in 2025.
+      </p>
+      <figure>
+        <div id="fig-horizon" class="chart" role="img" aria-labelledby="cap-fig-horizon"><div class="ph">Figure 6 · the certainty horizon — loading…</div></div>
+        <figcaption id="cap-fig-horizon">
+          Fig 6 — Share of the world's population in each future year that was already
+          born in 2025, by group (UN WPP 2024 medium variant, five-year steps). Where a
+          line sits at 100%, the count depends on survival and migration but on no
+          future birth.
+        </figcaption>
+      </figure>
+      <p class="takeaway"><b>Takeaway</b> Certainty has two horizons. Everyone of working
+        age in 2045 is alive today; after that the already-born share falls to
+        <span data-fc="born:wa:2050">88%</span> in 2050 and
+        <span data-fc="born:wa:2070">43%</span> in 2070. Retirees are known for far
+        longer: every person who will be 65 or older in 2090 has been born. In any
+        old-age ratio, then, births can no longer change the top for sixty-five years
+        or the bottom for twenty.<span data-tk="horizon"></span></p>
+      <p>
+        That asymmetry is why the claims below get firmer the nearer and the older their
+        subject. A statement about pensioners in 2060 rests on people who are over
+        thirty now. A statement about schoolchildren in 2060 rests on a fertility
+        assumption. The economic support ratio splits the same way:
+        <span data-fc="born:prod:2050">95%</span> of the world's effective producers in
+        2050 are already born, against <span data-fc="born:cons:2050">74%</span> of its
+        effective consumers, because the consumers include children not yet conceived.
+        One caution: already born means born somewhere. For a single country, migration
+        still moves people between ledgers, which makes the Gulf states and the
+        traditional immigration countries the least certain rows in any table here.
+      </p>
+
+      <h3 id="growth-term">The growth identity, evaluated</h3>
+      <p>
+        Section 4 split growth in income per effective consumer into productivity growth
+        plus the growth rate of the economic support ratio, and moved on. The second
+        term can simply be computed, because the pipeline holds the support ratio of
+        every country every five years from 1950 to 2100. Figure 7 draws it as a weather
+        map: blue where age structure added to growth, red where it subtracts.
+      </p>
+      <figure>
+        <div id="fig-growth" class="chart" role="img" aria-labelledby="cap-fig-growth"><div class="ph">Figure 7 · the demographic growth term — loading…</div></div>
+        <figcaption id="cap-fig-growth">
+          Fig 7 — The demographic growth term, \( \tfrac{d}{dt}\ln SR_{\text{econ}} \), in
+          percentage points of annual growth, by five-year period. Blue adds to growth,
+          red subtracts; full color at ±1.5. Rows run in the order each country's
+          support ratio peaked. Left of 2025 is history; from 2025 to 2045 every worker
+          is already born; right of 2045 the projection leans increasingly on births
+          that have not happened.
+        </figcaption>
+      </figure>
+      <details class="aside-box">
+        <summary>Figure 7 as a table (decade averages)</summary>
+        <div class="ledger-wrap" id="growth-table"></div>
+      </details>
+      <p class="takeaway"><b>Takeaway</b> The dividend is a wave that crosses the map
+        once. The blue band runs diagonally: Japan in the 1960s, South Korea in the late
+        1980s, China in the late 1990s, India in the 2000s, Nigeria not until the
+        2040s. A red band of comparable depth follows each one, because the cohort that
+        raised the ratio by entering work lowers it by leaving. The world row is the
+        sum: its support ratio climbed from <span data-fc="world:esrtrough">1975</span>
+        and peaks in <span data-fc="world:esrpeak">2025</span>.<span data-tk="growth"></span></p>
+      <p>
+        The sizes are not small. South Korea's age structure added
+        <span data-fc="divpk:KOR">+1.3</span> points a year to growth at its peak in the
+        late 1980s, and subtracts about one point a year from now to 2050
+        (<span data-fc="g:KOR">−1.0</span>). Over the same 2025–2050 window the term
+        averages <span data-fc="g:ITA">−0.7</span> in Italy,
+        <span data-fc="g:CHN">−0.6</span> in China, <span data-fc="g:JPN">−0.5</span> in
+        Japan, <span data-fc="g:DEU">−0.5</span> in Germany,
+        <span data-fc="g:RUS">−0.5</span> in Russia and
+        <span data-fc="g:USA">−0.2</span> in the United States. It is positive in Mexico
+        (<span data-fc="g:MEX">+0.1</span>), India (<span data-fc="g:IND">+0.2</span>)
+        and Nigeria (<span data-fc="g:NGA">+0.7</span>). For the world as a whole it is
+        close to zero (<span data-fc="world:g">−0.1</span>): the global dividend is
+        over, and what is left is its redistribution — headwinds in the countries that
+        aged first, tailwinds in those that have not yet.
+      </p>
+      <p>
+        Read each number as a hurdle rate. It is the productivity growth a country must
+        find merely to keep income per effective consumer growing as fast as output per
+        effective worker. It is not a forecast of GDP, because nothing in the identity
+        says whether the productivity will be found; §10 collects the evidence that, so
+        far, aging economies have found a good deal of it.
+      </p>
+
+      <h3 id="offsets">What would cancel it</h3>
+      <p>
+        The identity also says what an offset has to look like. Either productivity
+        grows faster, or the support ratio is kept from falling: people work longer,
+        more of them work, or more workers arrive. Section 10 reviews the evidence on
+        each. One of them can be priced with the machinery already on this page.
+        Suppose that by 2050 working lives run some years longer than the Figure 3
+        profile assumes — the exit from work moves later and consumption stays as it
+        is. The slider recomputes every country's 2050 support ratio on that
+        assumption.
+      </p>
+      <div class="lever">
+        <label for="lever">Working lives longer by 2050</label>
+        <input type="range" id="lever" min="0" max="10" step="0.5" value="0" />
+        <output id="lever-val" for="lever">+0.0 years</output>
+      </div>
+      <p class="lever-out" id="lever-out" aria-live="polite"></p>
+      <figure>
+        <div id="fig-hurdle" class="chart" role="img" aria-labelledby="cap-fig-hurdle"><div class="ph">Figure 8 · the hurdle and the lever — loading…</div></div>
+        <figcaption id="cap-fig-hurdle">
+          Fig 8 — Average demographic growth term, 2025–2050, with working lives as they
+          are (light) and extended by the slider's amount by 2050 (dark). The label on
+          each row is the break-even: the extension that would leave the 2050 support
+          ratio where it stands today.
+        </figcaption>
+      </figure>
+      <p class="takeaway"><b>Takeaway</b> Longer working lives are a real offset, and for
+        the oldest economies not a small one to ask for. Holding the support ratio at
+        its 2025 level takes about <span data-fc="k:KOR">7.1</span> more working years
+        in South Korea, <span data-fc="k:ITA">5.6</span> in Italy, roughly four in
+        Japan, China, Germany and Russia, and <span data-fc="k:USA">1.5</span> in the
+        United States. Mexico, India and Nigeria have no gap to close before
+        2050.<span data-tk="hurdle"></span></p>
+      <p>
+        Three cautions. The break-even is a unit of account, not a policy: it moves the
+        whole exit from work, which no retirement-age law does on its own. It holds
+        consumption fixed. And it rests on one stylized profile for every country (§4),
+        so compare rows rather than reading levels. Migration and automation, the other
+        two offsets, do not reduce to a slider with this page's data; §10 gives their
+        published magnitudes.
+      </p>
+
+      <h3 id="ledger-h">The ledger</h3>
+      <p>
+        Last, the dated claims. Each is computed from the same files as everything else
+        on this page, on a five-year grid, so read the years as approximate. The marker
+        in each cell says how much of the claim rests on people already born. The
+        columns, left to right: when the working-age population (20–64) peaks; when the
+        economic support ratio peaks, which is when the first dividend ends; when the
+        headcount ratio falls to two workers per retiree; the average growth term for
+        2025–2050; the change in the support ratio by 2050; the longer working life
+        that would hold it level; and when total population peaks.
+      </p>
+      <div class="ledger-wrap" id="ledger"><p class="atlas-note">The ledger is built from the data when this section loads.</p></div>
+      <p class="cert-key"><span class="cert c2" aria-hidden="true"></span>rests only on people already born ·
+        <span class="cert c1" aria-hidden="true"></span>rests partly on births that have not happened ·
+        <span class="cert c0" aria-hidden="true"></span>rests mostly on them. Grey dates have already
+        passed. Select a country's name to follow it through the figures.</p>
+      <p>
+        Four of these can be checked within about a decade. Italy and Germany reach two
+        workers per retiree around <span data-fc="sr2:ITA">2030</span> and
+        <span data-fc="sr2:DEU">2031</span>, South Korea around
+        <span data-fc="sr2:KOR">2035</span>, and the world's own support ratio turns
+        down before 2030. If the UN's next revisions move those dates by more than a
+        few years, the fixity principle is weaker than this article says it is, and
+        that would be worth knowing.
+      </p>
+
+      <h2 id="limits">10 · What this lens misses</h2>
       <p>
         A forecast tool is only as honest as its list of failure modes. Start with the
         framework this article set out to test-drive. Here is the Zeihan causal chain,
@@ -817,7 +1073,8 @@
         timing.
       </p>
       <p>
-        And here is where demographic determinism — mine included — breaks:
+        And here is where demographic determinism — mine included — breaks. Read each
+        item against the hurdle rates of §9: these are the forces that can clear them.
       </p>
       <ul>
         <li><b>Aging hasn't lowered growth — yet.</b> Acemoglu &amp; Restrepo (2017):
@@ -864,7 +1121,9 @@
           gains raises older workers' participation by ~20 points, hours by ~6 a week,
           productivity by ~30% and earnings by ~35%. "Old" is drifting upward faster
           than any fixed-65 ratio can see — which is the whole case for the
-          prospective instruments on the panel.</li>
+          prospective instruments on the panel. Section 9 prices this lever: between
+          four and seven more working years by 2050 would hold the support ratio
+          level in the oldest economies.</li>
         <li><b>The institutions that price this professionally price strain, not
           collapse.</b> The US intelligence community's Global Trends 2040 files
           demographics under chronic fiscal and governance pressure — not deglobalization
@@ -893,7 +1152,7 @@
       </ul>
 
       <div class="colophon" id="colophon">
-        <h2>10 · Sources &amp; methods</h2>
+        <h2>11 · Sources &amp; methods</h2>
         <p>
           <b>Demographic data:</b> United Nations, Department of Economic and Social
           Affairs, Population Division — <i>World Population Prospects 2024</i>, medium
@@ -923,6 +1182,19 @@
           fetches. No numbers are typed into the prose that the pipeline doesn't produce.
           Charts render with a pinned, self-hosted <a href="https://plotly.com/javascript/">Plotly.js</a> 2.35.2;
           math with self-hosted <a href="https://katex.org/">KaTeX</a> 0.16.9. No CDNs, no trackers.
+        </p>
+        <p>
+          <b>Forecast section (§9):</b> Figures 6–8 and the ledger are computed in the
+          browser by <a href="forecast.js">forecast.js</a> from the same five-year
+          pyramids the atlas uses, plus a world aggregate
+          (<a href="data/world.json">world.json</a>) summed from the country files by
+          <a href="../scripts/build_demographics_world.py">scripts/build_demographics_world.py</a>.
+          The support ratio there is recomputed from five-year bins and checked on load
+          against the shipped single-age value; the two agree to the third decimal. The
+          break-even working-life extension moves the exit ramp of the Figure 3
+          labor-income profile later and holds consumption fixed. Every number quoted
+          in the takeaways and in §9's prose is recomputed from the data when the page
+          loads, and corrected if it has drifted.
         </p>
         <p>
           <b>Intellectual debts:</b> Modigliani &amp; Brumberg (1954) for the life-cycle
@@ -1017,5 +1289,7 @@
     });
   </script>
   <script src="app.js"></script>
+  <script src="forecast.js"></script>
+  <div id="focus-pill" role="status" hidden></div>
 </body>
 </html>
