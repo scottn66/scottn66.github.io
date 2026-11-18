@@ -29,6 +29,10 @@ const FC_DIVERGING = [                            // warm pole · neutral gray �
   [0, '#B83A2E'], [0.25, '#E0A9A2'], [0.5, '#F0EFEC'], [0.75, '#9DB4DA'], [1, '#1F4E9E'],
 ];
 const FC_ZMAX = 1.5;                              // pp/yr at full saturation
+// "By birth year" table: six countries by four cohorts. `rho` is the
+// illustrative replacement rate behind the contribution levels; the ratio
+// between two cohorts does not depend on it.
+const FC_COHORT = { iso: ['USA', 'KOR', 'JPN', 'DEU', 'CHN', 'NGA'], born: [1950, 1975, 1990, 2000], rho: 0.40 };
 
 const fcName = code => code === FC_WORLD ? 'World'
   : (FC_SHORT[code] || (state.countries[code] && state.countries[code].n) || code);
@@ -135,15 +139,38 @@ function fcAddEntity(code, pyr, series) {
   return e;
 }
 
+/* ------------------------------------------------ the two cohort identities */
+// Cohort b is the people aged 0–4 in year b; five years later they are the 5–9
+// bin, and so on. It is a resident cohort, so migration is included. Both
+// functions return null when the years they need fall off the 1950–2100 grid.
+
+// 1 · Career growth term (pp/yr): section 4's growth identity averaged over
+// the forty years the cohort is aged 25 to 64.
+function fcCareerG(e, b) {
+  const yrs = FC.years, i = yrs.indexOf(b + 25), j = yrs.indexOf(b + 65);
+  return i < 0 || j < 0 ? null : 100 * Math.log(e.esr[j] / e.esr[i]) / (yrs[j] - yrs[i]);
+}
+// 2 · Pay-as-you-go arithmetic: contribution rate = replacement rate / workers
+// per retiree. This is the mean of retirees per worker over the nine grid years
+// b+20 … b+60; multiply it by a replacement rate to get the contribution rate.
+function fcCareerLoad(e, b) {
+  const yrs = FC.years, i = yrs.indexOf(b + 20), j = yrs.indexOf(b + 60);
+  if (i < 0 || j < 0) return null;
+  let s = 0;
+  for (let t = i; t <= j; t++) s += 1 / e.sr[t];
+  return s / (j - i + 1);
+}
+
 function fcEnsureBase() {
   if (!FC.base) {
-    const feat = fcFeatured();
+    // the featured ten, plus any country the cohort table needs that is not one of them
+    const feat = fcFeatured(), need = feat.concat(FC_COHORT.iso.filter(c => !feat.includes(c) && state.countries[c]));
     FC.base = Promise.all([
       fetch('data/world.json').then(r => { if (!r.ok) throw new Error('world.json missing'); return r.json(); }),
-      ...feat.map(iso => fetchDetail(iso)),
+      ...need.map(iso => fetchDetail(iso)),
     ]).then(([world, ...ds]) => {
       fcAddEntity(FC_WORLD, world.pyramid, null);
-      ds.forEach((d, i) => fcAddEntity(feat[i], d.pyramid, d.series));
+      ds.forEach((d, i) => fcAddEntity(need[i], d.pyramid, d.series));
       fcParity();
     }).catch(err => { FC.base = null; throw err; });
   }
@@ -389,6 +416,36 @@ function fcLedger() {
     fcSetFocus(b.dataset.code === FC.focus ? null : b.dataset.code)));
 }
 
+/* ------------------------------------------- the two identities by birth year */
+// One table, two layouts: the measures side by side where there is room, and
+// stacked as two row groups on a narrow screen so no column is off-screen.
+function fcCohortTable() {
+  const host = document.getElementById('cohort-table');
+  if (!host) return;
+  const born = FC_COHORT.born, rho = FC_COHORT.rho;
+  const ents = FC_COHORT.iso.map(c => FC.ents.get(c)).filter(Boolean);
+  const dash = '<td>–</td>';
+  const cols = [
+    { head: 'Career growth term <small>pp/yr, by birth year</small>',
+      cell: (e, b) => { const v = fcCareerG(e, b); return v === null ? dash : `<td>${fcSigned(v, 2)}</td>`; } },
+    { head: `Contribution at ${Math.round(100 * rho)}% replacement <small>by birth year</small>`,
+      cell: (e, b) => { const v = fcCareerLoad(e, b); return v === null ? dash : `<td>${(100 * rho * v).toFixed(1)}%</td>`; } },
+  ];
+  const years = born.map(b => `<th scope="col">${b}</th>`).join('');
+  const row = (e, parts) => `<tr${FC.focus === e.code ? ' class="is-focus"' : ''}><th scope="row">${fcEsc(e.name)}</th>${parts}</tr>`;
+  const tbl = '<table class="ledger" aria-labelledby="cohort-identities" aria-describedby="cohort-key">';
+  if (fcNarrow(host)) {
+    host.innerHTML = `${tbl}<thead><tr><th scope="col">Country</th>${years}</tr></thead>${cols.map(c =>
+      `<tbody><tr><th scope="rowgroup" colspan="${born.length + 1}">${c.head}</th></tr>${
+        ents.map(e => row(e, born.map(b => c.cell(e, b)).join(''))).join('')}</tbody>`).join('')}</table>`;
+    return;
+  }
+  host.innerHTML = `${tbl}<colgroup></colgroup>${cols.map(() => `<colgroup span="${born.length}"></colgroup>`).join('')}
+    <thead><tr><th scope="col" rowspan="2">Country</th>${cols.map(c => `<th scope="colgroup" colspan="${born.length}">${c.head}</th>`).join('')}</tr>
+    <tr>${cols.map(() => years).join('')}</tr></thead>
+    <tbody>${ents.map(e => row(e, cols.map(c => born.map(b => c.cell(e, b)).join('')).join(''))).join('')}</tbody></table>`;
+}
+
 /* ------------------------------------------------------------- prose audit */
 // Every number the new prose states is tagged data-fc="key"; this recomputes
 // each from the data and replaces the text if it has drifted.
@@ -426,6 +483,23 @@ function fcProseValues() {
     m['divpk:' + code] = fcSigned(e.g[e.iDivPeak], 1);
     if (e.srCross2 !== null) m['sr2:' + code] = String(Math.round(e.srCross2));
     if (e.tfr) { const x = fcCrossDown(e.tfr, 2.1, yrs); if (x !== null) m['tfrx:' + code] = String(Math.round(x)); }
+  });
+  // the cohort identities: growth term, contribution level, and the ratio of
+  // the contribution rate between an earlier cohort a and a later cohort b
+  m['coh:rho'] = Math.round(100 * FC_COHORT.rho) + '%';
+  FC_COHORT.iso.forEach(code => {
+    const e = FC.ents.get(code);
+    if (!e) return;
+    FC_COHORT.born.forEach(b => {
+      const g = fcCareerG(e, b), load = fcCareerLoad(e, b);
+      if (g !== null) m[`coh:g:${code}:${b}`] = fcSigned(g, 2);
+      if (load === null) return;
+      m[`coh:c:${code}:${b}`] = (100 * FC_COHORT.rho * load).toFixed(1) + '%';
+      FC_COHORT.born.forEach(a => {
+        const from = a < b ? fcCareerLoad(e, a) : null;
+        if (from !== null) m[`coh:x:${code}:${a}:${b}`] = (load / from).toFixed(1);
+      });
+    });
   });
   return m;
 }
@@ -563,7 +637,7 @@ async function fcSetFocus(code) {
   fcEmphasizeLines('fig-tfr', 'tfr');
   fcEmphasizeLines('fig-sr', 'sr');
   fcEmphasizeScatter();
-  if (FC.drawn) { fcDrawGrowth(); fcDrawHurdle(); fcLedger(); }
+  if (FC.drawn) { fcDrawGrowth(); fcDrawHurdle(); fcLedger(); fcCohortTable(); }
   fcTakeaways();
 }
 
@@ -591,10 +665,11 @@ function fcBuildFollow() {
 /* -------------------------------------------------------------------- boot */
 function fcDrawAll() {
   FC.drawn = true;
-  fcDrawHorizon(); fcDrawGrowth(); fcDrawHurdle(); fcLedger(); fcAuditProse(); fcTakeaways();
+  fcDrawHorizon(); fcDrawGrowth(); fcDrawHurdle(); fcLedger(); fcCohortTable(); fcAuditProse(); fcTakeaways();
 }
-// The three figures choose labels and margins by container width; redraw when
-// the container crosses the breakpoint (rotation, a resized window).
+// The three figures and the cohort table choose their layout by container
+// width; redraw when the container crosses the breakpoint (rotation, a resized
+// window).
 function fcWatchWidth() {
   const el = document.getElementById('fig-growth');
   if (!el || !('ResizeObserver' in window)) return;
@@ -603,7 +678,7 @@ function fcWatchWidth() {
     const now = fcNarrow(el);
     if (now === last) return;
     last = now;
-    if (FC.drawn) { fcDrawHorizon(); fcDrawGrowth(); fcDrawHurdle(); }
+    if (FC.drawn) { fcDrawHorizon(); fcDrawGrowth(); fcDrawHurdle(); fcCohortTable(); }
   }).observe(el);
 }
 function fcFail(err) {

@@ -149,6 +149,8 @@
     .cert.c2{background:var(--muted)}
     .cert.c1{background:linear-gradient(90deg,var(--muted) 50%,transparent 50%)}
     table.ledger.tight th,table.ledger.tight td{padding:.25rem .4rem;font-size:.74rem;white-space:nowrap}
+    table.ledger th[scope=rowgroup]{white-space:normal}
+    table.ledger colgroup+colgroup{border-left:2px solid var(--accent)}
     .rowpick{background:none;border:none;border-bottom:1px solid rgba(31,78,158,.25);padding:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;text-align:left}
     .cert-key{font-size:.8rem;color:var(--muted);margin:.2rem 0 1rem}
     @media(max-width:560px){#focus-pill{left:.6rem;right:.6rem;bottom:.6rem;justify-content:space-between}}
@@ -863,7 +865,8 @@
         arithmetic on people who already exist and how much is an assumption about
         people who do not. It has three exhibits — how far the certainty reaches, what
         age structure does to growth inside that reach, and how much adaptation would
-        cancel the effect — and ends with a table of dated claims that time can check.
+        cancel the effect — and ends with a table of dated claims that time can check,
+        plus a coda that reads the same arithmetic by birth year.
       </p>
       <div class="follow"></div>
 
@@ -1023,6 +1026,80 @@
         few years, the fixity principle is weaker than this article says it is, and
         that would be worth knowing.
       </p>
+
+      <h3 id="cohort-identities">The same arithmetic, by birth year</h3>
+      <p>
+        Everything above is dated by calendar year, but a working life crosses four
+        decades of them. To see what the arithmetic adds up to for one generation,
+        follow a <b>cohort</b>: the people aged 0 to 4 in a given year, who move up the
+        pyramid one bar every five years. A cohort is labeled here by that year, so
+        “born 1950” means under five in 1950, and it is a resident cohort: it counts
+        whoever lives in the country at each age, migrants included. Two identities
+        already on this page can be read along that path. The first is §4's growth
+        identity. Average its demographic term over the forty years in which the
+        cohort labeled \(b\) is aged 25 to 64 and you have that cohort's
+        <b>career growth term</b>, in percentage points a year:
+      </p>
+      <p style="text-align:center">
+        \[ \bar g_b \;=\; \frac{100}{40}\,\ln\frac{SR_{\text{econ}}(b+65)}{SR_{\text{econ}}(b+25)} \]
+      </p>
+      <p>
+        Where it is negative the cohort works against a headwind: over its career,
+        income per effective consumer grows that much more slowly each year than
+        output per effective worker. Where it is positive, a tailwind. The second
+        identity is the budget of a <b>pay-as-you-go</b> pension, one that pays this
+        year's retirees out of this year's contributions. If each retiree receives a
+        set share of the average wage (the <b>replacement rate</b>) and each worker
+        pays in a set share of theirs (the <b>contribution rate</b>), the two sides
+        balance only when
+      </p>
+      <p style="text-align:center">
+        \[ \small \text{contribution rate} \;=\; \frac{\text{replacement rate}}{\text{workers per retiree}} \]
+      </p>
+      <p>
+        with workers per retiree counted as in Figure 4: everyone aged 20–64 over
+        everyone aged 65 or older. Average that rate over the nine five-year marks at
+        which a cohort is aged 20 to 64, and the replacement rate cancels out of any
+        comparison between two cohorts. Keeping the same pension affordable asks
+        <span data-fc="coh:x:USA:1975:2000">1.4</span> times the contribution rate of
+        Americans born in 2000 that it asks of the cohort born in 1975, roughly their
+        parents; <span data-fc="coh:x:DEU:1975:2000">1.4</span> times in Germany,
+        <span data-fc="coh:x:JPN:1975:2000">1.5</span> in Japan,
+        <span data-fc="coh:x:CHN:1975:2000">2.3</span> in China and
+        <span data-fc="coh:x:KOR:1975:2000">2.5</span> in South Korea. To put levels on
+        those ratios the table sets the replacement rate at an illustrative
+        <span data-fc="coh:rho">40%</span>. That is one of two poles: hold the benefit
+        and contributions rise, as tabulated; hold contributions and the benefit falls
+        instead. Real systems sit between the two.
+      </p>
+      <div class="ledger-wrap" id="cohort-table"><p class="atlas-note">The table is built from the data when this section loads.</p></div>
+      <p class="cert-key" id="cohort-key">UN WPP 2024, medium variant. A cohort's birth year
+        is the year it was aged 0 to 4. The careers of the 1990 and 2000 cohorts run past
+        2045, where the numbers start to lean on births that have not happened.</p>
+      <p>
+        The two halves of the table tell different stories. The pension arithmetic
+        worsens with birth year in every aging country shown; Nigeria, still young,
+        stays near <span data-fc="coh:c:NGA:2000">3.0%</span>. The growth headwind is
+        not simply worse for the young. Of the four cohorts shown, the one born in
+        1975 has the most negative career growth term in the United States and Japan
+        and ties with the 1990 cohort in Germany, and in all three the 2000 cohort's
+        headwind is somewhat smaller:
+        <span data-fc="coh:g:USA:2000">−0.18</span> against
+        <span data-fc="coh:g:USA:1975">−0.23</span> in the United States. Only in
+        South Korea and China does the term worsen steadily with birth year, down to
+        <span data-fc="coh:g:KOR:2000">−1.00</span> and
+        <span data-fc="coh:g:CHN:2000">−0.65</span>. Nor did every older cohort have it
+        easy: Japan's 1950 cohort already worked against a headwind
+        (<span data-fc="coh:g:JPN:1950">−0.17</span>). Read the pension half for what
+        it is. It says what a pay-as-you-go promise could afford on these headcounts.
+        It is not a forecast of any real system (Nigeria has no universal scheme at
+        all), and nothing here is advice about your own retirement.
+      </p>
+      <p class="takeaway"><b>Takeaway</b> The two identities keep different time.
+        Pay-as-you-go arithmetic gets harder with each later birth year in every aging
+        country here. The growth headwind does not: in the United States, Germany and
+        Japan it is somewhat lighter for the cohort born in 2000 than for the one born
+        in 1975. Compare yourself with your parents' cohort, not with “boomers”.</p>
 
       <h2 id="limits">10 · What this lens misses</h2>
       <p>
@@ -1184,8 +1261,8 @@
           math with self-hosted <a href="https://katex.org/">KaTeX</a> 0.16.9. No CDNs, no trackers.
         </p>
         <p>
-          <b>Forecast section (§9):</b> Figures 6–8 and the ledger are computed in the
-          browser by <a href="forecast.js">forecast.js</a> from the same five-year
+          <b>Forecast section (§9):</b> Figures 6–8, the ledger and the birth-year table
+          are computed in the browser by <a href="forecast.js">forecast.js</a> from the same five-year
           pyramids the atlas uses, plus a world aggregate
           (<a href="data/world.json">world.json</a>) summed from the country files by
           <a href="../scripts/build_demographics_world.py">scripts/build_demographics_world.py</a>.
