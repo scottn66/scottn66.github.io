@@ -18,6 +18,7 @@ const FC = {
   k: 0,                     // working-life extension by 2050 (years)
   drawn: false,
   mounted: {},
+  resolvers: [],            // key -> text, for data-fc keys owned by another file (cohort.js)
 };
 const FC_WORLD = 'WLD';
 const FC_SHORT = {
@@ -432,7 +433,8 @@ function fcProseValues() {
 function fcAuditProse() {
   const vals = fcProseValues();
   document.querySelectorAll('[data-fc]').forEach(el => {
-    const v = vals[el.dataset.fc];
+    let v = vals[el.dataset.fc];
+    for (let i = 0; v === undefined && i < FC.resolvers.length; i++) v = FC.resolvers[i](el.dataset.fc);
     if (v === undefined) return;
     if (el.textContent.trim() !== v) {
       console.warn('[forecast] prose drift:', el.dataset.fc, JSON.stringify(el.textContent.trim()), '→', JSON.stringify(v));
@@ -565,6 +567,7 @@ async function fcSetFocus(code) {
   fcEmphasizeScatter();
   if (FC.drawn) { fcDrawGrowth(); fcDrawHurdle(); fcLedger(); }
   fcTakeaways();
+  document.dispatchEvent(new CustomEvent('demographics:focus', { detail: { iso3: FC.focus } }));   // cohort.js redraws section 10
 }
 
 function fcBuildFollow() {
