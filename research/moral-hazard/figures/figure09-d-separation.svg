@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="842.742062pt" height="440.433333pt" viewBox="0 0 842.742062 440.433333" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-18T02:42:23.706141</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 440.433333 
+L 842.742062 440.433333 
+L 842.742062 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 104.939315 57.835162 
+Q 90.918825 79.77069 77.590779 100.622868 
+" style="fill: none; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 81.046243 98.558947 
+L 77.590779 100.622868 
+L 78.012921 96.620144 
+z
+" style="fill: #1f4e9e; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 148.223542 57.794791 
+Q 163.394458 79.772022 177.834954 100.691136 
+" style="fill: none; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 177.271154 96.705897 
+L 177.834954 100.691136 
+L 174.308483 98.751033 
+z
+" style="fill: #1f4e9e; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 106.983891 58.371556 
+L 146.120575 58.371556 
+Q 149.019588 58.371556 149.019588 55.036553 
+L 149.019588 37.805703 
+Q 149.019588 34.470699 146.120575 34.470699 
+L 106.983891 34.470699 
+Q 104.084878 34.470699 104.084878 37.805703 
+L 104.084878 55.036553 
+Q 104.084878 58.371556 106.983891 58.371556 
+z
+" clip-path="url(#p9d3a74480f)" style="fill: #ede3f7; stroke: #6b4c9a; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 36.924396 127.155999 
+L 85.724458 127.155999 
+Q 88.623472 127.155999 88.623472 123.820996 
+L 88.623472 105.200561 
+Q 88.623472 101.865558 85.724458 101.865558 
+L 36.924396 101.865558 
+Q 34.025383 101.865558 34.025383 105.200561 
+L 34.025383 123.820996 
+Q 34.025383 127.155999 36.924396 127.155999 
+z
+" clip-path="url(#p9d3a74480f)" style="fill: #f6efd8; stroke: #c9a227; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 171.003775 127.155999 
+L 212.556303 127.155999 
+Q 215.455317 127.155999 215.455317 123.820996 
+L 215.455317 105.200561 
+Q 215.455317 101.865558 212.556303 101.865558 
+L 171.003775 101.865558 
+Q 168.104761 101.865558 168.104761 105.200561 
+L 168.104761 123.820996 
+Q 168.104761 127.155999 171.003775 127.155999 
+z
+" clip-path="url(#p9d3a74480f)" style="fill: #ffffff; stroke: #1f4e9e; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(86.277733 156.721296)">Type is a common cause.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(55.112733 164.403046)">Chosen coverage and claims are associated.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(53.061233 172.084796)">That association is not a test of moral hazard.</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8.7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1e1e1e" x="5.76" y="12.370641" transform="rotate(-0 5.76 12.370641)">A.  Adverse selection only,  coverage chosen</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="126.552233" y="48.319847" transform="rotate(-0 126.552233 48.319847)">θ  type</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="61.324427" y="116.381091" transform="rotate(-0 61.324427 116.381091)">coverage</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="191.780039" y="116.381372" transform="rotate(-0 191.780039 116.381372)">claims  k</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_7">
+    <path d="M 361.018849 57.835162 
+Q 346.998359 79.77069 333.519782 100.858379 
+" style="fill: none; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 336.975246 98.794458 
+L 333.519782 100.858379 
+L 333.941924 96.855655 
+z
+" style="fill: #aaaaaa; stroke-dasharray: 2.7,1.8; stroke-dashoffset: 0; stroke: #aaaaaa; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 404.303076 57.794791 
+Q 419.473992 79.772022 433.914488 100.691136 
+" style="fill: none; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 433.350688 96.705897 
+L 433.914488 100.691136 
+L 430.388017 98.751033 
+z
+" style="fill: #1f4e9e; stroke: #1f4e9e; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 363.063425 58.371556 
+L 402.200109 58.371556 
+Q 405.099122 58.371556 405.099122 55.036553 
+L 405.099122 37.805703 
+Q 405.099122 34.470699 402.200109 34.470699 
+L 363.063425 34.470699 
+Q 360.164412 34.470699 360.164412 37.805703 
+L 360.164412 55.036553 
+Q 360.164412 58.371556 363.063425 58.371556 
+z
+" clip-path="url(#p3450cadcca)" style="fill: #ede3f7; stroke: #6b4c9a; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 293.00393 127.155999 
+L 341.803992 127.155999 
+Q 344.703006 127.155999 344.703006 123.820996 
+L 344.703006 105.200561 
+Q 344.703006 101.865558 341.803992 101.865558 
+L 293.00393 101.865558 
+Q 290.104917 101.865558 290.104917 105.200561 
+L 290.104917 123.820996 
+Q 290.104917 127.155999 293.00393 127.155999 
+z
+" clip-path="url(#p3450cadcca)" style="fill: #f6efd8; stroke: #c9a227; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_6">
+    <text style="font-style: italic; font-size: 6.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #888888" x="337.938641" y="76.991991" transform="rotate(-0 337.938641 76.991991)">cut</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 427.083309 127.155999 
+L 468.635837 127.155999 
+Q 471.53485 127.155999 471.53485 123.820996 
+L 471.53485 105.200561 
+Q 471.53485 101.865558 468.635837 101.865558 
+L 427.083309 101.865558 
+Q 424.184295 101.865558 424.184295 105.200561 
+L 424.184295 123.820996 
+Q 424.184295 127.155999 427.083309 127.155999 
+z
+" clip-path="url(#p3450cadcca)" style="fill: #ffffff; stroke: #1f4e9e; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(302.703767 156.721296)">Random assignment cuts the edge into coverage.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(312.557767 164.403046)">If this is the only path, coverage and claims</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(299.399267 172.084796)">are then independent.  (RAND would find no effect.)</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8.7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1e1e1e" x="261.839534" y="12.370641" transform="rotate(-0 261.839534 12.370641)">B.  Adverse selection only,  after do(coverage)</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="382.631767" y="48.319847" transform="rotate(-0 382.631767 48.319847)">θ  type</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="317.403961" y="116.381372" transform="rotate(-0 317.403961 116.381372)">do(coverage)</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="447.859573" y="116.381372" transform="rotate(-0 447.859573 116.381372)">claims  k</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_12">
+    <path d="M 88.686699 323.03186 
+Q 96.351456 323.03186 102.730473 323.03186 
+" style="fill: none; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 99.130473 321.23186 
+L 102.730473 323.03186 
+L 99.130473 324.83186 
+z
+" style="fill: #6b4c9a; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 149.084437 323.03186 
+Q 158.56214 323.03186 166.754104 323.03186 
+" style="fill: none; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 163.154104 321.23186 
+L 166.754104 323.03186 
+L 163.154104 324.83186 
+z
+" style="fill: #6b4c9a; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 36.924396 335.67708 
+L 85.724458 335.67708 
+Q 88.623472 335.67708 88.623472 332.342077 
+L 88.623472 313.721642 
+Q 88.623472 310.386639 85.724458 310.386639 
+L 36.924396 310.386639 
+Q 34.025383 310.386639 34.025383 313.721642 
+L 34.025383 332.342077 
+Q 34.025383 335.67708 36.924396 335.67708 
+z
+" clip-path="url(#p9fbae3ea63)" style="fill: #f6efd8; stroke: #c9a227; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 106.983891 334.982288 
+L 146.120575 334.982288 
+Q 149.019588 334.982288 149.019588 331.647285 
+L 149.019588 314.416434 
+Q 149.019588 311.081431 146.120575 311.081431 
+L 106.983891 311.081431 
+Q 104.084878 311.081431 104.084878 314.416434 
+L 104.084878 331.647285 
+Q 104.084878 334.982288 106.983891 334.982288 
+z
+" clip-path="url(#p9fbae3ea63)" style="fill: #ede3f7; stroke: #6b4c9a; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 171.003775 335.67708 
+L 212.556303 335.67708 
+Q 215.455317 335.67708 215.455317 332.342077 
+L 215.455317 313.721642 
+Q 215.455317 310.386639 212.556303 310.386639 
+L 171.003775 310.386639 
+Q 168.104761 310.386639 168.104761 313.721642 
+L 168.104761 332.342077 
+Q 168.104761 335.67708 171.003775 335.67708 
+z
+" clip-path="url(#p9fbae3ea63)" style="fill: #ffffff; stroke: #1f4e9e; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_12">
+    <text style="font-style: italic; font-size: 6.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #6b4c9a" x="126.552233" y="307.746428" transform="rotate(-0 126.552233 307.746428)">moral-hazard path</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(34.156233 365.242377)">Coverage causes use or prevention, which causes claims.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(47.087733 372.924127)">The same raw association now has a causal path.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(48.522733 380.605877)">Observationally, it still looks like the left column.</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8.7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1e1e1e" x="5.76" y="220.891722" transform="rotate(-0 5.76 220.891722)">C.  Moral hazard (a causal path),  coverage chosen</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="61.324427" y="324.902172" transform="rotate(-0 61.324427 324.902172)">coverage</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="126.552233" y="324.902172" transform="rotate(-0 126.552233 324.902172)">a  or  m</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="191.780039" y="324.902453" transform="rotate(-0 191.780039 324.902453)">claims  k</text>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_17">
+    <path d="M 344.766233 323.03186 
+Q 352.43099 323.03186 358.810007 323.03186 
+" style="fill: none; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 355.210007 321.23186 
+L 358.810007 323.03186 
+L 355.210007 324.83186 
+z
+" style="fill: #6b4c9a; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 405.163971 323.03186 
+Q 414.641674 323.03186 422.833637 323.03186 
+" style="fill: none; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+    <path d="M 419.233637 321.23186 
+L 422.833637 323.03186 
+L 419.233637 324.83186 
+z
+" style="fill: #6b4c9a; stroke: #6b4c9a; stroke-width: 1.15; stroke-linecap: round"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 293.00393 335.67708 
+L 341.803992 335.67708 
+Q 344.703006 335.67708 344.703006 332.342077 
+L 344.703006 313.721642 
+Q 344.703006 310.386639 341.803992 310.386639 
+L 293.00393 310.386639 
+Q 290.104917 310.386639 290.104917 313.721642 
+L 290.104917 332.342077 
+Q 290.104917 335.67708 293.00393 335.67708 
+z
+" clip-path="url(#p630a930127)" style="fill: #f6efd8; stroke: #c9a227; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 363.063425 334.982288 
+L 402.200109 334.982288 
+Q 405.099122 334.982288 405.099122 331.647285 
+L 405.099122 314.416434 
+Q 405.099122 311.081431 402.200109 311.081431 
+L 363.063425 311.081431 
+Q 360.164412 311.081431 360.164412 314.416434 
+L 360.164412 331.647285 
+Q 360.164412 334.982288 363.063425 334.982288 
+z
+" clip-path="url(#p630a930127)" style="fill: #ede3f7; stroke: #6b4c9a; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_21">
+    <path d="M 427.083309 335.67708 
+L 468.635837 335.67708 
+Q 471.53485 335.67708 471.53485 332.342077 
+L 471.53485 313.721642 
+Q 471.53485 310.386639 468.635837 310.386639 
+L 427.083309 310.386639 
+Q 424.184295 310.386639 424.184295 313.721642 
+L 424.184295 332.342077 
+Q 424.184295 335.67708 427.083309 335.67708 
+z
+" clip-path="url(#p630a930127)" style="fill: #ffffff; stroke: #1f4e9e; stroke-width: 1.05; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_18">
+    <text style="font-style: italic; font-size: 6.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #6b4c9a" x="382.631767" y="307.746428" transform="rotate(-0 382.631767 307.746428)">moral-hazard path</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(312.898267 365.242377)">do(coverage) leaves the causal path intact.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(317.584767 372.924127)">Coverage and claims remain associated.</text>
+    <text style="font-size: 6.4px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(308.164267 380.605877)">That remaining association is the RAND result.</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8.7px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #1e1e1e" x="261.839534" y="220.891722" transform="rotate(-0 261.839534 220.891722)">D.  Moral hazard,  after do(coverage)</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="317.403961" y="324.902453" transform="rotate(-0 317.403961 324.902453)">do(coverage)</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="382.631767" y="324.902172" transform="rotate(-0 382.631767 324.902172)">a  or  m</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7.2px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #1e1e1e" x="447.859573" y="324.902453" transform="rotate(-0 447.859573 324.902453)">claims  k</text>
+   </g>
+  </g>
+  <g id="text_24">
+   <text style="font-size: 6.2px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #555555" x="21.312" y="433.18388" transform="rotate(-0 21.312 433.18388)">Schematic subgraphs of Figure 8.  A dashed arrow is an edge that the intervention has cut.  The Chiappori–Salanié positive-correlation test is a test of some remaining path in A or C, not of one graph against the other.  RAND is a version of the right-hand column.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p9d3a74480f">
+   <rect x="5.76" y="14.46068" width="241.584466" height="170.918919"/>
+  </clipPath>
+  <clipPath id="p3450cadcca">
+   <rect x="261.839534" y="14.46068" width="241.584466" height="170.918919"/>
+  </clipPath>
+  <clipPath id="p9fbae3ea63">
+   <rect x="5.76" y="222.981761" width="241.584466" height="170.918919"/>
+  </clipPath>
+  <clipPath id="p630a930127">
+   <rect x="261.839534" y="222.981761" width="241.584466" height="170.918919"/>
+  </clipPath>
+ </defs>
+</svg>
