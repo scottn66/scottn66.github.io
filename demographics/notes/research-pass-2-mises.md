@@ -152,3 +152,9 @@ The essay section built on this report was reviewed twice, each finding checked 
 - **Mises's condition in ¶ II.13.18 is a government that cannot borrow.** Japan could, so its falling prices are evidence against the essay's own bridge from ageing to inflation, not against that sentence.
 
 Econlib does not display its paragraph ids, but each works as a link fragment (for example `msT.html?chapter_num=17#II.13.18`).
+
+A third review, of the "reading in Mises's manner" appended to the section, added three datings, each checked against the 1912 German first edition:
+
+- **¶ II.12.34 is 1924 text.** The argument that new money reaches people in sequence is 1912, but this paragraph, with the sentence "The sooner anybody is in a position to adjust his money income to its new value...", is absent from the first edition (pp. 228-229 run straight from ¶ II.12.33 to ¶ II.12.35).
+- **¶ III.19.16 was shortened in 1924.** In 1912 the sentence "Without knowledge of the actual data it is impossible to say anything definite about it" was followed by one giving the usual direction (a small fall in interest); the English text of the 1924 edition lacks it. The sentence also concerns only the lasting effect of a change in money on interest, and ¶ III.19.17 goes on to give a definite transitional rule.
+- **¶ II.10.11 and ¶ III.17.7 are in the first edition** (pp. 209 and 345f.), so "goods are paid for only with goods" and the one sentence on a shrinking population can be dated 1912.
