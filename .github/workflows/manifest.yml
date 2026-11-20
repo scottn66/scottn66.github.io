@@ -35,14 +35,17 @@ jobs:
       - name: Build manifest
         run: python3 scripts/build_manifest.py
 
+      - name: Build sitemap
+        run: python3 scripts/build_sitemap.py
+
       - name: Commit if changed
         run: |
-          if git diff --quiet -- published-corpus.json; then
-            echo "published-corpus.json unchanged — nothing to commit."
+          if git diff --quiet -- published-corpus.json sitemap.xml; then
+            echo "published-corpus.json and sitemap.xml unchanged — nothing to commit."
           else
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add published-corpus.json
-            git commit -m "chore: regenerate published-corpus.json [skip ci]"
+            git add published-corpus.json sitemap.xml
+            git commit -m "chore: regenerate published-corpus.json and sitemap.xml [skip ci]"
             git push
           fi

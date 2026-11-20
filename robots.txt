@@ -1,0 +1,28 @@
+# https://scottn66.github.io/
+# Research notes and the repo readme are markdown source, not portfolio pages.
+# Prefix rules (no wildcards) are what the sitemap check requires. The
+# trailing wildcard is for crawlers that honor Google's robots syntax.
+
+User-agent: *
+Allow: /
+
+Disallow: /README.md
+Disallow: /HMM-hoffman-open-problems.md
+Disallow: /HMM-hoffman-research.md
+Disallow: /HMM-hoffman-research-2-trace-logic.md
+Disallow: /HMM-hoffman-research-3-traces-paper.md
+Disallow: /HMM-hoffman-research-4-recursion-bridges.md
+Disallow: /HMM-hoffman-research-5-verification-record.md
+Disallow: /conscious-agents-review-findings.md
+Disallow: /bitcoin-power-law/AUDIT.md
+Disallow: /bitcoin-power-law/README.md
+Disallow: /demographics/notes/
+Disallow: /robot-arm-sim/NARRATIVE.md
+Disallow: /solar/README.md
+
+# Workflow files are not pages. .nojekyll serves the tree as static files.
+Disallow: /.github/
+
+Disallow: /*.md$
+
+Sitemap: https://scottn66.github.io/sitemap.xml
