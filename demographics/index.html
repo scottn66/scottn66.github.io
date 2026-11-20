@@ -4,12 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>The Shape of People to Come · Demographics as Destiny, Audited</title>
-  <meta name="description"
-        content="An econometric deep dive on post-industrial demographic shape change:
-                 the capital structure of a human life, what inverted population pyramids
-                 do to labor, capital and trade, a richer instrument panel than birth
-                 rates, and an interactive world atlas scored by a transparent
-                 demographic-strategic index built from UN WPP 2024 data." />
+  <meta name="description" content="Capital, cohorts, and the end of the demographic dividend: an interactive econometric atlas of 236 countries built on UN World Population Prospects 2024.">
+  <link rel="canonical" href="https://scottn66.github.io/demographics/">
   <meta name="author" content="Scott Nelson" />
   <meta name="unit" content="demographics" />
   <meta property="og:title" content="The Shape of People to Come" />
@@ -31,7 +27,8 @@
       --c-jpn:#6A4FA3; --c-kor:#0782AF; --c-ind:#C2632F;
     }
     *,*::before,*::after{box-sizing:border-box}
-    html{scroll-behavior:smooth;scroll-padding-top:3.6rem}
+    html{scroll-padding-top:3.6rem}
+    @media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
     body{margin:0;background:var(--bg);color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
       font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
@@ -131,9 +128,11 @@
       .cp-grid{grid-template-columns:1fr}
     }
   </style>
+<style>.skip{position:absolute;left:-9999px;top:0;background:#fff;color:#1a1a1a;padding:8px 14px;font-weight:600;z-index:3000;border:2px solid #1a1a1a}.skip:focus{left:8px;top:8px}</style>
 </head>
 <body>
-  <nav class="topbar">
+  <a class="skip" href="#main">Skip to content</a>
+  <nav class="topbar" aria-label="Site">
     <a class="brand" href="../index.html">Scott Nelson</a>
     <a href="../index.html#projects">Projects</a>
     <a href="../decision-theory.html">Decision theory</a>
@@ -142,9 +141,9 @@
   </nav>
 
   <div class="page">
-    <aside class="toc" aria-label="Contents">
-      <button class="toc-toggle" id="toc-toggle">Contents ▾</button>
-      <nav><ol>
+    <aside class="toc" id="toc" aria-label="Contents">
+      <button class="toc-toggle" id="toc-toggle" aria-expanded="false" aria-controls="toc">Contents ▾</button>
+      <nav aria-label="Table of contents"><ol>
         <li><a href="#fixity">The fixity principle</a></li>
         <li class="act">Part I · How we got here</li>
         <li><a href="#shapes">Pyramid, column, urn</a></li>
@@ -164,7 +163,7 @@
       </ol></nav>
     </aside>
 
-    <main>
+    <main id="main">
       <header id="hero">
         <div class="badges">
           <span class="badge">UN WPP 2024 · 236 countries</span>
@@ -229,8 +228,8 @@
         stem of young people, top-heavy with retirees.
       </p>
       <figure>
-        <div id="fig-shapes" class="chart"><div class="ph">Figure 1 · three silhouettes, 2025 — loading…</div></div>
-        <figcaption>
+        <div id="fig-shapes" class="chart" role="img" aria-labelledby="cap-fig-shapes"><div class="ph">Figure 1 · three silhouettes, 2025 — loading…</div></div>
+        <figcaption id="cap-fig-shapes">
           Fig 1 — The three shapes, drawn from the data: Nigeria 2025 (pyramid),
           United States 2025 (column), Japan 2050 (urn). Same axes, same scale per panel
           (share of that country's population), UN WPP 2024 medium variant.
@@ -275,16 +274,16 @@
         lifetime, a descent no society has ever experienced before.
       </p>
       <figure>
-        <div id="fig-tfr" class="chart"><div class="ph">Figure 2 · fertility trajectories — loading…</div></div>
-        <figcaption>
+        <div id="fig-tfr" class="chart" role="img" aria-labelledby="cap-fig-tfr"><div class="ph">Figure 2 · fertility trajectories — loading…</div></div>
+        <figcaption id="cap-fig-tfr">
           Fig 2 — Total fertility rate, 1950–2025, six countries on the same escalator at
           different start dates. Dashed line: replacement (~2.1). The later you
           industrialize, the faster you fall through it.
         </figcaption>
       </figure>
       <figure>
-        <div id="fig-tfr-continents" class="chart"><div class="ph">Figure 2b · fertility by continent — loading…</div></div>
-        <figcaption>
+        <div id="fig-tfr-continents" class="chart" role="img" aria-labelledby="cap-fig-tfr-continents"><div class="ph">Figure 2b · fertility by continent — loading…</div></div>
+        <figcaption id="cap-fig-tfr-continents">
           Fig 2b — The same escalator by continent, 1950–2025 (population-weighted
           average of country TFR, WPP 2024 medium). Africa is the last wave still
           descending; every other continent has already crossed replacement. North
@@ -322,8 +321,8 @@
         along this curve.
       </p>
       <figure>
-        <div id="fig-lifecycle" class="chart"><div class="ph">Figure 3 · the life-cycle deficit — loading…</div></div>
-        <figcaption>
+        <div id="fig-lifecycle" class="chart" role="img" aria-labelledby="cap-fig-lifecycle"><div class="ph">Figure 3 · the life-cycle deficit — loading…</div></div>
+        <figcaption id="cap-fig-lifecycle">
           Fig 3 — Stylized age profiles of labor income and consumption (shape follows the
           National Transfer Accounts cross-country average; units are % of peak labor
           income). Shaded: the two deficits and the one surplus that must pay for them.
@@ -332,7 +331,7 @@
       <p>Walking the curve, tranche by tranche:</p>
       <table>
         <thead>
-          <tr><th>Age tranche</th><th>Economic role</th><th>Cash-flow profile</th><th>Balance-sheet behavior</th></tr>
+          <tr><th scope="col">Age tranche</th><th scope="col">Economic role</th><th scope="col">Cash-flow profile</th><th scope="col">Balance-sheet behavior</th></tr>
         </thead>
         <tbody>
           <tr><td><b>0–4</b> · infants</td>
@@ -539,16 +538,16 @@
         about the world price of capital going up (§9 grades the original claim).
       </p>
       <figure>
-        <div id="fig-sr" class="chart"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
-        <figcaption>
+        <div id="fig-sr" class="chart" role="img" aria-labelledby="cap-fig-sr"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
+        <figcaption id="cap-fig-sr">
           Fig 4 — Workers (20–64) per retiree (65+), 1950–2100, UN medium variant. The
           gray band marks 2:1 and below — the zone where pay-as-you-go pension arithmetic
           stops working without major reform. Note who enters it, and when.
         </figcaption>
       </figure>
       <figure id="fig-ca-wrap" hidden>
-        <div id="fig-ca" class="chart"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
-        <figcaption>
+        <div id="fig-ca" class="chart" role="img" aria-labelledby="cap-fig-ca"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
+        <figcaption id="cap-fig-ca">
           Fig 5 — Current-account balance (% of GDP) against median age.
           Aged industrial economies cluster in the surplus quadrant: exporting is what a
           country does when its own consumers have retired.
@@ -575,7 +574,7 @@
         every country, from the single-year age data:
       </p>
       <table>
-        <thead><tr><th>Instrument</th><th>Definition</th><th>What it actually measures</th></tr></thead>
+        <thead><tr><th scope="col">Instrument</th><th scope="col">Definition</th><th scope="col">What it actually measures</th></tr></thead>
         <tbody>
           <tr><td><b>Median age</b>, now &amp; 2050</td>
               <td>\( \tilde a \): half the population older, half younger</td>
@@ -740,7 +739,7 @@
           </div>
           <div class="country-pick">
             <label class="atlas-note" for="country-input">Find a country</label>
-            <input list="country-list" id="country-input" placeholder="Type a name… e.g. Japan" autocomplete="off" />
+            <input type="text" list="country-list" id="country-input" placeholder="Type a name… e.g. Japan" autocomplete="off" />
             <datalist id="country-list"></datalist>
           </div>
         </div>
@@ -777,7 +776,7 @@
         where the data says otherwise:
       </p>
       <table>
-        <thead><tr><th>Link in the chain</th><th>Grade</th><th>The evidence</th></tr></thead>
+        <thead><tr><th scope="col">Link in the chain</th><th scope="col">Grade</th><th scope="col">The evidence</th></tr></thead>
         <tbody>
           <tr><td>Bretton Woods security order globalized trade &amp; industrialization</td>
               <td style="color:var(--good)"><b>SUPPORTED</b></td>
@@ -950,7 +949,7 @@
           its own math. A fuller audit trail — every instrument checked against its
           canonical source, with the caveat that citations were triangulated via search
           indexes rather than page-verified — lives in
-          <a href="notes/research-pass-1.md">notes/research-pass-1.md</a>. Errors,
+          <a href="https://github.com/scottn66/scottn66.github.io/blob/main/demographics/notes/research-pass-1.md" target="_blank" rel="noopener">notes/research-pass-1.md</a>. Errors,
           scores and opinions are mine.
         </p>
         <p>Data vintage: WPP 2024 · page generated July 2026 · <a href="../index.html">← back to all projects</a></p>
@@ -1017,5 +1016,14 @@
     });
   </script>
   <script src="app.js"></script>
+<script>
+  /* mobile TOC disclosure (same as the other research pages) */
+  document.getElementById("toc-toggle").addEventListener("click",function(){
+    const t=document.querySelector(".toc");
+    t.classList.toggle("open");
+    this.setAttribute("aria-expanded",t.classList.contains("open"));
+    this.textContent=t.classList.contains("open")?"Contents ▴":"Contents ▾";
+  });
+  </script>
 </body>
 </html>

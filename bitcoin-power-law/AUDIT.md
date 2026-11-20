@@ -85,7 +85,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 3. No Open Graph tags: shared link previews as a bare URL with no image, title, or description
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head, lines 3-15)
+- **Location:** bitcoin-power-law/index.html (head, lines 3-15)
 - **Issue:** The <head> contains only <title> and <meta name="description">. There are zero Open Graph tags (og:title, og:description, og:image, og:url, og:type). When this 'research note' is pasted into Slack, iMessage, LinkedIn, Discord, Reddit, or Facebook, the unfurl falls back to a bare link with no card, no preview image, and often a truncated/raw title. This directly undercuts the page's purpose: it is explicitly framed as a shareable note ('every chart is interactive; every test is reproducible'). Sibling pages already follow the house OG pattern, e.g. Q.html lines 10-14 set og:title/og:description/og:image/og:url plus twitter:card='summary_large_image', so this page is the exception, not the rule.
 - **Evidence:** index.html lines 6-7 are the only metadata: '<title>Does Bitcoin Follow a Power Law? — An Econometric Autopsy</title>' and '<meta name="description" content="An interactive, multi-lens econometric scrutiny..."/>'. grep for 'og:title|og:image|twitter:card' across the page returns nothing. Compare Q.html line 12: '<meta property="og:image" content="https://scottn66.github.io/robot-arm-sim/img/end_card_resolution.png">'.
 - **Fix:** Add the standard OG block to <head>: og:type='article', og:url='https://scottn66.github.io/bitcoin-power-law/', og:title (em-dash-free, see separate finding), og:description (reuse the meta description), and og:image pointing to an absolute https URL of a representative 1200x630 card. The 5 existing seaborn PNGs in assets/ (e.g. fig_aic.png) are not ideal social cards (wrong aspect ratio, tiny, no title), so generate a dedicated og-image; until then, an absolute URL to assets/fig_aic.png is better than nothing.
@@ -135,7 +135,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 5. Disclaimer is single, footer-only, and far from the page's buy-signal language
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 311 (footer disclaimer) vs lines 220 and 227 (valuation language)
+- **Location:** bitcoin-power-law/index.html line 311 (footer disclaimer) vs lines 220 and 227 (valuation language)
 - **Issue:** The page makes actionable-sounding valuation statements well above the fold of the disclaimer: line 220 'below the midline = historically cheap, above = expensive'; line 227 (Lens 4 verdict) 'Today Bitcoin sits below fair value, historically a favorable zone.' The chips even surface 'Price ÷ model' and 'Corridor' percentile prominently. The only 'Educational analysis — not investment advice' disclaimer sits once at line 311 in the footer, after eight long sections. A reader who stops at the Lens 4 verdict (a natural exit point that reads like a buy signal) never sees it.
 - **Evidence:** line 227: 'Today Bitcoin sits below fair value, historically a favorable zone.'  line 220: 'below the midline = historically cheap'  line 311: 'Educational analysis — not investment advice.'
 - **Fix:** Either soften the valuation verdicts (e.g. 'historically a below-average corridor position' rather than 'a favorable zone' / 'cheap'), or add a short inline disclaimer near the first valuation claim (Lens 4 verdict, line 227) so the 'not investment advice' caveat travels with the price-context language instead of living only in the footer.
@@ -256,7 +256,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 6. Pervasive em-dash usage contradicts the documented no-em-dash house style
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (88 instances) + README.md (11 instances); representative: line 6 (title), line 113 (lede), line 153 (Lens 1 verdict), line 303 (bottom line)
+- **Location:** bitcoin-power-law/index.html (88 instances) + README.md (11 instances); representative: line 6 (title), line 113 (lede), line 153 (Lens 1 verdict), line 303 (bottom line)
 - **Issue:** The site owner deliberately avoids em-dashes (prior commit 'Strip em-dashes across crawler pages'), yet this page is saturated with them: 88 em-dashes in index.html and 11 more in README.md (99 total). They appear in the most prominent places, starting with the <title>: 'Does Bitcoin Follow a Power Law? — An Econometric Autopsy' (line 6), the lede 'tracked a straight line on log–log axes for over a decade — a power law in time' (line 113), and nearly every verdict box and paragraph. This is a consistent, systematic violation of the established voice, not a one-off. (Note: the ~36 EN-dashes in 'log–log', 'Newey–West', 'Durbin–Watson', etc. are typographically correct and should be left alone — only the em-dash '—' is the house-style problem.)
 - **Evidence:** <title>Does Bitcoin Follow a Power Law? — An Econometric Autopsy</title>  (line 6); 88 '—' in index.html, 11 in README.md
 - **Fix:** Mechanical fix: replace em-dashes with the owner's preferred construction (sentence split, colon, comma, or parenthetical). Do a global pass over index.html (88) and README.md (11), being careful NOT to touch the en-dash '–' used in compound names/ranges (log–log, Newey–West, Ornstein–Uhlenbeck, ±2σ corridor, year ranges). Start with the title and the five .verdict boxes since those are highest-visibility.
@@ -266,7 +266,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 7. Ordinal typo '21th percentile' shown to readers
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/assets/data.js (PL.mean_reversion.interpretation), rendered at index.html line 509 (#mrcard, ${m.interpretation})
+- **Location:** bitcoin-power-law/assets/data.js (PL.mean_reversion.interpretation), rendered at index.html line 509 (#mrcard, ${m.interpretation})
 - **Issue:** The mean_reversion.interpretation string ends 'Bitcoin sits 0.91σ below fair value (21th percentile).' The ordinal is wrong: 21 takes 'st', not 'th'. This text is injected verbatim into the 'Where Bitcoin stands today' card via index.html line 509, so the typo is visible on the live page. (Confirmed Math.round(20.73)=21, so the figure itself is fine; only the suffix is wrong.)
 - **Evidence:** data.js: "...0.91σ below fair value (21th percentile)."  rendered by: <p ...>${m.interpretation||''}</p>  (index.html line 509)
 - **Fix:** Edit the interpretation string in data.js to '21st percentile'. Better, since this string is generated by scripts/pl_econometrics.py, fix the ordinal logic at the source so it never emits 'Nth' for 1/2/3-ending numbers (21st, 22nd, 23rd, etc.), then regenerate data.js.
@@ -276,7 +276,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 8. 'dex' unit used in reader-facing tables but never defined
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html lines 498, 499, 507, 510 (Lens 4 OU card and volatility spans)
+- **Location:** bitcoin-power-law/index.html lines 498, 499, 507, 510 (Lens 4 OU card and volatility spans)
 - **Issue:** The OU card prints 'Equilibrium θ ... dex' (498), 'Shock vol σ ... dex/yr' (499), 'Stationary 1σ dispersion ±... dex' (507), and the inline volatility range '...dex/yr' (510). 'dex' (a decade / log10 unit, ~factor-of-10) is genuinely obscure to the stated general-but-curious audience and is defined only in a JS code comment ('// dex (log10 units)', line 352) that readers never see. The prose around it explains θ, λ, σ in plain language but leaves the unit itself unexplained.
 - **Evidence:** line 352 comment: 'sigma=(PL.fit_full||{}).resid_sigma||0.276;     // dex (log10 units)'; line 507: '±${(m.resid_sigma||0).toFixed(2)} dex (≈...%)'
 - **Fix:** Define 'dex' once on first user-visible use, e.g. add a parenthetical in the Lens 4 lede or OU card: 'dex = orders of magnitude in log10 price (1 dex = a 10× move).' The line 507 row already shows the %-equivalent in parentheses, so leaning on that translation everywhere (or adding a tooltip) would also work.
@@ -286,7 +286,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 9. Three different headline exponents shown for 'the' power-law slope
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 337 (chip), line 424 (#fittab), line 153 (Lens 1 verdict), line 296 (scorecard)
+- **Location:** bitcoin-power-law/index.html line 337 (chip), line 424 (#fittab), line 153 (Lens 1 verdict), line 296 (scorecard)
 - **Issue:** A reader scanning for 'the exponent' sees three inconsistent numbers without explanation. The hero chip 'Exponent n' uses PL.fit_full.n = 5.54 (line 337). The Lens 1 inference table uses PL.fit_coinbase.n = 5.426 ≈ 5.43 (line 424). The Lens 1 verdict prose says 'it's 5.4' (line 153). And the scorecard 'Does not survive' bullet frames the contrast as '≈[4.3, 6.2], not 5.8 ± 0.01' (line 296), introducing yet a fourth figure (5.8, the literature value) as if it were the page's own point estimate. The full-history vs Coinbase-window distinction is real, but it is never flagged at the chip, so the 5.54 vs 5.43 gap looks like an error.
 - **Evidence:** chip: ['Exponent n', (f.n||0).toFixed(2)...] with f=PL.fit_full → '5.54'; fittab: ['Exponent n (point estimate)', (fc.n||0).toFixed(3)] with fc=PL.fit_coinbase → '5.426'; line 153: '5.4 with a 95% bootstrap interval'; line 296: '≈[4.3, 6.2], not 5.8 ± 0.01'
 - **Fix:** Pick one headline exponent for the chip (the Coinbase-window 5.43 that the formal tests and CI actually use, to match Lens 1), or label the chip 'Exponent n (full history)' so the 5.54 vs 5.43 difference is intentional and legible. In the scorecard bullet (line 296), keep '5.8' clearly attributed to the literature ('not the literature's 5.8 ± 0.01') so it isn't read as the page's own estimate.
@@ -296,7 +296,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 10. Data cadence described inconsistently: 'weekly' in the chart vs 'daily closes (~3,650 obs)' in the method/footer
 
 - **Dimension:** editorial · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 130 (hero figcaption 'weekly') vs lines 139, 150 (Lens 1 'daily') and line 310 (footer 'daily closes (≈3,650 obs)')
+- **Location:** bitcoin-power-law/index.html line 130 (hero figcaption 'weekly') vs lines 139, 150 (Lens 1 'daily') and line 310 (footer 'daily closes (≈3,650 obs)')
 - **Issue:** The hero figcaption says 'Blue = BTC (Coinbase, weekly)' (line 130), which matches the plotted PL.series (523 points at 7-day spacing — verified). But Lens 1 prose and the footer method describe the same dataset as daily: 'So ~3,650 daily prices are not 3,650 independent observations' (line 139), 'keep every day but tell the math how correlated it is' (line 150), and 'real Coinbase BTC-USD daily closes (≈3,650 obs) for all formal tests' (line 310). A careful reader cannot tell whether the analysis is on 523 weekly points or ~3,650 daily ones. (The formal tests may legitimately run on daily data while the chart is downsampled to weekly, but nothing on the page says so.)
 - **Evidence:** line 130: 'Blue = BTC (Coinbase, weekly)'; line 310: '2016–2026 real Coinbase BTC-USD daily closes (≈3,650 obs) for all formal tests'; PL.series length = 523 with 7-day gaps
 - **Fix:** Add one clarifying clause so the two cadences are reconciled, e.g. footnote the hero caption: 'chart downsampled to weekly for clarity; all formal tests use daily closes.' If the tests are in fact on the weekly series, correct the '≈3,650 daily' language in lines 139, 150, and 310 to match.
@@ -386,7 +386,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 19. No Twitter Card meta: X/Twitter previews degrade to a plain link
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head)
+- **Location:** bitcoin-power-law/index.html (head)
 - **Issue:** There is no <meta name="twitter:card"> (nor twitter:title/description/image). Without it, X renders a bare-link card. Every other shared page on the site sets it; Q.html line 14 uses summary_large_image. Quant/finance content like this is frequently shared on X, so the omission is consequential.
 - **Evidence:** No 'twitter:' string exists anywhere in index.html. Q.html line 14: '<meta name="twitter:card" content="summary_large_image">'.
 - **Fix:** Add '<meta name="twitter:card" content="summary_large_image">' and (optionally) twitter:title/twitter:description/twitter:image. Twitter will fall back to the OG tags for title/description/image, so at minimum the twitter:card declaration plus the OG block from the previous finding is enough.
@@ -396,7 +396,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 20. No canonical link: the page is reachable at two URLs with no canonical signal
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head)
+- **Location:** bitcoin-power-law/index.html (head)
 - **Issue:** There is no <link rel="canonical">. GitHub Pages serves this index at both https://scottn66.github.io/bitcoin-power-law/ and https://scottn66.github.io/bitcoin-power-law/index.html, and trailing-slash variants. Without a canonical, search engines may treat these as duplicates and split ranking signals, and OG/Twitter scrapers have no authoritative URL to attribute shares to.
 - **Evidence:** No 'rel="canonical"' present in index.html. The page is one HTML file served from a directory, so both /bitcoin-power-law/ and /bitcoin-power-law/index.html resolve.
 - **Fix:** Add '<link rel="canonical" href="https://scottn66.github.io/bitcoin-power-law/"/>' to <head> (same URL used for og:url).
@@ -406,7 +406,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 21. No favicon / apple-touch-icon: blank tab icon, inconsistent with house style
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head); also no icon files in assets/
+- **Location:** bitcoin-power-law/index.html (head); also no icon files in assets/
 - **Issue:** There is no <link rel="icon"> and no favicon asset in the folder, so browsers show a blank/default tab icon and bookmarks/home-screen saves have no icon. The site has an established pattern: decision-theory.html line 12-13 and robot-arm-sim/index.html line 11 both use an inline SVG-emoji data-URI favicon. The page even has a natural glyph for it — the bitcoin '₿' used in the nav brand (index.html line 98).
 - **Evidence:** No 'rel="icon"' in index.html; 'find' for *favicon*/*.ico/apple-touch* in the page folder returns nothing. House pattern, decision-theory.html: '<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns=...><text y=13 font-size=13>🪜</text></svg>" />'.
 - **Fix:** Add an inline SVG-emoji favicon matching the house pattern, e.g. a '₿' glyph: '<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>₿</text></svg>"/>'. Optionally add an apple-touch-icon.
@@ -416,7 +416,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 22. No theme-color meta despite a fully dark UI
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head; background defined at line 18 --bg:#0a0d12)
+- **Location:** bitcoin-power-law/index.html (head; background defined at line 18 --bg:#0a0d12)
 - **Issue:** The page is a deeply dark theme (--bg:#0a0d12, sticky translucent nav) but declares no <meta name="theme-color">. On mobile Chrome/Android and some PWA contexts the browser chrome will not match the page, producing a jarring light bar above the dark content.
 - **Evidence:** index.html line 18 sets '--bg:#0a0d12'; no 'theme-color' meta exists in the file.
 - **Fix:** Add '<meta name="theme-color" content="#0a0d12">' to <head> to match the page background.
@@ -426,7 +426,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 23. No JSON-LD structured data despite the page being a textbook ScholarlyArticle
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head)
+- **Location:** bitcoin-power-law/index.html (head)
 - **Issue:** The page is a long-form research note with a clear author, method/reproducibility section, references (Santostasi, Burger, Sornette), and a generated date — an ideal candidate for schema.org Article or ScholarlyArticle markup, which can enable richer search results and author attribution. The site already uses JSON-LD elsewhere (root index.html has a Person block), so the pattern exists. Currently there is none here.
 - **Evidence:** No 'application/ld+json' script in index.html. Root index.html lines 19-32 contain a '@type":"Person"' JSON-LD block, establishing the house uses structured data. The page has the raw fields: footer 'Generated <span id="genfoot">' (data.js generated_at='2026-06-16 07:20 UTC'), author byline material, and a reference list.
 - **Fix:** Add a JSON-LD '@type":"ScholarlyArticle"' (or 'Article') block with headline, description, author (Person: Scott Nelson), datePublished/dateModified (from data.js generated_at), and an image (the og-image). Keep it server-static rather than relying on the runtime data.js.
@@ -436,7 +436,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 24. Em-dash in <title> violates house style and risks awkward SERP/social truncation
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 6
+- **Location:** bitcoin-power-law/index.html line 6
 - **Issue:** The title 'Does Bitcoin Follow a Power Law? — An Econometric Autopsy' contains a literal em-dash (—). The site owner deliberately strips em-dashes from crawler/published pages (prior commit 'Strip em-dashes across crawler pages'), so this is an explicit house-style violation in the single most SEO-load-bearing string. The whole page body is also riddled with em-dashes, but the title is the one that shows in the browser tab, search results, and as the default OG/Twitter title. At ~52 characters it is borderline for SERP width, and the em-dash plus the trailing ' — An Econometric Autopsy' is exactly the kind of suffix Google truncates.
 - **Evidence:** index.html line 6: '<title>Does Bitcoin Follow a Power Law? — An Econometric Autopsy</title>' — the '—' is a U+2014 em-dash. Author's own published-corpus titles that pre-date the strip still show — (e.g. line 12 'City Cartography — Roads...'), confirming em-dash is the thing being removed.
 - **Fix:** Replace the em-dash with a colon or middot to match house style, e.g. '<title>Does Bitcoin Follow a Power Law? An Econometric Autopsy</title>' or '... Power Law? · An Econometric Autopsy'. Apply the same to og:title/twitter:title when added. (A full body em-dash sweep is out of scope for SEO but consistent with the owner's stated preference.)
@@ -446,7 +446,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 25. Four <figcaption> elements are not inside a <figure> (W3C validator error)
 
 - **Dimension:** standards · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html lines 130, 220, 243, 255
+- **Location:** bitcoin-power-law/index.html lines 130, 220, 243, 255
 - **Issue:** Per the HTML spec, a <figcaption> element must be a child of a <figure> element. Four captions are instead direct children of <div class="card">. Line 128-131: <div class="card"> ... <figcaption>Interactive: hover for fair value...</figcaption></div>. Same pattern at line 218-221 (oscillator), 241-244 (LPPLS), and 253-256 (rolling exponent). The W3C Nu validator reports each as a hard error: 'Element figcaption not allowed as child of element div in this context' / 'The figcaption element must be the first or last child of a figure element.' These four caption divs wrap a Plotly <div> (#hero, #osc, #lppls, #roll) rather than an <img>, so the author used a bare <figcaption> without the surrounding <figure>. Note the genuinely correct usage elsewhere (e.g. lines 141-142, 168-169, 197-198) where <figcaption> IS nested in <figure> with an <img> — so this is an inconsistency, not a global pattern.
 - **Evidence:** line 128 `<div class="card">`, line 129 `<div id="hero" class="plot" ...></div>`, line 130 `<figcaption>Interactive: hover for fair value vs. actual...`
 - **Fix:** Change the four wrapping `<div class="card">` to `<figure class="card">` (figure may contain flow content including the Plotly div plus a trailing figcaption), or replace the bare `<figcaption>` with a plain `<p class="figcaption">` / `<div class="cap">` styled the same. The simplest fix that preserves styling: add a `figure.card{...}` rule (or reuse `.card`) and swap `<div class="card">`→`<figure class="card">` (with matching `</figure>`) at lines 128/131, 218/221, 241/244, 253/256.
@@ -578,7 +578,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 7. No author meta and no robots meta
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html (head)
+- **Location:** bitcoin-power-law/index.html (head)
 - **Issue:** There is no <meta name="author"> identifying the author (the visible byline only credits tools — 'Built with Python · statsmodels · Plotly · seaborn', line 114 — not a person), and no <meta name="robots">. The author meta aids attribution and some discovery surfaces; an explicit robots='index,follow' is harmless reassurance for a page you want crawled (and the slot is the place you'd later add 'noindex' if you ever wanted to hide it).
 - **Evidence:** No 'name="author"' or 'name="robots"' in index.html. The byline at line 114 names only libraries, not a person.
 - **Fix:** Add '<meta name="author" content="Scott Nelson">' and '<meta name="robots" content="index,follow">' to <head>. Consider also adding a visible author name to the byline for human readers.
@@ -588,7 +588,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 8. Meta description front-loads a long jargon list and risks SERP truncation
 
 - **Dimension:** seo · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 7
+- **Location:** bitcoin-power-law/index.html line 7
 - **Issue:** The description is ~210 characters and ends in an eight-item comma list ('...mean reversion, LPPLS bubbles, structural stability, and risk.'). Google typically renders ~155-160 chars, so the tail list will be cut off and the snippet reads as a keyword dump rather than a hook. It is serviceable but not optimized for click-through.
 - **Evidence:** index.html line 7: content='An interactive, multi-lens econometric scrutiny of the Bitcoin power law: fit, inference, stationarity, model selection, mean reversion, LPPLS bubbles, structural stability, and risk.' (about 210 chars).
 - **Fix:** Tighten to ~150-155 chars leading with the payoff, e.g. 'An interactive, eight-lens econometric test of whether Bitcoin really follows a power law: honest error bars, model tournament, mean reversion, and more.' Reuse the same string for og:description.
@@ -598,7 +598,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 9. Obsolete charset attribute on the Plotly <script> (validator warning)
 
 - **Dimension:** standards · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html line 10
+- **Location:** bitcoin-power-law/index.html line 10
 - **Issue:** The <script> tag loading Plotly carries charset="utf-8". The charset content attribute on the script element was removed from HTML5; the W3C Nu validator emits the warning 'The charset attribute on the script element is obsolete.' It has no effect for an external script served by a modern CDN (the response's own Content-Type/charset governs decoding), so it is dead markup, not a functional bug. The document already declares UTF-8 via <meta charset="utf-8"> at line 4.
 - **Evidence:** line 10 `<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>`
 - **Fix:** Remove the `charset="utf-8"` attribute from the Plotly <script> tag so the document validates warning-free: `<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>`. (The MathJax and data.js scripts on lines 14-15 do not carry charset and are fine.)
@@ -608,7 +608,7 @@ The audit raised 69 candidate findings; adversarial verification confirmed 61 an
 ### 10. font-weight:750 / 650 are not in the loaded Inter weight set, so they will not render as intended
 
 - **Dimension:** standards · **Confidence:** high
-- **Location:** /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html lines 63 (h2) and 64 (h3); font request line 9
+- **Location:** bitcoin-power-law/index.html lines 63 (h2) and 64 (h3); font request line 9
 - **Issue:** The Google Fonts link (line 9) requests Inter as a discrete weight list: `Inter:wght@400;500;600;700;800` — NOT a variable range (which would be written `wght@400..800`). With a discrete-instance request, only the named weights 400/500/600/700/800 are delivered. The CSS then asks for `font-weight:750` (h2, line 63) and `font-weight:650` (h3, line 64). Those exact weights are not among the loaded faces, so the browser maps them to the nearest available face — 700 for both — meaning the 750/650 values silently render identically to 700 and the intended slightly-heavier headings never appear. Note: `font-weight:750`/`650` is VALID CSS syntax (CSS Fonts Level 4 allows any 1–1000 value), so this is not a validator error; it is a functional 'the value has no visible effect' issue. system-ui/-apple-system fallback fonts also generally only expose 100-step weights, so the fallback rounds too.
 - **Evidence:** line 9 `...css2?family=Inter:wght@400;500;600;700;800&...`; line 63 `h2{...font-weight:750;...}`; line 64 `h3{...font-weight:650;...}`
 - **Fix:** Either (a) load Inter as a variable axis so intermediate weights resolve: change the request to `Inter:wght@400..800`, or (b) snap the CSS to weights you actually load — `font-weight:700` for h2 (line 63) and `font-weight:600` for h3 (line 64). Option (b) is the minimal change and makes the rendered weight match what is shipped.
@@ -626,7 +626,7 @@ These candidate findings were checked and dismissed, which is itself a useful si
 - **Lens 1 prose treats ρ≈0.998 as residual autocorrelation, but the figcaption defines it as the level (not residual) lag-plot correlation, and the table labels it "residual lag-1"** — The finding's central claim — a semantic mismatch between the figcaption and the table — is wrong. The figcaption (index.html line 142) reads "Today's deviation from trend vs. yesterday's (ρ = 0.998)." "Deviation from trend" IS the residual, so this is a residual-on-lagged-residu
 - **MathJax tex-svg output has limited screen-reader accessibility as configured** — Refuted. The finding's core premise is factually wrong for the component actually loaded. index.html line 14 loads the MathJax 3 COMBINED component cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js. I inspected that bundle directly: it contains the line `r.Loader.preLoad("loader","st
 - **--mute (#93a1b2) used for small italic/secondary text passes AA only narrowly; verify on --card surfaces** — Self-refuting finding. I re-derived the WCAG contrast ratios for --mute (#93a1b2) using the standard sRGB-linear/relative-luminance formula and confirmed the finding's exact numbers: 6.77:1 on --card (#121821) and 7.40:1 on --bg (#0a0d12). It also clears 4.5:1 AA on every other s
-- **All external target=_blank links correctly carry rel="noopener" (no reverse-tabnabbing exposure)** — Confirmed the factual claims but this is a positive "no vulnerability" confirmation, not an actionable defect. Verified in /Users/scottnelson/Library/Mobile Documents/com~apple~CloudDocs/Desktop/website-related/scottn66.github.io/.audit-bitcoin/bitcoin-power-law/index.html: there
+- **All external target=_blank links correctly carry rel="noopener" (no reverse-tabnabbing exposure)** — Confirmed the factual claims but this is a positive "no vulnerability" confirmation, not an actionable defect. Verified in bitcoin-power-law/index.html: there
 - **Inline MathJax in the model-claims table cannot wrap and forces table overflow on mobile** — Refuted by direct measurement of the rendered page at both 375px and the finding's own stated 360px viewport. The "What each curve actually claims" table (index.html lines 182-190, inside the .card at line 180) does NOT overflow and does NOT push the page horizontally.
 
 Re-derive

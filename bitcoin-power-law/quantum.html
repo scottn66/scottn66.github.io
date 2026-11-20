@@ -4,14 +4,20 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Could a Quantum Computer Break Bitcoin? — An autopsy of a threat that isn't what you think</title>
-<meta name="description" content="Quantum doesn't break Bitcoin — it threatens the ownership of a countable set of coins whose public keys are already exposed. The math is solved; the hard part is coordination. An honest, anti-hype autopsy."/>
+<meta name="description" content="Quantum computing does not break Bitcoin; it threatens the coins whose public keys are already exposed. The math is solved, the hard part is coordination.">
+<link rel="canonical" href="https://scottn66.github.io/bitcoin-power-law/quantum.html">
+<meta property="og:title" content="Could a Quantum Computer Break Bitcoin? — An autopsy of a threat that isn't what you think">
+<meta property="og:description" content="Quantum computing does not break Bitcoin; it threatens the coins whose public keys are already exposed. The math is solved, the hard part is coordination.">
+<meta property="og:url" content="https://scottn66.github.io/bitcoin-power-law/quantum.html">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script>
   window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$','$$']] }, svg: { fontCache: 'global' } };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" id="MathJax-script" async integrity="sha384-KKWa9jJ1MZvssLeOoXG6FiOAZfAgmzsIIfw8BXwI9+kYm0lPCbC6yTQPBC00F1/L" crossorigin="anonymous"></script>
 <style>
   :root{
     --bg:#0a0d12; --bg2:#0e131a; --card:#121821; --card2:#0f141c; --line:#1f2731;
@@ -200,7 +206,7 @@
   <p>The punchline most coverage misses: <b>quantum threatens the ownership of exposed coins, not the integrity of the ledger.</b> Box A is the story; Box B is largely a non-event. Shor needs a <i>public key</i> to act on. Where the chain shows only the curtain — a hash — Shor has no target. That single fact partitions every coin into exposed and safe.</p>
 
   <div class="card"><table>
-    <thead><tr><th>Output type</th><th>What the public key is doing</th><th>Quantum status</th></tr></thead>
+    <thead><tr><th scope="col">Output type</th><th scope="col">What the public key is doing</th><th scope="col">Quantum status</th></tr></thead>
     <tbody>
       <tr><td><b>P2PK</b> (earliest coinbase coins)</td><td>Public key sits in the open, by the format's design</td><td><span class="pill no">Exposed</span> — key visible at rest</td></tr>
       <tr><td><b>Reused address</b> (any type, spent from at least once)</td><td>Public key was revealed the first time you spent</td><td><span class="pill no">Exposed</span> — key visible at rest</td></tr>
@@ -436,7 +442,7 @@
   <details><summary>▸ For the curious: the PQC signature sizes, and the exact status of BIP-360 and BIP-361</summary>
     <p><b>The signature-size trade-off.</b></p>
     <table>
-      <thead><tr><th>Scheme</th><th>Basis</th><th>Relative size</th><th>Security posture</th></tr></thead>
+      <thead><tr><th scope="col">Scheme</th><th scope="col">Basis</th><th scope="col">Relative size</th><th scope="col">Security posture</th></tr></thead>
       <tbody>
         <tr><td>Current (ECDSA/Schnorr)</td><td>Elliptic curve</td><td class="num">~64–96 B (sig + pubkey)</td><td>Quantum-vulnerable</td></tr>
         <tr><td><b>FN-DSA / Falcon</b></td><td>Lattice</td><td class="num">~1–2 KB</td><td>Compact; newer assumptions</td></tr>
@@ -520,7 +526,7 @@
   <details><summary>▸ For the curious: the false-alarm ledger — why "quantum broke crypto" headlines never survive review</summary>
     <p>Before panicking at the next "quantum just broke encryption" headline, install the right prior: that headline recurs every couple of years, and <b>none of the instances has survived review.</b></p>
     <table>
-      <thead><tr><th>Year</th><th>The claim</th><th>What actually happened</th></tr></thead>
+      <thead><tr><th scope="col">Year</th><th scope="col">The claim</th><th scope="col">What actually happened</th></tr></thead>
       <tbody>
         <tr><td><b>2019</b></td><td>Google's <b>Sycamore</b> achieves "quantum supremacy."</td><td>Real and important — but <b>random-circuit sampling</b>, a benchmark with no cryptographic content. It could not factor a number or break a key. Not cryptanalysis.</td></tr>
         <tr><td><b>recurring</b></td><td>"<b>Shor's algorithm factored 15</b> (and 21, and 35)."</td><td>True and a milestone each time — but these <b>do not scale.</b> They rely on hand-tuned circuits and prior knowledge of the answer; resource cost explodes long before practical numbers. A breakable 15 says nothing about a 256-bit key.</td></tr>

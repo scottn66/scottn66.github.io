@@ -1,7 +1,8 @@
 name: Build published-corpus manifest
 
 # Regenerates published-corpus.json (the P-plane machine-readable face
-# for the three-plane reconciliation rig) whenever site content changes.
+# for the three-plane reconciliation rig) and sitemap.xml whenever site
+# content changes.
 # Spec: AInt/_vault/_reconciliation.md
 
 on:
@@ -9,6 +10,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'published-corpus.json'   # don't re-trigger on our own commit
+      - 'sitemap.xml'
       - '.github/workflows/manifest.yml'
   workflow_dispatch: {}            # allow manual runs
 
@@ -23,7 +25,7 @@ jobs:
   manifest:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0           # full history so git log gives last_modified
 
@@ -37,12 +39,12 @@ jobs:
 
       - name: Commit if changed
         run: |
-          if git diff --quiet -- published-corpus.json; then
-            echo "published-corpus.json unchanged — nothing to commit."
+          if git diff --quiet -- published-corpus.json sitemap.xml; then
+            echo "published-corpus.json and sitemap.xml unchanged — nothing to commit."
           else
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add published-corpus.json
-            git commit -m "chore: regenerate published-corpus.json [skip ci]"
+            git add published-corpus.json sitemap.xml
+            git commit -m "chore: regenerate published-corpus.json and sitemap.xml [skip ci]"
             git push
           fi

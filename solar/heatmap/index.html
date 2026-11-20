@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>California Solar Viability Heatmap</title>
+<meta name="description" content="Interactive ZIP-level viability scores for all 2,593 California ZIP codes, scored with the same NREL-calibrated engine used in the individual city reports.">
+<link rel="canonical" href="https://scottn66.github.io/solar/heatmap/">
+<meta property="og:title" content="California Solar Viability Heatmap">
+<meta property="og:description" content="Interactive ZIP-level viability scores for all 2,593 California ZIP codes, scored with the same NREL-calibrated engine used in the individual city reports.">
+<meta property="og:url" content="https://scottn66.github.io/solar/heatmap/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -156,6 +163,7 @@
     color: #1B1464;
   }
   .tier-table {
+    display: block; overflow-x: auto;
     width: 100%;
     border-collapse: collapse;
     font-size: 0.88rem;
@@ -288,7 +296,7 @@
 
     <table class="tier-table">
       <thead>
-        <tr><th>Tier</th><th>TTS installs (ZIP3)</th><th>Appearance</th><th>Meaning</th></tr>
+        <tr><th scope="col">Tier</th><th scope="col">TTS installs (ZIP3)</th><th scope="col">Appearance</th><th scope="col">Meaning</th></tr>
       </thead>
       <tbody>
         <tr>

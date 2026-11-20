@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Teaching a Robot Arm to Crawl, and why our best AI got it 60 % wrong (until it didn't)</title>
 <meta name="description" content="The story version of the Q-learning crawler: a scroll-driven account of tuning a crawl, then closing the gap with a model-based method from 2002.">
+<link rel="canonical" href="https://scottn66.github.io/robot-arm-sim/narrative.html">
 <meta property="og:description" content="The story version of the Q-learning crawler: a scroll-driven account of tuning a crawl, then closing the gap with a model-based method from 2002.">
+<meta property="og:title" content="Teaching a Robot Arm to Crawl, and why our best AI got it 60 % wrong (until it didn't)">
 <meta property="og:url" content="https://scottn66.github.io/robot-arm-sim/narrative.html">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
 
 <!-- Math rendering -->
 <script>
   MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
 </script>
 <!-- polyfill.io removed: its CDN was compromised in the 2024 supply-chain attack; MathJax 3 needs no polyfill on modern browsers -->
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6/1Nxveei" crossorigin="anonymous"></script>
 
 <style>
   /* ---------- Type & color tokens ---------- */
@@ -29,7 +33,7 @@
   }
 
   * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
   body {
     background: var(--bg);
     color: var(--text);
@@ -102,6 +106,7 @@
     0%, 100% { opacity: 0.4; }
     50%      { opacity: 1.0; }
   }
+  @media (prefers-reduced-motion: reduce) { .hero .scroll-hint { animation: none; } }
 
   /* ---------- Acts ---------- */
   .act {
@@ -142,8 +147,11 @@
 
   /* ---------- Visuals (video / img blocks) ---------- */
   .visual {
-    margin: 2.5rem -2rem;
+    margin: 2.5rem 0;
     padding: 0;
+  }
+  @media (min-width: 600px) {
+    .visual { margin: 2.5rem -2rem; }
   }
   .visual video, .visual img {
     width: 100%;
@@ -160,6 +168,8 @@
   @media (min-width: 900px) {
     .visual { margin: 2.5rem -4rem; }
   }
+  mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+  @media (max-width:640px){mjx-container:not([display="true"]){display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}}
 
   /* ---------- Code & tables ---------- */
   code {
@@ -240,7 +250,7 @@
     closes the gap we spent eighteen minutes opening.
   </p>
   <figure>
-    <video autoplay loop muted playsinline poster="img/crawler_optimal.gif">
+    <video controls autoplay loop muted playsinline poster="img/crawler_optimal.gif">
       <source src="img/crawler_optimal.mp4" type="video/mp4">
       <img src="img/crawler_optimal.gif" alt="The optimal policy crawling forward smoothly">
     </video>
@@ -654,7 +664,7 @@
 
   <table>
     <thead>
-      <tr><th>approach</th><th class="num">max_velocity</th><th class="num">% of optimum</th></tr>
+      <tr><th scope="col">approach</th><th scope="col" class="num">max_velocity</th><th scope="col" class="num">% of optimum</th></tr>
     </thead>
     <tbody>
       <tr><td><strong>π* via VI (γ=0.99)</strong></td><td class="num"><strong>0.901</strong></td><td class="num"><strong>100 %</strong></td></tr>
@@ -743,7 +753,7 @@
 
   <div class="visual">
     <img src="img/title_card_act13.png"
-         alt="Sutton 1990 · Brafman & Tennenholtz 2002 · S&B Chapter 8">
+         alt="Sutton 1990 · Brafman & Tennenholtz 2002 · S&amp;B Chapter 8">
   </div>
 
   <p>
@@ -797,7 +807,7 @@
 
   <table>
     <thead>
-      <tr><th>condition</th><th class="num">budget</th><th class="num">max_v</th><th class="num">% of DP</th><th class="num">t to 85 %</th></tr>
+      <tr><th scope="col">condition</th><th scope="col" class="num">budget</th><th scope="col" class="num">max_v</th><th scope="col" class="num">% of DP</th><th scope="col" class="num">t to 85 %</th></tr>
     </thead>
     <tbody>
       <tr><td>ε-greedy</td><td class="num">100 k</td><td class="num">0.411</td><td class="num">46 %</td><td class="num">never</td></tr>
@@ -846,7 +856,7 @@
   </p>
 
   <div class="visual">
-    <video autoplay loop muted playsinline poster="img/crawler_race.gif">
+    <video controls autoplay loop muted playsinline poster="img/crawler_race.gif">
       <source src="img/crawler_race.mp4" type="video/mp4">
       <img src="img/crawler_race.gif" alt="4-panel race comparison">
     </video>
@@ -866,7 +876,7 @@
   </p>
 
   <div class="visual">
-    <video autoplay loop muted playsinline poster="img/crawler_cycle.gif">
+    <video controls autoplay loop muted playsinline poster="img/crawler_cycle.gif">
       <source src="img/crawler_cycle.mp4" type="video/mp4">
       <img src="img/crawler_cycle.gif" alt="16-step optimal limit cycle, slow motion">
     </video>
@@ -987,7 +997,7 @@
   <p>
     Source repo: <a href="https://github.com/scottn66/robot-arm-sim">github.com/scottn66/robot-arm-sim</a>
     · Dashboard view: <a href="index.html">index.html</a>
-    · Script: <a href="NARRATIVE.md">NARRATIVE.md</a>
+    · Script: <a href="https://github.com/scottn66/scottn66.github.io/blob/main/robot-arm-sim/NARRATIVE.md" target="_blank" rel="noopener">NARRATIVE.md</a>
   </p>
   <p>
     Built on UC Berkeley CS188's Pacman/crawler simulator, ported to
@@ -1007,5 +1017,10 @@
   });
 </script>
 
+<script>
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll("video[autoplay]").forEach(function (v) { v.removeAttribute("autoplay"); v.pause(); });
+    }
+  </script>
 </body>
 </html>

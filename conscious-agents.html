@@ -3,18 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>From Markov Chains to Conscious Agents — Trace Logic & the Edge of Physics</title>
+<title>From Markov Chains to Conscious Agents — Trace Logic &amp; the Edge of Physics</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><g fill='none' stroke='%235b4bd6' stroke-width='1.6' stroke-linecap='round'><circle cx='16' cy='16' r='14.1'/><ellipse cx='16' cy='16' rx='14.1' ry='4.7'/><ellipse cx='16' cy='16' rx='5' ry='14.1'/></g></svg>">
-<meta name="description" content="A rigorous, hierarchically organized study of Donald Hoffman &amp; Chetan Prakash's conscious-agent program: from textbook Markov chains and HMMs to the trace order, trace logic, observer windows, policy/meta-policy recursion, and the conjectural bridge to spacetime physics. Every claim tagged by epistemic status.">
+<meta name="description" content="A study of Hoffman and Prakash's conscious-agent program: from Markov chains and HMMs to trace logic and the conjectural bridge to spacetime physics.">
+<link rel="canonical" href="https://scottn66.github.io/conscious-agents.html">
+<meta property="og:title" content="From Markov Chains to Conscious Agents — Trace Logic & the Edge of Physics">
+<meta property="og:description" content="A study of Hoffman and Prakash's conscious-agent program: from Markov chains and HMMs to trace logic and the conjectural bridge to spacetime physics.">
+<meta property="og:url" content="https://scottn66.github.io/conscious-agents.html">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
 
 <!-- KaTeX (math) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"></script>
 
 <!-- highlight.js (Python) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
-<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/atom-one-dark.min.css" integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js" integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp" crossorigin="anonymous"></script>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +53,7 @@ html[data-theme="dark"]{
   --x-bg:#2c1228; --x-fg:#f0a6da; --x-bd:#6e2557;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: no-preference){html{scroll-behavior:smooth}}
 body{
   margin:0;background:var(--bg);color:var(--ink);
   font-family:"Newsreader",Georgia,serif;font-size:19px;line-height:1.62;
@@ -144,7 +150,7 @@ pre code{font-family:"JetBrains Mono",monospace;font-size:.8rem;line-height:1.6;
 .box.conj p{margin:.5rem 0}.box.conj p strong:first-child{color:var(--ink)}
 
 /* ---------- tables ---------- */
-.tbl-wrap{overflow-x:auto;margin:1.4rem 0;border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow)}
+.tbl-wrap{position:relative;overflow-x:auto;margin:1.4rem 0;border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow)}
 table{border-collapse:collapse;width:100%;font-family:"Inter",sans-serif;font-size:.82rem}
 th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top}
 th{background:var(--bg-soft);font-weight:700;color:var(--ink);position:sticky;top:0}
@@ -1030,7 +1036,7 @@ def dirichlet_energy(P, pi, f):
 
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Physical quantity</th><th>Proposed projection of…</th><th>Where</th></tr></thead>
+<thead><tr><th scope="col">Physical quantity</th><th scope="col">Proposed projection of…</th><th scope="col">Where</th></tr></thead>
 <tbody>
 <tr><td>Momentum / energy</td><td>\(1/d\), \(d=\)#asymptotic states; \(p=h/d,\ E=hc/d\)</td><td>eq. 44</td></tr>
 <tr><td>Position</td><td>index over asymptotic states</td><td>p. 19</td></tr>
@@ -1121,7 +1127,7 @@ def dirichlet_energy(P, pi, f):
 <h3>IX.2 · The positive‑geometry program itself <span class="tier t">T</span></h3>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Object</th><th>What it is</th><th>What physics it computes</th><th>Authors</th></tr></thead>
+<thead><tr><th scope="col">Object</th><th scope="col">What it is</th><th scope="col">What physics it computes</th><th scope="col">Authors</th></tr></thead>
 <tbody>
 <tr><td><strong>Amplituhedron</strong></td><td>A generalisation of a convex polytope into the Grassmannian \(\mathrm{Gr}(k,k+m)\) — the image of the positive Grassmannian \(\mathrm{Gr}_{\ge 0}(k,n)\) under a positive linear map \(Z\); a "positive geometry" with a canonical differential form</td><td>Scattering amplitudes in planar \(\mathcal{N}=4\) super‑Yang–Mills — the canonical form itself encodes the amplitude (tree amplitude / loop integrand); its residues on the geometry's boundaries encode factorization, whence locality &amp; unitarity emerge rather than being assumed. Form = amplitude is proven for the tree‑level \(m=4\) case (Even‑Zohar–Lakrec–Tessler, arXiv:2112.02703, Inventiones 2025) and open at loop level</td><td>Arkani‑Hamed &amp; Trnka, 2013 <a href="#refs">[arXiv:1312.2007]</a></td></tr>
 <tr><td><strong>Associahedron (ABHY)</strong></td><td>A polytope whose vertices are triangulations of a polygon (Catalan combinatorics), realised in kinematic space</td><td>Tree‑level bi‑adjoint scalar \(\phi^3\) amplitudes — the canonical form on the associahedron is the amplitude</td><td>Arkani‑Hamed, Bai, He &amp; Yan, 2017 <a href="#refs">[arXiv:1711.09102]</a></td></tr>
@@ -1260,7 +1266,7 @@ def dirichlet_energy(P, pi, f):
 <p>The authors' proposed identifications of Markov / recurrent-communicating-class (RCC) quantities with physical observables. All are conjectural; the recurring obstacle for <em>every</em> entry is the same — an <strong>undetermined dimensional bridge constant</strong>, since the projected quantity is dimensionless and the physical one is not.</p>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Observable</th><th>Proposed projection</th><th>Where</th><th>Note</th></tr></thead>
+<thead><tr><th scope="col">Observable</th><th scope="col">Proposed projection</th><th scope="col">Where</th><th scope="col">Note</th></tr></thead>
 <tbody>
 <tr><td><strong>Mass</strong></td><td>entropy rate of the RCC, \(h(Q)=-\sum_i\pi_i\sum_j Q_{ij}\log Q_{ij}\); deterministic cycle (zero entropy rate — the paper's non-standard "periodic kernels") \(\Rightarrow\) massless</td><td>eq. 47</td><td>the cleanest entry</td></tr>
 <tr><td><strong>Spin</strong></td><td>determinant of \(Q\) collapsed via a geometric-algebra "C-spin" to \(S\in\{0,\tfrac12,1\}\)</td><td>eq. 50, p. 30</td><td>⚠ the thinnest entry — a brief geometric-algebra sketch, not a worked construction</td></tr>
@@ -1284,7 +1290,7 @@ def dirichlet_energy(P, pi, f):
 <p>The program's one branded, numbered list — the aspirational derivation targets, each gated on the mathematics of §XI.1–§XI.2. The branding is the <strong>Trace Institute's</strong>, not the preprint's: the source is the Institute's research page ("Research → The Eight Conjectures," items 01/08–08/08 — a <em>pre-publication</em> source; the trace-logic anchor is itself a non-peer-reviewed preprint). The preprint contains no such list. Its own vocabulary is far thinner: one formally labelled <strong>Conjecture</strong> (p.26 — minimal total expected commute time iff periodic with period \(n\)), two inline "we conjecture" phrasings (the entropy-rate order, p.10; determinant/spin, p.24), and a numbered <em>six</em>-item list of "identifications" (p.19). Cite the preprint for the individual correspondences; cite the Institute for the branding.</p>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>#</th><th>Target</th><th>Conjectured claim</th></tr></thead>
+<thead><tr><th scope="col">#</th><th scope="col">Target</th><th scope="col">Conjectured claim</th></tr></thead>
 <tbody>
 <tr><td>01</td><td>Special relativity</td><td>Minkowski space emerges as the limiting behavior of Markov chains representing \(n\)-cycles as \(n\to\infty\) under certain conditions.</td></tr>
 <tr><td>02</td><td>General relativity</td><td>Curved spacetime emerges as the limiting behavior of special classes of <em>non-cyclic</em> Markov chains under certain conditions. <em>(Entirely unrealized in the papers — only the SR sketch exists.)</em></td></tr>
