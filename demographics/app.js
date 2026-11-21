@@ -601,6 +601,7 @@ async function selectCountry(iso3) {
   const c = state.countries[iso3];
   if (!c) return;
   state.selected = iso3;
+  document.dispatchEvent(new CustomEvent('demographics:select', { detail: { iso3 } }));   // forecast.js follows it
   if (state.playTimer) { clearInterval(state.playTimer); state.playTimer = null; }
   const panel = document.getElementById('country-panel');
   panel.innerHTML = `<div class="closed-hint">Loading ${c.n}…</div>`;
@@ -1099,6 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wirePicker();
     wireViewToggle();
     buildPortraits();
+    document.dispatchEvent(new CustomEvent('demographics:ready'));   // forecast.js: section 9 + the follow thread
     wireRouting();
   }).catch(err => {
     document.getElementById('map').innerHTML =

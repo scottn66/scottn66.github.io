@@ -119,6 +119,80 @@
     .portrait{border:1px solid var(--rule);border-radius:var(--radius);padding:.7rem .9rem;background:var(--card-bg)}
     .portrait b a{border:none}
     .portrait p{margin:.25rem 0 0;font-size:.92rem}
+    /* ---- takeaways, the follow-a-country thread, the forecast section ---- */
+    .takeaway{font-size:.95rem;border-left:3px solid var(--gold);padding:.1rem 0 .1rem .8rem;margin:.6rem 0 1.4rem}
+    .takeaway>b:first-child{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-right:.35rem}
+    .takeaway [data-tk]:not(:empty){display:block;margin-top:.35rem;background:var(--accent-soft);border-radius:6px;padding:.3rem .55rem}
+    .follow{margin:.6rem 0 .2rem;font-size:.85rem}
+    .follow .chips{display:flex;flex-wrap:wrap;gap:.35rem}
+    .chip{display:inline-flex;align-items:center;gap:.35rem;border:1px solid var(--rule);background:#fff;border-radius:99px;padding:.22rem .65rem;font:inherit;font-size:.8rem;color:var(--text);cursor:pointer}
+    .chip i{width:.6rem;height:.6rem;border-radius:50%;display:inline-block}
+    .chip.on{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text);font-weight:600}
+    .chip:focus-visible,.rowpick:focus-visible,#focus-pill button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .follow .any{display:block;margin-top:.45rem;color:var(--muted);font-size:.8rem}
+    .follow .any input{padding:.25rem .5rem;border:1px solid var(--rule);border-radius:8px;font:inherit;font-size:.8rem;width:180px;background:#fff}
+    #focus-pill{position:fixed;right:1rem;bottom:1rem;z-index:25;display:flex;gap:.7rem;align-items:center;background:#1b2330;color:#fff;border-radius:99px;padding:.4rem .5rem .4rem .95rem;font-size:.82rem;box-shadow:var(--shadow)}
+    #focus-pill[hidden]{display:none}
+    #focus-pill a{color:#cfe0ff;border:none}
+    #focus-pill button{background:rgba(255,255,255,.14);color:#fff;border:none;border-radius:50%;width:1.6rem;height:1.6rem;cursor:pointer;font-size:.8rem;line-height:1}
+    .lever{display:flex;flex-wrap:wrap;gap:.4rem 1rem;align-items:center;margin:1rem 0 .3rem;font-size:.88rem;font-weight:600}
+    .lever input[type=range]{flex:1 1 220px;accent-color:var(--accent);margin:0}
+    .lever output{font-variant-numeric:tabular-nums;min-width:6.4rem;text-align:right}
+    .lever-out{font-size:.85rem;color:var(--muted);margin:.1rem 0 .6rem;min-height:1.4em}
+    .ledger-wrap{overflow-x:auto}
+    table.ledger{font-size:.8rem;font-variant-numeric:tabular-nums}
+    table.ledger th small,table.ledger td small{font-weight:400}
+    table.ledger th,table.ledger td{white-space:nowrap;padding:.38rem .42rem}
+    table.ledger td.past{color:var(--muted)}
+    table.ledger tr.is-focus>*{background:var(--accent-soft)}
+    .cert{display:inline-block;width:.62em;height:.62em;border-radius:50%;border:1.5px solid var(--muted);margin-right:.35rem;background:transparent}
+    .cert.c2{background:var(--muted)}
+    .cert.c1{background:linear-gradient(90deg,var(--muted) 50%,transparent 50%)}
+    table.ledger.tight th,table.ledger.tight td{padding:.25rem .4rem;font-size:.74rem;white-space:nowrap}
+    .rowpick{background:none;border:none;border-bottom:1px solid rgba(31,78,158,.25);padding:0;font:inherit;font-weight:700;color:var(--accent);cursor:pointer;text-align:left}
+    .cert-key{font-size:.8rem;color:var(--muted);margin:.2rem 0 1rem}
+    /* ---- the cohort section ---- */
+    .co-controls{display:flex;flex-wrap:wrap;gap:.9rem 1.6rem;background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow);padding:.8rem 1rem;margin:1.1rem 0}
+    .co-ctl{flex:1 1 290px;min-width:0}
+    .co-lab{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:.35rem}
+    .co-controls .presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+    .co-toggle{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+    .co-controls .presets button,.co-toggle button{font:inherit;font-size:.8rem;line-height:1.3;padding:.34rem .2rem}
+    .co-controls .presets button+button,.co-toggle button+button{border-left:1px solid var(--rule)}
+    .co-controls .presets button span{display:block;font-variant-numeric:tabular-nums;font-weight:700}
+    .co-controls .presets button:focus-visible,.co-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+    .co-controls .presets button.on:focus-visible,.co-toggle button.on:focus-visible{outline-color:#fff}
+    .co-slide input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .co-slide{display:flex;align-items:center;gap:.7rem;margin-top:.6rem}
+    .co-slide input[type=range]{flex:1;min-width:0;accent-color:var(--accent);margin:0}
+    .co-slide output{font-weight:700;font-variant-numeric:tabular-nums;font-size:.92rem;white-space:nowrap}
+    .co-controls .follow{margin:0}
+    .co-who{font-size:.8rem;color:var(--muted);margin:.5rem 0 0}
+    .co-cards{display:grid;gap:1rem}
+    .co-card{min-width:0;background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .co-card>header{padding:.85rem 1rem 0}
+    .co-card h4{margin:0;font-size:1.12rem}
+    .co-k{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+    .co-def{font-size:.92rem;margin:.3rem 1rem .6rem}
+    .co-toggle{margin:0 1rem .6rem;max-width:22rem}
+    .co-eq{margin:0 1rem .8rem;padding:.45rem .7rem;background:var(--bg);border-radius:8px;font-size:.92rem;font-style:italic;text-align:center}
+    .co-eq b{font-style:normal;margin:0 .2rem}
+    .co-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:.6rem 1.2rem;padding:0 1rem .8rem;align-items:start}
+    .co-big{font-size:2.3rem;font-weight:700;line-height:1.1;letter-spacing:-.5px}
+    .co-unit{font-size:.8rem;color:var(--muted);min-height:1.2em}
+    .co-say{font-size:.9rem;margin:.5rem 0 0}
+    .co-par{font-size:.85rem;color:var(--muted);margin:.35rem 0 0}
+    .co-chart{min-height:178px}
+    .co-chart .ph{color:var(--muted);font-size:.8rem;text-align:center;padding:4rem 0}
+    .co-chart .cursor-pointer,.co-chart .nsewdrag{cursor:pointer}
+    .co-cap{font-size:.75rem;color:var(--muted);margin:.15rem 0 0;text-align:center;line-height:1.45}
+    .co-key{white-space:nowrap}
+    .co-sw{display:inline-block;width:.66rem;height:.66rem;border-radius:2px;margin:0 .25rem 0 .45rem}
+    .co-lever{margin:0;padding:.6rem 1rem;border-top:1px solid var(--rule);background:#FCFCFD;font-size:.85rem}
+    .co-lever b{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-right:.2rem}
+    .co-lever b+b,.co-lever b:not(:first-child){margin-left:.35rem}
+    @media(max-width:640px){.co-body{grid-template-columns:1fr}}
+    @media(max-width:560px){#focus-pill{left:.6rem;right:.6rem;bottom:.6rem;justify-content:space-between}}
     @media(max-width:880px){
       .page{grid-template-columns:1fr}
       h1{font-size:2rem}
@@ -158,7 +232,11 @@
         <li class="act">Part IV · The atlas</li>
         <li><a href="#atlas">The map</a></li>
         <li><a href="#portraits">Ten portraits</a></li>
-        <li class="act">Part V · Honesty</li>
+        <li class="act">Part V · The forecast</li>
+        <li><a href="#forecast">What is locked in, and what it costs</a></li>
+        <li><a href="#cohort">If you were born in…</a></li>
+        <li><a href="#claims">Claims on tomorrow's workers</a></li>
+        <li class="act">Part VI · Honesty</li>
         <li><a href="#limits">What this lens misses</a></li>
         <li><a href="#colophon">Sources &amp; methods</a></li>
       </ol></nav>
@@ -180,7 +258,10 @@
           ground up — what a human life looks like as a balance sheet, what happens when a
           country's balance sheets all hit the same phase at once — and then puts a score
           on every country on Earth, with the weights left unlocked so you can disagree
-          with me by dragging a slider.
+          with me by dragging a slider. It ends by committing to dated forecasts: what
+          is already locked in, what it costs in growth, and how much adaptation it
+          would take to cancel the bill. Then it turns the same arithmetic on one
+          birth cohort: yours.
         </p>
       </header>
 
@@ -207,7 +288,23 @@
         <div class="k">The claim this article defends</div>
         Age structure is the most under-priced forecastable input in economic and strategic
         planning — and the single number everyone quotes (the birth rate) is close to the
-        least informative way to read it.
+        least informative way to read it. The claim has two layers, and the article keeps
+        them apart. The <b>arithmetic</b> — how many workers and retirees, and when — is
+        set for decades, and §9 puts dates on it. The <b>economics</b> — what those
+        counts do to growth, capital and trade — depends on how societies adapt, so it is
+        stated as a hurdle to clear rather than a fate, and §12 tests it against the
+        evidence.
+      </div>
+      <div class="callout gold" id="thread">
+        <div class="k">One argument, one country at a time</div>
+        The figures are five steps of a single argument: a population's <b>shape</b>
+        (Fig 1), the <b>escalator</b> that produces it (Fig 2), what each age <b>earns
+        and costs</b> (Fig 3), the <b>ratio</b> that results (Fig 4), and what that ratio
+        does to <b>growth</b> (Figs 7 and 8). Pick a country and it stays highlighted
+        through all of them, with its own numbers under each chart. Clicking a line, a
+        point, or a country on the map does the same. Section 10 then reads the
+        country you picked along one lifetime: yours.
+        <div class="follow"></div>
       </div>
 
       <h2 id="shapes">1 · Pyramid, column, urn</h2>
@@ -236,6 +333,9 @@
           (share of that country's population), UN WPP 2024 medium variant.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Find the widest bar and you have read the
+        chart: ages 0–4 in Nigeria, 35–39 in the United States, 75–79 in Japan in 2050.
+        Figure 3 puts a price on each of those ages.</p>
       <p>
         The three silhouettes are not three destinies; they are three <i>timestamps on the
         same road</i>. Nigeria is where South Korea was in 1965. Japan is where South Korea
@@ -292,6 +392,15 @@
           shown on its own.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Every line crosses replacement, and the later
+        the start the steeper the drop. Germany crossed around
+        <span data-fc="tfrx:DEU">1969</span> and the United States around
+        <span data-fc="tfrx:USA">1973</span>. South Korea, which began above six births
+        per woman, crossed in <span data-fc="tfrx:KOR">1983</span>, China in
+        <span data-fc="tfrx:CHN">1992</span>, India in <span data-fc="tfrx:IND">2019</span>.
+        Nigeria is projected to cross around <span data-fc="tfrx:NGA">2078</span>.
+        Figure 4 shows the same sequence arriving a working lifetime later, as a
+        falling ratio of workers to retirees.<span data-tk="tfr"></span></p>
       <div class="callout gold">
         <div class="k">The staggered-cliff structure of the present</div>
         Because industrialization arrived in waves, the fertility collapses are arriving in
@@ -329,6 +438,10 @@
           income). Shaded: the two deficits and the one surplus that must pay for them.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> On this profile income exceeds consumption
+        only between about ages 32 and 59. Fewer than thirty years of a life pay for
+        the rest of it, and every ratio in this article is a way of counting how many
+        people are inside that window.</p>
       <p>Walking the curve, tranche by tranche:</p>
       <table>
         <thead>
@@ -397,7 +510,7 @@
           happens anyway. Two caveats travel with this mechanism everywhere in the
           article: the empirical support for large demographic asset-price effects is
           weak (Poterba's verdict: "modest at best" — real retirees sell down far more
-          slowly than the model's; see §9), and the whole capital-scarcity leg is
+          slowly than the model's; see §12), and the whole capital-scarcity leg is
           regime-dependent — it presumes old age is asset-funded rather than
           transfer-funded (see the callout in §4).
         </p>
@@ -447,7 +560,8 @@
         The second term <i>is</i> the <b>first demographic dividend</b> (UN Population
         Division Technical Paper 2017/1): it exists exactly while the support ratio is
         rising, adds to growth one-for-one while it lasts, and is an accounting identity —
-        not a causal promise. When fertility first falls, a country gets its golden
+        not a causal promise (§9 computes it, period by period, for 1950–2100). When
+        fertility first falls, a country gets its golden
         decades: the huge final pre-collapse cohorts flow into working age while the
         number of children they must support shrinks and the retirees above them are
         still few. Bloom and Williamson credit this phase with as much as a third of East
@@ -470,7 +584,7 @@
         both points in mind through the rest of this article: they are the strongest
         internal check on any deterministic aging→decline story, including the one this
         article is flirting with. The two-period model in §3's aside runs on the
-        asset-funded regime's rails; §9 collects the counter-evidence.
+        asset-funded regime's rails; §12 collects the counter-evidence.
       </div>
       <div class="callout warn">
         <div class="k">The no-kids acceleration</div>
@@ -500,7 +614,7 @@
         shrinking birth cohort therefore takes decades to dent aggregate demand; the
         drought arrives when the <i>prime-age</i> tranche thins, one generation after
         the birth dearth. (Zeihan's version puts peak consumption in the 20s–30s, which
-        moves his timelines earlier than the age profiles support — see §9.)
+        moves his timelines earlier than the age profiles support — see §12.)
       </p>
       <p>
         The trade channel isn't a metaphor; it's measured. Higgins (1998,
@@ -536,7 +650,7 @@
         absorbing the world's excess asset demand) — exactly the country-by-country
         rotation the capital-shift indicator watches. So read §3's toy model as a story
         about <i>which countries</i> rotate from financing the world to billing it, not
-        about the world price of capital going up (§9 grades the original claim).
+        about the world price of capital going up (§12 grades the original claim).
       </p>
       <figure>
         <div id="fig-sr" class="chart"><div class="ph">Figure 4 · support ratios, 1950–2100 — loading…</div></div>
@@ -546,13 +660,31 @@
           stops working without major reform. Note who enters it, and when.
         </figcaption>
       </figure>
+      <p class="takeaway"><b>Takeaway</b> Countries enter the shaded band in the order
+        they boarded the escalator: Japan around <span data-fc="sr2:JPN">2016</span>,
+        Germany around <span data-fc="sr2:DEU">2031</span>, South Korea around
+        <span data-fc="sr2:KOR">2035</span>, China around
+        <span data-fc="sr2:CHN">2046</span>. Up to the 2045 line every worker in the
+        ratio is already born, so the first three dates are arithmetic rather than
+        projection (Figure 6). The United States does not arrive until around
+        <span data-fc="sr2:USA">2074</span>, and that date does depend on births that
+        have not happened.<span data-tk="sr"></span></p>
       <figure id="fig-ca-wrap" hidden>
         <div id="fig-ca" class="chart"><div class="ph">Figure 5 · current account vs. age — loading…</div></div>
         <figcaption>
           Fig 5 — Current-account balance (% of GDP) against median age.
-          Aged industrial economies cluster in the surplus quadrant: exporting is what a
-          country does when its own consumers have retired.
+          Aged industrial economies sit mostly in the surplus half, but the cloud is
+          wide; the numbers below say how wide.
         </figcaption>
+        <p class="takeaway"><b>Takeaway</b> Age shifts the odds of a surplus; it does
+          not decide it. Across these countries the correlation is only
+          <span data-fc="ca:r">0.27</span>. Under a median age of 25,
+          <span data-fc="ca:young:pos">13</span> of <span data-fc="ca:young:n">46</span>
+          run a surplus and the average balance is
+          <span data-fc="ca:young:mean">−4.2</span>% of GDP. At 40 and over it is
+          <span data-fc="ca:old:pos">22</span> of <span data-fc="ca:old:n">39</span> and
+          <span data-fc="ca:old:mean">+1.6</span>%. The demographic channel is real
+          and it is one input among several.<span data-tk="ca"></span></p>
       </figure>
       <div class="aside-box" id="fig-ca-note">
         <span class="k">Data note</span> — Figure 5 (current account vs. age structure)
@@ -633,7 +765,8 @@
         regardless of what fertility does next, because everyone who will be over 25 in
         2050 already exists. This is the fixity principle doing real analytical work:
         these are not forecasts that might embarrass anyone; they are demographic
-        accounting.
+        accounting. Figure 6 in §9 measures how far that reach extends: to 2045 for
+        workers and to 2090 for retirees.
       </div>
 
       <h2 id="score">6 · A composite demographic-strategic score</h2>
@@ -768,7 +901,664 @@
         <!-- filled by app.js from the narrative templates below -->
       </div>
 
-      <h2 id="limits">9 · What this lens misses</h2>
+      <h2 id="forecast">9 · The forecast: what is locked in, what it costs, what would cancel it</h2>
+      <p>
+        An essay that opens by calling demographics forecastable owes its reader some
+        forecasts. This section makes them, and marks each one by how much of it is
+        arithmetic on people who already exist and how much is an assumption about
+        people who do not. It has three exhibits — how far the certainty reaches, what
+        age structure does to growth inside that reach, and how much adaptation would
+        cancel the effect — and ends with a table of dated claims that time can check.
+      </p>
+      <div class="follow"></div>
+
+      <h3 id="horizon">How far the fixity principle reaches</h3>
+      <p>
+        Section 0 claimed that the workforce of the 2040s is already standing in today's
+        kindergartens. Figure 6 measures that claim. Take the UN's medium projection for
+        any future year and ask what share of each group had already been born in 2025.
+      </p>
+      <figure>
+        <div id="fig-horizon" class="chart" role="img" aria-labelledby="cap-fig-horizon"><div class="ph">Figure 6 · the certainty horizon — loading…</div></div>
+        <figcaption id="cap-fig-horizon">
+          Fig 6 — Share of the world's population in each future year that was already
+          born in 2025, by group (UN WPP 2024 medium variant, five-year steps). Where a
+          line sits at 100%, the count depends on survival and migration but on no
+          future birth.
+        </figcaption>
+      </figure>
+      <p class="takeaway"><b>Takeaway</b> Certainty has two horizons. Everyone of working
+        age in 2045 is alive today; after that the already-born share falls to
+        <span data-fc="born:wa:2050">88%</span> in 2050 and
+        <span data-fc="born:wa:2070">43%</span> in 2070. Retirees are known for far
+        longer: every person who will be 65 or older in 2090 has been born. In any
+        old-age ratio, then, births can no longer change the top for sixty-five years
+        or the bottom for twenty.<span data-tk="horizon"></span></p>
+      <p>
+        That asymmetry is why the claims below get firmer the nearer and the older their
+        subject. A statement about pensioners in 2060 rests on people who are over
+        thirty now. A statement about schoolchildren in 2060 rests on a fertility
+        assumption. The economic support ratio splits the same way:
+        <span data-fc="born:prod:2050">95%</span> of the world's effective producers in
+        2050 are already born, against <span data-fc="born:cons:2050">74%</span> of its
+        effective consumers, because the consumers include children not yet conceived.
+        One caution: already born means born somewhere. For a single country, migration
+        still moves people between ledgers, which makes the Gulf states and the
+        traditional immigration countries the least certain rows in any table here.
+      </p>
+
+      <h3 id="growth-term">The growth identity, evaluated</h3>
+      <p>
+        Section 4 split growth in income per effective consumer into productivity growth
+        plus the growth rate of the economic support ratio, and moved on. The second
+        term can simply be computed, because the pipeline holds the support ratio of
+        every country every five years from 1950 to 2100. Figure 7 draws it as a weather
+        map: blue where age structure added to growth, red where it subtracts.
+      </p>
+      <figure>
+        <div id="fig-growth" class="chart" role="img" aria-labelledby="cap-fig-growth"><div class="ph">Figure 7 · the demographic growth term — loading…</div></div>
+        <figcaption id="cap-fig-growth">
+          Fig 7 — The demographic growth term, \( \tfrac{d}{dt}\ln SR_{\text{econ}} \), in
+          percentage points of annual growth, by five-year period. Blue adds to growth,
+          red subtracts; full color at ±1.5. Rows run in the order each country's
+          support ratio peaked. Left of 2025 is history; from 2025 to 2045 every worker
+          is already born; right of 2045 the projection leans increasingly on births
+          that have not happened.
+        </figcaption>
+      </figure>
+      <details class="aside-box">
+        <summary>Figure 7 as a table (decade averages)</summary>
+        <div class="ledger-wrap" id="growth-table"></div>
+      </details>
+      <p class="takeaway"><b>Takeaway</b> The dividend is a wave that crosses the map
+        once. The blue band runs diagonally: Japan in the 1960s, South Korea in the late
+        1980s, China in the late 1990s, India in the 2000s, Nigeria not until the
+        2040s. A red band of comparable depth follows each one, because the cohort that
+        raised the ratio by entering work lowers it by leaving. The world row is the
+        sum: its support ratio climbed from <span data-fc="world:esrtrough">1975</span>
+        and peaks in <span data-fc="world:esrpeak">2025</span>.<span data-tk="growth"></span></p>
+      <p>
+        The sizes are not small. South Korea's age structure added
+        <span data-fc="divpk:KOR">+1.3</span> points a year to growth at its peak in the
+        late 1980s, and subtracts about one point a year from now to 2050
+        (<span data-fc="g:KOR">−1.0</span>). Over the same 2025–2050 window the term
+        averages <span data-fc="g:ITA">−0.7</span> in Italy,
+        <span data-fc="g:CHN">−0.6</span> in China, <span data-fc="g:JPN">−0.5</span> in
+        Japan, <span data-fc="g:DEU">−0.5</span> in Germany,
+        <span data-fc="g:RUS">−0.5</span> in Russia and
+        <span data-fc="g:USA">−0.2</span> in the United States. It is positive in Mexico
+        (<span data-fc="g:MEX">+0.1</span>), India (<span data-fc="g:IND">+0.2</span>)
+        and Nigeria (<span data-fc="g:NGA">+0.7</span>). For the world as a whole it is
+        close to zero (<span data-fc="world:g">−0.1</span>): the global dividend is
+        over, and what is left is its redistribution — headwinds in the countries that
+        aged first, tailwinds in those that have not yet.
+      </p>
+      <p>
+        Read each number as a hurdle rate. It is the productivity growth a country must
+        find merely to keep income per effective consumer growing as fast as output per
+        effective worker. It is not a forecast of GDP, because nothing in the identity
+        says whether the productivity will be found; §12 collects the evidence that, so
+        far, aging economies have found a good deal of it.
+      </p>
+
+      <h3 id="offsets">What would cancel it</h3>
+      <p>
+        The identity also says what an offset has to look like. Either productivity
+        grows faster, or the support ratio is kept from falling: people work longer,
+        more of them work, or more workers arrive. Section 12 reviews the evidence on
+        each. One of them can be priced with the machinery already on this page.
+        Suppose that by 2050 working lives run some years longer than the Figure 3
+        profile assumes — the exit from work moves later and consumption stays as it
+        is. The slider recomputes every country's 2050 support ratio on that
+        assumption.
+      </p>
+      <div class="lever">
+        <label for="lever">Working lives longer by 2050</label>
+        <input type="range" id="lever" min="0" max="10" step="0.5" value="0" />
+        <output id="lever-val" for="lever">+0.0 years</output>
+      </div>
+      <p class="lever-out" id="lever-out" aria-live="polite"></p>
+      <figure>
+        <div id="fig-hurdle" class="chart" role="img" aria-labelledby="cap-fig-hurdle"><div class="ph">Figure 8 · the hurdle and the lever — loading…</div></div>
+        <figcaption id="cap-fig-hurdle">
+          Fig 8 — Average demographic growth term, 2025–2050, with working lives as they
+          are (light) and extended by the slider's amount by 2050 (dark). The label on
+          each row is the break-even: the extension that would leave the 2050 support
+          ratio where it stands today.
+        </figcaption>
+      </figure>
+      <p class="takeaway"><b>Takeaway</b> Longer working lives are a real offset, and for
+        the oldest economies not a small one to ask for. Holding the support ratio at
+        its 2025 level takes about <span data-fc="k:KOR">7.1</span> more working years
+        in South Korea, <span data-fc="k:ITA">5.6</span> in Italy, roughly four in
+        Japan, China, Germany and Russia, and <span data-fc="k:USA">1.5</span> in the
+        United States. Mexico, India and Nigeria have no gap to close before
+        2050.<span data-tk="hurdle"></span></p>
+      <p>
+        Three cautions. The break-even is a unit of account, not a policy: it moves the
+        whole exit from work, which no retirement-age law does on its own. It holds
+        consumption fixed. And it rests on one stylized profile for every country (§4),
+        so compare rows rather than reading levels. Migration and automation, the other
+        two offsets, do not reduce to a slider with this page's data; §12 gives their
+        published magnitudes.
+      </p>
+
+      <h3 id="ledger-h">The ledger</h3>
+      <p>
+        Last, the dated claims. Each is computed from the same files as everything else
+        on this page, on a five-year grid, so read the years as approximate. The marker
+        in each cell says how much of the claim rests on people already born. The
+        columns, left to right: when the working-age population (20–64) peaks; when the
+        economic support ratio peaks, which is when the first dividend ends; when the
+        headcount ratio falls to two workers per retiree; the average growth term for
+        2025–2050; the change in the support ratio by 2050; the longer working life
+        that would hold it level; and when total population peaks.
+      </p>
+      <div class="ledger-wrap" id="ledger"><p class="atlas-note">The ledger is built from the data when this section loads.</p></div>
+      <p class="cert-key"><span class="cert c2" aria-hidden="true"></span>rests only on people already born ·
+        <span class="cert c1" aria-hidden="true"></span>rests partly on births that have not happened ·
+        <span class="cert c0" aria-hidden="true"></span>rests mostly on them. Grey dates have already
+        passed. Select a country's name to follow it through the figures.</p>
+      <p>
+        Four of these can be checked within about a decade. Italy and Germany reach two
+        workers per retiree around <span data-fc="sr2:ITA">2030</span> and
+        <span data-fc="sr2:DEU">2031</span>, South Korea around
+        <span data-fc="sr2:KOR">2035</span>, and the world's own support ratio turns
+        down before 2030. If the UN's next revisions move those dates by more than a
+        few years, the fixity principle is weaker than this article says it is, and
+        that would be worth knowing.
+      </p>
+
+      <h2 id="cohort">10 · What this means if you were born in <span id="co-title">1996–2000</span></h2>
+      <p>
+        Everything above is about countries. This section turns the same arithmetic
+        on one life. Choose when you were born and which country to look at. The
+        page then follows your
+        <b>cohort</b>: the people born in the same five years as you who live in the
+        same country, including those who moved there. A cohort is named here by its
+        last birth year, so the 2000 cohort is everyone born from 1996 to 2000.
+      </p>
+      <p>
+        Three questions follow. What does your country's age mix do to incomes while
+        you work? What does a pension cost you, and what does it pay back? How
+        crowded is the job market when you arrive? Each answer sits beside the same
+        answer for your <b>parents' cohort</b>, born twenty-five years before yours.
+        This is arithmetic about groups of people. It is not financial advice for
+        any one of them.
+      </p>
+      <div class="co-controls">
+        <div class="co-ctl">
+          <span class="co-lab" id="co-born-lab">Born</span>
+          <div class="presets" id="co-presets" role="group" aria-labelledby="co-born-lab">
+            <button type="button" data-b="1950" aria-pressed="false">Boomer <span>1950</span></button>
+            <button type="button" data-b="1975" aria-pressed="false">Gen X <span>1975</span></button>
+            <button type="button" data-b="1990" aria-pressed="false">Millennial <span>1990</span></button>
+            <button type="button" data-b="2000" aria-pressed="true" class="on">Gen Z <span>2000</span></button>
+          </div>
+          <div class="co-slide">
+            <input type="range" id="co-year" min="1950" max="2010" step="5" value="2000"
+                   aria-labelledby="co-born-lab" aria-valuetext="born 1996 to 2000" />
+            <output id="co-year-out" for="co-year">1996–2000</output>
+          </div>
+        </div>
+        <div class="co-ctl">
+          <span class="co-lab">Country</span>
+          <div class="follow"></div>
+          <p class="co-who" id="co-who" aria-live="polite">Showing the United States until you choose a country.</p>
+        </div>
+      </div>
+
+      <h3 id="life-strip">Your life on your country's clock</h3>
+      <p>
+        One number does most of the work here. <b>Workers per retiree</b> is the
+        number of people aged 20 to 64 for each person aged 65 or over; §4 calls it
+        the headcount support ratio. Figure 9 lays your life along one line, from
+        birth on the left to age 100 on the right, with the calendar year under each
+        age. The heavier curve is your country's workers per retiree in that year.
+        The lighter grey curve is the same country at the same ages for your
+        parents' cohort.
+      </p>
+      <figure>
+        <div id="fig-life" class="chart" role="img" aria-labelledby="cap-fig-life"><div class="ph">Figure 9 · your life on your country's clock — loading…</div></div>
+        <figcaption id="cap-fig-life">
+          Fig 9 — Workers (20–64) per retiree (65+) in the chosen country, plotted
+          against the age of the chosen cohort, with the parents' cohort at the same
+          ages as the thinner grey line. Shading follows Figure 3: green for the working years, red
+          for retirement. Lines are dotted after 2025 (UN WPP 2024 medium variant,
+          five-year steps). Ages are those of the youngest in the cohort; the oldest
+          are four years ahead.
+        </figcaption>
+      </figure>
+      <details class="aside-box">
+        <summary>Figure 9 as a table</summary>
+        <div class="ledger-wrap" id="life-table"></div>
+      </details>
+      <p class="takeaway"><b>Takeaway</b> The same birthday arrives in a different
+        country. An American born in the 2000 cohort turns 45 with
+        <span data-fc="co:sr45:USA:2000">2.5</span> workers for each retiree; the
+        parents' cohort had <span data-fc="co:sr45:USA:1975">3.6</span> at that age.
+        In South Korea the step is from <span data-fc="co:sr45:KOR:1975">4.1</span>
+        to <span data-fc="co:sr45:KOR:2000">1.4</span>, and by 70 it is
+        <span data-fc="co:sr70:KOR:2000">0.9</span>: fewer than one worker per
+        retiree. In Nigeria the same cohort turns 45 with
+        <span data-fc="co:sr45:NGA:2000">12.8</span>.<span data-tk="co-strip"></span></p>
+
+      <h3 id="cohort-cards">Three lines of arithmetic</h3>
+      <p>
+        Each card below has one equation, one number for your cohort and one bar for
+        every cohort from 1925 to 2010, so you can see where yours stands. The key
+        under each chart marks your bar and your parents'. Select a bar to move to
+        that cohort. Under each card, one line separates what is already fixed from
+        what you or your country still chooses.
+      </p>
+      <figure class="co-cards">
+        <div class="co-card" role="group" aria-labelledby="co-t1">
+          <header><span class="co-k">Card 1</span><h4 id="co-t1">Career weather</h4></header>
+          <p class="co-def">
+            Income per person grows for two reasons: each worker produces more, or
+            there are more workers for each consumer. The second is the
+            <b>support ratio</b> of §4, effective workers per effective consumer.
+            Its yearly change, in percentage points of growth, is the weather your
+            career happens in. Below zero is a headwind. Above zero is a tailwind.
+          </p>
+          <p class="co-eq">income growth <b>=</b> productivity growth <b>+</b> change in the support ratio</p>
+          <div class="co-body">
+            <div class="co-num">
+              <div class="co-big" id="co-g-big">…</div>
+              <div class="co-unit" id="co-g-unit">points a year</div>
+              <p class="co-say" id="co-g-say"></p>
+              <p class="co-par" id="co-g-par"></p>
+            </div>
+            <div class="co-mini">
+              <div id="fig-co-g" class="co-chart" role="img" aria-labelledby="cap-co-g"><div class="ph">loading…</div></div>
+              <p class="co-cap" id="cap-co-g">Career term by birth cohort.</p>
+            </div>
+          </div>
+          <p class="co-lever"><b>Fixed</b> Who will be of working age until 2045:
+            they are already born (Figure 6). <b>Still chosen</b> How fast
+            productivity grows, how long and how many people work, and who may move
+            in. The number is a hurdle to clear, not a forecast of your pay (§9).</p>
+        </div>
+
+        <div class="co-card" role="group" aria-labelledby="co-t2">
+          <header><span class="co-k">Card 2</span><h4 id="co-t2">The pension deal</h4></header>
+          <p class="co-def">
+            In a <b>pay-as-you-go</b> pension, this year's workers pay this year's
+            retirees. Two rates describe it. The <b>replacement rate</b> is the
+            pension as a share of average pay. The <b>contribution rate</b> is the
+            share of pay that workers hand over. When there are fewer workers per
+            retiree, one of the two has to give. Choose which one is held.
+          </p>
+          <div class="presets co-toggle" id="co-mode" role="group" aria-label="Which side of the pension is held fixed">
+            <button type="button" data-mode="benefit" aria-pressed="true" class="on">Benefits held</button>
+            <button type="button" data-mode="contrib" aria-pressed="false">Contributions held</button>
+          </div>
+          <p class="co-eq" id="co-p-eq">contribution rate <b>=</b> replacement rate <b>÷</b> workers per retiree</p>
+          <div class="co-body">
+            <div class="co-num" aria-live="polite">
+              <div class="co-big" id="co-p-big">…</div>
+              <div class="co-unit" id="co-p-unit"></div>
+              <p class="co-say" id="co-p-say"></p>
+            </div>
+            <div class="co-mini">
+              <div id="fig-co-p" class="co-chart" role="img" aria-labelledby="cap-co-p"><div class="ph">loading…</div></div>
+              <p class="co-cap" id="cap-co-p">Pension arithmetic by birth cohort.</p>
+            </div>
+          </div>
+          <p class="co-lever"><b>Fixed</b> Who will be of pension age until 2090 and
+            of working age until 2045: all are already born. <b>Still chosen</b>
+            Which side gives way — the
+            pension, the contribution or the retirement age — and how much you save
+            outside the scheme.</p>
+        </div>
+
+        <div class="co-card" role="group" aria-labelledby="co-t3">
+          <header><span class="co-k">Card 3</span><h4 id="co-t3">The entry market</h4></header>
+          <p class="co-def">
+            The same arithmetic has a side that favours the young. Count the people
+            arriving at working age for each person about to leave it, in the year
+            your cohort is 20 to 24. The first group are the <b>entrants</b>. The
+            second, aged 60 to 64, are the retirees-to-be.
+          </p>
+          <p class="co-eq">entrants per retiree-to-be <b>=</b> people aged 20–24 <b>÷</b> people aged 60–64</p>
+          <div class="co-body">
+            <div class="co-num">
+              <div class="co-big" id="co-e-big">…</div>
+              <div class="co-unit" id="co-e-unit"></div>
+              <p class="co-say" id="co-e-say"></p>
+              <p class="co-par" id="co-e-par"></p>
+            </div>
+            <div class="co-mini">
+              <div id="fig-co-e" class="co-chart" role="img" aria-labelledby="cap-co-e"><div class="ph">loading…</div></div>
+              <p class="co-cap" id="cap-co-e">Entrants per retiree-to-be by birth cohort.</p>
+            </div>
+          </div>
+          <p class="co-lever"><b>Fixed</b> The size of your cohort and of the one
+            about to retire. <b>Still chosen</b> How employers respond — higher pay,
+            machines or recruiting abroad — and what you train for.</p>
+        </div>
+        <figcaption id="cap-fig-cards">
+          Fig 10 — Three quantities for one cohort in the chosen country, each with
+          one bar per five-year birth cohort; the parents' bar is hatched. Career weather: the average yearly
+          change in the economic support ratio between ages 25 and 65. The pension
+          deal: a stylised pay-as-you-go scheme under two fixed rules, with an
+          illustrative replacement rate of 40%. The entry market: people aged 20–24
+          over people aged 60–64 in the year the cohort is 20–24. UN WPP 2024 medium
+          variant.
+        </figcaption>
+      </figure>
+      <p class="takeaway"><b>Takeaway</b> Born later does not simply mean worse off.
+        In the United States the career headwind is larger for the 1975 cohort
+        (<span data-fc="co:g:USA:1975">−0.23</span>) than for the 2000 cohort
+        (<span data-fc="co:g:USA:2000">−0.18</span>). Japan
+        (<span data-fc="co:g:JPN:1975">−0.57</span>, then
+        <span data-fc="co:g:JPN:2000">−0.39</span>) and Germany
+        (<span data-fc="co:g:DEU:1975">−0.46</span>, then
+        <span data-fc="co:g:DEU:2000">−0.30</span>) show the same order. In South
+        Korea and China it deepens instead: <span data-fc="co:g:KOR:1975">−0.36</span>
+        to <span data-fc="co:g:KOR:2000">−1.00</span>, and
+        <span data-fc="co:g:CHN:1975">−0.03</span> to
+        <span data-fc="co:g:CHN:2000">−0.65</span>. What rises with every cohort in
+        all five is the pension bill. With benefits held, the 2000 cohort pays
+        <span data-fc="co:cx:USA:2000">1.43</span> times its parents' contribution
+        rate in the United States and <span data-fc="co:cx:KOR:2000">2.48</span>
+        times in South Korea. The gain is at the door, where fewer arrivals for
+        each departure make a new worker scarcer. Entrants per retiree-to-be fell
+        from <span data-fc="co:em:USA:1950">2.04</span> for the American 1950
+        cohort to <span data-fc="co:em:USA:2000">1.04</span> for the 2000 cohort,
+        and from <span data-fc="co:em:KOR:1950">3.78</span> to
+        <span data-fc="co:em:KOR:2000">0.86</span> in South
+        Korea.<span data-tk="co-cards"></span></p>
+      <p>
+        Why your parents, and not the baby boomers? Because “boomer” is not the same
+        starting point everywhere. A South Korean in the 1950 cohort worked through a
+        tailwind of <span data-fc="co:g:KOR:1950">+0.87</span> points a year. A
+        Japanese in the same cohort already faced a headwind of
+        <span data-fc="co:g:JPN:1950">−0.17</span>. Your parents' cohort lived in
+        your country one generation earlier, which makes it the fair comparison.
+      </p>
+      <p>
+        Read the pension card as two poles, not as a forecast of any real scheme.
+        Real schemes sit between the poles and change their rules as they go. Some
+        countries have no universal pay-as-you-go pension at all: Nigeria's main
+        scheme is funded, built on individual accounts for workers in formal jobs
+        (Pension Reform Act 2004, re-enacted 2014). There the card shows what any
+        arrangement that pays the old out of the earnings of the young, a family
+        included, has to work with.
+      </p>
+      <p>
+        The two poles also disagree about who gets the worst of it. With benefits
+        held, each later cohort pays more. With
+        contributions held, the lowest return goes to the cohort that pays in while
+        workers are many and draws its pension when they are few. In Japan that is
+        the 1975 cohort
+        (<span data-fc="co:r:JPN:1975">−0.90</span>% a year), not the 2000 cohort
+        (<span data-fc="co:r:JPN:2000">−0.72</span>%). In the United States it is
+        still the 2000 cohort (<span data-fc="co:r:USA:2000">+0.15</span>%, against
+        <span data-fc="co:r:USA:1975">+0.40</span>% for its parents). Each figure
+        is added to wage growth, so even a negative one can leave a pension worth
+        more than the contributions that paid for it.
+      </p>
+      <p>
+        One thing is missing on purpose. None of the cards says what your own
+        savings will earn. That depends on asset prices, which this page's data
+        cannot forecast; §4 reviews what the research says.
+      </p>
+
+      <h2 id="claims">11 · Claims on tomorrow's workers</h2>
+      <p>
+        Pensions, deposits and bonds are claims. Ludwig von Mises's
+        <a href="https://www.econlib.org/library/Mises/msT.html"><i>The Theory of Money and Credit</i></a>
+        (1912; revised 1924; final part written 1952) says what that means:
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=7#I.3.9" data-para="I.3.9">Claims are not goods; they are means of obtaining disposal over goods.</span>”
+        This page counts the workers who will make the goods, not what each claim on
+        them will fetch. The book never mentions pensions or age structure. Mises
+        called a social-security claim
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/HmA/msHmA.html?chapter_num=38#6.XXXV.53" data-para="6.XXXV.53">a check drawn upon the future taxpayers</span>”
+        elsewhere, in <i>Human Action</i> (1949). Every other bridge to demography
+        here is this article's.
+      </p>
+      <p>
+        <b>Interest.</b> The <b>natural rate</b>, Knut Wicksell's term, is the rate that
+        would rule if capital goods were lent without money. In Mises's
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=23">1912 chapter on interest</a>
+        it is lower the more a community has saved. Mises investigates something else,
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=23#III.19.38" data-para="III.19.38">a reduction below this rate in the money rate charged by the banks</span>”,
+        which he ties to crises. So §4's aging-driven fall in returns would be a fall
+        in the natural rate itself, not that bank-made gap. But a 1924 footnote
+        disowns the theory of interest the chapter borrows, and <i>Human Action</i>
+        (1949) denies that more capital means lower interest, though it keeps the two
+        rates distinct.
+      </p>
+      <p>
+        <b>Inflation.</b> §10's pension card had two poles: workers pay more, or retirees
+        get less. A third course is to pay in money that buys less.
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.18" aria-label="In the 1924 revision: Mises, chapter 13, on Econlib">In the 1924 revision</a>,
+        after the Austrian and German hyperinflations, Mises wrote that a government
+        inflates
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.18" data-para="II.13.18">when it cannot negotiate loans and dare not levy taxes</span>”.
+        Japan, the oldest and, relative to GDP, most indebted large economy, could
+        still borrow, and its prices were flat or falling from the late 1990s to 2012.
+      </p>
+      <p>
+        In 1950 Mises forecast that inflation would leave American workers' pensions
+        “<span class="quote" data-cite="https://cdn.mises.org/Planning%20for%20Freedom%20and%20Twelve%20other%20Essays%20and%20Addresses.pdf" data-para="PfF.89">a mere sham</span>”.
+        But most rich countries now index public pensions by law, though since 2023
+        Japan's have risen less than prices. What inflation erodes most is debt and
+        savings fixed in money, and only while interest lags: when inflation is
+        unforeseen (Mises's own 1924 rule) or the state caps interest.
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.17" aria-label="In 1952: Mises, chapter 21, on Econlib">In 1952</a>
+        he wrote that the common man who backs measures against creditors
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.17" data-para="IV.21.17">ignores the fact that he himself is a creditor</span>”.
+        In an old society, this article adds, that creditor is more often a retiree,
+        and a voter.
+      </p>
+      <p>
+        <b>Reserves.</b>
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=24#III.20.42" aria-label="Also in 1924: Mises, chapter 20, on Econlib">Also in 1924</a>,
+        Mises described states holding central-bank reserves not in gold but in
+        foreign claims to gold. Swings in the value of gold itself, he wrote, were
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=24#III.20.42" data-para="III.20.42">substantially dependent on the behavior of one government, namely, that of the United States</span>”.
+        Japan and China, large holders of American government debt, will have
+        <span data-fc="co:sr70:JPN:1975">1.3</span> and
+        <span data-fc="co:sr70:CHN:1975">2.0</span> workers per retiree in 2045,
+        against America's <span data-fc="co:sr70:USA:1975">2.5</span>. So part of what
+        each has saved is a claim on a country that will be younger, in that country's
+        money. That reading is this article's. Mises meant claims payable in gold;
+        today's dollar is not, and its foreign holders have both gained and lost.
+      </p>
+      <p class="takeaway"><b>Takeaway</b> Two tempting conclusions do not follow: that
+        an old society's low interest must be a central bank's doing, and that old
+        societies will inflate their pensions away. Inflation would pay retirees
+        partly out of their own savings. Nothing here says what any asset will
+        earn.</p>
+
+      <h3 id="mises-reading">A reading in Mises's manner: who pays when the ratio falls</h3>
+      <p>
+        The principles above say what does not follow. This is what a reader formed by
+        <i>The Theory of Money and Credit</i> might conclude from this page's numbers.
+        It is a reconstruction in Mises's manner, not his words. Only the phrases in
+        quotation marks are his, and his book, as said above, never mentions pensions
+        or age structure. Each step gives a fact from this page, a premise from the
+        book with its date, and what follows. The method yields incidence, who loses to
+        whom, and sometimes a direction. It never yields a magnitude or a date.
+      </p>
+      <p>
+        <b>The claim.</b> A credit transaction, in the 1912 text, exchanges present
+        goods for future goods. A pension contribution has the first half: the worker
+        gives up present goods. But the payment is compelled, he receives a statute and
+        not a contract, and §10's pay-as-you-go scheme stores nothing. This year's
+        workers pay this year's retirees. So the goods his claim refers to must be made
+        by those at work when it falls due, and this page counts them. Japan had
+        <span data-fc="co:sr45:JPN:1950">4.2</span> workers per retiree when its 1950 cohort was 45
+        and paying, and will have <span data-fc="co:sr45:JPN:2000">1.3</span> when its 2000 cohort
+        is. With the pension held at an illustrative 40% of wages, the first cohort's
+        career-average contribution is <span data-fc="co:c:JPN:1950">9.0%</span> of wages and the
+        second's <span data-fc="co:c:JPN:2000">27.3%</span>. A claim without a fund is not a claim
+        without backing: it is backed by the wage bill, which output per worker can
+        raise.
+      </p>
+      <p>
+        <b>Three sources, and money is not a fourth.</b> The premise was written of war
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.44" aria-label="in 1952: Mises, chapter 21, on Econlib">in 1952</a>. What the armed forces need must be provided
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.44" data-para="IV.21.44">by restricting consumption for nonvital purposes, by intensifying production in order to increase output, and by consuming a part of the capital previously accumulated</span>”.
+        The reader applies it to any large public promise. For a pension the first
+        source is the higher contribution or the lower benefit, §10's two poles. The
+        second is §9's offsets: South Korea would need about
+        <span data-fc="k:KOR">7.1</span> more working years by 2050 to hold its economic support
+        ratio at the 2025 level. The third is running down what was saved, at home or
+        abroad. New money adds directly to none of them. It alters whose consumption is
+        cut and, the 1924 text says, can conceal that capital is being consumed.
+      </p>
+      <p>
+        <b>Assent.</b> The premise is <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.15" aria-label="from 1924: Mises, chapter 13, on Econlib">from 1924</a>: high taxes can be
+        levied only
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.15" data-para="II.13.15">when those who bear the burden of the taxes assent to the purpose</span>”.
+        The fact is §10's. With benefits held, the 2000 cohort pays
+        <span data-fc="co:cx:USA:2000">1.43</span> times its parents' rate in the United States and
+        <span data-fc="co:cx:KOR:2000">2.48</span> times in South Korea. So the arithmetic measures
+        how much assent the claim requires, not how much exists. If assent wears with
+        the level of the levy, Japan and Italy (<span data-fc="co:c:ITA:2000">24.9%</span>) are
+        tested hardest among the ten countries portrayed. If it wears with the speed of
+        the rise, South Korea and China (<span data-fc="co:cx:CHN:2000">2.30</span> times) are. The
+        page cannot say which. <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.46" aria-label="The 1952 chapters: Mises, chapter 21, on Econlib">The 1952 chapters</a> describe citizens
+        who vote
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.46" data-para="IV.21.46">only for such taxes as are to be paid by other people</span>”.
+        The book meant the rich. Here, the reader adds, the other people are a later
+        cohort, fewer for each pensioner.
+      </p>
+      <p>
+        <b>The loan.</b> Mises's 1924 sentence on inflating has two conditions: the
+        government cannot borrow, and dare not tax. So the loan comes first, and Japan
+        could still borrow. Japan refutes not the sentence but anyone who derives
+        inflation from age alone. What the loan does is change the claim's form. A
+        pension, which a legislature can amend, is paid by issuing a bond, which is
+        fixed in money. On §3's account the old hold such paper. The state then owes
+        the old twice, a pension and a bond. A loan defers the account. Later economics
+        adds that it settles it if the wage bill grows faster than the debt; the book
+        has no such test.
+      </p>
+      <p>
+        <b>Foresight.</b> Everyone of working age in 2045 is already born (§9), and
+        lenders can count them. The 1924 rule cited above is that depreciation relieves
+        a debtor only when unforeseen. <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.19" aria-label="The same pages: Mises, chapter 13, on Econlib">The same pages</a> draw the
+        consequence:
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.19" data-para="II.13.19">A policy aiming at a progressive diminution of the value of money does not benefit debtors.</span>”
+        A motive that can be read off a pyramid can be charged for in interest. How far
+        money will fall, the text insists, cannot be foreseen. So the borrowing state
+        gains only by the excess nobody expected or, as this article added above, by
+        holding interest down. Japan is again the counter-case. It kept borrowing while
+        prices were flat or falling, so a motive visible in the pyramid was, for those
+        years, no forecast.
+      </p>
+      <p>
+        <b>Incidence.</b> The book keeps two channels apart. A claim fixed in money
+        loses to its debtor, so far as money's fall was unforeseen. Other incomes gain
+        or lose by timing (a 1912 argument;
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=16#II.12.34" aria-label="the sentence is 1924: Mises, chapter 12, on Econlib">the sentence is 1924</a>):
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=16#II.12.34" data-para="II.12.34">The sooner anybody is in a position to adjust his money income to its new value, the more favorable will the process be for him.</span>”
+        Suppose a state met a pension deficit with new money. The indexed pensioner is
+        kept roughly whole, with a lag. The worker is spared the tax; whether his wage
+        keeps pace, the same paragraph leaves to the data. The creditor's loss falls on
+        bonds, annuities and deposits fixed in money. In an old society one person
+        stands on both sides, by his pension and by his savings. Among the old, those
+        who saved in money pay and those who did not are spared.
+      </p>
+      <p>
+        <b>The index.</b> The book has held since its first edition that index-number
+        contracts are no cure: the weights must stay fixed while what people buy
+        changes. Yet <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.21" aria-label="the 1952 text: Mises, chapter 21, on Econlib">the 1952 text</a> grants what an index does. It
+        has a part in what
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.21" data-para="IV.21.21">makes the people inflation-conscious</span>”,
+        and once it is in common use
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.21" data-para="IV.21.21">the government is forced to slow down the pace of the inflation</span>”.
+        An electorate of indexed pensioners may be such a people. The room left is in
+        the rule itself. Japan's pensions have risen less than prices since 2023: a cut
+        in goods without a cut in money, possible only while prices rise. A published
+        rule, it must be granted, is the opposite of the concealment the 1924 text
+        describes, and modern indices are reweighted, which answers part of the 1912
+        objection.
+      </p>
+      <p>
+        <b>Interest.</b> Two peoples with the same pyramid need not have the same rate.
+        The 1912 premise above is that the natural rate is lower the more a community
+        has saved. A pay-as-you-go claim is no part of that stock, because nothing was
+        stored. A people that provided for age by accumulating goods has the larger
+        stock and, on that premise, the lower natural rate. One that relied on
+        transfers has not. §4 draws the same line from the other side: its story about
+        capital presumes old age is asset-funded, not transfer-funded. Where capital
+        moves freely the 1912 text has rates nearly level, so the difference shows
+        mostly in who lends abroad. The later Mises denied the premise, as said above.
+      </p>
+      <p>
+        <b>Abroad.</b> Between countries, the 1912 text holds, goods are in the end
+        paid for only with goods. So an old creditor nation can enjoy its foreign
+        claims only by importing more than it exports, and the debtor's workers must
+        make the difference. An old country that shuts out imports refuses the only
+        form in which it can be paid. Here a fallacy must be named.
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=18#II.14.9" aria-label="The 1924 text: Mises, chapter 14, on Econlib">The 1924 text</a> condemns the habit of
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=18#II.14.9" data-para="II.14.9">regarding the monetary standard as something in the nature of the shares of the state or the community</span>”.
+        Its example was a country's wealth. The reader extends it to a country's youth.
+        The United States reaches two workers per retiree around
+        <span data-fc="sr2:USA">2074</span>, a date resting on births not yet happened, against
+        <span data-fc="sr2:JPN">2016</span> for Japan. That says who will be there to produce, not
+        what the dollar will buy when the claim falls due.
+      </p>
+      <p>
+        The debtor has pensioners too: America's 2000 cohort is the one paying
+        <span data-fc="co:cx:USA:2000">1.43</span> times its parents' rate. Only the bonds among
+        foreign claims are fixed in money, and the 1934 preface calls it misleading to
+        set creditor against debtor nations over currency. One case the 1924 conditions
+        do not reach at all. They presuppose a government able to issue money. Italy
+        and Germany, at two workers per retiree around <span data-fc="sr2:ITA">2030</span> and
+        <span data-fc="sr2:DEU">2031</span>, share a money neither issues alone. For a single member
+        the monetary course is closed. It can tax, cut, borrow or fail to pay, and the
+        question passes to the central bank it shares. The method cannot say what that
+        bank will do.
+      </p>
+      <p>
+        <b>What the method refuses.</b> It refuses both monetary prophecies. Age does
+        not meet the 1924 conditions; a treasury does. And the 1952 text names full
+        employment, not the treasury, as the main inflationary motive of its day. Nor
+        does age promise falling prices. The book's one sentence on a shrinking
+        population (1912) says the demand for money contracts with it. With the stock
+        unchanged each unit would then buy less. Against that, §3 has the old holding
+        cash, which raises that demand. The method cannot sum the two.
+      </p>
+      <p>
+        On which way a change in money moves interest in the end,
+        <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=23#III.19.16" aria-label="the text as it has stood since 1924: Mises, chapter 19, on Econlib">the text as it has stood since 1924</a> says
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=23#III.19.16" data-para="III.19.16">Without knowledge of the actual data it is impossible to say anything definite about it</span>”.
+        Nor may the method predict collapse. A paper currency issued with restraint,
+        and expected to stop inflating, is <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=26#IV.22.5" aria-label="by the 1952 text: Mises, chapter 22, on Econlib">by the 1952 text</a> a bad
+        currency that
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=26#IV.22.5" data-para="IV.22.5">can last and is not inevitably headed for a breakdown</span>”.
+      </p>
+      <p>
+        <b>The dilemma.</b> It is not between paying and not paying. As workers per
+        retiree fall, the contribution rises, the pension falls as a share of wages, or
+        the pension age moves, unless more people work or more arrive (§9). For a
+        pension tied to wages, productivity makes each easier to bear and removes none.
+        Short of a loan the wage bill outgrows, either that account is presented, as a
+        tax, a rule or an amended index, and someone must assent to it. Or it is not
+        presented, new money covers the difference, and the cost falls, so far as it
+        was unforeseen, on claims fixed in money, whose holders in an old society are
+        largely the pensioners themselves.
+      </p>
+      <p>
+        The 1952 text takes the first side: the second it calls
+        “<span class="quote" data-cite="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.46" data-para="IV.21.46">cheating the voters</span>”.
+        The method does not say which an electorate of elderly creditors will choose.
+        It says only that paying in cheaper money was never a third course. So far as
+        it surprises, it is largely the retiree's cut, moved from his pension onto his
+        savings in money, and never presented as an account.
+      </p>
+      <p class="takeaway"><b>Takeaway</b> Demography counts those who will be asked.
+        The book, read this way, says what can be asked of them and who pays when new
+        money is issued instead. It names no rate, no price and no year, and none of it
+        is advice.</p>
+
+      <h2 id="limits">12 · What this lens misses</h2>
       <p>
         A forecast tool is only as honest as its list of failure modes. Start with the
         framework this article set out to test-drive. Here is the Zeihan causal chain,
@@ -817,7 +1607,8 @@
         timing.
       </p>
       <p>
-        And here is where demographic determinism — mine included — breaks:
+        And here is where demographic determinism — mine included — breaks. Read each
+        item against the hurdle rates of §9: these are the forces that can clear them.
       </p>
       <ul>
         <li><b>Aging hasn't lowered growth — yet.</b> Acemoglu &amp; Restrepo (2017):
@@ -864,7 +1655,9 @@
           gains raises older workers' participation by ~20 points, hours by ~6 a week,
           productivity by ~30% and earnings by ~35%. "Old" is drifting upward faster
           than any fixed-65 ratio can see — which is the whole case for the
-          prospective instruments on the panel.</li>
+          prospective instruments on the panel. Section 9 prices this lever: between
+          four and seven more working years by 2050 would hold the support ratio
+          level in the oldest economies.</li>
         <li><b>The institutions that price this professionally price strain, not
           collapse.</b> The US intelligence community's Global Trends 2040 files
           demographics under chronic fiscal and governance pressure — not deglobalization
@@ -893,7 +1686,7 @@
       </ul>
 
       <div class="colophon" id="colophon">
-        <h2>10 · Sources &amp; methods</h2>
+        <h2>13 · Sources &amp; methods</h2>
         <p>
           <b>Demographic data:</b> United Nations, Department of Economic and Social
           Affairs, Population Division — <i>World Population Prospects 2024</i>, medium
@@ -923,6 +1716,89 @@
           fetches. No numbers are typed into the prose that the pipeline doesn't produce.
           Charts render with a pinned, self-hosted <a href="https://plotly.com/javascript/">Plotly.js</a> 2.35.2;
           math with self-hosted <a href="https://katex.org/">KaTeX</a> 0.16.9. No CDNs, no trackers.
+        </p>
+        <p>
+          <b>Forecast section (§9):</b> Figures 6–8 and the ledger are computed in the
+          browser by <a href="forecast.js">forecast.js</a> from the same five-year
+          pyramids the atlas uses, plus a world aggregate
+          (<a href="data/world.json">world.json</a>) summed from the country files by
+          <a href="../scripts/build_demographics_world.py">scripts/build_demographics_world.py</a>.
+          The support ratio there is recomputed from five-year bins and checked on load
+          against the shipped single-age value; the two agree to the third decimal. The
+          break-even working-life extension moves the exit ramp of the Figure 3
+          labor-income profile later and holds consumption fixed. Every number quoted
+          in the takeaways and in §9's prose is recomputed from the data when the page
+          loads, and corrected if it has drifted.
+        </p>
+        <p>
+          <b>Cohort section (§10):</b> Figures 9 and 10 are computed in the browser by
+          <a href="cohort.js">cohort.js</a> from the same five-year pyramids. A cohort
+          is the people aged 0–4 in year \(b\) (born in the five years to mid-\(b\));
+          it is read from age bin \(i\) in year \(b+5i\), so it is the resident
+          cohort and includes migration as well as survival. The parents' cohort is
+          \(b-25\). Career weather is \(100\,\ln(SR_{\text{econ}}[b+65]/SR_{\text{econ}}[b+25])/40\).
+          The fixed-benefit contribution rate is the mean of \(\rho/SR_{\text{head}}[t]\)
+          over the nine grid years \(b+20\) to \(b+60\), with \(\rho=0.40\) as an
+          illustration; ratios between cohorts do not depend on \(\rho\). The
+          fixed-contribution return is the rate that sets to zero the present value of
+          one unit paid per member aged 20–64 and \(SR_{\text{head}}\) units received
+          per member aged 65 and over. It is in wage units, so wage growth adds to it,
+          and it needs data to year \(b+100\), so it stops at the 2000 cohort. On a
+          stable population it must equal the population growth rate (the textbook
+          pay-as-you-go result); the script checks that on load for growth of +1%, 0
+          and −1% a year. Entrants per retiree-to-be is the population aged 20–24
+          over the population aged 60–64 in year \(b+20\). These are structural
+          measures of age structure, not forecasts of any country's pension system,
+          and nothing here forecasts asset returns or saving rates.
+        </p>
+        <p>
+          <b>Mises section (§11):</b> Five quotations are from Ludwig von Mises,
+          <i>The Theory of Money and Credit</i>, trans. H. E. Batson (1934; Part Four,
+          written 1952, added 1953; Liberty Fund, 1981), in
+          <a href="https://www.econlib.org/library/Mises/msT.html">Econlib's text</a>
+          at paragraphs <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=7#I.3.9">I.3.9</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=23#III.19.38">III.19.38</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.18">II.13.18</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.17">IV.21.17</a> and
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=24#III.20.42">III.20.42</a>, each matched word for word. The
+          1912 and 1924 dates follow Jörg Guido Hülsmann,
+          <a href="https://cdn.mises.org/Theory%20of%20Money%20and%20Fiduciary%20Media.pdf">“The Early Evolution of Mises's Monetary Thought”</a>
+          (2012); those for II.12.34, III.19.16, II.10.11 and III.17.7 were checked
+          against the 1912 German first edition. The 1924 footnote is the first note
+          to chapter 19; the 1924 rule on
+          unforeseen inflation is paragraph <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.11">II.13.11</a>. The
+          reading in Mises's manner quotes from nine more paragraphs, matched the same
+          way: <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.44">IV.21.44</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.15">II.13.15</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.46">IV.21.46</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.19">II.13.19</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=16#II.12.34">II.12.34</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=25#IV.21.21">IV.21.21</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=18#II.14.9">II.14.9</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=23#III.19.16">III.19.16</a> and
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=26#IV.22.5">IV.22.5</a>. Its paraphrased premises are at
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=19#III.15.9">III.15.9</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=17#II.13.16">II.13.16</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=16#II.12.16">II.12.16</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=24#III.20.13">III.20.13</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=14#II.10.11">II.10.11</a>, <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=4#HP.12">HP.12</a>,
+          <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=27#IV.23.20">IV.23.20</a> and <a href="https://www.econlib.org/library/Mises/msT.html?chapter_num=21#III.17.7">III.17.7</a>. Its inferences are this
+          article's reconstruction, not his. In
+          <i>Human Action</i> (1949) the check on future taxpayers is in chapter
+          XXXV, section 3, and the denial that more capital means lower interest in
+          chapter XIX, section 3. The 1950 forecast is “Economic Aspects of the
+          Pension Problem”, reprinted in
+          <a href="https://cdn.mises.org/Planning%20for%20Freedom%20and%20Twelve%20other%20Essays%20and%20Addresses.pdf"><i>Planning for Freedom</i></a>,
+          p. 89. Other facts: pension indexation is from the OECD's
+          <i>Pensions at a Glance 2023</i>; Japan's prices from a 2013 speech by the
+          Bank of Japan's governor, its debt ratio from the IMF's World Economic
+          Outlook (April 2026) and its pension increases since 2023 from the health
+          ministry's yearly notices; the reweighting of price indices from the ILO and
+          IMF's <i>Consumer Price Index Manual</i> (2020); inflation eroding debt while interest is held
+          down from Reinhart &amp; Sbrancia,
+          <a href="https://www.bis.org/publications/working-paper-363-liquidation-government-debt">BIS Working Paper 363</a>;
+          holdings of American government debt from U.S. Treasury international
+          capital data; foreign holders' gains and losses from
+          <a href="https://www.bis.org/publications/bulletin-105-us-dollars-slide-april-2025-role-fx-hedging">BIS Bulletin 105</a>;
+          the age of inflation's losers from Doepke &amp; Schneider (2006). The OECD,
+          IMF, ministry, index-manual, Treasury and Doepke–Schneider items were read
+          at second hand, not on their own pages. The research, with the evidence against each
+          connection, is in
+          <a href="notes/research-pass-2-mises.md">notes/research-pass-2-mises.md</a>.
         </p>
         <p>
           <b>Intellectual debts:</b> Modigliani &amp; Brumberg (1954) for the life-cycle
@@ -1017,5 +1893,8 @@
     });
   </script>
   <script src="app.js"></script>
+  <script src="forecast.js"></script>
+  <script src="cohort.js"></script>
+  <div id="focus-pill" role="status" hidden></div>
 </body>
 </html>
