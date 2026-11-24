@@ -1,0 +1,37 @@
+[
+  {
+    "file": "magnetic-chains.spr.gz",
+    "title": "Magnetic spheres chain up in a field",
+    "description": "512 spheres carrying body-fixed magnetic dipoles (dipolar coupling λ = 6) drift and spin in a thermal bath at kT = 1. Without a field they link head to tail into wandering chains and rings. At t = 20τ a field ramps on over 2τ to α = 5 along z, and the chains swing into line with it.",
+    "kind": "md",
+    "bytes": 4610124
+  },
+  {
+    "file": "billiards-chain-reaction.spr.gz",
+    "title": "Six pockets, one stroke",
+    "description": "One cue strike starts a chain: each ball knocks the next one on and peels off into a pocket, and the last ball drops too. Six balls, six pockets. The layout was found by a search with the simulator in the loop; sliding, rolling and spin are simulated event by event, so every contact is exact. Every cut could be off by up to 0.9 degrees either way and still drop its ball.",
+    "kind": "billiards",
+    "bytes": 104002
+  },
+  {
+    "file": "soccer-tunnelling.spr.gz",
+    "title": "Tunnelling on the pitch: fixed steps vs exact events",
+    "description": "Six balls on one diagonal. The exact solver (solid, with elastic bounces) finds the real first contact between balls 2 and 3 at 0.06 s; the original fixed 1.234 s step (rings) jumps balls 2 and 3 straight through each other and reports balls 3 and 5 instead.",
+    "kind": "soccer",
+    "bytes": 15221
+  },
+  {
+    "file": "magnetization-staircase.spr.gz",
+    "title": "Magnetization climbs a field staircase",
+    "description": "256 weakly coupled magnetic spheres (λ = 1) in a field that steps through α = 0.5, 1, 2, 4 and 8. Each plateau's magnetization can be compared with the Langevin function L(α) for independent dipoles.",
+    "kind": "md",
+    "bytes": 1510191
+  },
+  {
+    "file": "wca-gas-nve.spr.gz",
+    "title": "A repulsive gas at constant energy",
+    "description": "500 WCA spheres in a periodic box (ρ = 0.2) under velocity Verlet with no thermostat. The energy-drift panel is the integrator health gauge: |ΔE/E₀| stays at the 10⁻⁵ level for the whole run.",
+    "kind": "md",
+    "bytes": 643545
+  }
+]
