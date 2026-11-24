@@ -1,0 +1,1223 @@
+{
+  "title": "Concept map: moral hazard, for the Scott Nelson portfolio",
+  "status": "draft only, not for publication",
+  "created": "2026-11-16",
+  "timezone_note": "Dates in this file are calendar dates. The work was done in America/Los_Angeles.",
+  "public_title": "Data Engineer",
+  "node_types": [
+    "concept",
+    "model",
+    "empirical finding",
+    "mechanism or remedy",
+    "domain application"
+  ],
+  "edge_types": [
+    "critiqued by",
+    "replied to by",
+    "defines",
+    "originates",
+    "splits into",
+    "formalizes",
+    "formalized as",
+    "cousin of",
+    "implies",
+    "justifies",
+    "solved by",
+    "specializes to",
+    "extends to",
+    "distinct from",
+    "tested by",
+    "also produces",
+    "refined by",
+    "identified by",
+    "complemented by",
+    "remedied by",
+    "enters",
+    "applied in",
+    "applies in",
+    "tested in",
+    "already contains",
+    "names as loading",
+    "names as credibility",
+    "teaches"
+  ],
+  "nodes": [
+    {
+      "id": "moral-hazard",
+      "type": "concept",
+      "branch": "origins",
+      "label": "Moral hazard",
+      "summary": "Hidden action after (or because of) a risk-transfer contract. Insurance, or another guarantee, changes the insured party's incentives, so the loss probability or the loss size is not the same as it would have been without coverage. Pauly (1968) argued that this is ordinary price theory, not a moral failing. Arrow (1968) accepted the incentive point and kept a residual role for professional and social norms.",
+      "citations": [
+        "pauly-1968",
+        "arrow-1968"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "arrow-1963-n",
+      "type": "concept",
+      "branch": "origins",
+      "label": "Arrow 1963: uncertainty and medical care",
+      "summary": "Arrow compared medical care with the competitive welfare benchmark and traced many of its special features to uncertainty in both the incidence of illness and the efficacy of treatment. He argued that the welfare case for insurance is strong, and that missing insurance markets are a form of market failure. This paper is the origin of the modern economic discussion, even though 'moral hazard' is treated more fully in the 1968 exchange.",
+      "citations": [
+        "arrow-1963"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "pauly-1968-n",
+      "type": "concept",
+      "branch": "origins",
+      "label": "Pauly 1968: comment",
+      "summary": "A reply to Arrow (1963). If demand for medical care is price-elastic, insurance that lowers the out-of-pocket price raises use. Full coverage need not be optimal, and the absence of some insurance markets need not imply that government should supply the missing cover. The response is rational economic behavior.",
+      "citations": [
+        "pauly-1968"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "arrow-1968-n",
+      "type": "concept",
+      "branch": "origins",
+      "label": "Arrow 1968: further comment",
+      "summary": "Arrow accepted Pauly's claim that complete insurance is no longer optimal when the insurance method itself influences demand. He likened the incentive effect to an excise tax. He also argued that Pauly's exclusive emphasis on market incentives overlooked norms and self-imposed constraints that can limit the response.",
+      "citations": [
+        "arrow-1968"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "ex-ante",
+      "type": "concept",
+      "branch": "types",
+      "label": "Ex ante moral hazard",
+      "summary": "A change in preventive effort, or in other actions taken before a loss, that shifts the probability (or the distribution) of the loss. Ehrlich and Becker (1972) separate market insurance, self-insurance (reducing the size of a loss), and self-protection (reducing its probability). Zweifel and Manning (2000) report that theory does not unambiguously predict a fall in prevention, and that empirical evidence on ex ante moral hazard in health care is limited.",
+      "citations": [
+        "ehrlich-becker-1972",
+        "zweifel-manning-2000"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "ex-post",
+      "type": "concept",
+      "branch": "types",
+      "label": "Ex post moral hazard",
+      "summary": "A change in the amount or intensity of the loss, or in the use of a covered service, after a loss or illness has occurred. In health insurance this is the rise in medical-care use when the out-of-pocket price falls. Zweifel and Manning (2000) treat static ex post moral hazard as the case with the stronger theory and the stronger evidence, and they also flag a possible dynamic form (bias toward new, costlier technology).",
+      "citations": [
+        "zweifel-manning-2000",
+        "pauly-1968"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "hidden-action",
+      "type": "model",
+      "branch": "models",
+      "label": "Hidden-action principal-agent model",
+      "summary": "A principal writes a contract on an observed outcome. The agent chooses an unobserved action (effort) that shifts the distribution of that outcome. The tension is risk-sharing versus incentives: a risk-averse agent would like to be insulated from luck, but insulation dulls effort.",
+      "citations": [
+        "holmstrom-1979",
+        "grossman-hart-1983"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "informativeness",
+      "type": "model",
+      "branch": "models",
+      "label": "Informativeness principle (Holmström 1979)",
+      "summary": "A signal other than the outcome should be written into the contract if and only if it carries information about the hidden action that the outcome does not already contain. This is the contract-design cousin of the value of information on the decision-theory page.",
+      "citations": [
+        "holmstrom-1979"
+      ],
+      "portfolio_links": [
+        "decision-theory.html#vpi"
+      ]
+    },
+    {
+      "id": "grossman-hart-n",
+      "type": "model",
+      "branch": "models",
+      "label": "Grossman-Hart 1983 two-stage approach",
+      "summary": "Because the first-order approach to the agent's incentive constraint is not generally valid (a point associated with Mirrlees), Grossman and Hart split the problem: first find the cheapest contract that implements a given action, then choose the action. This is the standard way to characterize optimal incentive schemes.",
+      "citations": [
+        "grossman-hart-1983"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "linear-contracts",
+      "type": "model",
+      "branch": "models",
+      "label": "Holmström-Milgrom 1987 linear contracts",
+      "summary": "In a continuous-time model with exponential utility and Brownian information, the optimal incentive scheme is linear in aggregated outcomes. This is the usual justification for studying simple linear sharing rules (including coinsurance) rather than highly nonlinear contracts.",
+      "citations": [
+        "holmstrom-milgrom-1987"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "multitasking",
+      "type": "model",
+      "branch": "models",
+      "label": "Holmström-Milgrom 1991 multitasking",
+      "summary": "When the agent has several tasks and some are harder to measure than others, strong incentives on the measurable task can pull effort away from the unmeasurable one (for example, quality, prevention, or long-term care). Incentive intensity should fall when measurement is unbalanced.",
+      "citations": [
+        "holmstrom-milgrom-1991"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "adverse-selection",
+      "type": "concept",
+      "branch": "adverse-selection",
+      "label": "Adverse selection (hidden type)",
+      "summary": "Hidden information about risk type, not hidden action. Rothschild and Stiglitz (1976) show that a competitive insurance market with hidden types may have a separating equilibrium in which higher-risk agents buy more coverage, or may have no equilibrium. This is the other information problem in insurance, and it is what the actuarial page names as 'anti-selection' when it appears as a loading.",
+      "citations": [
+        "rothschild-stiglitz-1976"
+      ],
+      "portfolio_links": [
+        "actuarial-pricing.html#loading"
+      ]
+    },
+    {
+      "id": "positive-correlation",
+      "type": "model",
+      "branch": "adverse-selection",
+      "label": "Positive-correlation test",
+      "summary": "Chiappori and Salanié (2000) test for a positive correlation between coverage and claims, conditional on observables. A positive residual correlation is evidence of asymmetric information, but it does not by itself say whether the cause is adverse selection, moral hazard, or both. Their French automobile data did not reject the null of no residual correlation in that sample.",
+      "citations": [
+        "chiappori-salanie-2000"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "einav-finkelstein-sep",
+      "type": "model",
+      "branch": "adverse-selection",
+      "label": "Separating selection from moral hazard",
+      "summary": "Einav, Finkelstein, and Cullen (2010) use price variation to trace demand and average-cost curves and to measure the welfare cost of selection. Einav, Finkelstein, Ryan, Schrimpf, and Cullen (2013) go further and estimate selection on moral hazard: people who choose more coverage also have a larger behavioral response to coverage. Both papers use confidential employer data, not a public file.",
+      "citations": [
+        "einav-finkelstein-cullen-2010",
+        "einav-finkelstein-etal-2013"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "rand-hie",
+      "type": "empirical finding",
+      "branch": "empirical",
+      "label": "RAND Health Insurance Experiment",
+      "summary": "Families were randomly assigned to plans with different cost sharing, which identifies a price response without confounding by plan choice. Manning, Newhouse, Duan, Keeler, Leibowitz, and Marquis (1987) report that a catastrophic plan reduces expenditures 31 percent relative to a zero out-of-pocket price, and that the price elasticity is approximately 0.2 in absolute value. Aron-Dine, Einav, and Finkelstein (2013) review the design and the later re-analyses. Public-use microdata are at ICPSR 6439.",
+      "citations": [
+        "manning-etal-1987",
+        "aron-dine-einav-finkelstein-2013",
+        "icpsr-6439"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "oregon-hie",
+      "type": "empirical finding",
+      "branch": "empirical",
+      "label": "Oregon Health Insurance Experiment",
+      "summary": "A 2008 lottery for a limited number of Medicaid slots. Finkelstein, Taubman, Wright, Bernstein, Gruber, Newhouse, Allen, Baicker, and the Oregon Health Study Group (2012) study the first year. The lottery provides random variation in coverage, so utilization differences are not an artifact of who chose to buy insurance. Public-use data and replication code are on the NBER Oregon page, under click-through terms.",
+      "citations": [
+        "finkelstein-etal-2012",
+        "oregon-data"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "deductibles",
+      "type": "mechanism or remedy",
+      "branch": "remedies",
+      "label": "Deductibles",
+      "summary": "The insured pays the first dollars of a loss. Mossin (1968) shows that when insurance is loaded above the actuarial premium, a positive deductible is optimal for a risk-averse buyer. Raviv (1979) studies the broader design of an optimal policy. On the applied page, the deductible is already the residual D in p* = C/(L-D), but p does not respond to D.",
+      "citations": [
+        "mossin-1968",
+        "raviv-1979"
+      ],
+      "portfolio_links": [
+        "applied-decision-theory.html#insurance"
+      ]
+    },
+    {
+      "id": "coinsurance",
+      "type": "mechanism or remedy",
+      "branch": "remedies",
+      "label": "Coinsurance and copays",
+      "summary": "A sharing rule: the insured pays a fraction of the loss, or a fixed copay per use. Zeckhauser (1970) is the classic analysis of the tradeoff between risk spreading and incentives in medical insurance. Linear coinsurance is also the applied form of the Holmström-Milgrom 1987 linear contract. The applied page lists a copay as one reading of D, and does not mention coinsurance by name.",
+      "citations": [
+        "zeckhauser-1970",
+        "holmstrom-milgrom-1987"
+      ],
+      "portfolio_links": [
+        "applied-decision-theory.html#insurance"
+      ]
+    },
+    {
+      "id": "experience-rating",
+      "type": "mechanism or remedy",
+      "branch": "remedies",
+      "label": "Experience rating and bonus-malus",
+      "summary": "Future premiums depend on past claims. This is both a statistical shrinkage problem (Bühlmann credibility on the actuarial page) and an incentive device: the insured internalizes part of the future cost of a claim. Bonus-malus and no-claims discounts in motor insurance are the usual examples. Shavell (1979) analyzes observation of care and the use of such instruments under moral hazard.",
+      "citations": [
+        "shavell-1979"
+      ],
+      "portfolio_links": [
+        "actuarial-pricing.html#cred"
+      ]
+    },
+    {
+      "id": "monitoring",
+      "type": "mechanism or remedy",
+      "branch": "remedies",
+      "label": "Monitoring and telematics",
+      "summary": "A direct application of the informativeness principle: if a signal of hidden action can be observed, it belongs in the contract. In automobile insurance this includes mileage and telematic driving data. Edlin (1999) analyzes per-mile premiums as a way to price the marginal mile. Usage-based insurance is the later commercial form of the same idea.",
+      "citations": [
+        "holmstrom-1979",
+        "edlin-1999"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "domain-health",
+      "type": "domain application",
+      "branch": "domains",
+      "label": "Health insurance",
+      "summary": "The setting of Arrow, Pauly, Zeckhauser, the RAND experiment, the Oregon experiment, and the Einav-Finkelstein program. Ex post utilization responses are the best-documented form of moral hazard in this domain. Ex ante prevention responses are weaker and less settled (Zweifel and Manning 2000).",
+      "citations": [
+        "arrow-1963",
+        "manning-etal-1987",
+        "finkelstein-etal-2012",
+        "zweifel-manning-2000"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "domain-auto",
+      "type": "domain application",
+      "branch": "domains",
+      "label": "Automobile insurance",
+      "summary": "The main field for bonus-malus, experience rating, and telematics, and the setting of the Chiappori-Salanié (2000) test. The Peltzman (1975) offset hypothesis, that safety regulation can induce more risk-taking, is a related risk-compensation mechanism, not itself an insurance-contract result.",
+      "citations": [
+        "chiappori-salanie-2000",
+        "peltzman-1975",
+        "edlin-1999"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "domain-deposit",
+      "type": "domain application",
+      "branch": "domains",
+      "label": "Deposit insurance, too-big-to-fail, and bailouts",
+      "summary": "A fixed-rate guarantee of bank liabilities can encourage risk-taking. Keeley (1990) links this moral hazard to the decline of bank charter values and to later problems in the 1980s. Farhi and Tirole (2012) study collective moral hazard when private leverage choices anticipate a systemic bailout. The page should keep this as a mechanism and evidence discussion, not a political argument.",
+      "citations": [
+        "keeley-1990",
+        "farhi-tirole-2012"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "domain-ui",
+      "type": "domain application",
+      "branch": "domains",
+      "label": "Unemployment insurance",
+      "summary": "The cleanest applied decision-theory statement of the insurance-incentive tradeoff is the Baily-Chetty formula: the optimal benefit balances the consumption-smoothing gain (risk aversion times the consumption drop) against the moral-hazard cost (the elasticity of unemployment duration with respect to benefits). Chetty (2006) generalizes Baily (1978). Chetty (2008) separates moral hazard from liquidity effects in the duration response.",
+      "citations": [
+        "baily-1978",
+        "chetty-2006",
+        "chetty-2008"
+      ],
+      "portfolio_links": [
+        "decision-theory.html#utility"
+      ]
+    },
+    {
+      "id": "domain-disaster",
+      "type": "domain application",
+      "branch": "domains",
+      "label": "Disaster insurance",
+      "summary": "Flood and catastrophe insurance raise both ordinary moral hazard (less mitigation when losses are covered) and a related 'charity hazard': expected public relief can crowd out private insurance (Raschky and Weck-Hannemann 2007). Browne and Hoyt (2000) study demand for cover under the U.S. National Flood Insurance Program, including the role of previous disaster relief.",
+      "citations": [
+        "raschky-weck-hannemann-2007",
+        "browne-hoyt-2000"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "peltzman-n",
+      "type": "empirical finding",
+      "branch": "domains",
+      "label": "Peltzman effect / risk compensation",
+      "summary": "Peltzman (1975) argued that automobile safety regulation can be offset, in part, by more aggressive driving. This is risk compensation: a reduction in the expected cost of an accident changes behavior. It is included on the map as a cousin of ex ante moral hazard, not as a result about insurance contracts.",
+      "citations": [
+        "peltzman-1975"
+      ],
+      "portfolio_links": []
+    },
+    {
+      "id": "eu-risk-aversion",
+      "type": "concept",
+      "branch": "decision-theory",
+      "label": "Expected utility and risk aversion",
+      "summary": "The buyer's reason to want insurance. Pratt (1964) defines the Arrow-Pratt coefficients of risk aversion. The applied insurance thread already uses the approximation (1/2) A(W) Var(loss) for the risk premium, without naming the source. The actuarial page uses an insurer risk-aversion coefficient in the exponential premium principle.",
+      "citations": [
+        "pratt-1964"
+      ],
+      "portfolio_links": [
+        "applied-decision-theory.html#insurance",
+        "decision-theory.html#utility",
+        "actuarial-pricing.html#loading"
+      ]
+    },
+    {
+      "id": "optimal-insurance",
+      "type": "model",
+      "branch": "decision-theory",
+      "label": "Optimal-insurance tradeoff and the Baily-Chetty formula",
+      "summary": "Insurance has value because it smooths consumption, and a cost because it changes behavior. At the optimum, those two forces balance. Zeckhauser (1970) and Mossin (1968) are the insurance-contract versions. Baily (1978) and Chetty (2006) give the social-insurance version, often called the Baily-Chetty formula. Chetty's equation (8) equates the gap in marginal utilities between the unemployed and employed states to the elasticity term (b/D)(dD/db). The first-order (quadratic-utility) approximation is Baily's inverse-elasticity rule. This draft does not restate a compact typographic form of that approximation, because PDF text extraction garbled the symbols. Any page formula should be copied from the typeset papers, not from this file.",
+      "citations": [
+        "mossin-1968",
+        "zeckhauser-1970",
+        "baily-1978",
+        "chetty-2006"
+      ],
+      "portfolio_links": [
+        "decision-theory.html#utility",
+        "applied-decision-theory.html#insurance"
+      ]
+    },
+    {
+      "id": "page-applied",
+      "type": "concept",
+      "branch": "portfolio",
+      "label": "Portfolio: applied decision theory",
+      "summary": "Existing playground. Insurance thread and break-even calculator treat p as fixed. Natural place to extend D so that p or L depends on coverage.",
+      "citations": [],
+      "portfolio_links": [
+        "applied-decision-theory.html",
+        "applied-decision-theory.html#insurance"
+      ]
+    },
+    {
+      "id": "page-actuarial",
+      "type": "concept",
+      "branch": "portfolio",
+      "label": "Portfolio: actuarial pricing",
+      "summary": "Existing pricing track. Loadings already name an anti-selection margin. Credibility already names experience rating and bonus-malus. Neither is modeled as a hidden-action remedy.",
+      "citations": [],
+      "portfolio_links": [
+        "actuarial-pricing.html",
+        "actuarial-pricing.html#loading",
+        "actuarial-pricing.html#cred"
+      ]
+    },
+    {
+      "id": "page-ladder",
+      "type": "concept",
+      "branch": "portfolio",
+      "label": "Portfolio: decision-theory ladder",
+      "summary": "Existing curriculum for expected utility, MEU, and VPI. Supplies the buyer's objective and the information-value language that the informativeness principle echoes.",
+      "citations": [],
+      "portfolio_links": [
+        "decision-theory.html",
+        "decision-theory.html#utility",
+        "decision-theory.html#vpi"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "arrow-1963-n",
+      "to": "pauly-1968-n",
+      "type": "critiqued by",
+      "note": "Pauly replies that full coverage need not be optimal once demand responds to the insured price."
+    },
+    {
+      "from": "pauly-1968-n",
+      "to": "arrow-1968-n",
+      "type": "replied to by",
+      "note": "Arrow accepts the incentive point and adds a role for norms."
+    },
+    {
+      "from": "pauly-1968-n",
+      "to": "moral-hazard",
+      "type": "defines",
+      "note": "The modern economic reading of moral hazard as a price response."
+    },
+    {
+      "from": "arrow-1968-n",
+      "to": "moral-hazard",
+      "type": "defines",
+      "note": "Accepts the incentive critique and keeps a residual institutional point."
+    },
+    {
+      "from": "arrow-1963-n",
+      "to": "moral-hazard",
+      "type": "originates",
+      "note": "Opens the welfare analysis of insurance under uncertainty."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "ex-ante",
+      "type": "splits into",
+      "note": ""
+    },
+    {
+      "from": "moral-hazard",
+      "to": "ex-post",
+      "type": "splits into",
+      "note": ""
+    },
+    {
+      "from": "ex-ante",
+      "to": "peltzman-n",
+      "type": "cousin of",
+      "note": "Risk compensation is an ex ante behavioral response to a lower cost of accidents."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "hidden-action",
+      "type": "formalized as",
+      "note": "The hidden-action principal-agent model is the general theory."
+    },
+    {
+      "from": "hidden-action",
+      "to": "informativeness",
+      "type": "implies",
+      "note": ""
+    },
+    {
+      "from": "hidden-action",
+      "to": "grossman-hart-n",
+      "type": "solved by",
+      "note": "Two-stage implementation, avoiding an invalid first-order approach."
+    },
+    {
+      "from": "hidden-action",
+      "to": "linear-contracts",
+      "type": "specializes to",
+      "note": "Conditions under which linear sharing rules are optimal."
+    },
+    {
+      "from": "hidden-action",
+      "to": "multitasking",
+      "type": "extends to",
+      "note": "Incentive intensity falls when some tasks are unmeasurable."
+    },
+    {
+      "from": "linear-contracts",
+      "to": "coinsurance",
+      "type": "justifies",
+      "note": "Coinsurance is a linear sharing rule."
+    },
+    {
+      "from": "informativeness",
+      "to": "monitoring",
+      "type": "justifies",
+      "note": "Telematics and other signals belong in the contract when they are informative about hidden action."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "adverse-selection",
+      "type": "distinct from",
+      "note": "Hidden action versus hidden type. Both are asymmetric information."
+    },
+    {
+      "from": "adverse-selection",
+      "to": "positive-correlation",
+      "type": "tested by",
+      "note": "A residual coverage-claims correlation is a test of asymmetric information, not of one source."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "positive-correlation",
+      "type": "also produces",
+      "note": "Moral hazard can also generate a coverage-claims correlation, which is why the test does not separate the two."
+    },
+    {
+      "from": "positive-correlation",
+      "to": "einav-finkelstein-sep",
+      "type": "refined by",
+      "note": "Price variation and selection on moral hazard go beyond a single correlation test."
+    },
+    {
+      "from": "ex-post",
+      "to": "rand-hie",
+      "type": "identified by",
+      "note": "Random assignment of cost sharing identifies a utilization response."
+    },
+    {
+      "from": "ex-post",
+      "to": "oregon-hie",
+      "type": "identified by",
+      "note": "Lottery assignment to Medicaid identifies a coverage effect on use."
+    },
+    {
+      "from": "rand-hie",
+      "to": "einav-finkelstein-sep",
+      "type": "complemented by",
+      "note": "RAND identifies moral hazard by design. Einav-Finkelstein separate selection from moral hazard in observational contract choice."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "deductibles",
+      "type": "remedied by",
+      "note": ""
+    },
+    {
+      "from": "moral-hazard",
+      "to": "coinsurance",
+      "type": "remedied by",
+      "note": ""
+    },
+    {
+      "from": "moral-hazard",
+      "to": "experience-rating",
+      "type": "remedied by",
+      "note": ""
+    },
+    {
+      "from": "moral-hazard",
+      "to": "monitoring",
+      "type": "remedied by",
+      "note": ""
+    },
+    {
+      "from": "eu-risk-aversion",
+      "to": "optimal-insurance",
+      "type": "enters",
+      "note": "Risk aversion is why insurance has value."
+    },
+    {
+      "from": "moral-hazard",
+      "to": "optimal-insurance",
+      "type": "enters",
+      "note": "Behavioral response is why full insurance is costly."
+    },
+    {
+      "from": "optimal-insurance",
+      "to": "deductibles",
+      "type": "implies",
+      "note": "A loaded premium makes a positive deductible optimal (Mossin)."
+    },
+    {
+      "from": "optimal-insurance",
+      "to": "coinsurance",
+      "type": "implies",
+      "note": "Zeckhauser's risk-spreading versus incentives tradeoff."
+    },
+    {
+      "from": "optimal-insurance",
+      "to": "domain-ui",
+      "type": "applied in",
+      "note": "Baily-Chetty formula for unemployment insurance."
+    },
+    {
+      "from": "ex-post",
+      "to": "domain-health",
+      "type": "applies in",
+      "note": ""
+    },
+    {
+      "from": "ex-ante",
+      "to": "domain-health",
+      "type": "applies in",
+      "note": "Weaker evidence."
+    },
+    {
+      "from": "experience-rating",
+      "to": "domain-auto",
+      "type": "applies in",
+      "note": ""
+    },
+    {
+      "from": "monitoring",
+      "to": "domain-auto",
+      "type": "applies in",
+      "note": ""
+    },
+    {
+      "from": "positive-correlation",
+      "to": "domain-auto",
+      "type": "tested in",
+      "note": "Chiappori-Salanié used French automobile contracts."
+    },
+    {
+      "from": "hidden-action",
+      "to": "domain-deposit",
+      "type": "applies in",
+      "note": "A liability guarantee is a contract that can dull private risk control."
+    },
+    {
+      "from": "ex-ante",
+      "to": "domain-disaster",
+      "type": "applies in",
+      "note": "Less mitigation, and charity hazard from expected relief."
+    },
+    {
+      "from": "page-applied",
+      "to": "deductibles",
+      "type": "already contains",
+      "note": "D is in the break-even formula, with p held fixed."
+    },
+    {
+      "from": "page-applied",
+      "to": "eu-risk-aversion",
+      "type": "already contains",
+      "note": "Arrow-Pratt risk-premium approximation in the insurance answer."
+    },
+    {
+      "from": "page-actuarial",
+      "to": "adverse-selection",
+      "type": "names as loading",
+      "note": "Anti-selection margin in thread 2."
+    },
+    {
+      "from": "page-actuarial",
+      "to": "experience-rating",
+      "type": "names as credibility",
+      "note": "Bonus-malus and experience rating in thread 5."
+    },
+    {
+      "from": "page-ladder",
+      "to": "eu-risk-aversion",
+      "type": "teaches",
+      "note": "Utility and MEU."
+    },
+    {
+      "from": "page-ladder",
+      "to": "informativeness",
+      "type": "cousin of",
+      "note": "VPI is the value of information before acting. The informativeness principle is the value of a signal inside a contract."
+    }
+  ],
+  "bibliography": [
+    {
+      "id": "arrow-1963",
+      "authors": [
+        "Kenneth J. Arrow"
+      ],
+      "year": 1963,
+      "title": "Uncertainty and the Welfare Economics of Medical Care",
+      "journal": "American Economic Review",
+      "volume": "53",
+      "issue": "5",
+      "pages": "941-973",
+      "doi": null,
+      "url": "https://assets.aeaweb.org/asset-server/files/9442.pdf",
+      "verification_note": "Original journal DOI not found in Crossref (later book-reprint DOIs exist, e.g. 10.1515/9780822385028-004). Official AEA PDF fetched."
+    },
+    {
+      "id": "pauly-1968",
+      "authors": [
+        "Mark V. Pauly"
+      ],
+      "year": 1968,
+      "title": "The Economics of Moral Hazard: Comment",
+      "journal": "American Economic Review",
+      "volume": "58",
+      "issue": "3, Part 1",
+      "pages": "531-537",
+      "doi": null,
+      "url": "http://links.jstor.org/sici?sici=0002-8282%28196806%2958%3A3%3C531%3ATEOMHC%3E2.0.CO%3B2-A",
+      "verification_note": "Original journal DOI not found in Crossref. A later book-reprint DOI is 10.1017/cbo9780511528248.009. Volume, issue, and pages confirmed from the JSTOR record printed on the article."
+    },
+    {
+      "id": "arrow-1968",
+      "authors": [
+        "Kenneth J. Arrow"
+      ],
+      "year": 1968,
+      "title": "The Economics of Moral Hazard: Further Comment",
+      "journal": "American Economic Review",
+      "volume": "58",
+      "issue": "3, Part 1",
+      "pages": "537-539",
+      "doi": null,
+      "url": "https://doi.org/10.1017/cbo9780511528248.010",
+      "verification_note": "Original journal DOI not found in Crossref. The listed DOI is a 1982 book reprint, not the 1968 AER article. Pages 537-539 confirmed from multiple secondary sources, including Newhouse and Taylor (RAND P-4080-1, 1969)."
+    },
+    {
+      "id": "ehrlich-becker-1972",
+      "authors": [
+        "Isaac Ehrlich",
+        "Gary S. Becker"
+      ],
+      "year": 1972,
+      "title": "Market Insurance, Self-Insurance, and Self-Protection",
+      "journal": "Journal of Political Economy",
+      "volume": "80",
+      "issue": "4",
+      "pages": "623-648",
+      "doi": "10.1086/259916",
+      "url": "https://doi.org/10.1086/259916"
+    },
+    {
+      "id": "zweifel-manning-2000",
+      "authors": [
+        "Peter Zweifel",
+        "Willard G. Manning"
+      ],
+      "year": 2000,
+      "title": "Moral Hazard and Consumer Incentives in Health Care",
+      "journal": "Handbook of Health Economics",
+      "volume": "1",
+      "issue": null,
+      "pages": "409-459",
+      "doi": "10.1016/S1574-0064(00)80167-5",
+      "url": "https://doi.org/10.1016/S1574-0064(00)80167-5",
+      "verification_note": "Chapter 8, edited by A. J. Culyer and J. P. Newhouse. RePEc:eee:heachp:1-08."
+    },
+    {
+      "id": "holmstrom-1979",
+      "authors": [
+        "Bengt Holmstrom"
+      ],
+      "year": 1979,
+      "title": "Moral Hazard and Observability",
+      "journal": "Bell Journal of Economics",
+      "volume": "10",
+      "issue": "1",
+      "pages": "74-91",
+      "doi": "10.2307/3003320",
+      "url": "https://doi.org/10.2307/3003320"
+    },
+    {
+      "id": "grossman-hart-1983",
+      "authors": [
+        "Sanford J. Grossman",
+        "Oliver D. Hart"
+      ],
+      "year": 1983,
+      "title": "An Analysis of the Principal-Agent Problem",
+      "journal": "Econometrica",
+      "volume": "51",
+      "issue": "1",
+      "pages": "7-46",
+      "doi": "10.2307/1912246",
+      "url": "https://doi.org/10.2307/1912246"
+    },
+    {
+      "id": "holmstrom-milgrom-1987",
+      "authors": [
+        "Bengt Holmstrom",
+        "Paul Milgrom"
+      ],
+      "year": 1987,
+      "title": "Aggregation and Linearity in the Provision of Intertemporal Incentives",
+      "journal": "Econometrica",
+      "volume": "55",
+      "issue": "2",
+      "pages": "303-328",
+      "doi": "10.2307/1913238",
+      "url": "https://doi.org/10.2307/1913238"
+    },
+    {
+      "id": "holmstrom-milgrom-1991",
+      "authors": [
+        "Bengt Holmstrom",
+        "Paul Milgrom"
+      ],
+      "year": 1991,
+      "title": "Multitask Principal-Agent Analyses: Incentive Contracts, Asset Ownership, and Job Design",
+      "journal": "Journal of Law, Economics, and Organization",
+      "volume": "7",
+      "issue": "special issue",
+      "pages": "24-52",
+      "doi": "10.1093/jleo/7.special_issue.24",
+      "url": "https://doi.org/10.1093/jleo/7.special_issue.24"
+    },
+    {
+      "id": "rothschild-stiglitz-1976",
+      "authors": [
+        "Michael Rothschild",
+        "Joseph Stiglitz"
+      ],
+      "year": 1976,
+      "title": "Equilibrium in Competitive Insurance Markets: An Essay on the Economics of Imperfect Information",
+      "journal": "Quarterly Journal of Economics",
+      "volume": "90",
+      "issue": "4",
+      "pages": "629-649",
+      "doi": "10.2307/1885326",
+      "url": "https://doi.org/10.2307/1885326"
+    },
+    {
+      "id": "manning-etal-1987",
+      "authors": [
+        "Willard G. Manning",
+        "Joseph P. Newhouse",
+        "Naihua Duan",
+        "Emmett B. Keeler",
+        "Arleen Leibowitz",
+        "M. Susan Marquis"
+      ],
+      "year": 1987,
+      "title": "Health Insurance and the Demand for Medical Care: Evidence from a Randomized Experiment",
+      "journal": "American Economic Review",
+      "volume": "77",
+      "issue": "3",
+      "pages": "251-277",
+      "doi": null,
+      "url": "https://ideas.repec.org/a/aea/aecrev/v77y1987i3p251-77.html",
+      "verification_note": "Original journal DOI not found in Crossref. RePEc handle RePEc:aea:aecrev:v:77:y:1987:i:3:p:251-77. RAND record: https://www.rand.org/pubs/external_publications/EP19870601.html. Abstract on RePEc states that a catastrophic plan reduces expenditures 31 percent relative to a zero out-of-pocket price, and that the price elasticity is approximately 0.2 in absolute value."
+    },
+    {
+      "id": "aron-dine-einav-finkelstein-2013",
+      "authors": [
+        "Aviva Aron-Dine",
+        "Liran Einav",
+        "Amy Finkelstein"
+      ],
+      "year": 2013,
+      "title": "The RAND Health Insurance Experiment, Three Decades Later",
+      "journal": "Journal of Economic Perspectives",
+      "volume": "27",
+      "issue": "1",
+      "pages": "197-222",
+      "doi": "10.1257/jep.27.1.197",
+      "url": "https://doi.org/10.1257/jep.27.1.197"
+    },
+    {
+      "id": "finkelstein-etal-2012",
+      "authors": [
+        "Amy Finkelstein",
+        "Sarah Taubman",
+        "Bill Wright",
+        "Mira Bernstein",
+        "Jonathan Gruber",
+        "Joseph P. Newhouse",
+        "Heidi Allen",
+        "Katherine Baicker",
+        "Oregon Health Study Group"
+      ],
+      "year": 2012,
+      "title": "The Oregon Health Insurance Experiment: Evidence from the First Year",
+      "journal": "Quarterly Journal of Economics",
+      "volume": "127",
+      "issue": "3",
+      "pages": "1057-1106",
+      "doi": "10.1093/qje/qjs020",
+      "url": "https://doi.org/10.1093/qje/qjs020"
+    },
+    {
+      "id": "einav-finkelstein-cullen-2010",
+      "authors": [
+        "Liran Einav",
+        "Amy Finkelstein",
+        "Mark R. Cullen"
+      ],
+      "year": 2010,
+      "title": "Estimating Welfare in Insurance Markets Using Variation in Prices",
+      "journal": "Quarterly Journal of Economics",
+      "volume": "125",
+      "issue": "3",
+      "pages": "877-921",
+      "doi": "10.1162/qjec.2010.125.3.877",
+      "url": "https://doi.org/10.1162/qjec.2010.125.3.877"
+    },
+    {
+      "id": "einav-finkelstein-etal-2013",
+      "authors": [
+        "Liran Einav",
+        "Amy Finkelstein",
+        "Stephen P. Ryan",
+        "Paul Schrimpf",
+        "Mark R. Cullen"
+      ],
+      "year": 2013,
+      "title": "Selection on Moral Hazard in Health Insurance",
+      "journal": "American Economic Review",
+      "volume": "103",
+      "issue": "1",
+      "pages": "178-219",
+      "doi": "10.1257/aer.103.1.178",
+      "url": "https://doi.org/10.1257/aer.103.1.178"
+    },
+    {
+      "id": "chiappori-salanie-2000",
+      "authors": [
+        "Pierre-André Chiappori",
+        "Bernard Salanié"
+      ],
+      "year": 2000,
+      "title": "Testing for Asymmetric Information in Insurance Markets",
+      "journal": "Journal of Political Economy",
+      "volume": "108",
+      "issue": "1",
+      "pages": "56-78",
+      "doi": "10.1086/262111",
+      "url": "https://doi.org/10.1086/262111",
+      "verification_note": "February 2000. Some RePEc records list the year as 2001; the journal issue is JPE 108(1), February 2000."
+    },
+    {
+      "id": "zeckhauser-1970",
+      "authors": [
+        "Richard Zeckhauser"
+      ],
+      "year": 1970,
+      "title": "Medical Insurance: A Case Study of the Tradeoff between Risk Spreading and Appropriate Incentives",
+      "journal": "Journal of Economic Theory",
+      "volume": "2",
+      "issue": "1",
+      "pages": "10-26",
+      "doi": "10.1016/0022-0531(70)90010-4",
+      "url": "https://doi.org/10.1016/0022-0531(70)90010-4"
+    },
+    {
+      "id": "mossin-1968",
+      "authors": [
+        "Jan Mossin"
+      ],
+      "year": 1968,
+      "title": "Aspects of Rational Insurance Purchasing",
+      "journal": "Journal of Political Economy",
+      "volume": "76",
+      "issue": "4, Part 1",
+      "pages": "553-568",
+      "doi": "10.1086/259427",
+      "url": "https://doi.org/10.1086/259427"
+    },
+    {
+      "id": "raviv-1979",
+      "authors": [
+        "Artur Raviv"
+      ],
+      "year": 1979,
+      "title": "The Design of an Optimal Insurance Policy",
+      "journal": "American Economic Review",
+      "volume": "69",
+      "issue": "1",
+      "pages": "84-96",
+      "doi": null,
+      "url": "https://ideas.repec.org/a/aea/aecrev/v69y1979i1p84-96.html",
+      "verification_note": "Original journal DOI not found in Crossref. A later book-reprint DOI is 10.1007/978-94-015-7957-5_13. RePEc:aea:aecrev:v:69:y:1979:i:1:p:84-96."
+    },
+    {
+      "id": "shavell-1979",
+      "authors": [
+        "Steven Shavell"
+      ],
+      "year": 1979,
+      "title": "On Moral Hazard and Insurance",
+      "journal": "Quarterly Journal of Economics",
+      "volume": "93",
+      "issue": "4",
+      "pages": "541-562",
+      "doi": "10.2307/1884469",
+      "url": "https://doi.org/10.2307/1884469"
+    },
+    {
+      "id": "pratt-1964",
+      "authors": [
+        "John W. Pratt"
+      ],
+      "year": 1964,
+      "title": "Risk Aversion in the Small and in the Large",
+      "journal": "Econometrica",
+      "volume": "32",
+      "issue": "1/2",
+      "pages": "122-136",
+      "doi": "10.2307/1913738",
+      "url": "https://doi.org/10.2307/1913738"
+    },
+    {
+      "id": "baily-1978",
+      "authors": [
+        "Martin Neil Baily"
+      ],
+      "year": 1978,
+      "title": "Some Aspects of Optimal Unemployment Insurance",
+      "journal": "Journal of Public Economics",
+      "volume": "10",
+      "issue": "3",
+      "pages": "379-402",
+      "doi": "10.1016/0047-2727(78)90053-1",
+      "url": "https://doi.org/10.1016/0047-2727(78)90053-1"
+    },
+    {
+      "id": "chetty-2006",
+      "authors": [
+        "Raj Chetty"
+      ],
+      "year": 2006,
+      "title": "A General Formula for the Optimal Level of Social Insurance",
+      "journal": "Journal of Public Economics",
+      "volume": "90",
+      "issue": "10-11",
+      "pages": "1879-1901",
+      "doi": "10.1016/j.jpubeco.2006.01.004",
+      "url": "https://doi.org/10.1016/j.jpubeco.2006.01.004"
+    },
+    {
+      "id": "chetty-2008",
+      "authors": [
+        "Raj Chetty"
+      ],
+      "year": 2008,
+      "title": "Moral Hazard versus Liquidity and Optimal Unemployment Insurance",
+      "journal": "Journal of Political Economy",
+      "volume": "116",
+      "issue": "2",
+      "pages": "173-234",
+      "doi": "10.1086/588585",
+      "url": "https://doi.org/10.1086/588585"
+    },
+    {
+      "id": "peltzman-1975",
+      "authors": [
+        "Sam Peltzman"
+      ],
+      "year": 1975,
+      "title": "The Effects of Automobile Safety Regulation",
+      "journal": "Journal of Political Economy",
+      "volume": "83",
+      "issue": "4",
+      "pages": "677-725",
+      "doi": "10.1086/260352",
+      "url": "https://doi.org/10.1086/260352"
+    },
+    {
+      "id": "keeley-1990",
+      "authors": [
+        "Michael C. Keeley"
+      ],
+      "year": 1990,
+      "title": "Deposit Insurance, Risk, and Market Power in Banking",
+      "journal": "American Economic Review",
+      "volume": "80",
+      "issue": "5",
+      "pages": "1183-1200",
+      "doi": null,
+      "url": "https://ideas.repec.org/a/aea/aecrev/v80y1990i5p1183-1200.html",
+      "verification_note": "Original journal DOI not found in Crossref. RePEc:aea:aecrev:v:80:y:1990:i:5:p:1183-1200. A JSTOR file URL appearing in search results was https://www.jstor.org/stable/2006769, not independently fetched."
+    },
+    {
+      "id": "farhi-tirole-2012",
+      "authors": [
+        "Emmanuel Farhi",
+        "Jean Tirole"
+      ],
+      "year": 2012,
+      "title": "Collective Moral Hazard, Maturity Mismatch, and Systemic Bailouts",
+      "journal": "American Economic Review",
+      "volume": "102",
+      "issue": "1",
+      "pages": "60-93",
+      "doi": "10.1257/aer.102.1.60",
+      "url": "https://doi.org/10.1257/aer.102.1.60"
+    },
+    {
+      "id": "browne-hoyt-2000",
+      "authors": [
+        "Mark J. Browne",
+        "Robert E. Hoyt"
+      ],
+      "year": 2000,
+      "title": "The Demand for Flood Insurance: Empirical Evidence",
+      "journal": "Journal of Risk and Uncertainty",
+      "volume": "20",
+      "issue": "3",
+      "pages": "291-306",
+      "doi": "10.1023/A:1007823631497",
+      "url": "https://doi.org/10.1023/A:1007823631497"
+    },
+    {
+      "id": "raschky-weck-hannemann-2007",
+      "authors": [
+        "Paul A. Raschky",
+        "Hannelore Weck-Hannemann"
+      ],
+      "year": 2007,
+      "title": "Charity Hazard: A Real Hazard to Natural Disaster Insurance?",
+      "journal": "Environmental Hazards",
+      "volume": "7",
+      "issue": "4",
+      "pages": "321-329",
+      "doi": "10.1016/j.envhaz.2007.09.002",
+      "url": "https://doi.org/10.1016/j.envhaz.2007.09.002"
+    },
+    {
+      "id": "edlin-1999",
+      "authors": [
+        "Aaron S. Edlin"
+      ],
+      "year": 1999,
+      "title": "Per-Mile Premiums for Auto Insurance",
+      "journal": "NBER Working Paper",
+      "volume": null,
+      "issue": "6934",
+      "pages": null,
+      "doi": "10.3386/w6934",
+      "url": "https://doi.org/10.3386/w6934",
+      "verification_note": "Working paper, not a journal article. Issued February 1999."
+    },
+    {
+      "id": "icpsr-6439",
+      "authors": [
+        "Joseph P. Newhouse"
+      ],
+      "year": 2005,
+      "title": "RAND Health Insurance Experiment [in Metropolitan and Non-Metropolitan Areas of the United States], 1974-1982",
+      "journal": "ICPSR",
+      "volume": null,
+      "issue": "6439",
+      "pages": null,
+      "doi": "10.3886/ICPSR06439.v1",
+      "url": "https://www.icpsr.umich.edu/web/NACDA/studies/6439",
+      "verification_note": "The ICPSR study page, fetched 16 November 2026, says the public-use files are available to the general public and do not require affiliation with an ICPSR member institution. A free ICPSR account is still typically required. RAND's older instructions page (https://www.rand.org/health/projects/hie/hiedata.html) still mentions possible fees for non-member institutions. Confirm access terms at the time of download."
+    },
+    {
+      "id": "oregon-data",
+      "authors": [
+        "Amy Finkelstein",
+        "Katherine Baicker"
+      ],
+      "year": 2016,
+      "title": "Oregon Health Insurance Experiment Public Use Data",
+      "journal": "NBER",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "doi": null,
+      "url": "https://www.nber.org/research/data/oregon-health-insurance-experiment-data",
+      "verification_note": "NBER hosts public-use data and replication code for Finkelstein et al. (2012, QJE) and later Oregon papers. The download page requires agreement to terms: no identification of subjects, no commercial use, and bibliographic citation of the data. Year listed here is conventional, not a publication year of a paper."
+    },
+    {
+      "id": "fremtpl2",
+      "authors": [
+        "CASdatasets authors (compiled data from an unknown private insurer)"
+      ],
+      "year": 2021,
+      "title": "French Motor Third-Party Liability datasets (freMTPL2freq, freMTPL2sev)",
+      "journal": "CASdatasets",
+      "volume": null,
+      "issue": null,
+      "pages": null,
+      "doi": null,
+      "url": "https://dutangc.github.io/CASdatasets/reference/freMTPL.html",
+      "verification_note": "677,991 policies, roughly 2011-2013, with BonusMalus, ClaimNb, and Exposure. Source stated as an unknown private insurer. Public through the CASdatasets R package documentation. This is not the Chiappori-Salanié 2000 sample, and it has no optional-coverage choice variable."
+    }
+  ],
+  "citations_without_original_journal_doi": [
+    "arrow-1963",
+    "pauly-1968",
+    "arrow-1968",
+    "manning-etal-1987",
+    "raviv-1979",
+    "keeley-1990"
+  ],
+  "notes": [
+    "Citation years, titles, journals, volumes, issues, and pages were checked against publisher, RePEc, Crossref, or official PDF records on 16 November 2026.",
+    "Where no original journal DOI was found, a URL is given instead, and a reprint DOI is labeled as a reprint when used.",
+    "Figures quoted from Manning et al. (1987) come from the paper's abstract as shown on RePEc, not from a re-analysis of the microdata.",
+    "The Chiappori-Salanié (2000) microdata and the Einav-Finkelstein employer microdata are not public.",
+    "Holmstrom is spelled as in the original papers, without a diacritic, in bibliography fields. Prose may use Holmström."
+  ]
+}

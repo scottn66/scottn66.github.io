@@ -44,6 +44,9 @@ exclude = [
   '^https?://([a-z0-9-]+\.)*linkedin\.com',
   # doi.org returns 403 to non-browser clients; that is not a missing DOI.
   '^https?://(dx\.)?doi\.org/',
+  # Econlib (Liberty Fund) is behind Cloudflare and answers a non-browser client
+  # that sends a browser user agent with 403. A plain request returns 200.
+  '^https?://www\.econlib\.org',
   # ResearchGate blocks checkers with 403.
   '^https?://([a-z0-9-]+\.)*researchgate\.net',
   # MDPI blocks checkers with 403.

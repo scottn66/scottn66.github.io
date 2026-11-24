@@ -14,8 +14,11 @@ assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_3.html 5767168
 assets/images/projects/MAB/cum_reg_cmsi_432_ass3_sims_4.html 3932160
 demographics/vendor/plotly-2.35.2.min.js 4718592
 demographics/vendor/topojson/world_50m.json 1310720
+research/moral-hazard/moral-hazard-article.pdf 2097152
 robot-arm-sim/img/bo_evolution.gif 2359296
 robot-arm-sim/img/crawler_race.gif 3407872
 robot-arm-sim/img/pbt_evolution.gif 2097152
 robot-arm-sim/img/q_evolution.gif 1572864
 solar/heatmap/heatmap_ca.html 1310720
+spinpitch/data/magnetic-chains.spr.gz 4718592
+spinpitch/data/magnetization-staircase.spr.gz 1572864
