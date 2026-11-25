@@ -92,6 +92,8 @@ def number_headings(body):
         seen.add(hid)
         if level == "2":
             toc.append((hid, inner))
+        # set the section number apart ("3.7" in the accent color)
+        inner = re.sub(r"^(\d+(?:\.\d+)*\.?)(\s)", r'<span class="secno">\1</span>\2', inner)
         return f'<h{level} id="{hid}">{inner}</h{level}>'
 
     body = re.sub(r"<h([23])>(.*?)</h\1>", fix, body, flags=re.S)
@@ -138,6 +140,12 @@ def tables(body):
     return re.sub(r"<th>", '<th scope="col">', body)
 
 
+def wrap_abstract(body):
+    """Set the abstract apart, as a paper does."""
+    return re.sub(r'(<h2 id="abstract">.*?)(?=<h2 )', r'<section class="abstract">\1</section>\n', body,
+                  count=1, flags=re.S)
+
+
 def references(body):
     m = re.search(r'(<h2 id="references">.*?</h2>)(.*)$', body, flags=re.S)
     if not m:
@@ -174,6 +182,7 @@ def build():
     body = fix_figures(body)
     body = code_blocks(body)
     body = tables(body)
+    body = wrap_abstract(body)
     body = references(body)
 
     leftover = re.findall(r"(?<!\\)\$", re.sub(r'<(div|span) class="math[^>]*>.*?</\1>', "", body, flags=re.S))
@@ -286,8 +295,40 @@ TEMPLATE = """<!DOCTYPE html>
     .references p:first-child{{padding-left:0;text-indent:0;color:var(--muted)}}
     .colophon{{margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;font-size:.85rem;color:var(--muted)}}
     .colophon h2{{border:none;font-size:1.05rem;margin-top:.6rem;padding-top:0}}
+    /* ---- working-paper flavor: the site's frame, a reading face for the paper ----
+       Top bar, contents, badges, captions and table heads keep the site's sans.
+       The article text is set in Source Serif 4 (self-hosted, OFL), which sits
+       well beside KaTeX's book-style math; figures lose the dashboard card. */
+    @font-face{{font-family:'Source Serif 4 Variable';font-style:normal;font-display:swap;font-weight:200 900;
+      src:url(fonts/source-serif-4-latin-opsz-normal.woff2) format('woff2-variations');
+      unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}}
+    @font-face{{font-family:'Source Serif 4 Variable';font-style:italic;font-display:swap;font-weight:200 900;
+      src:url(fonts/source-serif-4-latin-opsz-italic.woff2) format('woff2-variations');
+      unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}}
+    :root{{--serif:'Source Serif 4 Variable','Source Serif 4',Charter,'Iowan Old Style','Palatino Linotype',Georgia,serif;
+      --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+      --bg:#FBFAF7; --ink:#222}}
+    .page{{grid-template-columns:230px minmax(0,700px);max-width:1020px}}
+    main{{font-family:var(--serif);font-size:1.07rem;line-height:1.68;color:var(--ink);font-optical-sizing:auto}}
+    main h1,main h2,main h3{{font-family:var(--sans)}}
+    main h1{{font-weight:700;letter-spacing:-.5px;line-height:1.1}}
+    .secno{{color:var(--accent);margin-right:.08em}}
+    .math.display{{margin:.7rem 0}}
+    .math.display>.katex-display{{margin:0}}
+    main .badges,main .byline,figcaption,th,.callout .k,details.diagram-text summary,.colophon{{font-family:var(--sans)}}
+    .byline{{font-size:.92rem}}
+    .abstract{{font-size:.97em;border-left:3px solid var(--rule);padding:.1rem 0 .1rem 1.1rem;margin:1.2rem 0 0}}
+    .abstract h2{{border:none;margin-top:.2rem;padding-top:0;font-size:1.05rem;font-family:var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}}
+    .abstract p:last-child{{font-size:.92em;color:var(--muted)}}
+    .callout{{box-shadow:none;background:#FFFDF6;font-size:.95rem}}
+    figure .fig-link{{box-shadow:none;border-radius:6px;padding:.6rem}}
+    figcaption{{text-align:left;font-size:.82rem}}
+    table{{font-family:var(--sans)}}
+    .katex{{font-size:1.04em}}
+    .references p{{font-size:.9rem}}
     @media(max-width:880px){{
       .page{{grid-template-columns:minmax(0,1fr);gap:1rem;padding-top:1.2rem}}
+      main{{font-size:1.04rem}}
       h1{{font-size:1.9rem}}
       .toc{{position:static;max-height:none}}
       .toc>nav{{display:none}}
@@ -339,8 +380,9 @@ TEMPLATE = """<!DOCTYPE html>
           <code>scripts/build_moral_hazard_page.py</code>. A letter-size reading copy is the
           <a href="moral-hazard-article.pdf">PDF version</a>. The figures are drawn by the scripts in
           <code>figures/scripts/</code> from the article's stated, illustrative parameters; they are
-          not empirical estimates. Math is typeset with a self-hosted copy of
-          <a href="https://katex.org/">KaTeX</a> 0.16.9. No CDNs, no trackers.</p>
+          not empirical estimates. Text is set in Source Serif 4 (SIL Open Font License,
+          <a href="fonts/OFL.txt">licence</a>) and math in a self-hosted copy of
+          <a href="https://katex.org/">KaTeX</a> 0.16.9, both served from this site. No CDNs, no trackers.</p>
         <p><a href="../../index.html#projects">← back to all projects</a></p>
       </footer>
     </main>
