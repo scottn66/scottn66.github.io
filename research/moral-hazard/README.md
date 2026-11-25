@@ -4,7 +4,10 @@ This folder is a **draft for review**. It is not linked from the live portfolio
 site. Nothing here is wired into site navigation, templates, or widgets.
 
 The article is `article.md`. A letter-size reading render is
-`moral-hazard-article.pdf`. Supporting notes from the research pack
+`moral-hazard-article.pdf`. The web page, `index.html`, is generated from
+`article.md` by `scripts/build_moral_hazard_page.py` (Python-Markdown; math
+typeset by the KaTeX copy in `demographics/vendor/katex`). Edit the markdown and
+rerun the script; do not edit `index.html` by hand. Supporting notes from the research pack
 (`concept-map.md`, `concept-map.json`, `research-plan.md`,
 `existing-coverage.md`, `figures-plan.md`, `self-review.md`) sit alongside it.
 
