@@ -8,7 +8,7 @@ Plotly, and seaborn on 10 years of real Coinbase data.
 
 ## What it covers
 
-Eight analytical lenses, each interactive:
+Seven analytical lenses, each interactive:
 
 1. **Fit & honest inference** — OLS in log-log space, Newey–West (HAC) SEs, and a
    moving-block bootstrap that widens the exponent CI to ≈[4.3, 6.2].
@@ -23,7 +23,8 @@ Eight analytical lenses, each interactive:
    2020–21 cycle, with a strict acceptance filter.
 6. **Structural stability** — rolling exponent + Chow tests at the halvings.
 7. **Risk & deceleration** — diminishing cycle returns as a power-law prediction.
-8. **Honest scorecard** — what survives scrutiny and what doesn't.
+
+Plus an **honest scorecard** — what survives scrutiny and what doesn't.
 
 ## How it stays fresh
 

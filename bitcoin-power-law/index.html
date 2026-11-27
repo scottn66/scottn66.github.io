@@ -128,7 +128,7 @@
 <header class="hero"><div class="wrap">
   <div class="eyebrow">Quantitative Research Note</div>
   <h1>Does Bitcoin follow a <span class="g">power&nbsp;law</span>?<br/>An econometric autopsy.</h1>
-  <p class="lede">Bitcoin's price has tracked a straight line on log–log axes for over a decade — a power law in time. This note interrogates that claim from eight angles: not just <i>does it fit</i>, but <i>does the fit mean anything</i>. Every chart is interactive; every test is reproducible.</p>
+  <p class="lede">Bitcoin's price has tracked a straight line on log–log axes for over a decade — a power law in time. This note interrogates that claim from seven angles: not just <i>does it fit</i>, but <i>does the fit mean anything</i>. Every chart is interactive; every test is reproducible.</p>
   <div class="byline">Built with Python · statsmodels · Plotly · seaborn — on 10 years of real Coinbase data. <span id="gen"></span></div>
   <div class="chips" id="chips"></div>
 </div></header>
@@ -156,7 +156,7 @@
 <section id="fit"><div class="wrap">
   <div class="lenstag"><span class="lensnum">1</span> Lens 1 — Fit &amp; honest inference</div>
   <h2>The exponent is real — but far less precise than it looks</h2>
-  <p class="q">"R² = <span id="pl-r2-full">0.94</span> sounds decisive. What's the actual uncertainty on the exponent?"</p>
+  <p class="q">"R² = <span id="pl-r2-full">0.94</span> (full history, fit on all data) sounds decisive. What's the actual uncertainty on the exponent?"</p>
   <p><b>First, the intuition.</b> A fit's error bars depend on how many <i>independent</i> facts the data really contains. Bitcoin doesn't teleport — today's distance above or below the trend line is almost exactly yesterday's. So ~3,650 daily prices are not 3,650 independent observations; they're more like a few dozen genuinely different "situations," each smeared across weeks of nearly-identical days. The picture below <em>is</em> the whole problem in one frame:</p>
   <div class="grid2">
     <figure><img src="assets/fig_lag.png" alt="Today's deviation versus yesterday's" loading="lazy" width="784" height="616"/>
@@ -170,7 +170,7 @@
   </div>
   <p><b>So what's a more appropriate sampling mechanism?</b> Either thin the data to roughly-independent chunks (sample monthly, not daily), or — better — keep every day but tell the math how correlated it is. The two methods above do exactly that: both shrink the <i>effective</i> sample size and widen the interval honestly, instead of pretending each day is fresh evidence.</p>
   <div class="card"><table id="fittab"></table></div>
-  <p><b>"But how can the residuals be <span id="pl-rho-pct">99.8%</span> autocorrelated and the fit still explain only <span id="pl-r2-cb-pct">86%</span>?"</b> Because those measure different things. R² asks <i>how much of the giant up-and-to-the-right does the trend capture?</i> — almost all of it. Autocorrelation asks <i>how sticky are the leftover wiggles?</i> — extremely. A ball rolling down a long ramp: the ramp explains the journey (high R²), yet the ball's slow side-to-side wobble persists for months (high residual autocorrelation). They coexist happily. And that wobble isn't random noise — it's <b>money supply, halving cycles, ETF flows, regulation, war.</b> The model has <em>one</em> input, time; everything else the world does to Bitcoin lands in the residual. That, ultimately, is why the honest error bars are wide.</p>
+  <p><b>"But how can the residuals be <span id="pl-rho-pct">99.8%</span> autocorrelated and the fit still explain only <span id="pl-r2-cb-pct">86%</span> (Coinbase window, 2016–2026)?"</b> Because those measure different things. R² asks <i>how much of the giant up-and-to-the-right does the trend capture?</i> — almost all of it. Autocorrelation asks <i>how sticky are the leftover wiggles?</i> — extremely. A ball rolling down a long ramp: the ramp explains the journey (high R²), yet the ball's slow side-to-side wobble persists for months (high residual autocorrelation). They coexist happily. And that wobble isn't random noise — it's <b>money supply, halving cycles, ETF flows, regulation, war.</b> The model has <em>one</em> input, time; everything else the world does to Bitcoin lands in the residual. That, ultimately, is why the honest error bars are wide.</p>
   <div class="verdict v-warn">The exponent is genuinely positive and near the literature's ~5.8 — but once you respect the autocorrelation, it's <b><span id="pl-n-coinbase">5.4</span> with a 95% bootstrap interval of roughly <span class="pl-n-ci">[4.3, 6.2]</span></b>, not a three-decimal constant. Any narrative built on a precise exponent is overselling the data.</div>
 </div></section>
 
@@ -307,7 +307,7 @@
         <li>The <b>exponential model is decisively rejected</b> — Bitcoin's doubling time is not constant.</li>
         <li><b>Diminishing cycle returns</b> are internally consistent with a decelerating power law.</li>
         <li>A <b>weak, slow mean reversion</b> to the trend is detectable (~<span id="pl-hl-score">9</span>-month half-life).</li>
-        <li>LPPLS shows <b>real log-periodic structure</b> within bubble episodes (as a hedged diagnostic).</li>
+        <li>LPPLS shows <b>log-periodic structure in one of three cycles; not robust</b> (as a hedged diagnostic).</li>
       </ul>
     </div>
     <div class="card" style="border-color:rgba(248,81,73,.3)">

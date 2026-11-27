@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>From soccer balls to ferrofluids · spinpitch</title>
+  <meta name="description" content="How a 2021 soccer-ball homework grew into a validated molecular-dynamics engine whose spheres spin, carry magnetic dipoles, and link into chains when a field switches on." />
+  <meta name="unit" content="spinpitch-narrative" />
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%233f90da'/><path d='M8 2v12' stroke='%23C9A227' stroke-width='2'/></svg>" />
+  <style>
+    :root {
+      --bg: #FAFAFA; --card-bg: #FFFFFF; --text: #1E1E1E; --muted: #555; --rule: #E5E5EA;
+      --accent: #1F4E9E; --accent-soft: #DCE6F4; --good: #2F7A4A; --warn: #B83A2E; --gold: #C9A227;
+      --code-bg: #F2F2F5; --radius: 12px;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px; line-height: 1.65;
+    }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    .skip { position: absolute; left: -9999px; }
+    .skip:focus { left: 16px; top: 8px; background: var(--card-bg); padding: 6px 10px; z-index: 10; }
+    header.top { border-bottom: 1px solid var(--rule); background: var(--card-bg); }
+    header.top nav { max-width: 760px; margin: 0 auto; padding: 12px 16px; display: flex; gap: 18px; flex-wrap: wrap; font-size: 15px; }
+    main { max-width: 760px; margin: 0 auto; padding: 8px 16px 64px; }
+    h1 { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.15; margin: 40px 0 8px; letter-spacing: -0.01em; }
+    .lede { font-size: 1.15rem; color: var(--muted); margin: 0 0 28px; }
+    h2 { font-size: 1.45rem; margin: 48px 0 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
+    h2 .kicker { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+    figure { margin: 24px 0; background: var(--card-bg); border: 1px solid var(--rule); border-radius: var(--radius); padding: 12px; }
+    figure img { width: 100%; height: auto; display: block; }
+    .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 600px) { .pair { grid-template-columns: 1fr; } }
+    figcaption { font-size: 0.92rem; color: var(--muted); margin-top: 8px; }
+    .eq { overflow-x: auto; background: var(--card-bg); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px 16px; margin: 18px 0; text-align: center; font-size: 1.1rem; }
+    code { font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 5px; }
+    .callout { background: var(--accent-soft); border-radius: var(--radius); padding: 14px 18px; margin: 22px 0; }
+    .cta { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 10px 18px; border-radius: 999px; font-weight: 600; margin: 8px 0; }
+    .cta:hover { filter: brightness(1.1); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; margin: 16px 0; background: var(--card-bg); border-radius: var(--radius); overflow: hidden; }
+    .table-wrap { overflow-x: auto; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    th { background: #F4F5F8; font-weight: 600; }
+    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .pass { color: var(--good); font-weight: 600; }
+    footer { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rule); }
+    @media (max-width: 520px) { body { font-size: 16px; } .eq { font-size: 1rem; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#story">Skip to the story</a>
+  <header class="top">
+    <nav aria-label="Site">
+      <a href="../">← Portfolio</a>
+      <a href="./">Open the player</a>
+      <a href="#validation">How we know it's right</a>
+    </nav>
+  </header>
+  <main id="story">
+    <h1>From soccer balls to ferrofluids</h1>
+    <p class="lede">A 2021 homework rolled soccer balls across a field and asked whether any two would collide. Rebuilding it properly turned a counting exercise into physics: forces instead of overlaps, spheres that spin, magnetic dipoles that pull them into chains, and a test suite that checks every step against theory and published reference data.</p>
+    <a class="cta" href="./">Open the player →</a>
+
+    <h2><span class="kicker">Chapter 1</span>The toy</h2>
+    <p>The original program was small and honest. Each ball is a 4.45-inch disk with a position and a velocity. Every time step it moves by <code>x += v·dt</code>, rolling resistance takes 1% of its speed per second, and a ball that rolls fully over a touchline stops where it is. Before each step the program checks every pair of balls; the first pair closer than two radii ends the game with "Collision occurred between ball <i>i</i> and ball <i>j</i>."</p>
+    <p>That design has one deep flaw, and it is the same flaw every naive simulation has: it only <em>looks</em> at the world at the sample times.</p>
+
+    <h2><span class="kicker">Chapter 2</span>Balls that pass through each other</h2>
+    <p>The course's own test cases expose it. Six balls start on one diagonal. With a time step of 0.01 s the program correctly reports that balls 2 and 3 collide after 7 steps. With a step of 1.234 s it reports balls <em>3 and 5</em>; with 10 s steps and four more balls it reports <em>no collision at all</em>. Balls 2 and 3 are heading straight at each other at a combined 438 inches per second. They can't miss, but between two snapshots they simply swap places.</p>
+    <figure>
+      <img src="img/soccer_tunnelling.png" alt="Distance between balls 2 and 3 over time. The exact trajectory reaches the touching distance at 0.06 seconds; the 0.01 s steps follow it down; a single 1.234 s step jumps from 35 inches apart to 505 inches apart without ever sampling the contact." width="1343" height="952" loading="lazy" />
+      <figcaption>Distance between balls 2 and 3. Small steps catch the contact at 0.06 s; one big step jumps from 35 to 505 inches apart and never sees it. The faint curve shows what happens next when the balls bounce.</figcaption>
+    </figure>
+    <p>The fix is to stop sampling and solve. Every rolling ball slows at the same rate γ = −ln 0.99, so measured from any moment each ball sits at its start point plus its velocity times a common "distance budget"</p>
+    <div class="eq" role="math" aria-label="s of tau equals one minus e to the minus gamma tau, over gamma">
+      <math display="block"><mi>s</mi><mo>(</mo><mi>τ</mi><mo>)</mo><mo>=</mo><mfrac><mrow><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><mi>γ</mi><mi>τ</mi></mrow></msup></mrow><mi>γ</mi></mfrac></math>
+    </div>
+    <p>Two balls touch when their separation reaches two radii, which is a quadratic in <i>s</i>. Its earliest root, written in a form that avoids cancellation, gives the exact contact time; exits over the touchlines and the moment a ball slows below 1 in/s are solved the same way. Event by event, the answer no longer depends on any time step: balls 2 and 3 meet at <b>t = 0.06036266 s</b>, in all three versions of the test. The rebuilt "legacy" mode still reproduces all five of the original outputs exactly, so the old answers and the corrected ones can be shown side by side.</p>
+
+    <h2><span class="kicker">Chapter 3</span>From collisions to forces</h2>
+    <p>Real particles never "detect" collisions. They push on each other continuously. In the new engine every interaction is a potential energy, and forces are its slope. Close contact is a steep but smooth repulsion (the Weeks–Chandler–Andersen form of Lennard-Jones), and motion is integrated with velocity Verlet, a <em>symplectic</em> scheme: its energy error stays bounded instead of drifting, and it shrinks with the square of the step.</p>
+    <figure>
+      <img src="img/energy_drift.png" alt="Log-log plot of energy fluctuation against time step, following a line of slope two." width="817" height="702" loading="lazy" />
+      <figcaption>Halve the step and the energy error drops four-fold: measured ratios 3.90 and 3.95.</figcaption>
+    </figure>
+
+    <h2><span class="kicker">Chapter 4</span>Giving the balls a spin</h2>
+    <p>Each sphere now has an orientation, stored as a unit quaternion, and an angular velocity. Anything that depends on orientation (today, a magnetic dipole fixed in the sphere) is handed to the physics as a vector in space. One identity then turns every energy into torques as well as forces:</p>
+    <div class="eq" role="math" aria-label="torque equals minus the sum over body vectors u of u cross the partial derivative of U with respect to u">
+      <math display="block"><mi mathvariant="bold">τ</mi><mo>=</mo><mo>−</mo><munder><mo>∑</mo><mi mathvariant="bold">u</mi></munder><mi mathvariant="bold">u</mi><mo>×</mo><mfrac><mrow><mo>∂</mo><mi>U</mi></mrow><mrow><mo>∂</mo><mi mathvariant="bold">u</mi></mrow></mfrac></math>
+    </div>
+    <p>The engine is written in PyTorch, so automatic differentiation computes ∂U/∂<b>u</b> and ∂U/∂<b>r</b> for every potential. Adding a new interaction means writing one energy function; tests confirm the forces and torques against finite differences to better than one part in a hundred million.</p>
+
+    <h2><span class="kicker">Chapter 5</span>Spin you can see: billiards</h2>
+    <p>Before the spins get magnetic, a detour back to the table the project started from, now with real balls. A pool ball struck by the cue <i>slides</i>: the cloth rubs at its contact point until the spin catches up with the speed, and from then on it <i>rolls</i>. Hit it low and it carries backspin (draw), high and it carries topspin (follow), off-center and it spins about the vertical (english). Sliding friction obeys one tidy law: the speed plus two-fifths of the spin's rim speed stays fixed until the ball rolls. Everything a pool player calls a rule follows from it.</p>
+    <div class="eq" role="math" aria-label="v plus two fifths R omega cross z-hat is conserved while sliding; the rolling speed after a stroke at height h is five sevenths times one plus h times v zero">
+      <math display="block"><mi mathvariant="bold">v</mi><mo>+</mo><mfrac><mn>2</mn><mn>5</mn></mfrac><mi>R</mi><mspace width="0.1em"/><mi mathvariant="bold">ω</mi><mo>×</mo><mover><mi mathvariant="bold">z</mi><mo>^</mo></mover><mo>=</mo><mtext>const</mtext><mspace width="2em"/><msub><mi>v</mi><mtext>roll</mtext></msub><mo>=</mo><mfrac><mn>5</mn><mn>7</mn></mfrac><mo>(</mo><mn>1</mn><mo>+</mo><mi>h</mi><mo>)</mo><msub><mi>v</mi><mn>0</mn></msub></math>
+    </div>
+    <p>The simulator keeps the soccer chapter's lesson: it never steps through time. Within each kind of motion a ball's position is a quadratic in time, so every collision, cushion hit and pocket drop is the exact root of a polynomial (a quartic for two balls). Balls cannot tunnel, and each collision is computed at the instant the balls touch.</p>
+    <figure>
+      <img src="img/billiards_rules.png" alt="Left: simulated deflection angles of a rolling cue ball lie exactly on the theoretical curve against cut angle, peaking at 33.7 degrees for a half-ball hit. Right: cue ball speed against time for draw, stun, follow and natural-roll strokes, each sliding and then rolling at five sevenths of one plus h times the starting speed." width="1636" height="794" loading="lazy" />
+      <figcaption>Two textbook results, reproduced to nine decimal places. Left: the "30° rule" for a rolling cue ball. Right: slide, then roll, at a speed set by where the tip struck.</figcaption>
+    </figure>
+    <p>Then the fun part. Could one stroke sink every ball? From a normal rack, essentially never. But the layout can be <i>designed</i>: a search with the simulator in the loop builds a domino chain in which the cue ball strikes ball 1, each ball knocks the next one on and peels off into a pocket, and the last ball drops too: six balls, six pockets. Each placement is found by scanning the cut angle with exact physics, spin and all, and taking the middle of the window that works; the whole layout counts only if the full simulation reproduces every planned contact.</p>
+    <figure>
+      <img src="img/billiards_chain.png" alt="Top view of the table. The cue ball comes down from the upper left and clips ball 1; balls 1 to 6 sit in a line along the bottom of the table, and each one's path runs from its spot into a different pocket, balls 2 and 3 after banking off the bottom cushion. The cue ball draws back off two cushions and stops near the middle." width="1373" height="813" loading="lazy" />
+      <figcaption>One stroke at 5.5 m/s with draw. The cue ball clips ball 1 and the chain fires in half a second: each ball knocks the next one on and peels off, balls 2 and 3 banking off the bottom cushion. All six pockets fill within 3.2 seconds (4 first, 5 last) while the cue ball comes back off two cushions to rest mid-table. Every cut in the chain could be off by up to 0.9° either way and still drop its ball.</figcaption>
+    </figure>
+    <p class="callout">Watch it in 3D: numbered balls rolling and spinning on the table, the cue ball's dots turning as it slides and grips, energy and slip plots, every contact in the event log. <a href="./#run=billiards-chain-reaction.spr.gz">Open the trick shot →</a></p>
+
+    <h2><span class="kicker">Chapter 6</span>Magnetism, measured</h2>
+    <p>Two dimensionless numbers describe magnetic spheres in a warm bath. The coupling <b>λ</b> compares the attraction of two touching dipoles with thermal energy; the field strength <b>α</b> compares a dipole's energy in the field with thermal energy:</p>
+    <div class="eq" role="math" aria-label="lambda equals m squared over sigma cubed k T; alpha equals m B over k T">
+      <math display="block"><mi>λ</mi><mo>=</mo><mfrac><msup><mi>m</mi><mn>2</mn></msup><mrow><msup><mi>σ</mi><mn>3</mn></msup><mi>k</mi><mi>T</mi></mrow></mfrac><mspace width="2em"/><mi>α</mi><mo>=</mo><mfrac><mrow><mi>m</mi><mi>B</mi></mrow><mrow><mi>k</mi><mi>T</mi></mrow></mfrac></math>
+    </div>
+    <p>For independent dipoles, statistical mechanics predicts exactly how much they line up with a field: the Langevin function <i>L</i>(α) = coth α − 1/α. Thousands of simulated spinning dipoles, kept at temperature by rotational Langevin dynamics, land on that curve within statistical error at every field tested.</p>
+    <figure>
+      <img src="img/langevin.png" alt="The Langevin function curve with simulated points lying on it at alpha equal to 0.5, 1, 2, 5 and 10." width="788" height="702" loading="lazy" />
+      <figcaption>Theory (line) and simulation (points) for dipoles in a field.</figcaption>
+    </figure>
+    <figure>
+      <img src="img/staircase.png" alt="Magnetization stepping up through five field plateaus, tracking the Langevin prediction on each plateau." width="1133" height="671" loading="lazy" />
+      <figcaption>Weakly coupled spheres (λ = 1) on a field staircase follow the independent-dipole prediction plateau by plateau.</figcaption>
+    </figure>
+
+    <h2><span class="kicker">Chapter 7</span>Chains</h2>
+    <p>Turn the coupling up to λ = 6 and the spheres stop behaving independently. Head-to-tail contact is worth 12 kT, so dipoles snap together into wandering chains and closed rings even with no field at all. At t = 20 the field ramps on. Within a few time units the rings open, the chains swing into line, and nine in ten spheres end up in field-aligned chains averaging 15 spheres long. The magnetization overshoots what independent dipoles could manage (0.88 against 0.80), because the chains help each other along.</p>
+    <figure>
+      <div class="pair">
+        <img src="img/ovito_chains_n512_t015.png" alt="Before the field: 512 spheres tangled into curling chains and closed rings, colored by the length of the chain each belongs to." width="1600" height="1000" loading="lazy" />
+        <img src="img/ovito_chains_n512_t150.png" alt="With the field on: the same spheres stand in long vertical chains aligned with the field." width="1600" height="1000" loading="lazy" />
+      </div>
+      <figcaption>The same 512 spheres before the field (t = 15, left: chains curl and close into rings) and long after it switches on (t = 150, right: chains stand along the field, which points up). Color is chain length, from dark (free) through teal to yellow (24 or more). Rendered offline with OVITO from the run's GSD trajectory.</figcaption>
+    </figure>
+    <figure>
+      <img src="img/chains.png" alt="Left: fraction of spheres in chains rises to about 0.9 while rings vanish after the field turns on. Right: chain alignment and magnetization both rise to about 0.9 after t equals 20." width="1315" height="671" loading="lazy" />
+      <figcaption>512 spheres, 150 time units, 3.6 minutes on a laptop. The gold band marks the field ramp.</figcaption>
+    </figure>
+    <p class="callout">Watch it happen: the player shows every sphere's dipole as a cone and a marker on its surface turning as it spins. Color them by orientation, by alignment with the field, or by the length of the chain they belong to. <a href="./">Open the player →</a></p>
+
+    <h2 id="validation"><span class="kicker">Evidence</span>How we know it's right</h2>
+    <p>Every claim above is a test that runs on each change. Selected results (float64 on the CPU):</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Check</th><th>Requirement</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Forces and torques against finite differences</td><td>&lt; 10⁻⁶ relative</td><td class="num pass">3.6 × 10⁻⁹</td></tr>
+          <tr><td>NIST Lennard-Jones reference energies and virials (12 cases)</td><td>all 5 published digits</td><td class="num pass">12 / 12</td></tr>
+          <tr><td>Energy error vs. time step (velocity Verlet)</td><td>∝ dt² (ratio ≈ 4)</td><td class="num pass">3.90, 3.95</td></tr>
+          <tr><td>Total angular momentum, orbital + spin, over 10⁴ steps</td><td>&lt; 10⁻¹⁰</td><td class="num pass">1.2 × 10⁻¹²</td></tr>
+          <tr><td>Run backwards to the start after 1000 steps</td><td>&lt; 10⁻⁸ σ</td><td class="num pass">1.5 × 10⁻¹⁴ σ</td></tr>
+          <tr><td>Dipoles in a field vs. the Langevin function</td><td>within 3σ at 5 fields</td><td class="num pass">≤ 1.1σ</td></tr>
+          <tr><td>Translational vs. rotational temperature</td><td>both within 2% of target</td><td class="num pass">1.003, 1.001</td></tr>
+          <tr><td>Soccer: original outputs; exact contact times</td><td>exact; 50-digit cross-check</td><td class="num pass">5 / 5; 10⁻¹²</td></tr>
+          <tr><td>Billiards: 5/7 rolling speed; 30° rule for a rolling cue ball</td><td>closed forms</td><td class="num pass">10⁻¹²; 10⁻⁹ °</td></tr>
+          <tr><td>Billiards: contacts exact, no ball escapes (12 random breaks)</td><td>&lt; 10⁻⁹ m</td><td class="num pass">pass</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2><span class="kicker">Next</span>Molecules as graphs</h2>
+    <p>The spheres are the first step. Next, atoms become nodes and bonds become edges of a graph, from which every bond angle, torsion and exclusion follows automatically: hydrogen, nitrogen, oxygen, carbon dioxide, water. After that come rigid multi-site molecules, Ewald sums for charges and dipoles in periodic boxes (checked against NIST's water reference energies), a live mode with sliders for field and temperature, and machine-learned potentials. The engine was built so each of these is a new energy term, not a rewrite.</p>
+    <a class="cta" href="./">Open the player →</a>
+  </main>
+  <footer>
+    spinpitch · Python + PyTorch engine (MIT licensed), three.js + uPlot player. Nothing on this page loads from the network.
+  </footer>
+</body>
+</html>
